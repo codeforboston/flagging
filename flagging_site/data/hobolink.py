@@ -39,9 +39,6 @@ def get_hobolink_data(export_name: str = EXPORT_NAME) -> pd.DataFrame:
     """This function runs through the whole process for retrieving data from
     HOBOlink: first we perform the request, and then we clean the data.
 
-    :param export_name:
-    :return: Pandas DataFrame containing HOBOlink data.
-
     Args:
         export_name: (str) Name of the "export." On the Hobolink web dashboard,
                      go to Data > Exports and choose a name off the list.
@@ -79,11 +76,13 @@ def request_to_hobolink(
 
 def parse_hobolink_data(res: str) -> pd.DataFrame:
     """
-    Clean the response from the API.
+    Clean the response from the HOBOlink API.
 
-    :param res: A string of the text received from the post request to the
-                HOBOlink API from a successful request.
-    :return: Pandas DataFrame containing HOBOlink data.
+    Args:
+        res: (str) A string of the text received from the post request to the
+             HOBOlink API from a successful request.
+    Returns:
+        Pandas DataFrame containing the HOBOlink data.
     """
     # TODO:
     #  The first half of the output is a yaml-formatted text stream. Is there

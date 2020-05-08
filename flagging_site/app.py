@@ -10,8 +10,10 @@ def create_app(config: ClassVar = None) -> Flask:
     """Create and configure an instance of the Flask application.
 
     Args:
-        config: Can be either a string such as `config.BaseConfig`, or the
-                actual object itself.
+        config: (ClassVar) Can be either a string such as `config.BaseConfig`,
+                or the actual object itself.
+    Returns:
+        The fully configured Flask app instance.
     """
     app = Flask(__name__, instance_relative_config=True)
 
