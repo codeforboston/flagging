@@ -8,8 +8,6 @@ This code base is built in Python and utilizes the Flask library heavily.
 
 Please visit the [Flagging Website wiki](https://github.com/codeforboston/flagging/wiki) for on-boarding documents, code style guide, development updates, and more.
 
-Note: I _strongly_ recommend using a full-featured IDE for work on this project, as you'll likely want to have multiple terminals and `py` files open simultaneously. [PyCharm](https://www.jetbrains.com/pycharm/) and [Visual Studio Code](https://code.visualstudio.com/) are two very good IDEs that work well with this workflow.
-
 ## Setup
 
 These are the steps to set the code up in development mode.
