@@ -2,7 +2,7 @@
 
 This is the code base for the [Charles River Watershed Association's](https://crwa.org/) ("CRWA") flagging website. The flagging website hosts an interface for the CRWA's staff to monitor the outputs of a predictive model that determines whether it is reasonably safe to swim or boat in the Charles River.
 
-This code base is built in Python and utilizes the Flask library heavily.
+This code base is built in Python 3.7+ and utilizes the Flask library heavily.
 
 ## For Developers
 

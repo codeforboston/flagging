@@ -105,4 +105,7 @@ def parse_hobolink_data(res: str) -> pd.DataFrame:
     # timestamps, which only include the battery status.)
     df = df.loc[df['water_temp'].notna(), :]
 
+    # Convert time column to Pandas datetime
+    df['time'] = pd.to_datetime(df['time'])
+
     return df

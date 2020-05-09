@@ -10,6 +10,7 @@ setup(
     version='0.0.1',
     packages=find_packages(),
     author='Code for Boston',
+    python_requires='>=3.7.1',
     maintainer='Charles River Watershed Association',
     include_package_data=True,
     tests_require=[],
