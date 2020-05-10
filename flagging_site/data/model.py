@@ -115,14 +115,6 @@ def reach_2_model(df: pd.DataFrame) -> pd.DataFrame:
 
 def reach_3_model(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
-    # $lg_R3 =
-    # 1.4144+
-    # 0.0255*($wtmpD1*9/5+32)
-    # -0.0007*$parD2
-    # +0.0009*24*$daysset[$x]
-    # -0.3022*log($daysset[$x]*24+0.0001)
-    # +0.0015*$flowD2
-    # -0.3957*log($flowD2)
     df['r3_out'] = (
         1.4144
         + 0.0255 * (df['water_temp_1d_mean'] * 9/5 + 32)

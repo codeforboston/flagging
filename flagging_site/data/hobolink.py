@@ -9,7 +9,6 @@ formatting of the data that we receive from it.
 import pandas as pd
 import requests
 import io
-from typing import Dict
 from .keys import get_keys, HTTPException
 
 
