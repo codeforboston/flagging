@@ -1,13 +1,16 @@
 function get_python_exec() {
   # Get a Python executable that can run this app.
-  pyver=`python3 -V | cut -b 8-`
-  major=`echo ${pyver} | cut -d. -f1`
-  minor=`echo ${pyver} | cut -d. -f2`
-  # If python3 is 3.7+, then use that. Else, attempt to use "python3.7"
-  if [ ${major} == 3 ] && [ ${minor} -ge 7 ]; then
-    pyexec="python3"; else
-    pyexec="python3.7"; fi
-  echo ${pyexec}
+  for pyexec in "python" "python3" "python3.7"
+  do
+    pyver=`${pyexec} -V | cut -b 8-`
+    major=`echo ${pyver} | cut -d. -f1`
+    minor=`echo ${pyver} | cut -d. -f2`
+    # If python3 is 3.7+, then use that. Else, attempt to use "python3.7"
+    if [ ${major} == 3 ] && [ ${minor} -ge 7 ]; then
+      echo ${pyexec}
+      break
+    fi
+  done
 }
 
 # Get proper Python executable
