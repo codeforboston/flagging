@@ -19,6 +19,7 @@ PYEXEC=$(get_python_exec)
 
 # Set up virtual environment in /venv
 $PYEXEC -m venv venv
+source venv/bin/activate
 $PYEXEC -m pip install -r requirements.txt
 
 # Set up and run the Flask application
