@@ -148,6 +148,7 @@ def reach_4_model(df: pd.DataFrame) -> pd.DataFrame:
         .tail(n=24)
     )
 
+
 def reach_5_model(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
     df['r5_lg'] = (
