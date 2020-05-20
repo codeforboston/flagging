@@ -26,5 +26,5 @@ $PYEXEC -m pip install -r requirements.txt
 export FLASK_APP=flagging_site
 export FLASK_ENV=development
 read -p "Enter vault password: " vault_pw
-export VAULT_PASSWORD=${VAULT_PASSWORD}
+export VAULT_PASSWORD=${vault_pw}
 flask run
