@@ -64,13 +64,16 @@ def update_config_from_vault(app: Flask) -> None:
     """
     try:
         app.config['KEYS'] = get_keys()
-        app.config['SECRET_KEY'] = app.config['KEYS']['flask']['secret_key']
-    except RuntimeError:
+    except (RuntimeError, KeyError):
         msg = 'Unable to load the vault; bad password provided.'
         if app.env == 'production':
             raise RuntimeError(msg)
         else:
             print(f'Warning: {msg}')
+            app.config['KEYS'] = None
+            app.config['SECRET_KEY'] = None
+    else:
+        app.config['SECRET_KEY'] = app.config['KEYS']['flask']['secret_key']
 
 
 if __name__ == '__main__':
