@@ -7,6 +7,7 @@ https://waterdata.usgs.gov/nwis/uv?site_no=01104500
 """
 import pandas as pd
 import requests
+from .keys import HTTPException
 
 # Constants
 USGS_URL = 'https://waterservices.usgs.gov/nwis/iv/'
@@ -26,8 +27,7 @@ def get_usgs_data() -> pd.DataFrame:
     return df
 
 
-def request_to_usgs(
-) -> requests.models.Response:
+def request_to_usgs() -> requests.models.Response:
     """
     Get a request from the USGS.
 
@@ -44,6 +44,8 @@ def request_to_usgs(
     }
     
     res = requests.get(USGS_URL, params=payload)
+    if res.status_code // 100 in [4, 5]:
+        raise HTTPException(res.status_code)
     return res
 
 
