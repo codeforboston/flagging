@@ -7,13 +7,12 @@ https://waterdata.usgs.gov/nwis/uv?site_no=01104500
 """
 import pandas as pd
 import requests
-import numpy as np
 
 # Constants
 USGS_URL = 'https://waterservices.usgs.gov/nwis/iv/'
-USGS_COLUMNS = ['Timestamp', 'Discharge Volume', 'Gage height']
 
 # ~ ~ ~ ~
+
 
 def get_usgs_data() -> pd.DataFrame:
     """This function  runs through the whole process for retrieving data from
@@ -47,6 +46,7 @@ def request_to_usgs(
     res = requests.get(USGS_URL, params=payload)
     return res
 
+
 def parse_usgs_data(res) -> pd.DataFrame:
     """
     Clean the response from the USGS API.
@@ -60,18 +60,19 @@ def parse_usgs_data(res) -> pd.DataFrame:
 
     raw_data = res.json()
 
-    df = pd.DataFrame.from_dict(raw_data)
-
     discharge_volume = raw_data['value']['timeSeries'][0]['values'][0]['value']
     gage_height = raw_data['value']['timeSeries'][1]['values'][0]['value']
 
     data_list = [
-        [vol_entry['dateTime'], vol_entry['value'], height_entry['value']] 
-        for [vol_entry, height_entry] in zip (discharge_volume, gage_height)
+        {
+            'timestamp': vol_entry['dateTime'],
+            'discharge_volume': vol_entry['value'],
+            'gage_height': height_entry['value']
+        }
+        for vol_entry, height_entry
+        in zip(discharge_volume, gage_height)
     ]
 
-    data_2d_array = np.array(data_list)
-    
-    df = pd.DataFrame(data_2d_array, columns = USGS_COLUMNS)
+    df = pd.DataFrame(data_list)
 
     return df
