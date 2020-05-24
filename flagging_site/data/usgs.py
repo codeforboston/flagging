@@ -69,7 +69,9 @@ def parse_usgs_data(res) -> pd.DataFrame:
         [vol_entry['dateTime'], vol_entry['value'], height_entry['value']] 
         for [vol_entry, height_entry] in zip (discharge_volume, gage_height)
     ]
+
     data_2d_array = np.array(data_list)
+    
     df = pd.DataFrame(data_2d_array, columns = USGS_COLUMNS)
 
     return df
