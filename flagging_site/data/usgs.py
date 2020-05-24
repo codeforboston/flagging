@@ -74,5 +74,6 @@ def parse_usgs_data(res) -> pd.DataFrame:
     ]
 
     df = pd.DataFrame(data_list)
+    df['timestamp'] = pd.to_datetime(df['timestamp']).dt.tz_convert(None)
 
     return df
