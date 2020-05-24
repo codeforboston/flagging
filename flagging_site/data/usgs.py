@@ -2,15 +2,16 @@
 This file handles connections to the USGS API to retrieve data from the Waltham
 gauge.
 
+Link  to the web interface (not the api) 
 https://waterdata.usgs.gov/nwis/uv?site_no=01104500
 """
 import pandas as pd
 import requests
-import io
+import numpy as np
 
 # Constants
-USGS_URL = 'https://waterdata.usgs.gov/nwis/uv?site_no=01104500'
-# Each key is the original column name; the value is the renamed column.
+USGS_URL = 'https://waterservices.usgs.gov/nwis/iv/'
+USGS_COLUMNS = ['Timestamp', 'Discharge Volume', 'Gage height']
 
 # ~ ~ ~ ~
 
@@ -35,13 +36,20 @@ def request_to_usgs(
         Request Response containing the data from the request.
     """
     
-    res = requests.get('https://waterservices.usgs.gov/nwis/iv/?format=json&sites=01104500&period=P7D&parameterCd=00060,00065&siteStatus=all')
-
+    payload = {
+        'format': 'json',
+        'sites': '01104500',
+        'period': 'P7D',
+        'parameterCd': '00060,00065',
+        'siteStatus': 'all'
+    }
+    
+    res = requests.get(USGS_URL, params=payload)
     return res
 
 def parse_usgs_data(res) -> pd.DataFrame:
     """
-    Clean the response from the HOBOlink API.
+    Clean the response from the USGS API.
 
     Args:
         res: response object from USGS
@@ -50,21 +58,18 @@ def parse_usgs_data(res) -> pd.DataFrame:
         Pandas DataFrame containing the usgs data.
     """
 
-    json = res.json()
-    time_list = []
-    volume_list = []
-    height_list = []
+    raw_data = res.json()
 
-    for time_data in json['value']['timeSeries'][0]['values'][0]['value']:
-        time_list.append(time_data['dateTime'])
+    df = pd.DataFrame.from_dict(raw_data)
 
-    for vol_data in json['value']['timeSeries'][0]['values'][0]['value']:
-        volume_list.append(vol_data['value'])
+    discharge_volume = raw_data['value']['timeSeries'][0]['values'][0]['value']
+    gage_height = raw_data['value']['timeSeries'][1]['values'][0]['value']
 
-    for height_data in json['value']['timeSeries'][1]['values'][0]['value']:
-        height_list.append(height_data['value'])
-
-    df = pd.DataFrame(list(zip(time_list, volume_list, height_list)),
-        columns =['Time', 'Discharge Volume', 'Gage height'])
+    data_list = [
+        [vol_entry['dateTime'], vol_entry['value'], height_entry['value']] 
+        for [vol_entry, height_entry] in zip (discharge_volume, gage_height)
+    ]
+    data_2d_array = np.array(data_list)
+    df = pd.DataFrame(data_2d_array, columns = USGS_COLUMNS)
 
     return df
