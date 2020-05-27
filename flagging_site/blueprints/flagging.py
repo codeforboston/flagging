@@ -1,5 +1,5 @@
 import pandas as pd
-from flask import Blueprint
+from flask import Blueprint, render_template
 from flagging_site.data.hobolink import get_hobolink_data
 from flagging_site.data.usgs import get_usgs_data
 from flagging_site.data.model import (
@@ -38,9 +38,10 @@ def output_model() -> str:
     df_hobolink = get_hobolink_data('code_for_boston_export_21d')
     df_usgs = get_usgs_data()
     df = process_data(df_hobolink, df_usgs)
-    return '<br /><br />'.join(map(stylize_model_output, [
+    table_html = '<br /><br />'.join(map(stylize_model_output, [
         reach_2_model(df),
         reach_3_model(df),
         reach_4_model(df),
         reach_5_model(df)
     ]))
+    return render_template('flags.html', tables=table_html)
