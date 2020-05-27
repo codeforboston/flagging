@@ -67,8 +67,8 @@ def parse_usgs_data(res) -> pd.DataFrame:
 
     data_list = [
         {
-            'timestamp': vol_entry['dateTime'],
-            'discharge_volume': vol_entry['value'],
+            'time': vol_entry['dateTime'],
+            'stream_flow': vol_entry['value'],
             'gage_height': height_entry['value']
         }
         for vol_entry, height_entry
@@ -76,6 +76,16 @@ def parse_usgs_data(res) -> pd.DataFrame:
     ]
 
     df = pd.DataFrame(data_list)
-    df['timestamp'] = pd.to_datetime(df['timestamp']).dt.tz_convert(None)
+    try:
+        # Not time zone aware
+        df['time'] = (
+            pd.to_datetime(df['time'])  # Convert to Pandas datetime format
+            .dt.tz_localize('UTC')  # This is UTC; define it as such
+            .dt.tz_convert('US/Eastern')  # Take the UTC time and convert to EST
+            .dt.tz_localize(None)  # Remove the timezone from the datetime
+        )
+    except TypeError:
+        # Now try if already timezone aware
+        df['time'] = pd.to_datetime(df['time']).dt.tz_localize(None)
 
     return df
