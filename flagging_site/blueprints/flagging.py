@@ -28,12 +28,11 @@ def stylize_model_output(df: pd.DataFrame):
     )
 
 
+# @bp.route('/')
+# def index() -> str:
+#     return 'Hello World!'
+
 @bp.route('/')
-def index() -> str:
-    return 'Hello, world!'
-
-
-@bp.route('/output_model')
 def output_model() -> str:
     df_hobolink = get_hobolink_data('code_for_boston_export_21d')
     df_usgs = get_usgs_data()
@@ -44,4 +43,17 @@ def output_model() -> str:
         reach_4_model(df),
         reach_5_model(df)
     ]))
-    return render_template('flags.html', tables=table_html)
+    return render_template('base.html', tables=table_html)
+
+# @bp.route('/output_model')
+# def output_model() -> str:
+#     df_hobolink = get_hobolink_data('code_for_boston_export_21d')
+#     df_usgs = get_usgs_data()
+#     df = process_data(df_hobolink, df_usgs)
+#     table_html = '<br /><br />'.join(map(stylize_model_output, [
+#         reach_2_model(df),
+#         reach_3_model(df),
+#         reach_4_model(df),
+#         reach_5_model(df)
+#     ]))
+#     return render_template('flags.html', tables=table_html)

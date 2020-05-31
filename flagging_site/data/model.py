@@ -113,7 +113,7 @@ def process_data(
         .fillna(df['time'].min())
     )
     df['days_since_sig_rain'] = (
-            (df['time'] - df['last_sig_rain']).dt.seconds / 60 / 60 / 24
+        (df['time'] - df['last_sig_rain']).dt.seconds / 60 / 60 / 24
     )
 
     return df
@@ -142,8 +142,10 @@ def reach_2_model(df: pd.DataFrame) -> pd.DataFrame:
     df['r2_sigmoid'] = sigmoid(df['r2_out'])
     df['r2_safe'] = df['r2_sigmoid'] <= SAFETY_THRESHOLD
     return (
-        df[['time', 'r2_out', 'r2_sigmoid', 'r2_safe']]
-        .tail(n=24)
+        # df[['time', 'r2_out', 'r2_sigmoid', 'r2_safe']]
+        df[['r2_safe']]
+        # .tail(n=24)
+        .tail(n=1)
     )
 
 
@@ -170,8 +172,10 @@ def reach_3_model(df: pd.DataFrame) -> pd.DataFrame:
     df['r3_sigmoid'] = sigmoid(df['r3_out'])
     df['r3_safe'] = df['r3_sigmoid'] <= SAFETY_THRESHOLD
     return (
-        df[['time', 'r3_out', 'r3_sigmoid', 'r3_safe']]
-        .tail(n=24)
+        # df[['time', 'r3_out', 'r3_sigmoid', 'r3_safe']]
+        df[['r3_safe']]
+        .tail(n=1)
+        # .tail(n=24)
     )
 
 
@@ -200,8 +204,10 @@ def reach_4_model(df: pd.DataFrame) -> pd.DataFrame:
     df['r4_sigmoid'] = sigmoid(df['r4_out'])
     df['r4_safe'] = df['r4_sigmoid'] <= SAFETY_THRESHOLD
     return (
-        df[['time', 'r4_out', 'r4_sigmoid', 'r4_safe']]
-        .tail(n=24)
+        # df[['time', 'r4_out', 'r4_sigmoid', 'r4_safe']]
+        df[['r4_safe']]
+        .tail(n=1)
+        # .tail(n=24)
     )
 
 
@@ -228,6 +234,8 @@ def reach_5_model(df: pd.DataFrame) -> pd.DataFrame:
     df['r5_sigmoid'] = sigmoid(df['r5_out'])
     df['r5_safe'] = df['r5_sigmoid'] <= SAFETY_THRESHOLD
     return (
-        df[['time', 'r5_out', 'r5_sigmoid', 'r5_safe']]
-        .tail(n=24)
+        # df[['time', 'r5_out', 'r5_sigmoid', 'r5_safe']]
+        df[['r5_safe']]
+        .tail(n=1)
+        # .tail(n=24)
     )
