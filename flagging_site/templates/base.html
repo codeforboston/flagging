@@ -1,37 +1,43 @@
 <!DOCTYPE html>
-<title>{% block title %}{% endblock %} - Water Quality Flagging Program ( 5/29/2020 ) </title>
+<title>
+    {% block title %} Charles River Water Quality Projections {% endblock %}
+</title>
 <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
-
-
 
 <section class="content">
     <header>
-        {% block header %}{% endblock %}
+        {% block header %} Water Quality Flagging Program ( 5/29/2020 ) {% endblock
+    %}
     </header>
 
+    <img src="../images/CRWA_banner_main.jpg" />
+    <p>
+        The following predicted concentrations of Fecal Indicator Bacteria (FIB) are
+        based on modeled correlations between FIB and weather or water conditions.
+    </p>
+    <p>
+        Flagging is based on safety thresholds for boating. The weather and water
+        data is sourced from the CESN weather station at Community Boating and the
+        USGS Waltham river flow gauge.
+    </p>
+    <p>
+        Currently the predictions are only based on
+        one year of historical statistics. An ideal model would include 2-3 years of
+        history. New models will be developed in future years as more data is
+        collected.
+    </p>
+    <p>
+        Click here for a full description of this bacteria forecasting
+        project.
 
-    {{banner here}}
-    """
+        Water quality flags, with forecasted E.coli concentrations and
+        probabilities (updated hourly):
+    </p>
 
+    {% block body %} {{ tables|safe }}
 
-
-    The following predicted concentrations of Fecal Indicator Bacteria (FIB) are based on modeled correlations between
-    FIB
-    and weather or water conditions. Flagging is based on safety thresholds for boating. The weather and water data is
-    sourced from the CESN weather station at Community Boating and the USGS Waltham river flow gauge. Currently the
-    predictions are only based on one year of historical statistics. An ideal model would include 2-3 years of history.
-    New
-    models will be developed in future years as more data is collected. Click here for a full description of this
-    bacteria
-    forecasting project.
-
-    Water quality flags, with forecasted E.coli concentrations and probabilities (updated hourly):
-    """
-    {% endfor %}
-
-    {% block body %}
-
-    {{ tables|safe }}
+    <img src="../images/red_flag.jpg" />
+    <img src="../images/blue_flag.jpg" />
 
     {% endblock %}
 </section>
