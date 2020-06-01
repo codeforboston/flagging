@@ -119,7 +119,7 @@ def process_data(
     return df
 
 
-def reach_2_model(df: pd.DataFrame) -> pd.DataFrame:
+def reach_2_model(df: pd.DataFrame, rows: int = 24) -> pd.DataFrame:
     """Model params:
     a- rainfall sum 0-24 hrs
     d- Days since last rain
@@ -132,7 +132,8 @@ def reach_2_model(df: pd.DataFrame) -> pd.DataFrame:
     Returns:
         Outputs for model as a dataframe.
     """
-    df = df.copy()
+    df = df.tail(n=rows).copy()
+
     df['r2_out'] = (
         0.6233
         + 0.3531 * df['rain_0_to_24h_sum']
@@ -141,15 +142,10 @@ def reach_2_model(df: pd.DataFrame) -> pd.DataFrame:
     )
     df['r2_sigmoid'] = sigmoid(df['r2_out'])
     df['r2_safe'] = df['r2_sigmoid'] <= SAFETY_THRESHOLD
-    return (
-        # df[['time', 'r2_out', 'r2_sigmoid', 'r2_safe']]
-        df[['r2_safe']]
-        # .tail(n=24)
-        .tail(n=1)
-    )
+    return df[['time', 'r2_out', 'r2_sigmoid', 'r2_safe']]
 
 
-def reach_3_model(df: pd.DataFrame) -> pd.DataFrame:
+def reach_3_model(df: pd.DataFrame, rows: int = 24) -> pd.DataFrame:
     """
     a- rainfall sum 0-24 hrs
     b- rainfall sum 24-48 hr
@@ -162,24 +158,22 @@ def reach_3_model(df: pd.DataFrame) -> pd.DataFrame:
     Returns:
         Outputs for model as a dataframe.
     """
-    df = df.copy()
+
+    df = df.tail(n=rows).copy()
+
     df['r3_out'] = (
         0.5157
         + 0.267 * df['rain_0_to_24h_sum']
         + 0.1681 * df['rain_24_to_48h_sum']
         - 0.02855 * df['days_since_sig_rain']
     )
+
     df['r3_sigmoid'] = sigmoid(df['r3_out'])
     df['r3_safe'] = df['r3_sigmoid'] <= SAFETY_THRESHOLD
-    return (
-        # df[['time', 'r3_out', 'r3_sigmoid', 'r3_safe']]
-        df[['r3_safe']]
-        .tail(n=1)
-        # .tail(n=24)
-    )
+    return df[['time', 'r3_out', 'r3_sigmoid', 'r3_safe']]
 
 
-def reach_4_model(df: pd.DataFrame) -> pd.DataFrame:
+def reach_4_model(df: pd.DataFrame, rows: int = 24) -> pd.DataFrame:
     """
     a- rainfall sum 0-24 hrs
     b- rainfall sum 24-48 hr
@@ -193,7 +187,7 @@ def reach_4_model(df: pd.DataFrame) -> pd.DataFrame:
     Returns:
         Outputs for model as a dataframe.
     """
-    df = df.copy()
+    df = df.tail(n=rows).copy()
     df['r4_out'] = (
         0.5791
         + 0.30276 * df['rain_0_to_24h_sum']
@@ -203,15 +197,10 @@ def reach_4_model(df: pd.DataFrame) -> pd.DataFrame:
     )
     df['r4_sigmoid'] = sigmoid(df['r4_out'])
     df['r4_safe'] = df['r4_sigmoid'] <= SAFETY_THRESHOLD
-    return (
-        # df[['time', 'r4_out', 'r4_sigmoid', 'r4_safe']]
-        df[['r4_safe']]
-        .tail(n=1)
-        # .tail(n=24)
-    )
+    return df[['time', 'r4_out', 'r4_sigmoid', 'r4_safe']]
 
 
-def reach_5_model(df: pd.DataFrame) -> pd.DataFrame:
+def reach_5_model(df: pd.DataFrame, rows: int = 24) -> pd.DataFrame:
     """
     c- rainfall sum 0-48 hr
     d- Days since last rain
@@ -224,7 +213,7 @@ def reach_5_model(df: pd.DataFrame) -> pd.DataFrame:
     Returns:
         Outputs for model as a dataframe.
     """
-    df = df.copy()
+    df = df.tail(n=rows).copy()
     df['r5_out'] = (
         0.3333
         + 0.1091 * df['rain_0_to_48h_sum']
@@ -233,9 +222,4 @@ def reach_5_model(df: pd.DataFrame) -> pd.DataFrame:
     )
     df['r5_sigmoid'] = sigmoid(df['r5_out'])
     df['r5_safe'] = df['r5_sigmoid'] <= SAFETY_THRESHOLD
-    return (
-        # df[['time', 'r5_out', 'r5_sigmoid', 'r5_safe']]
-        df[['r5_safe']]
-        .tail(n=1)
-        # .tail(n=24)
-    )
+    return df[['time', 'r5_out', 'r5_sigmoid', 'r5_safe']]
