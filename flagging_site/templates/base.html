@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<title>
+    {% block title %} Charles River Water Quality Projections {% endblock %}
+</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+
+<section class="content">
+    <img src="{{ url_for('static', filename='images/CRWA_banner_main.jpg') }}" />
+    <header>
+        {% block header %} Water Quality Flagging Program {% endblock
+    %}
+    </header>
+
+    <p>
+        The following predicted concentrations of Fecal Indicator Bacteria (FIB) are
+        based on modeled correlations between FIB and weather or water conditions.
+    </p>
+    <p>
+        Flagging is based on safety thresholds for boating. The weather and water
+        data is sourced from the CESN weather station at Community Boating and the
+        USGS Waltham river flow gauge.
+    </p>
+    <p>
+        Currently the predictions are only based on
+        one year of historical statistics. An ideal model would include 2-3 years of
+        history. New models will be developed in future years as more data is
+        collected.
+    </p>
+    <!-- <p>
+        Click here* for a full description of this bacteria forecasting
+        project.
+    </p> -->
+    <p>
+        Water quality flags, with forecasted E.coli concentrations and
+        probabilities (updated hourly):
+    </p>
+
+    {% block body %}
+
+    {% for reach, flag in flags.items() %}
+    <h1> {{ reach }} {{ flag }} </h1>
+
+    {% if True %}
+    <img src="{{ url_for('static', filename='images/blue_flag.jpg') }}" />
+
+    {% else %}
+    <img src="{{ url_for('static', filename='images/red_flag.jpg') }}" />
+    {% endif %}
+
+    <br /><br />
+    {% endfor %}
+
+
+
+
+
+    {% endblock %}
+</section>
