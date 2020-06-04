@@ -9,8 +9,8 @@ formatting of the data that we receive from it.
 import pandas as pd
 import requests
 import io
-from .keys import get_keys, HTTPException
-
+from .keys import get_keys
+from flask import Flask, abort
 
 # Constants
 HOBOLINK_URL = 'http://webservice.hobolink.com/restv2/data/custom/file'
@@ -67,9 +67,13 @@ def request_to_hobolink(
         'query': export_name,
         'authentication': get_keys()['hobolink']
     }
+
     res = requests.post(HOBOLINK_URL, json=data)
+    # handle HOBOLINK errors by checking HTTP status code
+    # status codes in 400's are client errors, in 500's are server errors
     if res.status_code // 100 in [4, 5]:
-        raise HTTPException(res.status_code)
+        error_message = "link has failed with error # " + str(res.status_code)  
+        return abort(res.status_code, error_message)
     return res
 
 
