@@ -64,9 +64,9 @@ header .action {
   background: #cae6f6;
   border: 1px solid #377ba8;
 }
-/* .flag doesnt workDoesn't work */
+/* .flag doesnt work */
 .flag {
-  max-width: 5rem;
+  width: 2rem;
   height: auto;
   padding: 1rem;
 }
