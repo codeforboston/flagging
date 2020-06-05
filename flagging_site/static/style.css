@@ -64,6 +64,12 @@ header .action {
   background: #cae6f6;
   border: 1px solid #377ba8;
 }
+/* .flag doesnt work */
+.flag {
+  width: 2rem;
+  height: auto;
+  padding: 1rem;
+}
 .post > header {
   display: flex;
   align-items: flex-end;
