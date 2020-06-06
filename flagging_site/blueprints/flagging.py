@@ -28,10 +28,6 @@ def stylize_model_output(df: pd.DataFrame):
     )
 
 
-# @bp.route('/')
-# def index() -> str:
-#     return 'Hello World!'
-
 @bp.route('/')
 def index() -> str:
     df_hobolink = get_hobolink_data('code_for_boston_export_21d')
