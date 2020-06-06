@@ -38,15 +38,16 @@
     {% block body %}
 
     {% for reach, flag in flags.items() %}
-    <h1> {{ reach }} {{ flag }} </h1>
+    <div> Model {{ reach[1] }} Reach: {{ reach[3:] }} {{ flag }}
+        {% if flag %}
+        <img class="flag" src="{{ url_for('static', filename='images/blue_flag.jpg') }}" />
 
-    {% if True %}
-    <img src="{{ url_for('static', filename='images/blue_flag.jpg') }}" />
+        {% else %}
+        <img class="flag" src="{{ url_for('static', filename='images/red_flag.jpg') }}" />
 
-    {% else %}
-    <img src="{{ url_for('static', filename='images/red_flag.jpg') }}" />
-    {% endif %}
+        {% endif %}
 
+    </div>
     <br /><br />
     {% endfor %}
 
