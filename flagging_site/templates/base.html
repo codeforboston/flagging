@@ -1,8 +1,11 @@
 <!DOCTYPE html>
-<title>
-    {% block title %} Charles River Water Quality Projections {% endblock %}
-</title>
-<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+<html lang="en">
+    <head>
+    <title>
+        {% block title %} Charles River Watershed Association {% endblock %}
+    </title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
 
 <section class="content">
     <img src="{{ url_for('static', filename='images/CRWA_banner_main.jpg') }}" />

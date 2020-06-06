@@ -74,7 +74,7 @@ def offline_mode() -> bool:
     if current_app:
         return current_app.config['OFFLINE_MODE']
     else:
-        return bool(strtobool(os.environ['OFFLINE_MODE']))
+        return bool(strtobool(os.environ.get('OFFLINE_MODE', 'false')))
 
 
 def get_data_store_file_path(file_name: str) -> str:
