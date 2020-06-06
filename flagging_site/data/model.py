@@ -77,9 +77,21 @@ def process_data(
     #  sure that is their intent.
     df_hobolink = df_hobolink.loc[df_hobolink['time'].dt.minute == 0, :]
     df_usgs = df_usgs.loc[df_usgs['time'].dt.minute == 0, :]
-    df = df_hobolink.merge(right=df_usgs, how='outer', on='time')
 
-    # Next, they do the following:
+    # This is an outer join to include all the data (we collect more Hobolink
+    # data than USGS data). With that said, for the most recent value, we need
+    # to make sure one of the sources didn't update before the other one did.
+    # Note that usually Hobolink updates first.
+    df = df_hobolink.merge(right=df_usgs, how='left', on='time')
+    df = df.sort_values('time')
+
+    # Drop last row if either Hobolink or USGS is missing.
+    # We drop instead of `ffill()` because we want the model to output
+    # consistently each hour.
+    if df.iloc[-1, :][['stream_flow', 'rain']].isna().any():
+        df = df.drop(df.index[-1])
+
+    # Next, do the following:
     #
     # 1 day avg of:
     #   - wind_speed

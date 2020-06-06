@@ -10,7 +10,7 @@ Inside the "vault.zip" file, there is a file named "keys.yml." And this is the
 file with all the credentials (plus a Flask secret key). It looks like this:
 
     flask:
-      secret_key: "<SSL cert is here>"
+      secret_key: "<key is here>"
     hobolink:
       password: "<password is here>"
       user: "crwa"
@@ -23,6 +23,7 @@ file with all the credentials (plus a Flask secret key). It looks like this:
 import os
 from flagging_site.config import VAULT_FILE
 from flask import current_app
+from distutils.util import strtobool
 import zipfile
 import yaml
 
@@ -69,5 +70,16 @@ def load_keys_from_vault(
     return d
 
 
-class HTTPException(Exception):  # TODO: put this in a better spot?
-    pass
+def offline_mode() -> bool:
+    if current_app:
+        return current_app.config['OFFLINE_MODE']
+    else:
+        return bool(strtobool(os.environ['OFFLINE_MODE']))
+
+
+def get_data_store_file_path(file_name: str) -> str:
+    if current_app:
+        return os.path.join(current_app.config['DATA_STORE'], file_name)
+    else:
+        from ..config import DATA_STORE
+        return os.path.join(DATA_STORE, file_name)
