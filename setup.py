@@ -7,7 +7,7 @@ with io.open('README.md', 'rt', encoding='utf8') as f:
 
 setup(
     name='CRWA Flagging Website',
-    version='0.0.1',
+    version='0.1.0',
     packages=find_packages(),
     author='Code for Boston',
     python_requires='>=3.7.1',
