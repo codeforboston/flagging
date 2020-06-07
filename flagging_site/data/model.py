@@ -32,15 +32,6 @@ https://www.metrics24.de/WebRoot/Store5/Shops/62187045/5D79/1FE4/31E4/0996/0440/
 
 - Regulatory standards in MA:
 https://www.mass.gov/files/documents/2016/08/tz/36wqara.pdf
-
-TODO:
- make sure that hobolink is taking the hourly rate of rainfall at every 10 min
- increment, otherwise their aggregation of rainfall doesn't make sense. If it
- is the case that hobolink is taking 10 minute rainfall, then that leads to
- another challenge, however, which is confirming that CRWA trained their model
- on the 'incorrect' increments. If they did, then we cannot touch their
- aggregation because them model parameters will reflect their particular
- aggregation.
 """
 import numpy as np
 import pandas as pd
