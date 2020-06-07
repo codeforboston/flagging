@@ -28,7 +28,8 @@ def refresh_data_store(vault_password: Optional[str] = None) -> None:
 
     from flask import current_app
     if current_app:
-        raise Exception('The app should not be running when this is ')
+        raise Exception('The app should not be running when the data store is '
+                        'being refreshed.')
 
     from flagging_site.data.keys import get_data_store_file_path
 
