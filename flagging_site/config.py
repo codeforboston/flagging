@@ -19,7 +19,7 @@ VAULT_FILE = os.path.join(ROOT_DIR, 'vault.zip')
 @dataclass
 class BaseConfig:
     # ==========================================================================
-    # FLASK CONFIG OPTIONS
+    # FLASK BUILTIN CONFIG OPTIONS
     #
     # These options are Flask builtins, meaning that Flask treats these
     # particular config options in a special way.
@@ -29,14 +29,22 @@ class BaseConfig:
     DEBUG: bool = False
     TESTING: bool = False
     SECRET_KEY: str = None  # Note: Loaded from vault
+
+    # ==========================================================================
+    # DATABASE CONFIG OPTIONS
+    #
+    # Not currently used, but soon we'll want to start using the config to set
+    # up references to the database, data storage, and data retrieval.
+    # ==========================================================================
     DATABASE: str = None
 
     # ==========================================================================
-    # CUSTOM CONFIG OPTIONS
+    # MISC. CUSTOM CONFIG OPTIONS
     #
-    # These are options that Flask does not know how to interpret, but are used
-    # inside our custom code to handle the behavior of the website. At the
-    # moment, all of these options relate to the "vault" system.
+    # These are options that Flask does not know how to interpret, but our
+    # custom code does. These are also used  to handle the behavior of the
+    # website. At the moment, all of these options relate to either the "vault"
+    # system or offline mode.
     # ==========================================================================
     VAULT_OPTIONAL: bool = False
     """If True, the app instance will not fail to load just because the vault
@@ -45,7 +53,7 @@ class BaseConfig:
 
     KEYS: Dict[str, Dict[str, Any]] = None
     """These are where the keys from the vault are stored. It should be a dict 
-    of dicts. Each key in the first level dict corresponds to a difference
+    of dicts. Each key in the first level dict corresponds to a different
     service that needs keys / secured credentials stored.
     
     Currently, HOBOlink and Flask's `SECRET_KEY` are the two services that pass

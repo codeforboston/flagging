@@ -26,7 +26,11 @@ If you are in PowerShell (default VSC terminal), use `start-process run_windows_
 sh run_unix_dev.sh
 ```
 
-After you run the script for your respective OS, it will ask you for a vault password. If you have the vault password, enter it here.
+After you run the script for your respective OS, it will ask you if you want to use online mode. If you do not have the "vault password," say yes (`y`)
+
+After that, it will ask if you have the vault password. If you do, enter it here. If not, you can skip this.
+
+Note that the website will _not_ without either the vault password or offline mode turned on; you must do one or the other.
 
 ## Deploy
 
