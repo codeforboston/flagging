@@ -76,8 +76,8 @@ def parse_usgs_data(res) -> pd.DataFrame:
     data_list = [
         {
             'time': vol_entry['dateTime'],
-            'stream_flow': vol_entry['value'],
-            'gage_height': height_entry['value']
+            'stream_flow': int(vol_entry['value']),
+            'gage_height': float(height_entry['value'])
         }
         for vol_entry, height_entry
         in zip(discharge_volume, gage_height)

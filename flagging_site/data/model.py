@@ -66,15 +66,39 @@ def process_data(
     Returns:
         Cleaned dataframe.
     """
+    df_hobolink = df_hobolink.copy()
+    df_usgs = df_usgs.copy()
 
-    # They take the measurement at each hour, and drop the rest.
-    # TODO:
-    #  Ask CRWA if the intent was to take the average per hour, or the
-    #  value at each hour. Their spreadsheet takes the value at each hour, and
-    #  discards all data at :10, :20, :30, :40, and :50. We just want to make
-    #  sure that is their intent.
-    df_hobolink = df_hobolink.loc[df_hobolink['time'].dt.minute == 0, :]
-    df_usgs = df_usgs.loc[df_usgs['time'].dt.minute == 0, :]
+    # Convert all timestamps to hourly in preparation for aggregation.
+    df_usgs['time'] = df_usgs['time'].dt.floor('h')
+    df_hobolink['time'] = df_hobolink['time'].dt.floor('h')
+
+    # Now collapse the data.
+    # Take the mean measurements of everything except rain; rain is the sum
+    # within an hour. (HOBOlink devices record all rain seen in 10 minutes).
+    df_usgs = (
+        df_usgs
+        .groupby('time')
+        .mean()
+        .reset_index()
+    )
+    df_hobolink = (
+        df_hobolink
+        .groupby('time')
+        .agg({
+            'pressure': np.mean,
+            'par': np.mean,
+            'rain': sum,
+            'rh': np.mean,
+            'dew_point': np.mean,
+            'wind_speed': np.mean,
+            'gust_speed': np.mean,
+            'wind_dir': np.mean,
+            'water_temp': np.mean,
+            'air_temp': np.mean,
+        })
+        .reset_index()
+    )
 
     # This is an outer join to include all the data (we collect more Hobolink
     # data than USGS data). With that said, for the most recent value, we need
@@ -82,6 +106,7 @@ def process_data(
     # Note that usually Hobolink updates first.
     df = df_hobolink.merge(right=df_usgs, how='left', on='time')
     df = df.sort_values('time')
+    df = df.reset_index()
 
     # Drop last row if either Hobolink or USGS is missing.
     # We drop instead of `ffill()` because we want the model to output
