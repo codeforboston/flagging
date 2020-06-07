@@ -33,8 +33,6 @@ https://www.metrics24.de/WebRoot/Store5/Shops/62187045/5D79/1FE4/31E4/0996/0440/
 - Regulatory standards in MA:
 https://www.mass.gov/files/documents/2016/08/tz/36wqara.pdf
 
-TODO: Fill the model parameters from the `ManualModel_Hourly.xlsx` spreadsheet.
-
 TODO:
  make sure that hobolink is taking the hourly rate of rainfall at every 10 min
  increment, otherwise their aggregation of rainfall doesn't make sense. If it

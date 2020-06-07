@@ -16,16 +16,12 @@ file with all the credentials (plus a Flask secret key). It looks like this:
       user: "crwa"
       token: "<token is here>"
 """
-# TODO:
-#  Do we really want `HTTPException` in this module? I only store it here
-#  because this avoids circular dependency issues (keys.py does not import
-#  anything else from `data/`), but it seems a little weird.
 import os
-from flagging_site.config import VAULT_FILE
-from flask import current_app
-from distutils.util import strtobool
 import zipfile
 import yaml
+from distutils.util import strtobool
+from flask import current_app
+from flagging_site.config import VAULT_FILE
 
 
 def get_keys() -> dict:

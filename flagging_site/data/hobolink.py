@@ -7,11 +7,9 @@ formatting of the data that we receive from it.
 #  using pandas because we do not have any cron jobs or any caching or SQL, but
 #  I think in future versions we should not be using Pandas at all.
 import io
-import os
 import requests
 import pandas as pd
 from flask import abort
-from flask import current_app
 from .keys import get_keys
 from .keys import offline_mode
 from .keys import get_data_store_file_path

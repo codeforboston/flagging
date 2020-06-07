@@ -5,11 +5,9 @@ gauge.
 Link  to the web interface (not the api) 
 https://waterdata.usgs.gov/nwis/uv?site_no=01104500
 """
-import os
 import pandas as pd
 import requests
 from flask import abort
-from flask import current_app
 from .keys import offline_mode
 from .keys import get_data_store_file_path
 
