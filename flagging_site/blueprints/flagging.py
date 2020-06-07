@@ -34,12 +34,12 @@ def index() -> str:
     df_usgs = get_usgs_data()
     df = process_data(df_hobolink, df_usgs)
     flags = {
-        'r2': reach_2_model(df, rows=1)['r2_safe'].iloc[0],
-        'r3': reach_3_model(df, rows=1)['r3_safe'].iloc[0],
-        'r4': reach_4_model(df, rows=1)['r4_safe'].iloc[0],
-        'r5': reach_5_model(df, rows=1)['r5_safe'].iloc[0]
+        2: reach_2_model(df, rows=1)['r2_safe'].iloc[0],
+        3: reach_3_model(df, rows=1)['r3_safe'].iloc[0],
+        4: reach_4_model(df, rows=1)['r4_safe'].iloc[0],
+        5: reach_5_model(df, rows=1)['r5_safe'].iloc[0]
     }
-    return render_template('base.html', flags=flags)
+    return render_template('index.html', flags=flags)
 
 
 @bp.route('/output_model')
@@ -53,4 +53,4 @@ def output_model() -> str:
         reach_4_model(df),
         reach_5_model(df)
     ]))
-    return render_template('flags.html', tables=table_html)
+    return render_template('output_model.html', tables=table_html)

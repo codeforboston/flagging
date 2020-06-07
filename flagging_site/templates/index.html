@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Water Quality Flagging Overview{% endblock %}
+{% block content %}
+    <p>
+        The following predicted concentrations of Fecal Indicator Bacteria (FIB) are
+        based on modeled correlations between FIB and weather or water conditions.
+    </p>
+    <p>
+        Flagging is based on safety thresholds for boating. The weather and water
+        data is sourced from the CESN weather station at Community Boating and the
+        USGS Waltham river flow gauge.
+    </p>
+    <p>
+        Currently the predictions are only based on
+        one year of historical statistics. An ideal model would include 2-3 years of
+        history. New models will be developed in future years as more data is
+        collected.
+    </p>
+    {# <p>
+        Click here* for a full description of this bacteria forecasting
+        project.
+    </p> #}
+    <p>
+        Water quality flags, with forecasted E.coli concentrations and
+        probabilities (updated hourly):
+    </p>
+
+    {% for reach, flag in flags.items() %}
+    <div>
+        Reach {{ reach }}
+        {% if flag %}
+            <img class="flag" src="{{ url_for('static', filename='images/blue_flag.jpg') }}" />
+        {% else %}
+            <img class="flag" src="{{ url_for('static', filename='images/red_flag.jpg') }}" />
+        {% endif %}
+    </div>
+    {% endfor %}
+
+{% endblock %}
