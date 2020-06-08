@@ -43,9 +43,13 @@ def create_app(config: Type = None) -> Flask:
 
     # Register the "blueprints." Blueprints are basically like mini web apps
     # that can be joined to the main web app.
-    from .blueprints import flagging, cyanobacteria
-    app.register_blueprint(flagging.bp)
-    app.register_blueprint(cyanobacteria.bp)
+    from . import blueprints
+    if app.config.get('BLUEPRINTS'):
+        bp_list = app.config['BLUEPRINTS']
+    else:
+        bp_list = filter(lambda x: not x.startswith('_'), dir(blueprints))
+    for bp_module in bp_list:
+        app.register_blueprint(getattr(blueprints, bp_module).bp)
 
     # Register the database commands
     # from .data import db

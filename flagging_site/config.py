@@ -2,7 +2,7 @@
 Configurations for the website.
 """
 import os
-from typing import Dict, Any
+from typing import Dict, Any, Optional, List
 from dataclasses import dataclass
 
 # Constants
@@ -77,12 +77,18 @@ class BaseConfig:
     when doing requests.
     """
 
+    BLUEPRINTS: Optional[List[str]] = None
+    """Names of the blueprints available to the app. We can use this to turn
+    parts of the website off or on depending on if they're fully developed
+    or not.
+    """
+
 
 class ProductionConfig(BaseConfig):
     """The Production Config is used for deployment of the website to the
     internet.
     """
-    pass
+    BLUEPRINTS: Optional[List[str]] = ['flagging']
 
 
 class DevelopmentConfig(BaseConfig):
