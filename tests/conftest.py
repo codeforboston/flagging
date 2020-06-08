@@ -1,8 +1,10 @@
+#tests/conftest.py
 #https://github.com/pallets/flask/blob/master/examples/tutorial/tests/conftest.py
 
 import os
 
 import pytest
+from flagging_site import create_app
 from flagging_site.config import TestingConfig
 
 @pytest.fixture
