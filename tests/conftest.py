@@ -1,6 +1,3 @@
-#tests/conftest.py
-#https://github.com/pallets/flask/blob/master/examples/tutorial/tests/conftest.py
-
 import os
 
 import pytest
