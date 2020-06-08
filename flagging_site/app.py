@@ -42,7 +42,10 @@ def create_app(config: Type = None) -> Flask:
     update_config_from_vault(app)
 
     # Register the "blueprints." Blueprints are basically like mini web apps
-    # that can be joined to the main web app.
+    # that can be joined to the main web app. In this particular app, the way
+    # blueprints are imported is: If BLUEPRINTS is in the config, then import
+    # only from that list. Otherwise, import everything that's inside of
+    # `blueprints/__init__.py`.
     from . import blueprints
     if app.config.get('BLUEPRINTS'):
         bp_list = app.config['BLUEPRINTS']

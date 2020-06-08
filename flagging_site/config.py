@@ -80,13 +80,15 @@ class BaseConfig:
     BLUEPRINTS: Optional[List[str]] = None
     """Names of the blueprints available to the app. We can use this to turn
     parts of the website off or on depending on if they're fully developed
-    or not.
+    or not. If BLUEPRINTS is `None`, then it imports all the blueprints it can
+    find in the `blueprints` module.
     """
 
 
 class ProductionConfig(BaseConfig):
     """The Production Config is used for deployment of the website to the
-    internet.
+    internet. Currently the only part of the website that's pretty fleshed out
+    is the `flagging` part, so that's the only blueprint we import.
     """
     BLUEPRINTS: Optional[List[str]] = ['flagging']
 
