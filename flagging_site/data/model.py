@@ -32,17 +32,6 @@ https://www.metrics24.de/WebRoot/Store5/Shops/62187045/5D79/1FE4/31E4/0996/0440/
 
 - Regulatory standards in MA:
 https://www.mass.gov/files/documents/2016/08/tz/36wqara.pdf
-
-TODO: Fill the model parameters from the `ManualModel_Hourly.xlsx` spreadsheet.
-
-TODO:
- make sure that hobolink is taking the hourly rate of rainfall at every 10 min
- increment, otherwise their aggregation of rainfall doesn't make sense. If it
- is the case that hobolink is taking 10 minute rainfall, then that leads to
- another challenge, however, which is confirming that CRWA trained their model
- on the 'incorrect' increments. If they did, then we cannot touch their
- aggregation because them model parameters will reflect their particular
- aggregation.
 """
 import numpy as np
 import pandas as pd
@@ -68,18 +57,55 @@ def process_data(
     Returns:
         Cleaned dataframe.
     """
+    df_hobolink = df_hobolink.copy()
+    df_usgs = df_usgs.copy()
 
-    # They take the measurement at each hour, and drop the rest.
-    # TODO:
-    #  Ask CRWA if the intent was to take the average per hour, or the
-    #  value at each hour. Their spreadsheet takes the value at each hour, and
-    #  discards all data at :10, :20, :30, :40, and :50. We just want to make
-    #  sure that is their intent.
-    df_hobolink = df_hobolink.loc[df_hobolink['time'].dt.minute == 0, :]
-    df_usgs = df_usgs.loc[df_usgs['time'].dt.minute == 0, :]
-    df = df_hobolink.merge(right=df_usgs, how='outer', on='time')
+    # Convert all timestamps to hourly in preparation for aggregation.
+    df_usgs['time'] = df_usgs['time'].dt.floor('h')
+    df_hobolink['time'] = df_hobolink['time'].dt.floor('h')
 
-    # Next, they do the following:
+    # Now collapse the data.
+    # Take the mean measurements of everything except rain; rain is the sum
+    # within an hour. (HOBOlink devices record all rain seen in 10 minutes).
+    df_usgs = (
+        df_usgs
+        .groupby('time')
+        .mean()
+        .reset_index()
+    )
+    df_hobolink = (
+        df_hobolink
+        .groupby('time')
+        .agg({
+            'pressure': np.mean,
+            'par': np.mean,
+            'rain': sum,
+            'rh': np.mean,
+            'dew_point': np.mean,
+            'wind_speed': np.mean,
+            'gust_speed': np.mean,
+            'wind_dir': np.mean,
+            'water_temp': np.mean,
+            'air_temp': np.mean,
+        })
+        .reset_index()
+    )
+
+    # This is an outer join to include all the data (we collect more Hobolink
+    # data than USGS data). With that said, for the most recent value, we need
+    # to make sure one of the sources didn't update before the other one did.
+    # Note that usually Hobolink updates first.
+    df = df_hobolink.merge(right=df_usgs, how='left', on='time')
+    df = df.sort_values('time')
+    df = df.reset_index()
+
+    # Drop last row if either Hobolink or USGS is missing.
+    # We drop instead of `ffill()` because we want the model to output
+    # consistently each hour.
+    if df.iloc[-1, :][['stream_flow', 'rain']].isna().any():
+        df = df.drop(df.index[-1])
+
+    # Next, do the following:
     #
     # 1 day avg of:
     #   - wind_speed

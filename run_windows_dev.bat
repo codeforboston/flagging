@@ -5,6 +5,7 @@ python -m pip install -r requirements.txt
 
 set FLASK_APP=flagging_site
 set FLASK_ENV=development
+set /p OFFLINE_MODE="Offline mode? [y/n]: "
 set /p VAULT_PASSWORD="Enter vault password: "
 
 flask run

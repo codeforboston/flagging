@@ -46,13 +46,18 @@ header .action {
   display: block;
   padding: 0.5rem;
 }
+section.page-header {
+  text-align: center;
+  border-bottom: 1px solid lightgray;
+   padding-bottom: 0.7em;
+}
+.page-header > header {
+  padding: 0.4em 0 0.4em 0;
+  text-align: center;
+  font-size: 1.5em;
+}
 .content {
   padding: 0 1rem 1rem;
-}
-.content > header {
-  border-bottom: 1px solid lightgray;
-  display: flex;
-  align-items: flex-end;
 }
 .content > header h1 {
   flex: auto;
@@ -64,7 +69,6 @@ header .action {
   background: #cae6f6;
   border: 1px solid #377ba8;
 }
-/* .flag doesnt work */
 .flag {
   width: 2rem;
   height: auto;
@@ -104,6 +108,14 @@ header .action {
 .content input,
 .content textarea {
   margin-bottom: 1em;
+}
+.footer {
+  padding: 3em 1em 3em 1em;
+}
+.footer > .footer-content {
+  width: 27em;
+  text-align: center;
+  margin: 0 auto;
 }
 .content textarea {
   min-height: 12em;

@@ -6,13 +6,16 @@ formatting of the data that we receive from it.
 #  Pandas is inefficient. It should go to SQL, not to Pandas. I am currently
 #  using pandas because we do not have any cron jobs or any caching or SQL, but
 #  I think in future versions we should not be using Pandas at all.
-import pandas as pd
-import requests
 import io
-from .keys import get_keys, HTTPException
-
+import requests
+import pandas as pd
+from flask import abort
+from .keys import get_keys
+from .keys import offline_mode
+from .keys import get_data_store_file_path
 
 # Constants
+
 HOBOLINK_URL = 'http://webservice.hobolink.com/restv2/data/custom/file'
 EXPORT_NAME = 'code_for_boston_export'
 # Each key is the original column name; the value is the renamed column.
@@ -30,7 +33,7 @@ HOBOLINK_COLUMNS = {
     'Temp, *F, Charles River Weather Station Air Temp': 'air_temp',
     # 'Batt, V, Charles River Weather Station': 'battery'
 }
-
+STATIC_FILE_NAME = 'hobolink.pickle'
 # ~ ~ ~ ~
 
 
@@ -45,8 +48,11 @@ def get_hobolink_data(export_name: str = EXPORT_NAME) -> pd.DataFrame:
     Returns:
         Pandas Dataframe containing the cleaned-up Hobolink data.
     """
-    res = request_to_hobolink(export_name=export_name)
-    df = parse_hobolink_data(res.text)
+    if offline_mode():
+        df = pd.read_pickle(get_data_store_file_path(STATIC_FILE_NAME))
+    else:
+        res = request_to_hobolink(export_name=export_name)
+        df = parse_hobolink_data(res.text)
     return df
 
 
@@ -67,9 +73,13 @@ def request_to_hobolink(
         'query': export_name,
         'authentication': get_keys()['hobolink']
     }
+
     res = requests.post(HOBOLINK_URL, json=data)
+    # handle HOBOLINK errors by checking HTTP status code
+    # status codes in 400's are client errors, in 500's are server errors
     if res.status_code // 100 in [4, 5]:
-        raise HTTPException(res.status_code)
+        error_message = "link has failed with error # " + str(res.status_code)  
+        return abort(res.status_code, error_message)
     return res
 
 

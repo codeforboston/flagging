@@ -7,11 +7,14 @@ https://waterdata.usgs.gov/nwis/uv?site_no=01104500
 """
 import pandas as pd
 import requests
-from .keys import HTTPException
+from flask import abort
+from .keys import offline_mode
+from .keys import get_data_store_file_path
 
 # Constants
 USGS_URL = 'https://waterservices.usgs.gov/nwis/iv/'
 
+STATIC_FILE_NAME = 'usgs.pickle'
 # ~ ~ ~ ~
 
 
@@ -22,8 +25,11 @@ def get_usgs_data() -> pd.DataFrame:
     Returns:
         Pandas Dataframe containing the usgs data.
     """
-    res = request_to_usgs()
-    df = parse_usgs_data(res)
+    if offline_mode():
+        df = pd.read_pickle(get_data_store_file_path(STATIC_FILE_NAME))
+    else:
+        res = request_to_usgs()
+        df = parse_usgs_data(res)
     return df
 
 
@@ -45,7 +51,9 @@ def request_to_usgs() -> requests.models.Response:
     
     res = requests.get(USGS_URL, params=payload)
     if res.status_code // 100 in [4, 5]:
-        raise HTTPException(res.status_code)
+        error_msg = 'API request to the USGS endpoint failed with status code '\
+                    + str(res.status_code)
+        abort(res.status_code, error_msg)
     return res
 
 
@@ -68,8 +76,8 @@ def parse_usgs_data(res) -> pd.DataFrame:
     data_list = [
         {
             'time': vol_entry['dateTime'],
-            'stream_flow': vol_entry['value'],
-            'gage_height': height_entry['value']
+            'stream_flow': int(vol_entry['value']),
+            'gage_height': float(height_entry['value'])
         }
         for vol_entry, height_entry
         in zip(discharge_volume, gage_height)

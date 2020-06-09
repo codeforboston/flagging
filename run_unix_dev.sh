@@ -25,6 +25,8 @@ $PYEXEC -m pip install -r requirements.txt
 # Set up and run the Flask application
 export FLASK_APP=flagging_site
 export FLASK_ENV=development
+read -p "Offline mode? [y/n]: " offline_mode
+export OFFLINE_MODE=${offline_mode}
 read -p "Enter vault password: " vault_pw
 export VAULT_PASSWORD=${vault_pw}
 flask run
