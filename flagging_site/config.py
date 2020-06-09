@@ -17,20 +17,13 @@ class BaseConfig:
     KEYS: dict = None  # Loaded from vault
     VAULT_FILE: str = VAULT_FILE
 
-
 class ProductionConfig(BaseConfig):
     DEBUG: bool = False
     TESTING: bool = False
-
 
 class DevelopmentConfig(BaseConfig):
     DEBUG: bool = True
     TESTING: bool = True
 
-
-# class StagingConfig(ProductionConfig):
-#     pass
-
-
-# class TestingConfig(BaseConfig):
-#     TESTING: bool = True
+class TestingConfig(BaseConfig):
+    TESTING: bool = True
