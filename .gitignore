@@ -4,7 +4,6 @@
 keys.yml
 .DS_Store
 Pipfile
-setup.cfg
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
