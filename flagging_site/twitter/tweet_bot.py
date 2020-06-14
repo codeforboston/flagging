@@ -13,11 +13,11 @@ from keys import *
 
 def post_tweet(msg): 
     """
-        Posts tweet onto twitter handle
+    Posts tweet onto twitter handle
 
-        arg: accept string message msg
+    arg: accept string message msg
 
-        returns: string message that have been inputed
+    returns: string message that have been inputed
     """
 
     # Authenticates using consumer key and secret
