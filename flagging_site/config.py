@@ -84,14 +84,12 @@ class BaseConfig:
     find in the `blueprints` module.
     """
 
-
 class ProductionConfig(BaseConfig):
     """The Production Config is used for deployment of the website to the
     internet. Currently the only part of the website that's pretty fleshed out
     is the `flagging` part, so that's the only blueprint we import.
     """
     BLUEPRINTS: Optional[List[str]] = ['flagging']
-
 
 class DevelopmentConfig(BaseConfig):
     """The Development Config is used for running the website on your own
@@ -109,7 +107,6 @@ class DevelopmentConfig(BaseConfig):
     VAULT_OPTIONAL: bool = True
     DEBUG: bool = True
     TESTING: bool = True
-
 
 class OfflineDevelopmentConfig(DevelopmentConfig):
     """The Offline Development Config extends `DevelopmentConfig` to use a
