@@ -7,4 +7,4 @@
   - __init__.py: required to treat directory as a package
   - app.py: main flask application
   - config.py: file holding the config options for flask and 
-  
+  - vault.zip: contains credentials necessary to accessing hoblink and usgs api 
