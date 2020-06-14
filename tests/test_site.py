@@ -11,4 +11,3 @@ from flask import session
                          )
 def test_page(client, app, page, result):
     assert client.get(page).status_code == result
-

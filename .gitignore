@@ -142,6 +142,4 @@ dmypy.json
 .pytype/
 
 # Cython debug symbols
-cython_debug/
-
-tests/test_ed.py
+cython_debug/l
