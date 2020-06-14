@@ -1,4 +1,4 @@
-#Contents of blueprints
+# Contents of blueprints
 
 - __init__.py: required to treat directory as package
 - cyanobacteria.py: 
