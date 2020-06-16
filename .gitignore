@@ -145,5 +145,3 @@ dmypy.json
 cython_debug/l
 
 flagging_site/keys.json
-
-setup.py
