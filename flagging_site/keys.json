@@ -1,0 +1,10 @@
+{
+    "flask": {
+       "secret_key": "5c7rfv02bfkldse54761wemvbo2bd0f1"
+    },
+    "hobolink": {
+       "password": "pTMVKX5iDYLmbQy",
+       "user": "crwa",
+       "token": "YeXsAq7OLy"
+    }
+}

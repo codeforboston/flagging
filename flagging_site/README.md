@@ -6,5 +6,5 @@
   - templates: contains the html pages that define the web page structure
   - __init__.py: required to treat directory as a package
   - app.py: main flask application
-  - config.py: file holding the config options for flask and 
+  - config.py: file holding the config options for flask and database
   - vault.zip: contains credentials necessary to accessing hoblink and usgs api 

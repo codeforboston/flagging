@@ -9,7 +9,13 @@ Allow more functionality allowing user input
 """
 
 import tweepy
-from keys import *  
+
+# Constants for secret and public keys
+
+CONSUMER_KEY = '' 
+CONSUMER_SECRET = ''
+ACCESS_KEY = ''
+ACCESS_SECRET = ''
 
 def post_tweet(msg): 
     """

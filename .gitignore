@@ -1,7 +1,7 @@
 .vscode/
 *.code-workspace
 .idea/
-keys.yml
+keys.json
 .DS_Store
 Pipfile
 
