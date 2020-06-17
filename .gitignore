@@ -1,7 +1,7 @@
 .vscode/
 *.code-workspace
 .idea/
-keys.yml
+keys.json
 .DS_Store
 Pipfile
 
@@ -142,4 +142,6 @@ dmypy.json
 .pytype/
 
 # Cython debug symbols
-cython_debug/
+cython_debug/l
+
+flagging_site/keys.json

@@ -11,8 +11,18 @@ from flagging_site.data.model import reach_5_model
 
 bp = Blueprint('flagging', __name__)
 
-
 def stylize_model_output(df: pd.DataFrame):
+    """ 
+    This function function stylizes the dataframe that we will output for our 
+    web page
+    
+    Args: 
+        data frame 
+        
+    Returns: 
+        Dataframe with properties set for color, border-style, flag colors, and 
+        border-width
+    """
     def color_flags(x):
         return 'color: blue' if x is True \
             else 'color: red' if x is False \
@@ -33,6 +43,12 @@ def stylize_model_output(df: pd.DataFrame):
 
 @bp.route('/')
 def index() -> str:
+    """
+    Retrieves data from hobolink and usgs and processes data, then displays data 
+    on `index_model.html`     
+
+    returns: render model on index.html
+    """
     df_hobolink = get_hobolink_data('code_for_boston_export_21d')
     df_usgs = get_usgs_data()
     df = process_data(df_hobolink, df_usgs)
@@ -47,6 +63,14 @@ def index() -> str:
 
 @bp.route('/output_model')
 def output_model() -> str:
+    """
+    Retrieves data from hobolink and usgs and processes data and then 
+    displays data on 'output_model.html'
+    
+    args: no argument
+    
+    returns: render model on output_model.html
+    """
     df_hobolink = get_hobolink_data('code_for_boston_export_21d')
     df_usgs = get_usgs_data()
     df = process_data(df_hobolink, df_usgs)
