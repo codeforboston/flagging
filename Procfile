@@ -1,1 +1,1 @@
-web: gunicorn run_heroku:app
+web: gunicorn flagging_site:app:create_app()
