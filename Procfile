@@ -1,1 +1,1 @@
-web: gunicorn flagging_site:app:create_app()
+web: gunicorn "flagging_site:app:create_app()"
