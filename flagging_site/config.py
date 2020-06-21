@@ -5,6 +5,7 @@ import os
 from typing import Dict, Any, Optional, List
 from dataclasses import dataclass
 
+
 # Constants
 # ~~~~~~~~~
 
@@ -70,6 +71,10 @@ class BaseConfig:
     """If Offline Mode is turned on, the data used when performing requests will
     be a static pickled version of the data instead of actively pulled from HTTP
     requests.
+    
+    This is useful for front-end development for two reasons: First, you don't
+    need the vault password to develop the front-end of the website. Second, it
+    means that the data loads faster and avoids any possible issues.
     """
 
     DATA_STORE: str = DATA_STORE
@@ -84,12 +89,14 @@ class BaseConfig:
     find in the `blueprints` module.
     """
 
+
 class ProductionConfig(BaseConfig):
     """The Production Config is used for deployment of the website to the
     internet. Currently the only part of the website that's pretty fleshed out
     is the `flagging` part, so that's the only blueprint we import.
     """
     BLUEPRINTS: Optional[List[str]] = ['flagging']
+
 
 class DevelopmentConfig(BaseConfig):
     """The Development Config is used for running the website on your own
@@ -107,22 +114,11 @@ class DevelopmentConfig(BaseConfig):
     VAULT_OPTIONAL: bool = True
     DEBUG: bool = True
     TESTING: bool = True
-
-class OfflineDevelopmentConfig(DevelopmentConfig):
-    """The Offline Development Config extends `DevelopmentConfig` to use a
-    pickled version of the data instead of loading data through the whole
-    pipeline from HTTP requests. It is useful for front-end development for two
-    reasons: First, you don't need the vault password to develop the front-end
-    of the website. Second, it means that the data loads faster and avoids any
-    possible issues.
-    """
-    OFFLINE_MODE: bool = True
+    OFFLINE_MODE = os.getenv('OFFLINE_MODE', False)
 
 
 class TestingConfig(BaseConfig):
     """The Testing Config is used for unit-testing and integration-testing the
     website.
     """
-
-class TestingConfig(BaseConfig):
     TESTING: bool = True
