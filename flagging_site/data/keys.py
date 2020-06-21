@@ -18,7 +18,7 @@ file with all the credentials (plus a Flask secret key). It looks like this:
 """
 import os
 import zipfile
-import yaml
+import json
 from distutils.util import strtobool
 from flask import current_app
 
@@ -55,15 +55,15 @@ def load_keys_from_vault(
 
     Args:
         vault_password: (str) Password for opening up the `vault_file`.
-        vault_file: (str) File path of the zip file containing `keys.yml`.
+        vault_file: (str) File path of the zip file containing `keys.json`.
 
     Returns:
         Dict of credentials.
     """
     pwd = bytes(vault_password, 'utf-8')
     with zipfile.ZipFile(vault_file) as f:
-        with f.open('keys.yml', pwd=pwd, mode='r') as keys_file:
-            d = yaml.load(keys_file, Loader=yaml.BaseLoader)
+        with f.open('keys.json', pwd=pwd, mode='r') as keys_file:
+            d = json.load(keys_file)
     return d
 
 
