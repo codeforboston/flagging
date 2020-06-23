@@ -48,3 +48,13 @@ heroku config:set VAULT_PASSWORD=replace_me_with_pw
 heroku create crwa-flagging-staging
 git push heroku master
 ```
+
+## Run tests
+
+Tests are written in Pytest. To run tests, run the following on your command line:
+
+```shell script
+python -m pytest ./tests -s
+```
+
+Note: the test may require you to enter the vault password if it is not already in your environment variables.
