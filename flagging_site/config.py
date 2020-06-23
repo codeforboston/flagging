@@ -114,7 +114,7 @@ class DevelopmentConfig(BaseConfig):
     VAULT_OPTIONAL: bool = True
     DEBUG: bool = True
     TESTING: bool = True
-    OFFLINE_MODE = os.getenv('OFFLINE_MODE', False)
+    OFFLINE_MODE = os.getenv('OFFLINE_MODE', 'false')
 
 
 class TestingConfig(BaseConfig):
