@@ -145,3 +145,6 @@ dmypy.json
 cython_debug/l
 
 flagging_site/keys.json
+
+# ignore file with database credentials
+flagging_site/data/db_creds.json
