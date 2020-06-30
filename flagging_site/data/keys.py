@@ -21,6 +21,7 @@ import zipfile
 import json
 from distutils.util import strtobool
 from flask import current_app
+
 from flagging_site.config import VAULT_FILE
 
 
@@ -39,7 +40,7 @@ def get_keys() -> dict:
     if current_app:
         d = current_app.config['KEYS']
     else:
-        vault_file = os.environ.get('VAULT_FILE') or VAULT_FILE
+        vault_file = os.getenv('VAULT_FILE') or VAULT_FILE
         d = load_keys_from_vault(vault_password=os.environ['VAULT_PASSWORD'],
                                  vault_file=vault_file)
     return d.copy()
@@ -62,7 +63,6 @@ def load_keys_from_vault(
     pwd = bytes(vault_password, 'utf-8')
     with zipfile.ZipFile(vault_file) as f:
         with f.open('keys.json', pwd=pwd, mode='r') as keys_file:
-#            d = yaml.load(keys_file, Loader=yaml.BaseLoader)
             d = json.load(keys_file)
     return d
 
@@ -71,7 +71,7 @@ def offline_mode() -> bool:
     if current_app:
         return current_app.config['OFFLINE_MODE']
     else:
-        return bool(strtobool(os.environ.get('OFFLINE_MODE', 'false')))
+        return bool(strtobool(os.getenv('OFFLINE_MODE', 'false')))
 
 
 def get_data_store_file_path(file_name: str) -> str:
