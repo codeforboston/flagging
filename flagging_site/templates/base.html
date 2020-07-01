@@ -11,14 +11,17 @@
     https://jinja.palletsprojects.com/en/2.11.x/templates/
 #}
 <html lang="en">
+
 <head>
     {% block head %}
     <title>
         {% block title %}{% endblock %} - CRWA Flagging Program
     </title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+    <link rel="icon" type="image/ico" href="../static/favicon/favicon.ico">
     {% endblock %}
 </head>
+
 <body>
     <section class="page-header">
         {% block header %}
@@ -40,7 +43,8 @@
             <strong>t</strong> (781) 788-0007 &nbsp; &nbsp;
             <strong>e</strong> <a href="mailto:charles@crwa.org">charles@crwa.org</a><br />
             <br />
-            This website was built by <a href="https://www.codeforboston.org/" target="_blank">Code for Boston</a> in collaboration with <a href="https://www.crwa.org/">Charles River Watershed Association</a>.<br />
+            This website was built by <a href="https://www.codeforboston.org/" target="_blank">Code for Boston</a> in
+            collaboration with <a href="https://www.crwa.org/">Charles River Watershed Association</a>.<br />
         </div>
         {% endblock %}
     </section>
