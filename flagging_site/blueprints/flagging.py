@@ -14,6 +14,12 @@ bp = Blueprint('flagging', __name__)
 
 @bp.route('/')
 def index() -> str:
+    """
+    Retrieves data from hobolink and usgs and processes data, then displays data 
+    on `index_model.html`     
+
+    returns: render model on index.html
+    """
     df_hobolink = get_hobolink_data('code_for_boston_export_21d')
     df_usgs = get_usgs_data()
     df = process_data(df_hobolink, df_usgs)

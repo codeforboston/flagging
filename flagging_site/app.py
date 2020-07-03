@@ -4,8 +4,8 @@ This file handles the construction of the Flask application object.
 import os
 from typing import Type
 from flask import Flask
+
 from .data.keys import get_keys
-from .data.keys import offline_mode
 
 
 def create_app(config: Type = None) -> Flask:
@@ -28,12 +28,9 @@ def create_app(config: Type = None) -> Flask:
     elif app.env == 'production':
         from .config import ProductionConfig
         app.config.from_object(ProductionConfig)
-    elif app.env == 'development' and not offline_mode():
+    elif app.env == 'development':
         from .config import DevelopmentConfig
         app.config.from_object(DevelopmentConfig)
-    elif app.env == 'development' and offline_mode():
-        from .config import OfflineDevelopmentConfig
-        app.config.from_object(OfflineDevelopmentConfig)
     else:
         raise ValueError('Bad config passed; the config must be `production` '
                          'or `development`.')
