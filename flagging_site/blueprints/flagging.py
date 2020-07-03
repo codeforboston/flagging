@@ -9,6 +9,8 @@ from flagging_site.data.model import reach_3_model
 from flagging_site.data.model import reach_4_model
 from flagging_site.data.model import reach_5_model
 
+from flask import request
+
 bp = Blueprint('flagging', __name__)
 
 def stylize_model_output(df: pd.DataFrame):
@@ -60,8 +62,7 @@ def index() -> str:
     }
     return render_template('index.html', flags=flags)
 
-
-@bp.route('/output_model')
+@bp.route('/output_model', methods = ["GET"])
 def output_model() -> str:
     """
     Retrieves data from hobolink and usgs and processes data and then 
@@ -71,13 +72,38 @@ def output_model() -> str:
     
     returns: render model on output_model.html
     """
+
+    #parse contents of the query string to get reach & hours parameter
+    #default is  reach = 0 and hours = 24
+    reach = request.args.get('reach', 0)
+    hours = request.args.get('hours', 24)
+        
+    #convert to integers
+    hours = int(hours)
+    reach = int(reach)
+    
     df_hobolink = get_hobolink_data('code_for_boston_export_21d')
     df_usgs = get_usgs_data()
     df = process_data(df_hobolink, df_usgs)
-    table_html = '<br /><br />'.join(map(stylize_model_output, [
-        reach_2_model(df),
-        reach_3_model(df),
-        reach_4_model(df),
-        reach_5_model(df)
-    ]))
+    
+    reach_model_mapping = {
+        2: reach_2_model,
+        3: reach_3_model,
+        4: reach_4_model,
+        5: reach_5_model
+    }
+    
+    if reach in reach_model_mapping:
+        reach_func = reach_model_mapping[reach]
+        reach_list = [reach_func(df, rows = hours)]
+    else:
+        reach_list = [
+            reach_2_model(df, rows = hours),
+            reach_3_model(df, rows = hours),
+            reach_4_model(df, rows = hours),
+            reach_5_model(df, rows = hours)
+        ]
+    
+    table_html = '<br /><br />'.join(map(stylize_model_output, reach_list))
+    
     return render_template('output_model.html', tables=table_html)
