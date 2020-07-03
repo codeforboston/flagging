@@ -8,28 +8,9 @@ from flagging_site.data.model import reach_2_model
 from flagging_site.data.model import reach_3_model
 from flagging_site.data.model import reach_4_model
 from flagging_site.data.model import reach_5_model
+from flask_restful import Resource, Api
 
 bp = Blueprint('flagging', __name__)
-
-
-def stylize_model_output(df: pd.DataFrame):
-    def color_flags(x):
-        return 'color: blue' if x is True \
-            else 'color: red' if x is False \
-            else ''
-    return (
-        df
-        .style
-        .hide_index()
-        .set_properties(**{
-            'border-color': '#888888',
-            'border-style': 'solid',
-            'border-width': '1px'
-        })
-        .applymap(color_flags)
-        .render()
-    )
-
 
 @bp.route('/')
 def index() -> str:
@@ -44,16 +25,44 @@ def index() -> str:
     }
     return render_template('index.html', flags=flags)
 
+api = Api(bp)
 
-@bp.route('/output_model')
-def output_model() -> str:
-    df_hobolink = get_hobolink_data('code_for_boston_export_21d')
-    df_usgs = get_usgs_data()
-    df = process_data(df_hobolink, df_usgs)
-    table_html = '<br /><br />'.join(map(stylize_model_output, [
-        reach_2_model(df),
-        reach_3_model(df),
-        reach_4_model(df),
-        reach_5_model(df)
-    ]))
-    return render_template('output_model.html', tables=table_html)
+# iterate through dataframe, adds to model dict
+# key equals column name, value column values as list type
+def add_to_dict(models, df, reach) -> None:
+    model = {}
+    df.time = df.time.astype(str)
+    for (name, col) in df.iteritems():
+        model[name] = col.tolist()
+
+    models['model ' + str(reach)] = model
+
+class ReachApi(Resource):
+    def output_model(self):
+        df_hobolink = get_hobolink_data('code_for_boston_export_21d')
+        df_usgs = get_usgs_data()
+        df = process_data(df_hobolink, df_usgs)
+        dfs = [
+            reach_2_model(df),
+            reach_3_model(df),
+            reach_4_model(df),
+            reach_5_model(df)
+        ]
+        main = {}
+        models = {}
+        # adds metadata
+        main['version'] = '2020'
+        main['time returned'] = 'last night'
+
+
+        for counter, df in enumerate(dfs):
+            add_to_dict(models, df, counter + 2)
+        # adds models dict to main dict
+        main['models'] = models
+
+        return main
+
+    def get(self):
+        return self.output_model()
+
+api.add_resource(ReachApi, '/output_model')
