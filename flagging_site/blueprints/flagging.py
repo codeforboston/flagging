@@ -33,10 +33,20 @@ def index() -> str:
 
 api = Api(bp)
 
-# iterate through dataframe, adds to model dict
-# key equals column name, value column values as list type
 def add_to_dict(models, df, reach) -> None:
+    """
+    Iterates through dataframe from model output, adds to model dict where
+    key equals column name, value equals column values as list type
+
+    args:
+        models: dictionary
+        df: pd.DataFrame
+        reach:int
+
+    returns: None
+        """
     model = {}
+    # converts time column to type string because of conversion to json error
     df.time = df.time.astype(str)
     for (name, col) in df.iteritems():
         model[name] = col.tolist()
@@ -44,7 +54,13 @@ def add_to_dict(models, df, reach) -> None:
     models['model ' + str(reach)] = model
 
 class ReachApi(Resource):
-    def output_model(self):
+    def output_model(self) -> dict:
+        """
+        Class method that retrieves data from hobolink and usgs and processes data, then creates json-like dictionary
+            structure for model output
+
+        returns: json-like dictionary
+        """
         df_hobolink = get_hobolink_data('code_for_boston_export_21d')
         df_usgs = get_usgs_data()
         df = process_data(df_hobolink, df_usgs)
