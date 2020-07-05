@@ -31,19 +31,22 @@ def stylize_model_output(df: pd.DataFrame):
         return 'color: blue' if x is True \
             else 'color: red' if x is False \
             else ''
+    return '<div class="table-wrapper">' + \
+           df.to_html(index=False) + \
+           '</div>'
+    # return '<div class="table-wrapper">' + (
+    #     df
+    #         .style
+    #         .hide_index()
+    #         .set_properties(**{
+    #         'border-color': '#888888',
+    #         'border-style': 'solid',
+    #         'border-width': '1px'
+    #     })
+    #         .applymap(color_flags)
+    #         .render()
+    # ) + '</div>'
 
-    return (
-        df
-            .style
-            .hide_index()
-            .set_properties(**{
-            'border-color': '#888888',
-            'border-style': 'solid',
-            'border-width': '1px'
-        })
-            .applymap(color_flags)
-            .render()
-    )
 
 def add_to_dict(models, df, reach) -> None:
     """
@@ -60,6 +63,7 @@ def add_to_dict(models, df, reach) -> None:
     # converts time column to type string because of conversion to json error
     df['time'] = df['time'].astype(str)
     models[f'model_{reach}'] = df.to_dict(orient='list')
+
 
 @bp.route('/')
 def index() -> str:
@@ -102,11 +106,12 @@ def output_model() -> str:
     ]))
     return render_template('output_model.html', tables=table_html)
 
+
 class ReachApi(Resource):
     def model_api(self) -> dict:
         """
-        Class method that retrieves data from hobolink and usgs and processes data, then creates json-like dictionary
-            structure for model output
+        Class method that retrieves data from hobolink and usgs and processes
+        data, then creates json-like dictionary structure for model output.
 
         returns: json-like dictionary
         """
@@ -134,5 +139,6 @@ class ReachApi(Resource):
 
     def get(self):
         return self.model_api()
+
 
 api.add_resource(ReachApi, '/api/v1/model')
