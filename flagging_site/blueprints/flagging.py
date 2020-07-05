@@ -99,7 +99,7 @@ def output_model() -> str:
     hours = int(request.args.get('hours', 24))
 
     # Return no more than 72 hours.
-    hours = max(hours, 72)
+    hours = min(max(hours, 1), 72)
 
     df = get_data()
 
