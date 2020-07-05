@@ -16,38 +16,34 @@ bp = Blueprint('flagging', __name__)
 api = Api(bp)
 
 
-def stylize_model_output(df: pd.DataFrame):
+def get_data() -> pd.DataFrame:
+    """Retrieves the data that gets plugged into the the model."""
+    df_hobolink = get_hobolink_data('code_for_boston_export_21d')
+    df_usgs = get_usgs_data()
+    df = process_data(df_hobolink, df_usgs)
+    return df
+
+
+def stylize_model_output(reach: int, df: pd.DataFrame) -> str:
     """
     This function function stylizes the dataframe that we will output for our
-    web page
+    web page. This function replaces the bools with colorized values, and then
+    returns the HTML of the table excluding the index.
 
     Args:
-        data frame
+        reach (int): The reach number.
 
     Returns:
-        Dataframe with properties set for color, border-style, flag colors, and
-        border-width
+        HTML table.
     """
+    def _apply_flag(x: bool) -> str:
+        flag_class = 'blue-flag' if x else 'red-flag'
+        return f'<span class="{flag_class}">{x}</span>'
 
-    def color_flags(x):
-        return 'color: blue' if x is True \
-            else 'color: red' if x is False \
-            else ''
-    return '<div class="table-wrapper">' + \
-           df.to_html(index=False) + \
-           '</div>'
-    # return '<div class="table-wrapper">' + (
-    #     df
-    #         .style
-    #         .hide_index()
-    #         .set_properties(**{
-    #         'border-color': '#888888',
-    #         'border-style': 'solid',
-    #         'border-width': '1px'
-    #     })
-    #         .applymap(color_flags)
-    #         .render()
-    # ) + '</div>'
+    df['safe'] = df['safe'].apply(_apply_flag)
+    df.columns = [i.title().replace('_', ' ') for i in df.columns]
+
+    return df.to_html(index=False, escape=False)
 
 
 def add_to_dict(models, df, reach) -> None:
@@ -75,18 +71,17 @@ def index() -> str:
 
     returns: render model on index.html
     """
-    df_hobolink = get_hobolink_data('code_for_boston_export_21d')
-    df_usgs = get_usgs_data()
-    df = process_data(df_hobolink, df_usgs)
+    df = get_data()
     flags = {
-        2: reach_2_model(df, rows=1)['r2_safe'].iloc[0],
-        3: reach_3_model(df, rows=1)['r3_safe'].iloc[0],
-        4: reach_4_model(df, rows=1)['r4_safe'].iloc[0],
-        5: reach_5_model(df, rows=1)['r5_safe'].iloc[0]
+        2: reach_2_model(df, rows=1)['safe'].iloc[0],
+        3: reach_3_model(df, rows=1)['safe'].iloc[0],
+        4: reach_4_model(df, rows=1)['safe'].iloc[0],
+        5: reach_5_model(df, rows=1)['safe'].iloc[0]
     }
     return render_template('index.html', flags=flags)
 
-@bp.route('/output_model', methods = ["GET"])
+
+@bp.route('/output_model', methods=["GET"])
 def output_model() -> str:
     """
     Retrieves data from hobolink and usgs and processes data and then
@@ -97,19 +92,17 @@ def output_model() -> str:
     returns: render model on output_model.html
     """
 
-    #parse contents of the query string to get reach & hours parameter
-    #default is  reach = 0 and hours = 24
-    reach = request.args.get('reach', 0)
-    hours = request.args.get('hours', 24)
-        
-    #convert to integers
-    hours = int(hours)
-    reach = int(reach)
-    
-    df_hobolink = get_hobolink_data('code_for_boston_export_21d')
-    df_usgs = get_usgs_data()
-    df = process_data(df_hobolink, df_usgs)
-    
+    # Parse contents of the query string to get reach and hours parameters.
+    # Defaults are hours = 24, and reach = -1.
+    # When reach = -1, we utilize all reaches.
+    reach = int(request.args.get('reach', -1))
+    hours = int(request.args.get('hours', 24))
+
+    # Return no more than 72 hours.
+    hours = max(hours, 72)
+
+    df = get_data()
+
     reach_model_mapping = {
         2: reach_2_model,
         3: reach_3_model,
@@ -118,22 +111,22 @@ def output_model() -> str:
     }
     
     if reach in reach_model_mapping:
-        reach_func = reach_model_mapping[reach]
-        reach_list = [reach_func(df, rows = hours)]
+        reach_func = reach_model_mapping[int(reach)]
+        reach_html_tables = {
+            reach: stylize_model_output(reach, reach_func(df, rows=hours))
+        }
     else:
-        reach_list = [
-            reach_2_model(df, rows = hours),
-            reach_3_model(df, rows = hours),
-            reach_4_model(df, rows = hours),
-            reach_5_model(df, rows = hours)
-        ]
-    
-    table_html = '<br /><br />'.join(map(stylize_model_output, reach_list))
-    
-    return render_template('output_model.html', tables=table_html)
+        reach_html_tables = {
+            reach: stylize_model_output(reach, reach_func(df, rows=hours))
+            for reach, reach_func
+            in reach_model_mapping.items()
+        }
+
+    return render_template('output_model.html', tables=reach_html_tables)
 
 
 class ReachApi(Resource):
+
     def model_api(self) -> dict:
         """
         Class method that retrieves data from hobolink and usgs and processes
@@ -141,23 +134,25 @@ class ReachApi(Resource):
 
         returns: json-like dictionary
         """
-        df_hobolink = get_hobolink_data('code_for_boston_export_21d')
-        df_usgs = get_usgs_data()
-        df = process_data(df_hobolink, df_usgs)
+        df = get_data()
+
         dfs = {
             2: reach_2_model(df),
             3: reach_3_model(df),
             4: reach_4_model(df),
             5: reach_5_model(df)
         }
+
         main = {}
         models = {}
+
         # adds metadata
         main['version'] = '2020'
         main['time_returned'] = str(pd.to_datetime('today'))
 
         for reach, df in dfs.items():
             add_to_dict(models, df, reach)
+
         # adds models dict to main dict
         main['models'] = models
 

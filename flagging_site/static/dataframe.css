@@ -8,13 +8,8 @@ https://freefrontend.com/css-tables/
     -moz-box-sizing: border-box;
 }
 
-h2 {
+.table-wrapper h2 {
     text-align: center;
-    font-size: 18px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    color: white;
-    padding: 30px 0;
 }
 
 /* Table Styles */
@@ -34,6 +29,14 @@ h2 {
     max-width: 100%;
     white-space: nowrap;
     background-color: white;
+}
+
+.dataframe td .blue-flag {
+    color: #21618C;
+}
+
+.dataframe td > .red-flag {
+    color: #943126;
 }
 
 .dataframe td, .dataframe th {

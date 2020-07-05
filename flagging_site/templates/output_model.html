@@ -5,5 +5,10 @@
 {% endblock %}
 {% block title %}Detailed Outputs{% endblock %}
 {% block content %}
-    {{ tables | safe }}
+    {% for reach, tbl in tables.items() %}
+        <div class="table-wrapper">
+            <h2>Predictive Model for Reach {{ reach }}</h2>
+            {{ tbl | safe }}
+        </div>
+    {% endfor %}
 {% endblock %}
