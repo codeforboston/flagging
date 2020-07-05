@@ -1,4 +1,8 @@
 {% extends "base.html" %}
+{% block head %}
+    {{ super() }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='dataframe.css') }}" />
+{% endblock %}
 {% block title %}Detailed Outputs{% endblock %}
 {% block content %}
     {{ tables | safe }}

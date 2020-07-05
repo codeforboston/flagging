@@ -8,39 +8,63 @@ from flagging_site.data.model import reach_2_model
 from flagging_site.data.model import reach_3_model
 from flagging_site.data.model import reach_4_model
 from flagging_site.data.model import reach_5_model
+from flask_restful import Resource, Api
 
 from flask import request
 
 bp = Blueprint('flagging', __name__)
+api = Api(bp)
+
 
 def stylize_model_output(df: pd.DataFrame):
-    """ 
-    This function function stylizes the dataframe that we will output for our 
+    """
+    This function function stylizes the dataframe that we will output for our
     web page
-    
-    Args: 
-        data frame 
-        
-    Returns: 
-        Dataframe with properties set for color, border-style, flag colors, and 
+
+    Args:
+        data frame
+
+    Returns:
+        Dataframe with properties set for color, border-style, flag colors, and
         border-width
     """
+
     def color_flags(x):
         return 'color: blue' if x is True \
             else 'color: red' if x is False \
             else ''
-    return (
-        df
-        .style
-        .hide_index()
-        .set_properties(**{
-            'border-color': '#888888',
-            'border-style': 'solid',
-            'border-width': '1px'
-        })
-        .applymap(color_flags)
-        .render()
-    )
+    return '<div class="table-wrapper">' + \
+           df.to_html(index=False) + \
+           '</div>'
+    # return '<div class="table-wrapper">' + (
+    #     df
+    #         .style
+    #         .hide_index()
+    #         .set_properties(**{
+    #         'border-color': '#888888',
+    #         'border-style': 'solid',
+    #         'border-width': '1px'
+    #     })
+    #         .applymap(color_flags)
+    #         .render()
+    # ) + '</div>'
+
+
+def add_to_dict(models, df, reach) -> None:
+    """
+    Iterates through dataframe from model output, adds to model dict where
+    key equals column name, value equals column values as list type
+
+    args:
+        models: dictionary
+        df: pd.DataFrame
+        reach:int
+
+    returns: None
+        """
+    # converts time column to type string because of conversion to json error
+    df['time'] = df['time'].astype(str)
+    models[f'model_{reach}'] = df.to_dict(orient='list')
 
 
 @bp.route('/')
@@ -65,11 +89,11 @@ def index() -> str:
 @bp.route('/output_model', methods = ["GET"])
 def output_model() -> str:
     """
-    Retrieves data from hobolink and usgs and processes data and then 
+    Retrieves data from hobolink and usgs and processes data and then
     displays data on 'output_model.html'
-    
+
     args: no argument
-    
+
     returns: render model on output_model.html
     """
 
@@ -107,3 +131,40 @@ def output_model() -> str:
     table_html = '<br /><br />'.join(map(stylize_model_output, reach_list))
     
     return render_template('output_model.html', tables=table_html)
+
+
+class ReachApi(Resource):
+    def model_api(self) -> dict:
+        """
+        Class method that retrieves data from hobolink and usgs and processes
+        data, then creates json-like dictionary structure for model output.
+
+        returns: json-like dictionary
+        """
+        df_hobolink = get_hobolink_data('code_for_boston_export_21d')
+        df_usgs = get_usgs_data()
+        df = process_data(df_hobolink, df_usgs)
+        dfs = {
+            2: reach_2_model(df),
+            3: reach_3_model(df),
+            4: reach_4_model(df),
+            5: reach_5_model(df)
+        }
+        main = {}
+        models = {}
+        # adds metadata
+        main['version'] = '2020'
+        main['time_returned'] = str(pd.to_datetime('today'))
+
+        for reach, df in dfs.items():
+            add_to_dict(models, df, reach)
+        # adds models dict to main dict
+        main['models'] = models
+
+        return main
+
+    def get(self):
+        return self.model_api()
+
+
+api.add_resource(ReachApi, '/api/v1/model')
