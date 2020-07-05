@@ -1,0 +1,121 @@
+/* Based on a style by Flor Antara here:
+https://freefrontend.com/css-tables/
+*/
+
+*{
+    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+}
+
+h2 {
+    text-align: center;
+    font-size: 18px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: white;
+    padding: 30px 0;
+}
+
+/* Table Styles */
+
+.table-wrapper {
+    margin: 10px 70px 70px;
+    box-shadow: 0px 35px 50px rgba( 0, 0, 0, 0.2 );
+}
+
+.dataframe {
+    border-radius: 5px;
+    font-size: 12px;
+    font-weight: normal;
+    border: none;
+    border-collapse: collapse;
+    width: 100%;
+    max-width: 100%;
+    white-space: nowrap;
+    background-color: white;
+}
+
+.dataframe td, .dataframe th {
+    text-align: center;
+    padding: 8px;
+}
+
+.dataframe td {
+    border-right: 1px solid #f8f8f8;
+    font-size: 12px;
+}
+
+.dataframe thead th {
+    color: #ffffff;
+    background: #4f8fbd;
+}
+
+.dataframe tr:nth-child(even) {
+   background: #dce9f2;
+}
+
+/* Responsive */
+
+@media (max-width: 767px) {
+    .dataframe {
+        display: block;
+        width: 100%;
+    }
+    .table-wrapper:before{
+        content: "Scroll horizontally >";
+        display: block;
+        text-align: right;
+        font-size: 11px;
+        color: white;
+        padding: 0 0 10px;
+    }
+    .dataframe thead, .dataframe tbody, .dataframe thead th {
+        display: block;
+    }
+    .dataframe thead th:last-child{
+        border-bottom: none;
+    }
+    .dataframe thead {
+        float: left;
+    }
+    .dataframe tbody {
+        width: auto;
+        position: relative;
+        overflow-x: auto;
+    }
+    .dataframe td, .dataframe th {
+        padding: 20px .625em .625em .625em;
+        height: 60px;
+        vertical-align: middle;
+        box-sizing: border-box;
+        overflow-x: hidden;
+        overflow-y: auto;
+        width: 160px;
+        font-size: 13px;
+        text-overflow: ellipsis;
+    }
+    .dataframe thead th {
+        text-align: left;
+        border-bottom: 1px solid #f7f7f9;
+    }
+    .dataframe tbody tr {
+        display: table-cell;
+    }
+    .dataframe tbody tr:nth-child(odd) {
+        background: none;
+    }
+    .dataframe tr:nth-child(even) {
+        background: transparent;
+    }
+    .dataframe tr td {
+        border-right: 1px solid #f8fbd;
+    }
+    .dataframe tr td:nth-child(odd) {
+        background: #dce9f2;
+    }
+    .dataframe tbody td {
+        display: block;
+        text-align: center;
+    }
+}
