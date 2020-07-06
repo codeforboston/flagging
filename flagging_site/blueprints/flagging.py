@@ -81,7 +81,12 @@ def index() -> str:
     return render_template('index.html', flags=flags)
 
 
-@bp.route('/output_model', methods=["GET"])
+@bp.route('/about')
+def about() -> str:
+    return render_template('about.html')
+
+
+@bp.route('/output_model', methods=['GET'])
 def output_model() -> str:
     """
     Retrieves data from hobolink and usgs and processes data and then
@@ -95,10 +100,17 @@ def output_model() -> str:
     # Parse contents of the query string to get reach and hours parameters.
     # Defaults are hours = 24, and reach = -1.
     # When reach = -1, we utilize all reaches.
-    reach = int(request.args.get('reach', -1))
-    hours = int(request.args.get('hours', 24))
+    try:
+        reach = int(request.args.get('reach'))
+    except (TypeError, ValueError):
+        reach = -1
 
-    # Return no more than 72 hours.
+    try:
+        hours = int(request.args.get('hours'))
+    except (TypeError, ValueError):
+        hours = 24
+
+    # Look at no more than 72 hours.
     hours = min(max(hours, 1), 72)
 
     df = get_data()

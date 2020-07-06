@@ -5,7 +5,8 @@ import pytest
     'page, result',
     [
         ('/', 200),
-        ('/output_model', 200)
+        ('/output_model', 200),
+        ('/api/v1/model', 200)
     ]
 )
 def test_page(client, page, result):

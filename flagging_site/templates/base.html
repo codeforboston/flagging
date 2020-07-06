@@ -29,15 +29,16 @@
         <header>{{ self.title() }}</header>
         <div class="navigation">
             <a href="/">Home</a>
-            | <a href="/output_model">Detailed Outputs</a>
-            | <a href="/api/v1/model">API</a>
+            &nbsp; | &nbsp; <a href="/about">About</a>
+            &nbsp; | &nbsp; <a href="/output_model">Detailed Outputs</a>
+            &nbsp; | &nbsp; <a href="/api/v1/model">API</a>
         </div>
         {% endblock %}
     </section>
     <section class="content">{% block content %}{% endblock %}</section>
     <section class="footer">
         {% block footer %}
-        <hr /><br />
+        <hr />
         <div class="footer-content">
             <strong>Charles River Watershed Association</strong><br />
             <a href="https://goo.gl/maps/sTNPQ5fLwnV3ja7A7" target="_blank">190 Park Rd, Weston, MA 02493</a><br />
