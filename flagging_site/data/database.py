@@ -51,7 +51,7 @@ def db_init_str():
 
 
 
-
+# this function connects to the database and creates a cursor
 def db_get():
     print('-------------------------------')
     print ("db_get has been called!\n") # TEST ONLY
@@ -71,6 +71,7 @@ def db_get():
         return g.db
 
 
+# this function closes the database connection / cursor
 def db_close():     # note: Flask sample code adds an unused parameter e
     print('-------------------------------')
     print ("db_close has been called!\n") # TEST ONLY
@@ -83,6 +84,8 @@ def db_close():     # note: Flask sample code adds an unused parameter e
         else:
             print ("the database was not closed\n")
 
+# this function intializes the database
+# (it connects via db_get and clears/creates the tables)
 def db_init():
     print('-------------------------------')
     print ("db_init has been called!\n") # TEST ONLY
