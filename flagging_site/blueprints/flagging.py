@@ -24,7 +24,7 @@ def get_data() -> pd.DataFrame:
     return df
 
 
-def stylize_model_output(reach: int, df: pd.DataFrame) -> str:
+def stylize_model_output(df: pd.DataFrame) -> str:
     """
     This function function stylizes the dataframe that we will output for our
     web page. This function replaces the bools with colorized values, and then
@@ -125,11 +125,11 @@ def output_model() -> str:
     if reach in reach_model_mapping:
         reach_func = reach_model_mapping[int(reach)]
         reach_html_tables = {
-            reach: stylize_model_output(reach, reach_func(df, rows=hours))
+            reach: stylize_model_output(reach_func(df, rows=hours))
         }
     else:
         reach_html_tables = {
-            reach: stylize_model_output(reach, reach_func(df, rows=hours))
+            reach: stylize_model_output(reach_func(df, rows=hours))
             for reach, reach_func
             in reach_model_mapping.items()
         }
