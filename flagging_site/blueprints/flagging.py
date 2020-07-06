@@ -31,7 +31,7 @@ def stylize_model_output(df: pd.DataFrame) -> str:
     returns the HTML of the table excluding the index.
 
     Args:
-        reach (int): The reach number.
+        df: (pd.DataFrame) Pandas Dataframe containing model outputs.
 
     Returns:
         HTML table.
