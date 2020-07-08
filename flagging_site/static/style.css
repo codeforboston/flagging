@@ -1,16 +1,15 @@
 html {
   font-family: sans-serif;
-  background: #eee;
+  background: #dce9f2;
   padding: 1rem;
 }
 body {
-  max-width: 960px;
+  max-width: 1260px;
   margin: 0 auto;
   background: white;
 }
-h1 {
-  font-family: serif;
-  color: #377ba8;
+h1, h2, h3, h4 {
+  color: #27475e;
   margin: 1rem 0;
 }
 a {
@@ -19,12 +18,6 @@ a {
 hr {
   border: none;
   border-top: 1px solid lightgray;
-}
-nav {
-  background: lightgray;
-  display: flex;
-  align-items: center;
-  padding: 0 0.5rem;
 }
 nav h1 {
   flex: auto;
@@ -72,7 +65,9 @@ section.page-header {
 .flag {
   width: 2rem;
   height: auto;
-  padding: 1rem;
+  padding-top: 1rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
 }
 .post > header {
   display: flex;
@@ -111,9 +106,11 @@ section.page-header {
 }
 .footer {
   padding: 3em 1em 3em 1em;
+  font-size: 0.85em;
+
 }
 .footer > .footer-content {
-  width: 27em;
+  width: 30em;
   text-align: center;
   margin: 0 auto;
 }

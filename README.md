@@ -8,6 +8,8 @@ This code base is built in Python 3.7+ and utilizes the Flask library heavily. T
 
 Please read the [Flagging Website wiki](https://github.com/codeforboston/flagging/wiki) for on-boarding documents, code style guide, and development requirements.
 
+For strict documentation of the website sans project management stuff, read the docs [here](https://codeforboston.github.io/flagging/).
+
 ## Setup (Dev)
 
 These are the steps to set the code up in development mode.
