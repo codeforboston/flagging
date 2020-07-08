@@ -1,6 +1,8 @@
 """
 This file handles their access credentials and tokens for various APIs required
-to retrieve data for the website.
+to retrieve data for the website. This file also handles retrieving config
+variables, which are either stored in the application config or (if there is no
+active Flask app context) the system environment.
 
 The file that contains the credentials is called "vault.zip", and is referenced
 by a constant, `VAULT_FILE`. This file is accessed using a password stored in
