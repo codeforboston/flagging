@@ -21,16 +21,16 @@ EXPORT_NAME = 'code_for_boston_export'
 # Each key is the original column name; the value is the renamed column.
 HOBOLINK_COLUMNS = {
     'Time, GMT-04:00': 'time',
-    'Pressure, inHg, Charles River Weather Station': 'pressure',
-    'PAR, uE, Charles River Weather Station': 'par',
-    'Rain, in, Charles River Weather Station': 'rain',
-    'RH, %, Charles River Weather Station': 'rh',
-    'DewPt, *F, Charles River Weather Station': 'dew_point',
-    'Wind Speed, mph, Charles River Weather Station': 'wind_speed',
-    'Gust Speed, mph, Charles River Weather Station': 'gust_speed',
-    'Wind Dir, *, Charles River Weather Station': 'wind_dir',
-    'Water Temp, *F, Charles River Weather Station': 'water_temp',
-    'Temp, *F, Charles River Weather Station Air Temp': 'air_temp',
+    'Pressure': 'pressure',
+    'PAR': 'par',
+    'Rain': 'rain',
+    'RH': 'rh',
+    'DewPt': 'dew_point',
+    'Wind Speed': 'wind_speed',
+    'Gust Speed': 'gust_speed',
+    'Wind Dir': 'wind_dir',
+    'Water Temp': 'water_temp',
+    'Temp': 'air_temp',
     # 'Batt, V, Charles River Weather Station': 'battery'
 }
 STATIC_FILE_NAME = 'hobolink.pickle'
@@ -78,7 +78,7 @@ def request_to_hobolink(
     # handle HOBOLINK errors by checking HTTP status code
     # status codes in 400's are client errors, in 500's are server errors
     if res.status_code // 100 in [4, 5]:
-        error_message = "link has failed with error # " + str(res.status_code)  
+        error_message = "link has failed with error # " + str(res.status_code)
         return abort(res.status_code, error_message)
     return res
 
@@ -104,15 +104,33 @@ def parse_hobolink_data(res: str) -> pd.DataFrame:
     str_table = res[res.find(split_by) + len(split_by):]
     df = pd.read_csv(io.StringIO(str_table), sep=',')
 
-    # Remove all unnecessary columns
-    df = df[HOBOLINK_COLUMNS.keys()]
+    # There is a weird issue in the HOBOlink data where it sometimes returns
+    # multiple columns with the same name and spreads real data out across
+    # those two columns. It is VERY weird. I promise this code used to be much
+    # simpler before we ran into this issue and it broke the website. Please
+    # trust us that it does have to be this complicated.
+    for old_col_startswith, new_col in HOBOLINK_COLUMNS.items():
 
-    # Rename the columns to have shorter, friendlier names.
-    df = df.rename(columns=HOBOLINK_COLUMNS)
+        # Only look at rows that start with `old_col_startswith`
+        subset_df = df.loc[
+            :,
+            filter(lambda x: x.startswith(old_col_startswith), df.columns)
+        ]
 
-    # Remove rows with missing data (i.e. the 05, 15, 25, 35, 45, and 55 min
-    # timestamps, which only include the battery status.)
-    df = df.loc[df['water_temp'].notna(), :]
+        # Remove rows with missing data (i.e. the 05, 15, 25, 35, 45, and 55 min
+        # timestamps, which only include the battery status.)
+        subset_df = subset_df.loc[~subset_df.isna().all(axis=1)]
+
+        # Take the first nonmissing column value within the subset of rows we've
+        # selected. This trick is similar to doing a COALESCE in sql.
+        df[new_col] = subset_df \
+            .apply(lambda x: x[x.first_valid_index()], axis=1)
+
+    # Only keep these columns
+    df = df[HOBOLINK_COLUMNS.values()]
+
+    # Remove the rows with all missing values again.
+    df = df.loc[df['water_temp'].notna()]
 
     # Convert time column to Pandas datetime
     df['time'] = pd.to_datetime(df['time'])
