@@ -137,7 +137,7 @@ def output_model() -> str:
     return render_template('output_model.html', tables=reach_html_tables)
 
 
-@bp.route('/output_model', methods=['GET'])
-def output_model() -> str:
+@bp.route('/api/v1/api', methods=['GET'])
+def api_landing_page() -> str:
 
     return render_template('api/index.html')
