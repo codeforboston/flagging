@@ -43,23 +43,6 @@ def stylize_model_output(df: pd.DataFrame) -> str:
     return df.to_html(index=False, escape=False)
 
 
-def add_to_dict(models, df, reach) -> None:
-    """
-    Iterates through dataframe from model output, adds to model dict where
-    key equals column name, value equals column values as list type
-
-    args:
-        models: dictionary
-        df: pd.DataFrame
-        reach:int
-
-    returns: None
-        """
-    # converts time column to type string because of conversion to json error
-    df['time'] = df['time'].astype(str)
-    models[f'model_{reach}'] = df.to_dict(orient='list')
-
-
 @bp.route('/')
 def index() -> str:
     """
@@ -138,3 +121,7 @@ def api_landing_page() -> str:
 
     return render_template('api/index.html')
 
+
+@bp.route('/api/v1/model', methods=['GET'])
+def api() -> str:
+    return

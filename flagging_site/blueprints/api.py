@@ -12,7 +12,7 @@ from flask_restful import Resource, Api
 
 from flask import Blueprint
 
-bp = Blueprint('api', __name__, url_prefix='/api/v1/model')
+bp = Blueprint('/api', __name__)
 api = Api(bp)
 
 def get_data() -> pd.DataFrame:
@@ -21,6 +21,22 @@ def get_data() -> pd.DataFrame:
     df_usgs = get_usgs_data()
     df = process_data(df_hobolink, df_usgs)
     return df
+
+def add_to_dict(models, df, reach) -> None:
+    """
+    Iterates through dataframe from model output, adds to model dict where
+    key equals column name, value equals column values as list type
+
+    args:
+        models: dictionary
+        df: pd.DataFrame
+        reach:int
+
+    returns: None
+        """
+    # converts time column to type string because of conversion to json error
+    df['time'] = df['time'].astype(str)
+    models[f'model_{reach}'] = df.to_dict(orient='list')
 
 class ReachApi(Resource):
 
