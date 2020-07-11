@@ -60,7 +60,7 @@ def add_to_dict(models, df, reach) -> None:
         """
     # converts time column to type string because of conversion to json error
     df['time'] = df['time'].astype(str)
-    models[f'model_{reach}'] = df.to_dict(orient='list')
+    models[f'reach_{reach}'] = df.to_dict(orient='list')
 
 
 @bp.route('/')
@@ -136,42 +136,49 @@ def output_model() -> str:
 
     return render_template('output_model.html', tables=reach_html_tables)
 
+def model_api(reach_param = [2,3,4,5]) -> dict:
+    """
+    Class method that retrieves data from hobolink and usgs and processes
+    data, then creates json-like dictionary structure for model output.
+
+    returns: json-like dictionary
+    """
+    df = get_data()
+
+    dfs = {
+        2: reach_2_model(df),
+        3: reach_3_model(df),
+        4: reach_4_model(df),
+        5: reach_5_model(df)
+    }
+
+    main = {}
+    models = {}
+
+    # adds metadata
+    main['version'] = '2020'
+    main['time_returned'] = str(pd.to_datetime('today'))
+
+    for reach, df in dfs.items():
+        if reach in reach_param:
+            add_to_dict(models, df, reach)
+
+    # adds models dict to main dict
+    main['models'] = models
+
+    return main
 
 class ReachApi(Resource):
 
-    def model_api(self) -> dict:
-        """
-        Class method that retrieves data from hobolink and usgs and processes
-        data, then creates json-like dictionary structure for model output.
+    def get(self,reach):
+        reach_params = [reach]
+        return model_api(reach_params)
 
-        returns: json-like dictionary
-        """
-        df = get_data()
-
-        dfs = {
-            2: reach_2_model(df),
-            3: reach_3_model(df),
-            4: reach_4_model(df),
-            5: reach_5_model(df)
-        }
-
-        main = {}
-        models = {}
-
-        # adds metadata
-        main['version'] = '2020'
-        main['time_returned'] = str(pd.to_datetime('today'))
-
-        for reach, df in dfs.items():
-            add_to_dict(models, df, reach)
-
-        # adds models dict to main dict
-        main['models'] = models
-
-        return main
-
+class ReachesApi(Resource):
     def get(self):
-        return self.model_api()
+        return model_api()
 
+api.add_resource(ReachApi, '/api/v1/model/<int:reach>')
 
-api.add_resource(ReachApi, '/api/v1/model')
+api.add_resource(ReachesApi, '/api/v1/model')
+
