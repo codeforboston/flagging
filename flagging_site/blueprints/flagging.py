@@ -13,8 +13,6 @@ from flask_restful import Resource, Api
 from flask import request
 
 bp = Blueprint('flagging', __name__)
-api = Api(bp)
-
 
 def get_data() -> pd.DataFrame:
     """Retrieves the data that gets plugged into the the model."""
@@ -22,7 +20,6 @@ def get_data() -> pd.DataFrame:
     df_usgs = get_usgs_data()
     df = process_data(df_hobolink, df_usgs)
     return df
-
 
 def stylize_model_output(df: pd.DataFrame) -> str:
     """
@@ -136,8 +133,8 @@ def output_model() -> str:
 
     return render_template('output_model.html', tables=reach_html_tables)
 
-
-@bp.route('/api/v1/api', methods=['GET'])
+@bp.route('/api', methods=['GET'])
 def api_landing_page() -> str:
 
     return render_template('api/index.html')
+

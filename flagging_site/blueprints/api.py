@@ -10,6 +10,18 @@ from flagging_site.data.model import reach_4_model
 from flagging_site.data.model import reach_5_model
 from flask_restful import Resource, Api
 
+from flask import Blueprint
+
+bp = Blueprint('api', __name__, url_prefix='/api/v1/model')
+api = Api(bp)
+
+def get_data() -> pd.DataFrame:
+    """Retrieves the data that gets plugged into the the model."""
+    df_hobolink = get_hobolink_data('code_for_boston_export_21d')
+    df_usgs = get_usgs_data()
+    df = process_data(df_hobolink, df_usgs)
+    return df
+
 class ReachApi(Resource):
 
     def model_api(self) -> dict:
