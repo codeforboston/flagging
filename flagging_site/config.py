@@ -102,7 +102,7 @@ class ProductionConfig(Config):
     internet. Currently the only part of the website that's pretty fleshed out
     is the `flagging` part, so that's the only blueprint we import.
     """
-    BLUEPRINTS: Optional[List[str]] = ['flagging']
+    BLUEPRINTS: Optional[List[str]] = ['flagging', 'api']
 
 
 class DevelopmentConfig(Config):
