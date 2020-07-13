@@ -12,7 +12,7 @@ from flask_restful import Resource, Api
 
 from flask import Blueprint
 
-bp = Blueprint('api', __name__)
+bp = Blueprint('api', __name__,url_prefix='/api')
 api = Api(bp)
 
 def get_data() -> pd.DataFrame:
@@ -39,13 +39,14 @@ def add_to_dict(models, df, reach) -> None:
     models[f'reach_{reach}'] = df.to_dict(orient='list')
 
 
-def model_api(reach_param = [2,3,4,5]) -> dict:
+def model_api(reach_param: list = None) -> dict:
     """
     Class method that retrieves data from hobolink and usgs and processes
     data, then creates json-like dictionary structure for model output.
 
     returns: json-like dictionary
     """
+    reach_param = reach_param or [2,3,4,5]
     df = get_data()
 
     dfs = {
@@ -80,10 +81,10 @@ class ReachesApi(Resource):
     def get(self):
         return model_api()
 
-api.add_resource(ReachApi, '/api/v1/model/<int:reach>')
+api.add_resource(ReachApi, '/v1/model/<int:reach>')
 
-@bp.route('/api', methods=['GET'])
+@bp.route('/', methods=['GET'])
 def api_landing_page() -> str:
     return render_template('api/index.html')
 
-api.add_resource(ReachesApi, '/api/v1/model')
+api.add_resource(ReachesApi, '/v1/model')
