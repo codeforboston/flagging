@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}API{% endblock %}
+{% block content %}
+    <h2>Flagging Program</h2>
+    <p>
+        The CRWA's API endpoints return JSON metadata based on REST principles about water quality, temperature, precipitation, and wind speed
+        from sensors located in the Charles River. The current API for the project utilizes a single HTTP request-response
+        mechanism, the GET request, to retrieve data. Users of the CRWA Public API can use GET requests to fetch data
+        for further analysis. Additional APIs may be added to the project as development progresses. This is a volunteer
+        driven project and we appreciate developer input on what would be most useful.
+
+        <br><br><br><a href="v1/model">Access to the API is free and open to the public.</a>
+
+        <br><br><br><strong>Note: The v1 API is still tentative and under development at this time. It will be
+        finalized when this messsage is removed.</strong>
+    </p>
+
+{% endblock %}

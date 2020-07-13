@@ -8,13 +8,10 @@ from flagging_site.data.model import reach_2_model
 from flagging_site.data.model import reach_3_model
 from flagging_site.data.model import reach_4_model
 from flagging_site.data.model import reach_5_model
-from flask_restful import Resource, Api
 
 from flask import request
 
 bp = Blueprint('flagging', __name__)
-api = Api(bp)
-
 
 def get_data() -> pd.DataFrame:
     """Retrieves the data that gets plugged into the the model."""
@@ -22,7 +19,6 @@ def get_data() -> pd.DataFrame:
     df_usgs = get_usgs_data()
     df = process_data(df_hobolink, df_usgs)
     return df
-
 
 def stylize_model_output(df: pd.DataFrame) -> str:
     """
@@ -44,24 +40,6 @@ def stylize_model_output(df: pd.DataFrame) -> str:
     df.columns = [i.title().replace('_', ' ') for i in df.columns]
 
     return df.to_html(index=False, escape=False)
-
-
-def add_to_dict(models, df, reach) -> None:
-    """
-    Iterates through dataframe from model output, adds to model dict where
-    key equals column name, value equals column values as list type
-
-    args:
-        models: dictionary
-        df: pd.DataFrame
-        reach:int
-
-    returns: None
-        """
-    # converts time column to type string because of conversion to json error
-    df['time'] = df['time'].astype(str)
-    models[f'model_{reach}'] = df.to_dict(orient='list')
-
 
 @bp.route('/')
 def index() -> str:
@@ -135,43 +113,3 @@ def output_model() -> str:
         }
 
     return render_template('output_model.html', tables=reach_html_tables)
-
-
-class ReachApi(Resource):
-
-    def model_api(self) -> dict:
-        """
-        Class method that retrieves data from hobolink and usgs and processes
-        data, then creates json-like dictionary structure for model output.
-
-        returns: json-like dictionary
-        """
-        df = get_data()
-
-        dfs = {
-            2: reach_2_model(df),
-            3: reach_3_model(df),
-            4: reach_4_model(df),
-            5: reach_5_model(df)
-        }
-
-        main = {}
-        models = {}
-
-        # adds metadata
-        main['version'] = '2020'
-        main['time_returned'] = str(pd.to_datetime('today'))
-
-        for reach, df in dfs.items():
-            add_to_dict(models, df, reach)
-
-        # adds models dict to main dict
-        main['models'] = models
-
-        return main
-
-    def get(self):
-        return self.model_api()
-
-
-api.add_resource(ReachApi, '/api/v1/model')
