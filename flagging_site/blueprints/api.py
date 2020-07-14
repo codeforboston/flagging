@@ -23,7 +23,7 @@ def get_data() -> pd.DataFrame:
     df = process_data(df_hobolink, df_usgs)
     return df
 
-def add_to_dict(models, df, reach) -> None:
+def add_to_dict(models, df, reach, hour) -> None:
     """
     Iterates through dataframe from model output, adds to model dict where
     key equals column name, value equals column values as list type
@@ -37,10 +37,10 @@ def add_to_dict(models, df, reach) -> None:
         """
     # converts time column to type string because of conversion to json error
     df['time'] = df['time'].astype(str)
-    models[f'reach_{reach}'] = df.to_dict(orient='list')
+    models[f'reach_{reach}'] = df.iloc[:hour].to_dict(orient='list')
 
 
-def model_api(reach_param: list = None, hour: str = None) -> dict:
+def model_api(reach_param: list = None, hour: str = 48) -> dict:
     """
     Class method that retrieves data from hobolink and usgs and processes
     data, then creates json-like dictionary structure for model output.
@@ -49,10 +49,16 @@ def model_api(reach_param: list = None, hour: str = None) -> dict:
     """
     if reach_param:
         reach_param = list(map(int, reach_param))
-    if hour:
-        hour = int(hour)
-    reach_param = reach_param or [2,3,4,5]
-    hour = hour or 48
+
+    reach_param = reach_param or [2, 3, 4, 5]
+
+    hour = int(hour)
+
+    if hour > 48:
+        hour = 48
+    elif hour < 1:
+        hour = 1
+
     df = get_data()
 
     dfs = {
@@ -71,7 +77,7 @@ def model_api(reach_param: list = None, hour: str = None) -> dict:
 
     for reach, df in dfs.items():
         if reach in reach_param:
-            add_to_dict(models, df, reach)
+            add_to_dict(models, df, reach, hour)
 
     # adds models dict to main dict
     main['models'] = models
@@ -80,8 +86,8 @@ def model_api(reach_param: list = None, hour: str = None) -> dict:
 
 class ReachesApi(Resource):
     def get(self):
-        reach = request.args.getlist('reach')
-        hour = request.args.get('hour')
+        reach = request.args.getlist('reach', None)
+        hour = request.args.get('hour', 48)
         return model_api(reach,hour)
 
 @bp.route('/', methods=['GET'])
