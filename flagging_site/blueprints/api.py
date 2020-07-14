@@ -11,6 +11,7 @@ from flagging_site.data.model import reach_5_model
 from flask_restful import Resource, Api
 
 from flask import Blueprint
+from flask import request
 
 bp = Blueprint('api', __name__,url_prefix='/api')
 api = Api(bp)
@@ -39,21 +40,32 @@ def add_to_dict(models, df, reach) -> None:
     models[f'reach_{reach}'] = df.to_dict(orient='list')
 
 
-def model_api(reach_param: list = None) -> dict:
+def model_api(reach_param: list = None, hour: str = 48) -> dict:
     """
     Class method that retrieves data from hobolink and usgs and processes
     data, then creates json-like dictionary structure for model output.
 
     returns: json-like dictionary
     """
-    reach_param = reach_param or [2,3,4,5]
+    if reach_param:
+        reach_param = list(map(int, reach_param))
+
+    reach_param = reach_param or [2, 3, 4, 5]
+
+    hour = int(hour)
+
+    if hour > 48:
+        hour = 48
+    elif hour < 1:
+        hour = 1
+
     df = get_data()
 
     dfs = {
-        2: reach_2_model(df),
-        3: reach_3_model(df),
-        4: reach_4_model(df),
-        5: reach_5_model(df)
+        2: reach_2_model(df,hour),
+        3: reach_3_model(df,hour),
+        4: reach_4_model(df,hour),
+        5: reach_5_model(df,hour)
     }
 
     main = {}
@@ -72,16 +84,11 @@ def model_api(reach_param: list = None) -> dict:
 
     return main
 
-class ReachApi(Resource):
-    def get(self,reach):
-        reach_params = [reach]
-        return model_api(reach_params)
-
 class ReachesApi(Resource):
     def get(self):
-        return model_api()
-
-api.add_resource(ReachApi, '/v1/model/<int:reach>')
+        reach = request.args.getlist('reach', None)
+        hour = request.args.get('hour', 48)
+        return model_api(reach,hour)
 
 @bp.route('/', methods=['GET'])
 def api_landing_page() -> str:
