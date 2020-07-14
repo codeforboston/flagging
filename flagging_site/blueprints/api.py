@@ -23,7 +23,7 @@ def get_data() -> pd.DataFrame:
     df = process_data(df_hobolink, df_usgs)
     return df
 
-def add_to_dict(models, df, reach, hour) -> None:
+def add_to_dict(models, df, reach) -> None:
     """
     Iterates through dataframe from model output, adds to model dict where
     key equals column name, value equals column values as list type
@@ -37,7 +37,7 @@ def add_to_dict(models, df, reach, hour) -> None:
         """
     # converts time column to type string because of conversion to json error
     df['time'] = df['time'].astype(str)
-    models[f'reach_{reach}'] = df.iloc[:hour].to_dict(orient='list')
+    models[f'reach_{reach}'] = df.to_dict(orient='list')
 
 
 def model_api(reach_param: list = None, hour: str = 48) -> dict:
@@ -62,10 +62,10 @@ def model_api(reach_param: list = None, hour: str = 48) -> dict:
     df = get_data()
 
     dfs = {
-        2: reach_2_model(df),
-        3: reach_3_model(df),
-        4: reach_4_model(df),
-        5: reach_5_model(df)
+        2: reach_2_model(df,hour),
+        3: reach_3_model(df,hour),
+        4: reach_4_model(df,hour),
+        5: reach_5_model(df,hour)
     }
 
     main = {}
@@ -77,7 +77,7 @@ def model_api(reach_param: list = None, hour: str = 48) -> dict:
 
     for reach, df in dfs.items():
         if reach in reach_param:
-            add_to_dict(models, df, reach, hour)
+            add_to_dict(models, df, reach)
 
     # adds models dict to main dict
     main['models'] = models
