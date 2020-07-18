@@ -42,6 +42,13 @@ header .action {
   display: block;
   padding: 0.5rem;
 }
+ul.home_boat_house{
+  list-style-type: square;
+  padding-left: 15px;
+  padding-right: 15px;
+  text-align: left;
+  line-height: 25px;
+}
 section.page-header {
   text-align: center;
   border-bottom: 1px solid lightgray;
@@ -120,6 +127,12 @@ section.page-header {
 .content textarea {
   min-height: 12em;
   resize: vertical;
+}
+
+.home_reach{
+  border: 1px solid black;
+  border-collapse: collapse;
+  padding: 15px;
 }
 input.danger {
   color: #cc2f2e;

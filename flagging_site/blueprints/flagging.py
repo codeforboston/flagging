@@ -74,6 +74,41 @@ def index() -> str:
     df = get_data()
     
     homepage = {
+        "2": {
+            "flag": reach_2_model(df, rows=1)['safe'].iloc[0],
+            "time": reach_2_model(df, rows=25)['time'].iloc[0],
+            "names": {
+                0: "Newton Yacht Club",
+                1: "Watertown Yacht Club",
+                2: "Community Rowing, Inc."
+            }
+        },
+        "3": {
+            "flag": reach_3_model(df, rows=1)['safe'].iloc[0],
+            "time": reach_3_model(df, rows=25)['time'].iloc[0],
+            "names": {
+                0: "Northeastern's Henderson Boathouse",
+                1: "Paddle Boston at Herter Park",
+                2: "Harvard's Weld Boathouse"
+            }
+        },
+        "4": {
+            "flag": reach_4_model(df, rows=1)['safe'].iloc[0],
+            "time": reach_4_model(df, rows=25)['time'].iloc[0],
+            "names": {
+                0: "Riverside Boat Club",
+                1: "Charles River Yacht Club",
+                2: "Union Boat Club"
+            }
+        },
+        "5": {
+            "flag": reach_5_model(df, rows=1)['safe'].iloc[0],
+            "time": reach_5_model(df, rows=25)['time'].iloc[0],
+            "names": {
+                0: "Community Boating",
+                1: "Paddle Boston at Kendall Square"
+            }
+        },
         "flags": {
             2: reach_2_model(df, rows=1)['safe'].iloc[0],
             3: reach_3_model(df, rows=1)['safe'].iloc[0],
