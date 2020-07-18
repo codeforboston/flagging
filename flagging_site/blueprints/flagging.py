@@ -74,9 +74,14 @@ def index() -> str:
     df = get_data()
     
     # Important: Restructured these dicts for easier use.
-    # Warning - The following aren't implemented yet due to inconsistencies with http://notification.crwa.org/wqmodel/charlesflags.php:
+    # Warning - The following aren't implemented yet due to inconsistencies with http://notification.crwa.org/wqmodel/charlesflags.php (old) vs https://www.crwa.org/flagging-program.html (new):
+        # not on old CRWA page, hence not implemented below:
         # 'Northeastern's Henderson Boathouse'
         # 'Paddle Boston at Herter Park' -- is this the same as Reach 3's 'CRCK at Herter Park?'
+
+        # only found on old CRWA page only, hence implemented according to old website's format:
+        # 'CRCK at Herter Park'
+        # 'CRCK at Kendall Square'
 
     homepage = {
         2: {
@@ -92,7 +97,7 @@ def index() -> str:
             'flag': reach_3_model(df, rows=1)['safe'].iloc[0],
             'time': reach_3_model(df, rows=25)['time'].iloc[0],
             'names': {
-                0: 'CRCK at Herter Park',
+                0: 'CRCK at Herter Park', # Found on old CRWA page only
                 1: 'Harvard\'s Weld Boathouse' 
             }
         },
@@ -110,7 +115,8 @@ def index() -> str:
                 0: 'Charles River Yacht Club',
                 1: 'Union Boat Club',
                 2: 'Community Boating',
-                3: 'CRCK at Kendall Square'
+                3: 'CRCK at Kendall Square', # Found on old CRWA page only
+                4: 'Paddle Boston at Kendall Square' # Assuming this is reach 5
             }
         }
     }
