@@ -51,30 +51,32 @@
     one week apart, to recommend rescinding the advisory.
 
 </p>
-<br />
-{% for time in homepage.times.items() %}
-<p>
-    <!-- Currently uses time of last row for reach 5 table. Needs unit test to ensure this matches the times for reach 2, 3, and 4 -->
-    {% if loop.last %}
-    Last updated: {{time[1]}}
-    {% endif %}
-</p>
-{% endfor %}
-<table class="home_reach">
-    {% for reach, flag in homepage.flags.items() %}
+<br /><br />
+<table class="home-reach">
+    {% for reach_no, reach in homepage.items() %}
     <tr>
-        <td class="home_reach">
-            <div> Reach {{ reach }} </div>
-            <ul class="home_boat_house">
-                <li> t </li>
+        <td class="home-reach">
+            <div> Reach {{ reach_no }} </div>
+            <ul class="home-boat-house">
+                {% for attr, vals in reach.names.items() %}
+                <li> {{ vals }} </li>
+                {% endfor %}
             </ul>
         </td>
-        {% if flag %}
-        <td class="home_reach"><img class="flag" src="{{ url_for('static', filename='images/blue_flag.jpg') }}" /></td>
+        {% if reach.flag %}
+        <td class="home-reach"><img class="flag" src="{{ url_for('static', filename='images/blue_flag.jpg') }}" /></td>
         {% else %}
         <td><img class="flag home_reach" src="{{ url_for('static', filename='images/red_flag.jpg') }}" /></td>
         {% endif %}
     </tr>
     {% endfor %}
 </table>
+{% for key, value in homepage.items() %}
+<p class="home-centered">
+    <!-- Currently uses time of last row for reach 5 table. Needs unit test to ensure this matches the times for reach 2, 3, and 4 -->
+    {% if loop.last %}
+    (Last updated: {{value.time}})
+    {% endif %}
+</p>
+{% endfor %}
 {% endblock %}

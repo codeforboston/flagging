@@ -42,7 +42,7 @@ header .action {
   display: block;
   padding: 0.5rem;
 }
-ul.home_boat_house{
+ul.home-boat-house{
   list-style-type: square;
   padding-left: 15px;
   padding-right: 15px;
@@ -129,10 +129,14 @@ section.page-header {
   resize: vertical;
 }
 
-.home_reach{
+.home-centered{
+  text-align: center;
+}
+.home-reach{
   border: 1px solid black;
   border-collapse: collapse;
   padding: 15px;
+  margin: 0 auto;            
 }
 input.danger {
   color: #cc2f2e;

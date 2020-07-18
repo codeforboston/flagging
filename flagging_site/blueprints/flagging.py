@@ -73,53 +73,45 @@ def index() -> str:
     """
     df = get_data()
     
+    # Important: Restructured these dicts for easier use.
+    # Warning - The following aren't implemented yet due to inconsistencies with http://notification.crwa.org/wqmodel/charlesflags.php:
+        # 'Northeastern's Henderson Boathouse'
+        # 'Paddle Boston at Herter Park' -- is this the same as Reach 3's 'CRCK at Herter Park?'
+
     homepage = {
-        "2": {
-            "flag": reach_2_model(df, rows=1)['safe'].iloc[0],
-            "time": reach_2_model(df, rows=25)['time'].iloc[0],
-            "names": {
-                0: "Newton Yacht Club",
-                1: "Watertown Yacht Club",
-                2: "Community Rowing, Inc."
+        2: {
+            'flag': reach_2_model(df, rows=1)['safe'].iloc[0],
+            'time': reach_2_model(df, rows=25)['time'].iloc[0],
+            'names': {
+                0: 'Newton Yacht Club',
+                1: 'Watertown Yacht Club',
+                2: 'Community Rowing, Inc.'
             }
         },
-        "3": {
-            "flag": reach_3_model(df, rows=1)['safe'].iloc[0],
-            "time": reach_3_model(df, rows=25)['time'].iloc[0],
-            "names": {
-                0: "Northeastern's Henderson Boathouse",
-                1: "Paddle Boston at Herter Park",
-                2: "Harvard's Weld Boathouse"
+        3: {
+            'flag': reach_3_model(df, rows=1)['safe'].iloc[0],
+            'time': reach_3_model(df, rows=25)['time'].iloc[0],
+            'names': {
+                0: 'CRCK at Herter Park',
+                1: 'Harvard\'s Weld Boathouse' 
             }
         },
-        "4": {
-            "flag": reach_4_model(df, rows=1)['safe'].iloc[0],
-            "time": reach_4_model(df, rows=25)['time'].iloc[0],
-            "names": {
-                0: "Riverside Boat Club",
-                1: "Charles River Yacht Club",
-                2: "Union Boat Club"
+        4: {
+            'flag': reach_4_model(df, rows=1)['safe'].iloc[0],
+            'time': reach_4_model(df, rows=25)['time'].iloc[0],
+            'names': {
+                0: 'Riverside Boat Club'
             }
         },
-        "5": {
-            "flag": reach_5_model(df, rows=1)['safe'].iloc[0],
-            "time": reach_5_model(df, rows=25)['time'].iloc[0],
-            "names": {
-                0: "Community Boating",
-                1: "Paddle Boston at Kendall Square"
+        5: {
+            'flag': reach_5_model(df, rows=1)['safe'].iloc[0],
+            'time': reach_5_model(df, rows=25)['time'].iloc[0],
+            'names': {
+                0: 'Charles River Yacht Club',
+                1: 'Union Boat Club',
+                2: 'Community Boating',
+                3: 'CRCK at Kendall Square'
             }
-        },
-        "flags": {
-            2: reach_2_model(df, rows=1)['safe'].iloc[0],
-            3: reach_3_model(df, rows=1)['safe'].iloc[0],
-            4: reach_4_model(df, rows=1)['safe'].iloc[0],
-            5: reach_5_model(df, rows=1)['safe'].iloc[0]
-        },
-        "times": {
-            2: reach_2_model(df, rows=25)['time'].iloc[0],
-            3: reach_3_model(df, rows=25)['time'].iloc[0],
-            4: reach_4_model(df, rows=25)['time'].iloc[0],
-            5: reach_5_model(df, rows=25)['time'].iloc[0]
         }
     }
 
