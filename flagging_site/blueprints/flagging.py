@@ -72,13 +72,24 @@ def index() -> str:
     returns: render model on index.html
     """
     df = get_data()
-    flags = {
-        2: reach_2_model(df, rows=1)['safe'].iloc[0],
-        3: reach_3_model(df, rows=1)['safe'].iloc[0],
-        4: reach_4_model(df, rows=1)['safe'].iloc[0],
-        5: reach_5_model(df, rows=1)['safe'].iloc[0]
+    
+    homepage = {
+        "flags": {
+            2: reach_2_model(df, rows=1)['safe'].iloc[0],
+            3: reach_3_model(df, rows=1)['safe'].iloc[0],
+            4: reach_4_model(df, rows=1)['safe'].iloc[0],
+            5: reach_5_model(df, rows=1)['safe'].iloc[0]
+        },
+        "times": {
+            2: reach_2_model(df, rows=25)['time'].iloc[0],
+            3: reach_3_model(df, rows=25)['time'].iloc[0],
+            4: reach_4_model(df, rows=25)['time'].iloc[0],
+            5: reach_5_model(df, rows=25)['time'].iloc[0]
+        }
     }
-    return render_template('index.html', flags=flags)
+
+    return render_template('index.html', homepage=homepage)
+    # return render_template('index.html', flags=flags)
 
 
 @bp.route('/about')

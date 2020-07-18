@@ -19,6 +19,9 @@ hr {
   border: none;
   border-top: 1px solid lightgray;
 }
+p {
+  line-height: 25px;
+}
 nav h1 {
   flex: auto;
   margin: 0;
