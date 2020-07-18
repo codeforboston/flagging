@@ -1,9 +1,13 @@
-"""
-Configurations for the website.
+"""Configurations for the website.
+
+Be careful with any config variables that reference the system environment, e.g.
+OFFLINE_MODE when it loads from `os.getenv`. These values are filled in when
+this module is loaded, meaning if you change the env variables _after_ you load
+this module, they won't refresh.
 """
 import os
 from typing import Dict, Any, Optional, List
-from dataclasses import dataclass
+
 
 # Constants
 # ~~~~~~~~~
@@ -16,8 +20,12 @@ VAULT_FILE = os.path.join(ROOT_DIR, 'vault.zip')
 # Configs
 # ~~~~~~~
 
-@dataclass
-class BaseConfig:
+class Config:
+    """This class is a container for all config variables. Instances of this
+    class are loaded into the Flask app in the `create_app` function.
+    """
+    def __repr__(self):
+        return f'{self.__class__.__name__}()'
     # ==========================================================================
     # FLASK BUILTIN CONFIG OPTIONS
     #
@@ -70,6 +78,10 @@ class BaseConfig:
     """If Offline Mode is turned on, the data used when performing requests will
     be a static pickled version of the data instead of actively pulled from HTTP
     requests.
+    
+    This is useful for front-end development for two reasons: First, you don't
+    need the vault password to develop the front-end of the website. Second, it
+    means that the data loads faster and avoids any possible issues.
     """
 
     DATA_STORE: str = DATA_STORE
@@ -84,14 +96,16 @@ class BaseConfig:
     find in the `blueprints` module.
     """
 
-class ProductionConfig(BaseConfig):
+
+class ProductionConfig(Config):
     """The Production Config is used for deployment of the website to the
     internet. Currently the only part of the website that's pretty fleshed out
     is the `flagging` part, so that's the only blueprint we import.
     """
     BLUEPRINTS: Optional[List[str]] = ['flagging']
 
-class DevelopmentConfig(BaseConfig):
+
+class DevelopmentConfig(Config):
     """The Development Config is used for running the website on your own
     computer. This is the default config loaded up when you use `run_unix_dev`
     or `run_windows_dev` to boot up the website.
@@ -107,22 +121,40 @@ class DevelopmentConfig(BaseConfig):
     VAULT_OPTIONAL: bool = True
     DEBUG: bool = True
     TESTING: bool = True
-
-class OfflineDevelopmentConfig(DevelopmentConfig):
-    """The Offline Development Config extends `DevelopmentConfig` to use a
-    pickled version of the data instead of loading data through the whole
-    pipeline from HTTP requests. It is useful for front-end development for two
-    reasons: First, you don't need the vault password to develop the front-end
-    of the website. Second, it means that the data loads faster and avoids any
-    possible issues.
-    """
-    OFFLINE_MODE: bool = True
+    OFFLINE_MODE = os.getenv('OFFLINE_MODE', 'false')
 
 
-class TestingConfig(BaseConfig):
+class TestingConfig(Config):
     """The Testing Config is used for unit-testing and integration-testing the
     website.
     """
-
-class TestingConfig(BaseConfig):
     TESTING: bool = True
+
+
+def get_config_from_env(env: str) -> Config:
+    """This function takes a string variable, looks at what that string variable
+    is, and returns an instance of a Config class corresponding to that string
+    variable.
+
+    Args:
+        env: (str) A string. Usually this is from `app.env` inside of the
+             `create_app` function, which in turn is set by the environment
+             variable `FLASK_ENV`.
+    Returns:
+        A Config instance corresponding with the string passed.
+
+    Example:
+        >>> get_config_from_env('development')
+        DevelopmentConfig()
+    """
+    config_mapping = {
+        'production': ProductionConfig,
+        'development': DevelopmentConfig,
+        'testing': TestingConfig
+    }
+    try:
+        config = config_mapping[env]
+    except KeyError:
+        raise KeyError('Bad config passed; the config must be production, '
+                       'development, or testing.')
+    return config()

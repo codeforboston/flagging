@@ -1,11 +1,10 @@
-# flagging_site Contents
+# flagging_site Content 
 
-
-    - app.py: Runs flask application 
-    - blueprints: contains files that are modular applications that add to main flask app 
-    - config.py: Configuration file that includes config options for database, flask, ....
-    - data: contains files that retrieves and cleans data
-    - __init__.py: Required to make Python treat directories as packages
-    - static: Contains css/style sheet, image files, unmodified content delivered to user
-    - templates: contains html files, defining web page structure
-    - vault.zip: ...
+  - `/blueprints`: contains files that are modular applications added to main flask application
+  - `/data`: contains files that retrieves and cleans the hobolink and usgs data
+  - `/static`: contains images and css/style sheet
+  - `/templates`: contains the html pages that define the web page structure
+  - `__init__.py`: required to treat directory as a package
+  - `app.py`: main flask application
+  - `config.py`: file holding the config options for flask and database
+  - `vault.zip`: contains credentials necessary to accessing hoblink and usgs api 

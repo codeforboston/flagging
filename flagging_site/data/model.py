@@ -160,15 +160,15 @@ def reach_2_model(df: pd.DataFrame, rows: int = 24) -> pd.DataFrame:
     """
     df = df.tail(n=rows).copy()
 
-    df['r2_out'] = (
+    df['log_odds'] = (
         0.6233
         + 0.3531 * df['rain_0_to_24h_sum']
         - 0.0362 * df['days_since_sig_rain']
         - 0.000312 * df['par_1d_mean']
     )
-    df['r2_sigmoid'] = sigmoid(df['r2_out'])
-    df['r2_safe'] = df['r2_sigmoid'] <= SAFETY_THRESHOLD
-    return df[['time', 'r2_out', 'r2_sigmoid', 'r2_safe']]
+    df['probability'] = sigmoid(df['log_odds'])
+    df['safe'] = df['probability'] <= SAFETY_THRESHOLD
+    return df[['time', 'log_odds', 'probability', 'safe']]
 
 
 def reach_3_model(df: pd.DataFrame, rows: int = 24) -> pd.DataFrame:
@@ -179,7 +179,8 @@ def reach_3_model(df: pd.DataFrame, rows: int = 24) -> pd.DataFrame:
     0.267*a + 0.1681*b - 0.02855*d  + 0.5157
 
     Args:
-        df: Input data from `process_data()`
+        df: (pd.DataFrame) Input data from `process_data()`
+        rows: (int) Number of rows to return.
 
     Returns:
         Outputs for model as a dataframe.
@@ -187,16 +188,15 @@ def reach_3_model(df: pd.DataFrame, rows: int = 24) -> pd.DataFrame:
 
     df = df.tail(n=rows).copy()
 
-    df['r3_out'] = (
+    df['log_odds'] = (
         0.5157
         + 0.267 * df['rain_0_to_24h_sum']
         + 0.1681 * df['rain_24_to_48h_sum']
         - 0.02855 * df['days_since_sig_rain']
     )
-
-    df['r3_sigmoid'] = sigmoid(df['r3_out'])
-    df['r3_safe'] = df['r3_sigmoid'] <= SAFETY_THRESHOLD
-    return df[['time', 'r3_out', 'r3_sigmoid', 'r3_safe']]
+    df['probability'] = sigmoid(df['log_odds'])
+    df['safe'] = df['probability'] <= SAFETY_THRESHOLD
+    return df[['time', 'log_odds', 'probability', 'safe']]
 
 
 def reach_4_model(df: pd.DataFrame, rows: int = 24) -> pd.DataFrame:
@@ -208,22 +208,23 @@ def reach_4_model(df: pd.DataFrame, rows: int = 24) -> pd.DataFrame:
     0.30276*a + 0.1611*b - 0.02267*d - 0.000427*f  +0.5791
 
     Args:
-        df: Input data from `process_data()`
+        df: (pd.DataFrame) Input data from `process_data()`
+        rows: (int) Number of rows to return.
 
     Returns:
         Outputs for model as a dataframe.
     """
     df = df.tail(n=rows).copy()
-    df['r4_out'] = (
+    df['log_odds'] = (
         0.5791
         + 0.30276 * df['rain_0_to_24h_sum']
         + 0.1611 * df['rain_24_to_48h_sum']
         - 0.02267 * df['days_since_sig_rain']
         - 0.000427 * df['par_1d_mean']
     )
-    df['r4_sigmoid'] = sigmoid(df['r4_out'])
-    df['r4_safe'] = df['r4_sigmoid'] <= SAFETY_THRESHOLD
-    return df[['time', 'r4_out', 'r4_sigmoid', 'r4_safe']]
+    df['probability'] = sigmoid(df['log_odds'])
+    df['safe'] = df['probability'] <= SAFETY_THRESHOLD
+    return df[['time', 'log_odds', 'probability', 'safe']]
 
 
 def reach_5_model(df: pd.DataFrame, rows: int = 24) -> pd.DataFrame:
@@ -234,18 +235,19 @@ def reach_5_model(df: pd.DataFrame, rows: int = 24) -> pd.DataFrame:
     0.1091*c  -  0.01355*d + 0.000342*e  +0.3333
 
     Args:
-        df: Input data from `process_data()`
+        df: (pd.DataFrame) Input data from `process_data()`
+        rows: (int) Number of rows to return.
 
     Returns:
         Outputs for model as a dataframe.
     """
     df = df.tail(n=rows).copy()
-    df['r5_out'] = (
+    df['log_odds'] = (
         0.3333
         + 0.1091 * df['rain_0_to_48h_sum']
         - 0.01355 * df['days_since_sig_rain']
         + 0.000342 * df['stream_flow_1d_mean']
     )
-    df['r5_sigmoid'] = sigmoid(df['r5_out'])
-    df['r5_safe'] = df['r5_sigmoid'] <= SAFETY_THRESHOLD
-    return df[['time', 'r5_out', 'r5_sigmoid', 'r5_safe']]
+    df['probability'] = sigmoid(df['log_odds'])
+    df['safe'] = df['probability'] <= SAFETY_THRESHOLD
+    return df[['time', 'log_odds', 'probability', 'safe']]

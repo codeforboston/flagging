@@ -1,0 +1,8 @@
+site_name: Water MKDocs
+nav:
+    - Home: index.md
+    - Background: background.md
+    - Deployment: deployment.md
+    - System: system.md
+    
+theme: readthedocs

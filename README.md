@@ -8,6 +8,8 @@ This code base is built in Python 3.7+ and utilizes the Flask library heavily. T
 
 Please read the [Flagging Website wiki](https://github.com/codeforboston/flagging/wiki) for on-boarding documents, code style guide, and development requirements.
 
+For strict documentation of the website sans project management stuff, read the docs [here](https://codeforboston.github.io/flagging/).
+
 ## Setup (Dev)
 
 These are the steps to set the code up in development mode.
@@ -48,3 +50,13 @@ heroku config:set VAULT_PASSWORD=replace_me_with_pw
 heroku create crwa-flagging-staging
 git push heroku master
 ```
+
+## Run tests
+
+Tests are written in Pytest. To run tests, run the following on your command line:
+
+```shell script
+python -m pytest ./tests -s
+```
+
+Note: the test may require you to enter the vault password if it is not already in your environment variables.

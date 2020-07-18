@@ -1,8 +1,9 @@
 import os
-
 import pytest
+
 from flagging_site import create_app
 from flagging_site.config import TestingConfig
+
 
 @pytest.fixture
 def app():
@@ -10,8 +11,9 @@ def app():
     if 'VAULT_PASSWORD' not in os.environ:
         os.environ['VAULT_PASSWORD'] = input('Enter vault password: ')
 
-    app = create_app(config=TestingConfig)
+    app = create_app(config=TestingConfig())
     yield app
+
 
 @pytest.fixture
 def client(app):
