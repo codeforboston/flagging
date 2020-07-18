@@ -19,7 +19,7 @@ def create_app(config: Optional[Config] = None) -> Flask:
         config: (ClassVar) Can be either a string such as `config.BaseConfig`,
                 or the actual object itself.
     Returns:
-        The fully configured Flask app instance.
+        The fully configured Flask app instance.Ï
     """
     app = Flask(__name__, instance_relative_config=True)
 
