@@ -60,3 +60,22 @@ python -m pytest ./tests -s
 ```
 
 Note: the test may require you to enter the vault password if it is not already in your environment variables.
+
+
+## Start DB
+
+Set environment variable `POSTGRES_PASSWORD` to be whatever you want.
+
+
+Powershell and CMD (Windows):
+
+```commandline
+psql -U postgres -c "DROP USER IF EXISTS flagging_admin; CREATE USER flagging_admin SUPERUSER PASSWORD '%POSTGRES_PASSWORD%'"
+```
+
+Bash (Mac OSX / Linux):
+
+```shell script
+psql -U postgres -c "DROP USER IF EXISTS flagging_admin; CREATE USER flagging_admin SUPERUSER PASSWORD '${POSTGRES_PASSWORD}'"
+```
+

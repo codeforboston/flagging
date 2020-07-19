@@ -2,6 +2,7 @@
 This file handles the construction of the Flask application object.
 """
 import os
+import click
 from typing import Optional
 from flask import Flask
 
@@ -43,8 +44,15 @@ def create_app(config: Optional[Config] = None) -> Flask:
     register_blueprints_from_module(app, blueprints)
 
     # Register the database commands
-    # from .data import db
-    # db.init_app(app)
+    from .data import db
+    db.init_app(app)
+
+    @app.cli.command('init-db')
+    def init_db_command():
+        """Clear existing data and create new tables."""
+        from .data.database import init_db
+        init_db()
+        click.echo('Initialized the database.')
 
     # And we're all set! We can hand the app over to flask at this point.
     return app

@@ -1,7 +1,0 @@
-{
-    "host":"dummy_host",
-    "port_num": 1234,
-    "dbname":"dummy_dbname",
-    "user":"dummy_user",
-    "password":"dummy_password"
-}

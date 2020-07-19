@@ -44,7 +44,24 @@ class Config:
     # Not currently used, but soon we'll want to start using the config to set
     # up references to the database, data storage, and data retrieval.
     # ==========================================================================
-    DATABASE: str = None
+    POSTGRES_USER: str = os.getenv('POSTGRES_USER', 'flagging_admin')
+    POSTGRES_PASSWORD: str = os.getenv('POSTGRES_PASSWORD')
+    POSTGRES_HOST: str = 'localhost'
+    POSTGRES_PORT: int = 5432
+    POSTGRES_DBNAME: str = 'flagging'
+
+    @property
+    def SQLALCHEMY_DATABASE_URI(self) -> str:
+        user = self.POSTGRES_USER
+        password = self.POSTGRES_PASSWORD
+        host = self.POSTGRES_HOST
+        port = self.POSTGRES_PORT
+        db = self.POSTGRES_DBNAME
+        return f'postgres://{user}:{password}@{host}:{port}/{db}'
+
+    SQLALCHEMY_ECHO: bool = True
+    SQLALCHEMY_RECORD_QUERIES: bool = True
+    SQLALCHEMY_TRACK_MODIFICATIONS: bool = False
 
     # ==========================================================================
     # MISC. CUSTOM CONFIG OPTIONS
@@ -158,3 +175,8 @@ def get_config_from_env(env: str) -> Config:
         raise KeyError('Bad config passed; the config must be production, '
                        'development, or testing.')
     return config()
+
+
+def postgres_uri_from_params(user: str, password: str, host: str, db: str):
+    """postgres://username:password@server/db"""
+    return f'postgres://{user}:{password}@{host}/{db}'

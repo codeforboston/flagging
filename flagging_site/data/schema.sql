@@ -1,12 +1,12 @@
-DROP TABLE IF EXISTS raw_usgs;
-CREATE TABLE IF NOT EXISTS raw_usgs (
+DROP TABLE IF EXISTS usgs;
+CREATE TABLE IF NOT EXISTS usgs (
     time            timestamp,
     stream_flow     decimal,
     gage_height     decimal
 );
 
-DROP TABLE IF EXISTS raw_hobolink;
-CREATE TABLE IF NOT EXISTS raw_hobolink (
+DROP TABLE IF EXISTS hobolink;
+CREATE TABLE IF NOT EXISTS hobolink (
     time            timestamp,
     pressure        decimal,
     par             decimal, /* photosynthetically active radiation */
