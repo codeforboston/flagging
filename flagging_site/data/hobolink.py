@@ -49,6 +49,7 @@ def get_live_hobolink_data(export_name: str = EXPORT_NAME) -> pd.DataFrame:
     Returns:
         Pandas Dataframe containing the cleaned-up Hobolink data.
     """
+    print('OFFLINE MODE', offline_mode())
     if offline_mode():
         df = pd.read_pickle(get_data_store_file_path(STATIC_FILE_NAME))
     else:
