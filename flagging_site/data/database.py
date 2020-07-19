@@ -61,9 +61,7 @@ def update_database():
 
     # Populate the `hobolink` table.
     from .hobolink import get_live_hobolink_data
-    print('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
     df_hobolink = get_live_hobolink_data()
-    print('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
     df_hobolink.to_sql('hobolink', **options)
 
     from .model import process_data
