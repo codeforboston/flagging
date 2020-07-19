@@ -7,7 +7,7 @@ set FLASK_APP=flagging_site:create_app
 set FLASK_ENV=development
 set /p OFFLINE_MODE="Offline mode? [y/n]: "
 set /p VAULT_PASSWORD="Enter vault password: "
-set /p POSTGRES_PASSWORD="Enter postgres PW: "
+set /p POSTGRES_PASSWORD="Enter Postgres password: "
 
 flask init-db
 flask run

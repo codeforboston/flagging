@@ -23,10 +23,14 @@ source venv/bin/activate
 $PYEXEC -m pip install -r requirements.txt
 
 # Set up and run the Flask application
-export FLASK_APP=flagging_site
+export FLASK_APP=flagging_site:create_app
 export FLASK_ENV=development
 read -p "Offline mode? [y/n]: " offline_mode
 export OFFLINE_MODE=${offline_mode}
 read -p "Enter vault password: " vault_pw
 export VAULT_PASSWORD=${vault_pw}
+read -p "Enter Postgres password: " postgres_pw
+export VAULT_PASSWORD=${postgres_pw}
+
+flask init-db
 flask run
