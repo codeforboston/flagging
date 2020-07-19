@@ -66,16 +66,19 @@ Note: the test may require you to enter the vault password if it is not already 
 
 Set environment variable `POSTGRES_PASSWORD` to be whatever you want.
 
-
 Powershell and CMD (Windows):
 
 ```commandline
-psql -U postgres -c "DROP USER IF EXISTS flagging_admin; CREATE USER flagging_admin SUPERUSER PASSWORD '%POSTGRES_PASSWORD%'"
+set POSTGRES_PASSWORD=enter_password_here
+createdb -U postgres flagging
+psql -U postgres -d flagging -c "DROP USER IF EXISTS flagging; CREATE USER flagging SUPERUSER PASSWORD '%POSTGRES_PASSWORD%'"
 ```
 
 Bash (Mac OSX / Linux):
 
 ```shell script
-psql -U postgres -c "DROP USER IF EXISTS flagging_admin; CREATE USER flagging_admin SUPERUSER PASSWORD '${POSTGRES_PASSWORD}'"
+export POSTGRES_PASSWORD=enter_password_here
+createdb -U postgres flagging
+psql -U postgres -d flagging -c "DROP USER IF EXISTS flagging; CREATE USER flagging SUPERUSER PASSWORD '${POSTGRES_PASSWORD}'"
 ```
 

@@ -6,6 +6,7 @@ formatting of the data that we receive from it.
 #  Pandas is inefficient. It should go to SQL, not to Pandas. I am currently
 #  using pandas because we do not have any cron jobs or any caching or SQL, but
 #  I think in future versions we should not be using Pandas at all.
+from .database import db
 import io
 import requests
 import pandas as pd
@@ -37,7 +38,7 @@ STATIC_FILE_NAME = 'hobolink.pickle'
 # ~ ~ ~ ~
 
 
-def get_hobolink_data(export_name: str = EXPORT_NAME) -> pd.DataFrame:
+def get_live_hobolink_data(export_name: str = EXPORT_NAME) -> pd.DataFrame:
     """This function runs through the whole process for retrieving data from
     HOBOlink: first we perform the request, and then we clean the data.
 

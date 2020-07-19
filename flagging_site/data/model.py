@@ -168,7 +168,8 @@ def reach_2_model(df: pd.DataFrame, rows: int = 24) -> pd.DataFrame:
     )
     df['probability'] = sigmoid(df['log_odds'])
     df['safe'] = df['probability'] <= SAFETY_THRESHOLD
-    return df[['time', 'log_odds', 'probability', 'safe']]
+    df['reach'] = 2
+    return df[['reach', 'time', 'log_odds', 'probability', 'safe']]
 
 
 def reach_3_model(df: pd.DataFrame, rows: int = 24) -> pd.DataFrame:
@@ -196,7 +197,8 @@ def reach_3_model(df: pd.DataFrame, rows: int = 24) -> pd.DataFrame:
     )
     df['probability'] = sigmoid(df['log_odds'])
     df['safe'] = df['probability'] <= SAFETY_THRESHOLD
-    return df[['time', 'log_odds', 'probability', 'safe']]
+    df['reach'] = 3
+    return df[['reach', 'time', 'log_odds', 'probability', 'safe']]
 
 
 def reach_4_model(df: pd.DataFrame, rows: int = 24) -> pd.DataFrame:
@@ -224,7 +226,8 @@ def reach_4_model(df: pd.DataFrame, rows: int = 24) -> pd.DataFrame:
     )
     df['probability'] = sigmoid(df['log_odds'])
     df['safe'] = df['probability'] <= SAFETY_THRESHOLD
-    return df[['time', 'log_odds', 'probability', 'safe']]
+    df['reach'] = 4
+    return df[['reach', 'time', 'log_odds', 'probability', 'safe']]
 
 
 def reach_5_model(df: pd.DataFrame, rows: int = 24) -> pd.DataFrame:
@@ -250,4 +253,25 @@ def reach_5_model(df: pd.DataFrame, rows: int = 24) -> pd.DataFrame:
     )
     df['probability'] = sigmoid(df['log_odds'])
     df['safe'] = df['probability'] <= SAFETY_THRESHOLD
-    return df[['time', 'log_odds', 'probability', 'safe']]
+    df['reach'] = 5
+    return df[['reach', 'time', 'log_odds', 'probability', 'safe']]
+
+
+def all_models(df: pd.DataFrame, *args, **kwargs):
+    out = pd.concat([
+        reach_2_model(df, *args, **kwargs),
+        reach_3_model(df, *args, **kwargs),
+        reach_4_model(df, *args, **kwargs),
+        reach_5_model(df, *args, **kwargs),
+    ], axis=0)
+    out = out.sort_values(['reach', 'time'])
+    return out
+
+
+def latest_model_outputs(hours: int = 1) -> dict:
+    if hours != 1:
+        raise NotImplementedError('Need to work on this!')
+    from .database import execute_sql_from_file
+    df = execute_sql_from_file('latest_model.sql')
+    df = df.set_index('reach')
+    return df.to_dict(orient='index')

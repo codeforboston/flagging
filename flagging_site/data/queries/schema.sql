@@ -20,17 +20,13 @@ CREATE TABLE IF NOT EXISTS hobolink (
     air_temp        decimal
 );
 
-DROP TABLE IF EXISTS ecoli_predictions;
-CREATE TABLE IF NOT EXISTS ecoli_predictions (
-    timestamp       timestamp,
-    r2_probability  decimal,
-    r3_probability  decimal,
-    r4_probability  decimal,
-    r5_probability  decimal,
-    r2_safe         boolean,
-    r3_safe         boolean,
-    r4_safe         boolean,
-    r5_safe         boolean
+DROP TABLE IF EXISTS model_outputs;
+CREATE TABLE IF NOT EXISTS model_outputs (
+    reach           int,
+    time            timestamp,
+    log_odds        decimal,
+    probability     decimal,
+    safe            boolean
 );
 
 COMMIT;

@@ -54,6 +54,12 @@ def create_app(config: Optional[Config] = None) -> Flask:
         init_db()
         click.echo('Initialized the database.')
 
+    @app.cli.command('update-db')
+    def update_db_command():
+        from .data.database import update_database
+        update_database()
+        click.echo('Updated the database.')
+
     # And we're all set! We can hand the app over to flask at this point.
     return app
 

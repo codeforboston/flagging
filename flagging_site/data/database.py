@@ -3,43 +3,34 @@ This file should handle all database connection stuff, namely: writing and
 retrieving data.
 """
 import os
-import click
-import psycopg2
-import psycopg2.extensions
-
-from flask import g
+import pandas as pd
+from typing import Optional
 from flask import current_app
-from flask import Flask
-
-from ..config import ROOT_DIR
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.exc import ResourceClosedError
 
 
-SCHEMA_FILE = os.path.join(ROOT_DIR, 'data', 'schema.sql')
 db = SQLAlchemy()
 
 
-# # this function connects to the database and creates a cursor
-# def db_get() -> SQLAlchemy:  # psycopg2.extensions.connection:
-#     with current_app.app_context():
-#         if 'db' not in g:
-#
-#             g.db = conn
-#         return g.db
-
-
-def close_db(e=None):
-    """If this request connected to the database, close the
-    connection.
-    """
-    db = g.pop('db', None)
-    if db is not None:
-        db.close()
-
-
-def execute_sql(query: str):
+def execute_sql(query: str) -> Optional[pd.DataFrame]:
+    """Execute arbitrary SQL in the database. This works for both read and write
+    operations. If it is a write operation, it will return None; otherwise it
+    returns a Pandas dataframe."""
     with db.engine.connect() as conn:
-        return conn.execute(query)
+        res = conn.execute(query)
+        try:
+            df = pd.DataFrame(res.fetchall())
+            df.columns = res.keys()
+            return df
+        except ResourceClosedError:
+            return None
+
+
+def execute_sql_from_file(file_name: str):
+    path = os.path.join(current_app.config['QUERIES_DIR'], file_name)
+    with current_app.open_resource(path) as f:
+        return execute_sql(f.read().decode('utf8'))
 
 
 def init_db():
@@ -47,18 +38,36 @@ def init_db():
     with current_app.app_context():
 
         # Read the `schema.sql` file, which initializes the database.
-        with current_app.open_resource(SCHEMA_FILE) as f:
-            schema = f.read().decode('utf8')
+        execute_sql_from_file('schema.sql')
 
-        # Run `schema.sql`
-        execute_sql(schema)
+        update_database()
 
-        # Populate the `usgs` table.
-        from .usgs import get_usgs_data
-        df = get_usgs_data()
-        df.to_sql('usgs', con=db.engine, index=False, if_exists='append')
 
-        # Populate the `hobolink` table.
-        from .hobolink import get_hobolink_data
-        df = get_hobolink_data()
-        df.to_sql('hobolink', con=db.engine, index=False, if_exists='append')
+def update_database():
+    """At the moment this overwrites the entire database. In the future we want
+    this to simply update it.
+    """
+
+    options = {
+        'con': db.engine,
+        'index': False,
+        'if_exists': 'replace'
+    }
+
+    # Populate the `usgs` table.
+    from .usgs import get_live_usgs_data
+    df_usgs = get_live_usgs_data()
+    df_usgs.to_sql('usgs', **options)
+
+    # Populate the `hobolink` table.
+    from .hobolink import get_live_hobolink_data
+    df_hobolink = get_live_hobolink_data()
+    df_hobolink.to_sql('hobolink', **options)
+
+    from .model import process_data
+    df = process_data(df_hobolink=df_hobolink, df_usgs=df_usgs)
+    df.to_sql('processed_data', **options)
+
+    from .model import all_models
+    model_outs = all_models(df)
+    model_outs.to_sql('model_outputs', **options)
