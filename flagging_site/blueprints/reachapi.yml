@@ -1,0 +1,16 @@
+parameters:
+  - name: reach
+    in: query
+    description: type of reach model
+    type: integer
+    required: false
+  - name: hours
+    in: query
+    description: number of hours of data
+    type: integer
+    required: false
+responses:
+  200:
+    description: json-like dictionary of model output
+    scehema:
+    example:

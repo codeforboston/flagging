@@ -9,6 +9,7 @@ from .data.keys import get_keys
 from .config import Config
 from .config import get_config_from_env
 
+from flasgger import Swagger
 
 def create_app(config: Optional[Config] = None) -> Flask:
     """Create and configure an instance of the Flask application. We use the
@@ -41,6 +42,8 @@ def create_app(config: Optional[Config] = None) -> Flask:
     # `blueprints/__init__.py`.
     from . import blueprints
     register_blueprints_from_module(app, blueprints)
+    
+    swg = Swagger (app)
 
     # Register the database commands
     # from .data import db
