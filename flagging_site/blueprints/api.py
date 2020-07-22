@@ -12,6 +12,7 @@ from flask_restful import Resource, Api
 
 from flask import Blueprint
 from flask import request
+from flasgger import swag_from
 
 bp = Blueprint('api', __name__,url_prefix='/api')
 api = Api(bp)
@@ -86,6 +87,25 @@ def model_api(reach_param: list = None, hour: str = 48) -> dict:
 
 class ReachesApi(Resource):
     def get(self):
+        """Produces json of model output in api/vi/model
+        ---
+        parameters:
+          - name: reach
+            in: path
+            type: int
+            required: false
+            default: all
+          - name: reach
+            in: path
+            type: int
+            required: false
+            default: all
+        responses:
+          200:
+            description: json-like dictionary of model output
+            schema:
+            examples:
+        """
         reach = request.args.getlist('reach', None)
         hour = request.args.get('hour', 48)
         return model_api(reach,hour)
