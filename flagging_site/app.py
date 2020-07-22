@@ -95,10 +95,3 @@ def register_blueprints_from_module(app: Flask, module: object) -> None:
         blueprint_list = filter(lambda x: not x.startswith('_'), dir(module))
     for submodule in blueprint_list:
         app.register_blueprint(getattr(module, submodule).bp)
-
-
-if __name__ == '__main__':
-    os.environ['FLASK_ENV'] = 'development'
-    os.environ['VAULT_PASSWORD'] = input('Enter vault password: ')
-    app = create_app()
-    app.run()

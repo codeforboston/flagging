@@ -1,18 +1,27 @@
 {% extends "base.html" %}
 {% block title %}API{% endblock %}
 {% block content %}
-    <h2>Flagging Program</h2>
     <p>
-        The CRWA's API endpoints return JSON metadata based on REST principles about water quality, temperature, precipitation, and wind speed
-        from sensors located in the Charles River. The current API for the project utilizes a single HTTP request-response
-        mechanism, the GET request, to retrieve data. Users of the CRWA Public API can use GET requests to fetch data
-        for further analysis. Additional APIs may be added to the project as development progresses. This is a volunteer
-        driven project and we appreciate developer input on what would be most useful.
-
-        <br><br><br><a href="v1/model">Access to the API is free and open to the public.</a>
-
-        <br><br><br><strong>Note: The v1 API is still tentative and under development at this time. It will be
-        finalized when this messsage is removed.</strong>
+        <strong>Note: The v1 API is still tentative and under development at this time. It will be
+        finalized when this messsage is removed. The schemas may break in the meanwhile.</strong>
     </p>
-
+    <h2>Public Flagging API</h2>
+    <p>
+        Pursuant to CRWA's mission to provide open access to ecological data to the greater Boston community and the
+        world, the CRWA allows open access to its Public Flagging API, which provides JSON versions of the CRWA's data
+        utilized in modeling, the CRWA's model outputs, and relevant metadata.
+    </p>
+    <p>
+        The API is built on simple REST principles; user of the Public Flagging API can utilize GET requests to retrieve
+        the data. Additional APIs may be added to the project as development progresses. This is a volunteer
+        driven project and we appreciate developers' and researchers' input on what would be most useful.
+    </p>
+    <h2>Available Endpoints</h2>
+    <ul>
+        <li><a href="{{ url_for('api.reachesapi') }}">Flagging Model Outputs</a></li>
+    </ul>
+    <h2>Documentation</h2>
+    <p>
+        Documentation for the API is currently in development. When it is done, it will be available <a href="/api/docs">here</a>.
+    </p>
 {% endblock %}

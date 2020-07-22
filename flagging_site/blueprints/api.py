@@ -1,20 +1,27 @@
 import pandas as pd
 from flask import Blueprint
 from flask import render_template
-from flagging_site.data.hobolink import get_hobolink_data
-from flagging_site.data.usgs import get_usgs_data
-from flagging_site.data.model import process_data
-from flagging_site.data.model import reach_2_model
-from flagging_site.data.model import reach_3_model
-from flagging_site.data.model import reach_4_model
-from flagging_site.data.model import reach_5_model
-from flask_restful import Resource, Api
-
-from flask import Blueprint
 from flask import request
+from flask_restful import Api
+from flask_restful import Resource
 
-bp = Blueprint('api', __name__,url_prefix='/api')
+from ..data.hobolink import get_hobolink_data
+from ..data.usgs import get_usgs_data
+from ..data.model import process_data
+from ..data.model import reach_2_model
+from ..data.model import reach_3_model
+from ..data.model import reach_4_model
+from ..data.model import reach_5_model
+
+
+bp = Blueprint('api', __name__, url_prefix='/api')
 api = Api(bp)
+
+
+@bp.route('/', methods=['GET'])
+def index() -> str:
+    return render_template('api/index.html')
+
 
 def get_data() -> pd.DataFrame:
     """Retrieves the data that gets plugged into the the model."""
@@ -22,6 +29,7 @@ def get_data() -> pd.DataFrame:
     df_usgs = get_usgs_data()
     df = process_data(df_hobolink, df_usgs)
     return df
+
 
 def add_to_dict(models, df, reach) -> None:
     """
@@ -62,10 +70,10 @@ def model_api(reach_param: list = None, hour: str = 48) -> dict:
     df = get_data()
 
     dfs = {
-        2: reach_2_model(df,hour),
-        3: reach_3_model(df,hour),
-        4: reach_4_model(df,hour),
-        5: reach_5_model(df,hour)
+        2: reach_2_model(df, hour),
+        3: reach_3_model(df, hour),
+        4: reach_4_model(df, hour),
+        5: reach_5_model(df, hour)
     }
 
     main = {}
@@ -84,14 +92,12 @@ def model_api(reach_param: list = None, hour: str = 48) -> dict:
 
     return main
 
+
 class ReachesApi(Resource):
     def get(self):
         reach = request.args.getlist('reach', None)
         hour = request.args.get('hour', 48)
-        return model_api(reach,hour)
+        return model_api(reach, hour)
 
-@bp.route('/', methods=['GET'])
-def api_landing_page() -> str:
-    return render_template('api/index.html')
 
 api.add_resource(ReachesApi, '/v1/model')

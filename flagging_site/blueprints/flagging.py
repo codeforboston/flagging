@@ -1,24 +1,27 @@
 import pandas as pd
 from flask import Blueprint
 from flask import render_template
-from flagging_site.data.hobolink import get_hobolink_data
-from flagging_site.data.usgs import get_usgs_data
-from flagging_site.data.model import process_data
-from flagging_site.data.model import reach_2_model
-from flagging_site.data.model import reach_3_model
-from flagging_site.data.model import reach_4_model
-from flagging_site.data.model import reach_5_model
-
 from flask import request
+
+from ..data.hobolink import get_hobolink_data
+from ..data.usgs import get_usgs_data
+from ..data.model import process_data
+from ..data.model import reach_2_model
+from ..data.model import reach_3_model
+from ..data.model import reach_4_model
+from ..data.model import reach_5_model
+
 
 bp = Blueprint('flagging', __name__)
 
+
 def get_data() -> pd.DataFrame:
-    """Retrieves the data that gets plugged into the the model."""
+    """Retrieves the processed data that gets plugged into the the model."""
     df_hobolink = get_hobolink_data('code_for_boston_export_21d')
     df_usgs = get_usgs_data()
     df = process_data(df_hobolink, df_usgs)
     return df
+
 
 def stylize_model_output(df: pd.DataFrame) -> str:
     """
@@ -41,13 +44,15 @@ def stylize_model_output(df: pd.DataFrame) -> str:
 
     return df.to_html(index=False, escape=False)
 
+
 @bp.route('/')
 def index() -> str:
     """
-    Retrieves data from hobolink and usgs and processes data, then displays data 
-    on `index_model.html`     
+    The home page of the website. This page contains a brief description of the
+    purpose of the website, and the latest outputs for the flagging model.
 
-    returns: render model on index.html
+    Returns:
+        The website's home page with the latest flag updates.
     """
     df = get_data()
     flags = {
@@ -67,12 +72,11 @@ def about() -> str:
 @bp.route('/output_model', methods=['GET'])
 def output_model() -> str:
     """
-    Retrieves data from hobolink and usgs and processes data and then
-    displays data on 'output_model.html'
+    Retrieves data from hobolink and usgs, processes that data, and then
+    displays the data as a human-readable, stylized HTML table.
 
-    args: no argument
-
-    returns: render model on output_model.html
+    Returns:
+        Rendering of the model outputs via the `output_model.html` template.
     """
 
     # Parse contents of the query string to get reach and hours parameters.
