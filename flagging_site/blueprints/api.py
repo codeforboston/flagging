@@ -5,8 +5,8 @@ from flask import request
 from flask_restful import Api
 from flask_restful import Resource
 
-from ..data.hobolink import get_hobolink_data
-from ..data.usgs import get_usgs_data
+from ..data.hobolink import get_live_hobolink_data
+from ..data.usgs import get_live_usgs_data
 from ..data.model import process_data
 from ..data.model import reach_2_model
 from ..data.model import reach_3_model
@@ -25,8 +25,8 @@ def index() -> str:
 
 def get_data() -> pd.DataFrame:
     """Retrieves the data that gets plugged into the the model."""
-    df_hobolink = get_hobolink_data('code_for_boston_export_21d')
-    df_usgs = get_usgs_data()
+    df_hobolink = get_live_hobolink_data('code_for_boston_export_21d')
+    df_usgs = get_live_usgs_data()
     df = process_data(df_hobolink, df_usgs)
     return df
 
