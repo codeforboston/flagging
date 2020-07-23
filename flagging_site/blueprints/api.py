@@ -86,26 +86,8 @@ def model_api(reach_param: list = None, hour: str = 48) -> dict:
     return main
 
 class ReachesApi(Resource):
+    @swag_from('reach_api.yml')
     def get(self):
-        """Produces json of model output in api/vi/model
-        ---
-        parameters:
-          - name: reach
-            in: path
-            type: int
-            required: false
-            default: all
-          - name: reach
-            in: path
-            type: int
-            required: false
-            default: all
-        responses:
-          200:
-            description: json-like dictionary of model output
-            schema:
-            examples:
-        """
         reach = request.args.getlist('reach', None)
         hour = request.args.get('hour', 48)
         return model_api(reach,hour)

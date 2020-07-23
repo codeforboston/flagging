@@ -1,0 +1,52 @@
+Endpoint returning json of the output model
+---
+tags:
+  - Reach Model API
+parameters:
+  - name: reach
+    description: type of reach model
+    in: query
+    type: int
+    enum: [2, 3, 4, 5]
+    required: false
+    default:
+  - name: hour
+    description: type of reach model
+    in: query
+    type: int
+    enum: [1, 2, 3, 6, 12, 24, 36, 48]
+    required: false
+    default:
+responses:
+  200:
+    description: Dictionary-like json of the output model
+    schema:
+      id: model_api
+      type: object
+      properties:
+        version:
+          description: the year schema is made
+          type: string
+        time_returned:
+          description: time data is returned
+          type: string
+        models:
+          description: the year schema is made
+          type: object
+          properties:
+            model_num:
+              description: type of reach model
+              type: object
+              properties:
+                time:
+                  description: time of data
+                  type: string
+                log_odds:
+                  description: logistical odds
+                  type: number
+                probability:
+                  description: probability
+                  type: number
+                safe:
+                  description: whether or not river is safe
+                  type: boolean
