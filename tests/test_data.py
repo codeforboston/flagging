@@ -29,17 +29,17 @@ def test_hobolink_handles_erroneous_csv(app, monkeypatch):
     a CSV where some column headers are repeated and only one contains
     the actual data.
     """
-    with io.open("tests/static/split_columns_hobolink_export.pickle", "rb") as f:
+    with io.open('tests/static/split_columns_hobolink_export.pickle', 'rb') as f:
         expected_dataframe = pickle.load(f)
 
-    with io.open("tests/static/split_columns_hobolink_export.csv", "r") as f:
+    with io.open('tests/static/split_columns_hobolink_export.csv', 'r') as f:
         csv_text = f.read()
 
     class MockHobolinkResponse:
         text = csv_text
     monkeypatch.setattr(
         hobolink,
-        "request_to_hobolink",
+        'request_to_hobolink',
         lambda export_name: MockHobolinkResponse()
     )
 
