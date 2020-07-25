@@ -15,7 +15,7 @@ from typing import Dict, Any, Optional, List
 ROOT_DIR = os.path.abspath(os.path.dirname(__file__))
 DATA_STORE = os.path.join(ROOT_DIR, 'data', '_store')
 VAULT_FILE = os.path.join(ROOT_DIR, 'vault.zip')
-
+API_MAX_HOURS = 48
 
 # Configs
 # ~~~~~~~
@@ -94,6 +94,12 @@ class Config:
     parts of the website off or on depending on if they're fully developed
     or not. If BLUEPRINTS is `None`, then it imports all the blueprints it can
     find in the `blueprints` module.
+    """
+
+    API_MAX_HOURS: int = API_MAX_HOURS
+    """The maximum number of hours of data that the API will return. We are not trying 
+    to be stingy about our data, we just want this in order to avoid any odd behaviors 
+    if the user requests more data than exists.
     """
 
 

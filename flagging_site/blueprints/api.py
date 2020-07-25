@@ -12,6 +12,7 @@ from ..data.model import reach_2_model
 from ..data.model import reach_3_model
 from ..data.model import reach_4_model
 from ..data.model import reach_5_model
+from flagging_site.config import API_MAX_HOURS
 
 
 bp = Blueprint('api', __name__, url_prefix='/api')
@@ -48,7 +49,7 @@ def add_to_dict(models, df, reach) -> None:
     models[f'reach_{reach}'] = df.to_dict(orient='list')
 
 
-def model_api(reach_param: list = None, hour: str = 48) -> dict:
+def model_api(reach_param: list, hour: str) -> dict:
     """
     Class method that retrieves data from hobolink and usgs and processes
     data, then creates json-like dictionary structure for model output.
@@ -62,8 +63,8 @@ def model_api(reach_param: list = None, hour: str = 48) -> dict:
 
     hour = int(hour)
 
-    if hour > 48:
-        hour = 48
+    if hour > API_MAX_HOURS:
+        hour = API_MAX_HOURS
     elif hour < 1:
         hour = 1
 
@@ -96,8 +97,8 @@ def model_api(reach_param: list = None, hour: str = 48) -> dict:
 class ReachesApi(Resource):
     def get(self):
         reach = request.args.getlist('reach', None)
-        hour = request.args.get('hour', 48)
-        return model_api(reach, hour)
+        hour = request.args.get('hour', API_MAX_HOURS)
+        return model_api(reach,hour)
 
 
 api.add_resource(ReachesApi, '/v1/model')

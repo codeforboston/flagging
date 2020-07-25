@@ -10,7 +10,7 @@ from ..data.model import reach_2_model
 from ..data.model import reach_3_model
 from ..data.model import reach_4_model
 from ..data.model import reach_5_model
-
+from flagging_site.config import API_MAX_HOURS
 
 bp = Blueprint('flagging', __name__)
 
@@ -92,8 +92,8 @@ def output_model() -> str:
     except (TypeError, ValueError):
         hours = 24
 
-    # Look at no more than 72 hours.
-    hours = min(max(hours, 1), 72)
+    # Look at no more than API_MAX_HOURS
+    hours = min(max(hours, 1),API_MAX_HOURS)
 
     df = get_data()
 
