@@ -86,7 +86,6 @@ def model_api(reach_param: list = None, hour: str = 48) -> dict:
     return main
 
 class ReachesApi(Resource):
-    @swag_from('reach_api.yml')
     def get(self):
         reach = request.args.getlist('reach', None)
         hour = request.args.get('hour', 48)
