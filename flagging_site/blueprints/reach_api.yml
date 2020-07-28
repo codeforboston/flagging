@@ -40,13 +40,21 @@ responses:
               properties:
                 time:
                   description: time of data
-                  type: string
-                log_odds:
-                  description: logistical odds
-                  type: number
+                  type: array
+                  items:
+                    type: string
+                log-odds:
+                  description: log odds output of the model
+                  type: array
+                  items:
+                    type: number
                 probability:
-                  description: probability
-                  type: number
+                  description: probability output of the model
+                  type: array
+                  items:
+                    type: number
                 safe:
                   description: whether or not river is safe
-                  type: boolean
+                  type: array
+                  items:
+                    type: boolean
