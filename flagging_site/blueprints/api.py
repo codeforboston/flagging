@@ -4,6 +4,7 @@ from flask import render_template
 from flask import request
 from flask_restful import Api
 from flask_restful import Resource
+from flask import current_app
 
 from ..data.hobolink import get_live_hobolink_data
 from ..data.usgs import get_live_usgs_data
@@ -48,7 +49,7 @@ def add_to_dict(models, df, reach) -> None:
     models[f'reach_{reach}'] = df.to_dict(orient='list')
 
 
-def model_api(reach_param: list = None, hour: str = 48) -> dict:
+def model_api(reach_param: list, hour: str) -> dict:
     """
     Class method that retrieves data from hobolink and usgs and processes
     data, then creates json-like dictionary structure for model output.
@@ -62,8 +63,8 @@ def model_api(reach_param: list = None, hour: str = 48) -> dict:
 
     hour = int(hour)
 
-    if hour > 48:
-        hour = 48
+    if hour > current_app.config['API_MAX_HOURS']:
+        hour = current_app.config['API_MAX_HOURS']
     elif hour < 1:
         hour = 1
 
@@ -96,8 +97,8 @@ def model_api(reach_param: list = None, hour: str = 48) -> dict:
 class ReachesApi(Resource):
     def get(self):
         reach = request.args.getlist('reach', None)
-        hour = request.args.get('hour', 48)
-        return model_api(reach, hour)
+        hour = request.args.get('hour', current_app.config['API_MAX_HOURS'])
+        return model_api(reach,hour)
 
 
 api.add_resource(ReachesApi, '/v1/model')
