@@ -4,6 +4,7 @@ from flask import render_template
 from flask import request
 from flask_restful import Api
 from flask_restful import Resource
+from flask import current_app
 
 from ..data.hobolink import get_live_hobolink_data
 from ..data.usgs import get_live_usgs_data
@@ -12,7 +13,6 @@ from ..data.model import reach_2_model
 from ..data.model import reach_3_model
 from ..data.model import reach_4_model
 from ..data.model import reach_5_model
-from flagging_site.config import API_MAX_HOURS
 
 
 bp = Blueprint('api', __name__, url_prefix='/api')
@@ -63,8 +63,8 @@ def model_api(reach_param: list, hour: str) -> dict:
 
     hour = int(hour)
 
-    if hour > API_MAX_HOURS:
-        hour = API_MAX_HOURS
+    if hour > current_app.config['API_MAX_HOURS']:
+        hour = current_app.config['API_MAX_HOURS']
     elif hour < 1:
         hour = 1
 
@@ -97,7 +97,7 @@ def model_api(reach_param: list, hour: str) -> dict:
 class ReachesApi(Resource):
     def get(self):
         reach = request.args.getlist('reach', None)
-        hour = request.args.get('hour', API_MAX_HOURS)
+        hour = request.args.get('hour', current_app.config['API_MAX_HOURS'])
         return model_api(reach,hour)
 
 

@@ -2,6 +2,7 @@ import pandas as pd
 from flask import Blueprint
 from flask import render_template
 from flask import request
+from flask import current_app
 
 from ..data.hobolink import get_live_hobolink_data
 from ..data.usgs import get_live_usgs_data
@@ -10,7 +11,6 @@ from ..data.model import reach_2_model
 from ..data.model import reach_3_model
 from ..data.model import reach_4_model
 from ..data.model import reach_5_model
-from flagging_site.config import API_MAX_HOURS
 
 bp = Blueprint('flagging', __name__)
 
@@ -92,8 +92,8 @@ def output_model() -> str:
     except (TypeError, ValueError):
         hours = 24
 
-    # Look at no more than API_MAX_HOURS
-    hours = min(max(hours, 1),API_MAX_HOURS)
+    # Look at no more than x_MAX_HOURS
+    hours = min(max(hours, 1),current_app.config['API_MAX_HOURS'])
 
     df = get_data()
 
