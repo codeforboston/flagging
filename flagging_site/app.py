@@ -45,20 +45,20 @@ def create_app(config: Optional[Config] = None) -> Flask:
 
     #Swagger configs for flasgger
     swagger_config = {
-        "headers": [
+        'headers': [
         ],
-        "specs": [
+        'specs': [
             {
-                "endpoint": 'apispec_1',
-                "route": '/apispec_1.json',
-                "rule_filter": lambda rule: True,  # all in
-                "model_filter": lambda tag: True,  # all in
+                'endpoint': 'apispec_1',
+                'route': '/apispec_1.json',
+                'rule_filter': lambda rule: True,  # all in
+                'model_filter': lambda tag: True,  # all in
             }
         ],
-        "static_url_path": "/flasgger_static",
+        'static_url_path': '/flasgger_static',
         # "static_folder": "static",  # must be set by user
-        "swagger_ui": True,
-        "specs_route": "/api/docs"
+        'swagger_ui': True,
+        'specs_route': '/api/docs'
     }
 
     swagger = Swagger(app, config=swagger_config)
