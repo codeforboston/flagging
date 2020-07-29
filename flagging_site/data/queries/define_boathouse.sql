@@ -18,7 +18,7 @@ VALUES (
             71.165467
         ),
         (
-            3, 
+            2, 
             'Northeastern''s Henderson Boathouse', 
             42.364135, 
             71.141571
