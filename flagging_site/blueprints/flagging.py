@@ -127,7 +127,7 @@ def flags() -> str:
     }
  
     flags_2 = {
-        'Paddle Boston at Herter Park': reach_3_model(df, rows=1)['safe'].iloc[0],
+        'Paddle Boston at Herter Park': reach_2_model(df, rows=1)['safe'].iloc[0],
         'Harvard\'s Weld Boathouse': reach_3_model(df, rows=1)['safe'].iloc[0],
         'Riverside Boat Club': reach_4_model(df, rows=1)['safe'].iloc[0],
         'Charles River Yacht Club': reach_5_model(df, rows=1)['safe'].iloc[0],
