@@ -8,6 +8,7 @@ from flask import Flask
 from .data.keys import get_keys
 from .config import Config
 from .config import get_config_from_env
+from flasgger import Swagger
 
 
 def create_app(config: Optional[Config] = None) -> Flask:
@@ -42,13 +43,32 @@ def create_app(config: Optional[Config] = None) -> Flask:
     from . import blueprints
     register_blueprints_from_module(app, blueprints)
 
+    #Swagger configs for flasgger
+    swagger_config = {
+        'headers': [
+        ],
+        'specs': [
+            {
+                'endpoint': 'apispec_1',
+                'route': '/apispec_1.json',
+                'rule_filter': lambda rule: True,  # all in
+                'model_filter': lambda tag: True,  # all in
+            }
+        ],
+        'static_url_path': '/flasgger_static',
+        # "static_folder": "static",  # must be set by user
+        'swagger_ui': True,
+        'specs_route': '/api/docs'
+    }
+
+    swagger = Swagger(app, config=swagger_config)
+
     # Register the database commands
     # from .data import db
     # db.init_app(app)
 
     # And we're all set! We can hand the app over to flask at this point.
     return app
-
 
 def update_config_from_vault(app: Flask) -> None:
     """

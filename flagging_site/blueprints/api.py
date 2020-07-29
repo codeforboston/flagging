@@ -12,6 +12,7 @@ from flask_restful import Resource, Api
 
 from flask import Blueprint
 from flask import request
+from flasgger import swag_from
 
 bp = Blueprint('api', __name__,url_prefix='/api')
 api = Api(bp)
@@ -85,6 +86,7 @@ def model_api(reach_param: list = None, hour: str = 48) -> dict:
     return main
 
 class ReachesApi(Resource):
+    @swag_from('reach_api.yml')
     def get(self):
         reach = request.args.getlist('reach', None)
         hour = request.args.get('hour', 48)
