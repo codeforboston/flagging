@@ -24,7 +24,7 @@ VALUES (
             71.141571
         ),
         (
-            3, 
+            2, 
             'Paddle Boston at Herter Park', 
             42.369182, 
             71.131301

@@ -38,6 +38,7 @@ def init_db():
     with current_app.app_context():
         # Read the `schema.sql` file, which initializes the database.
         execute_sql_from_file('schema.sql')
+        execute_sql_from_file('define_boathouse.sql')
         update_database()
 
 
@@ -68,5 +69,3 @@ def update_database():
     from .model import all_models
     model_outs = all_models(df)
     model_outs.to_sql('model_outputs', **options)
-
-    execute_sql_from_file('define_boathouse.sql')
