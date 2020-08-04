@@ -38,6 +38,11 @@ def stylize_model_output(df: pd.DataFrame) -> str:
     Returns:
         HTML table.
     """
+    
+    # print('\n\ndf conv to html\n\n')
+    # print(df)
+    # print('\n\n')
+
     def _apply_flag(x: bool) -> str:
         flag_class = 'blue-flag' if x else 'red-flag'
         return f'<span class="{flag_class}">{x}</span>'
@@ -68,15 +73,23 @@ def add_to_dict(models, df, reach) -> None:
 @bp.route('/')
 def index() -> str:
     """
-    Retrieves data from hobolink and usgs and processes data, then displays data 
-    on `index_model.html`     
+    Retrieves data from database, 
+    then displays data on `index_model.html`     
 
     returns: render model on index.html
     """
+    
+    df = latest_model_outputs()
+    
+    print('\n\nlatest_model_outputs:\n\n')
+    print( latest_model_outputs(48) )
+    print('\n\n')
+
+    df = df.set_index('reach')
     flags = {
         key: val['safe']
         for key, val
-        in latest_model_outputs().items()
+        in df.to_dict(orient='index').items()
     }
     return render_template('index.html', flags=flags)
 
@@ -113,26 +126,45 @@ def output_model() -> str:
     # Look at no more than 72 hours.
     hours = min(max(hours, 1), 72)
 
-    df = get_data()
+    df = latest_model_outputs(hours)
 
-    reach_model_mapping = {
-        2: reach_2_model,
-        3: reach_3_model,
-        4: reach_4_model,
-        5: reach_5_model
-    }
+ 
+    print('\n\ndf_list\n\n')
+    print( df.reach.unique() )
+    print('\n\n')
+    # go through each reach in df and create a subset of df of that reach only
+    # then add that to reach_html_tables
+
+    reach_html_tables = {}
+    for i in df.reach.unique():
+        print( i )
+        reach_html_tables[i] = stylize_model_output(  df.loc[df['reach'] == i ]  )
     
-    if reach in reach_model_mapping:
-        reach_func = reach_model_mapping[int(reach)]
-        reach_html_tables = {
-            reach: stylize_model_output(reach_func(df, rows=hours))
-        }
-    else:
-        reach_html_tables = {
-            reach: stylize_model_output(reach_func(df, rows=hours))
-            for reach, reach_func
-            in reach_model_mapping.items()
-        }
+
+    # df = get_data()
+
+    # reach_model_mapping = {
+    #     2: reach_2_model,
+    #     3: reach_3_model,
+    #     4: reach_4_model,
+    #     5: reach_5_model
+    # }
+    
+    # if reach in reach_model_mapping:
+    #     reach_func = reach_model_mapping[int(reach)]
+    #     reach_html_tables = {
+    #         reach: stylize_model_output(reach_func(df, rows=hours))
+    #     }
+    # else:
+    #     reach_html_tables = {
+    #         reach: stylize_model_output(reach_func(df, rows=hours))
+    #         for reach, reach_func
+    #         in reach_model_mapping.items()
+    #     }
+
+    print('\n\nreach_html_tables\n\n')
+    print(reach_html_tables)
+    print('\n\n')
 
     return render_template('output_model.html', tables=reach_html_tables)
 
