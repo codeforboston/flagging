@@ -38,11 +38,6 @@ def stylize_model_output(df: pd.DataFrame) -> str:
     Returns:
         HTML table.
     """
-    
-    # print('\n\ndf conv to html\n\n')
-    # print(df)
-    # print('\n\n')
-
     def _apply_flag(x: bool) -> str:
         flag_class = 'blue-flag' if x else 'red-flag'
         return f'<span class="{flag_class}">{x}</span>'
@@ -128,44 +123,18 @@ def output_model() -> str:
 
     df = latest_model_outputs(hours)
 
- 
-    print('\n\ndf_list\n\n')
-    print( df.reach.unique() )
-    print('\n\n')
-    # go through each reach in df and create a subset of df of that reach only
-    # then add that to reach_html_tables
-
+    # reach_html_tables is a dict where the index is the reach number
+    # and the values are HTML code for the table of data to display for
+    # that particular reach
     reach_html_tables = {}
+
+    # loop through each reach in df
+    #    extract the subset from the df for that reach
+    #    then convert that df subset to HTML code
+    #    and then add that HTML subset to reach_html_tables
     for i in df.reach.unique():
-        print( i )
         reach_html_tables[i] = stylize_model_output(  df.loc[df['reach'] == i ]  )
     
-
-    # df = get_data()
-
-    # reach_model_mapping = {
-    #     2: reach_2_model,
-    #     3: reach_3_model,
-    #     4: reach_4_model,
-    #     5: reach_5_model
-    # }
-    
-    # if reach in reach_model_mapping:
-    #     reach_func = reach_model_mapping[int(reach)]
-    #     reach_html_tables = {
-    #         reach: stylize_model_output(reach_func(df, rows=hours))
-    #     }
-    # else:
-    #     reach_html_tables = {
-    #         reach: stylize_model_output(reach_func(df, rows=hours))
-    #         for reach, reach_func
-    #         in reach_model_mapping.items()
-    #     }
-
-    print('\n\nreach_html_tables\n\n')
-    print(reach_html_tables)
-    print('\n\n')
-
     return render_template('output_model.html', tables=reach_html_tables)
 
 

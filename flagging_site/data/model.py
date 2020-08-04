@@ -274,9 +274,11 @@ def latest_model_outputs(hours: int = 1) -> dict:
     if hours == 1:
         df = execute_sql_from_file('return_1_hour_of_model_outputs.sql')
     elif hours > 1:
-        df = execute_sql_from_file('return_48_hours_of_model_outputs.sql')
-        # pull out all data older than parameter hours
-
+        df = execute_sql_from_file('return_48_hours_of_model_outputs.sql') # pull out 48 hours of model outputs
+        latest_time = max(df['time']) # find most recent timestamp
+        time_interval = pd.Timedelta(str(hours) + ' hours') # create pandas Timedelta, based on input parameter hours
+        df = df[ latest_time - df['time']< time_interval ] # reset df to exclude anything from before time_interval ago
+        
     else:
         raise ValueError('hours of data to pull cannot be less than one')
 
