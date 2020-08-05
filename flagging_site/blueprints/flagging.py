@@ -75,11 +75,6 @@ def index() -> str:
     """
     
     df = latest_model_outputs()
-    
-    print('\n\nlatest_model_outputs:\n\n')
-    print( latest_model_outputs(48) )
-    print('\n\n')
-
     df = df.set_index('reach')
     flags = {
         key: val['safe']
