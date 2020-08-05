@@ -1,6 +1,4 @@
--- This query returns 48 hours of data,
--- (unless the time interval in the data is less than 48 hours, 
--- in which case it will return data for all timestamps)
+-- This query returns up to 48 hours of the latest data
 
 SELECT *
 FROM model_outputs
