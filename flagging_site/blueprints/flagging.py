@@ -68,15 +68,18 @@ def add_to_dict(models, df, reach) -> None:
 @bp.route('/')
 def index() -> str:
     """
-    Retrieves data from hobolink and usgs and processes data, then displays data 
-    on `index_model.html`     
+    Retrieves data from database, 
+    then displays data on `index_model.html`     
 
     returns: render model on index.html
     """
+    
+    df = latest_model_outputs()
+    df = df.set_index('reach')
     flags = {
         key: val['safe']
         for key, val
-        in latest_model_outputs().items()
+        in df.to_dict(orient='index').items()
     }
     return render_template('index.html', flags=flags)
 
@@ -113,27 +116,20 @@ def output_model() -> str:
     # Look at no more than 72 hours.
     hours = min(max(hours, 1), 72)
 
-    df = get_data()
+    df = latest_model_outputs(hours)
 
-    reach_model_mapping = {
-        2: reach_2_model,
-        3: reach_3_model,
-        4: reach_4_model,
-        5: reach_5_model
-    }
+    # reach_html_tables is a dict where the index is the reach number
+    # and the values are HTML code for the table of data to display for
+    # that particular reach
+    reach_html_tables = {}
+
+    # loop through each reach in df
+    #    extract the subset from the df for that reach
+    #    then convert that df subset to HTML code
+    #    and then add that HTML subset to reach_html_tables
+    for i in df.reach.unique():
+        reach_html_tables[i] = stylize_model_output(  df.loc[df['reach'] == i ]  )
     
-    if reach in reach_model_mapping:
-        reach_func = reach_model_mapping[int(reach)]
-        reach_html_tables = {
-            reach: stylize_model_output(reach_func(df, rows=hours))
-        }
-    else:
-        reach_html_tables = {
-            reach: stylize_model_output(reach_func(df, rows=hours))
-            for reach, reach_func
-            in reach_model_mapping.items()
-        }
-
     return render_template('output_model.html', tables=reach_html_tables)
 
 
