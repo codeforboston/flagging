@@ -36,10 +36,9 @@ def execute_sql_from_file(file_name: str):
 def init_db():
     """Clear existing data and create new tables."""
     with current_app.app_context():
-
         # Read the `schema.sql` file, which initializes the database.
         execute_sql_from_file('schema.sql')
-
+        execute_sql_from_file('define_boathouse.sql')
         update_database()
 
 
@@ -47,7 +46,6 @@ def update_database():
     """At the moment this overwrites the entire database. In the future we want
     this to simply update it.
     """
-
     options = {
         'con': db.engine,
         'index': False,

@@ -20,6 +20,14 @@ CREATE TABLE IF NOT EXISTS hobolink (
     air_temp        decimal
 );
 
+DROP TABLE IF EXISTS boathouses;
+CREATE TABLE IF NOT EXISTS boathouses (
+    reach           int,
+    boathouse       varchar(255),
+    latitude        decimal,
+    longitude       decimal
+);
+
 DROP TABLE IF EXISTS model_outputs;
 CREATE TABLE IF NOT EXISTS model_outputs (
     reach           int,

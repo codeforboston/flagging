@@ -14,7 +14,22 @@ For strict documentation of the website sans project management stuff, read the 
 
 These are the steps to set the code up in development mode.
 
-**On Windows:** open up a Command Prompt terminal window (the default in PyCharm on Windows), point the terminal to the project directory if it's not already there, and enter:
+**On Windows:** (in progress)
+First install Postgressql using this link: https://www.postgresql.org/download/
+
+Then activate the Postgressql services in the Windows Services Panel.
+
+Set environment variable `POSTGRES_PASSWORD` to be whatever you want.
+
+Powershell and CMD (Windows):
+
+```commandline
+set POSTGRES_PASSWORD=enter_password_here
+createdb -U postgres flagging
+psql -U postgres -d flagging -c "DROP USER IF EXISTS flagging; CREATE USER flagging SUPERUSER PASSWORD '%POSTGRES_PASSWORD%'"
+```
+
+open up a Command Prompt terminal window (the default in PyCharm on Windows), point the terminal to the project directory if it's not already there, and enter:
 
 ```commandline
 run_windows_dev
@@ -22,7 +37,24 @@ run_windows_dev
 
 If you are in PowerShell (default VSC terminal), use `start-process run_windows_dev.bat` instead.
 
-**On OSX or Linux:** open up a Bash terminal, and in the project directory enter:
+**On OSX or Linux:** We need to setup postgres database first thus developers should install PostgreSQL with Homebrew then start the PostgreSQL database service. 
+
+```
+brew install postgresql
+brew services start postgresql
+```
+
+To begin initialize a database which we call `flagging`, enter into the bash terminal: 
+
+```shell script
+export POSTGRES_PASSWORD=*enter_password_here*
+createdb -U *enter_username_here* flagging
+psql -U *enter_username_here* -d flagging -c "DROP USER IF EXISTS flagging; CREATE USER flagging SUPERUSER PASSWORD '${POSTGRES_PASSWORD}'"
+```
+
+Note postgres password can be any password and postgres usernme can be default username  `postgres` or your OS username. 
+
+To run the website, in the project directory `flagging` enter:
 
 ```shell script
 sh run_unix_dev.sh
@@ -33,6 +65,8 @@ After you run the script for your respective OS, it will ask you if you want to 
 After that, it will ask if you have the vault password. If you do, enter it here. If not, you can skip this.
 
 Note that the website will _not_ without either the vault password or offline mode turned on; you must do one or the other.
+
+Next it will ask you to for the postgres password that you exported earlier. If you are in online mode, you can skip this as you do in the password section. 
 
 ## Deploy
 
@@ -63,22 +97,4 @@ Note: the test may require you to enter the vault password if it is not already 
 
 
 ## Start DB
-
-Set environment variable `POSTGRES_PASSWORD` to be whatever you want.
-
-Powershell and CMD (Windows):
-
-```commandline
-set POSTGRES_PASSWORD=enter_password_here
-createdb -U postgres flagging
-psql -U postgres -d flagging -c "DROP USER IF EXISTS flagging; CREATE USER flagging SUPERUSER PASSWORD '%POSTGRES_PASSWORD%'"
-```
-
-Bash (Mac OSX / Linux):
-
-```shell script
-export POSTGRES_PASSWORD=enter_password_here
-createdb -U postgres flagging
-psql -U postgres -d flagging -c "DROP USER IF EXISTS flagging; CREATE USER flagging SUPERUSER PASSWORD '${POSTGRES_PASSWORD}'"
-```
 
