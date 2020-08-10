@@ -48,23 +48,6 @@ def stylize_model_output(df: pd.DataFrame) -> str:
     return df.to_html(index=False, escape=False)
 
 
-def add_to_dict(models, df, reach) -> None:
-    """
-    Iterates through dataframe from model output, adds to model dict where
-    key equals column name, value equals column values as list type
-
-    args:
-        models: dictionary
-        df: pd.DataFrame
-        reach:int
-
-    returns: None
-        """
-    # converts time column to type string because of conversion to json error
-    df['time'] = df['time'].astype(str)
-    models[f'model_{reach}'] = df.to_dict(orient='list')
-
-
 @bp.route('/')
 def index() -> str:
     """
@@ -180,37 +163,6 @@ class ReachApi(Resource):
 
         return prim_dict
 
-        # to be replaced ......
-        """
-        Class method that retrieves data from hobolink and usgs and processes
-        data, then creates json-like dictionary structure for model output.
-
-        returns: json-like dictionary
-        """
-
-        # df = get_data()
-
-        # dfs = {
-        #     2: reach_2_model(df),
-        #     3: reach_3_model(df),
-        #     4: reach_4_model(df),
-        #     5: reach_5_model(df)
-        # }
-
-        # main = {}
-        # models = {}
-
-        # # adds metadata
-        # main['version'] = '2020'
-        # main['time_returned'] = str(pd.to_datetime('today'))
-
-        # for reach, df in dfs.items():
-        #     add_to_dict(models, df, reach)
-
-        # # adds models dict to main dict
-        # main['models'] = models
-
-        # return main
 
     def get(self):
         return self.model_api()
