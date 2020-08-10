@@ -2,17 +2,6 @@
 {% block title %}Flagging Program - Live Water Quality Alerts{% endblock %}
 {% block content %}
 <h2>Project Overview</h2>
-<!-- Older language
-<p>
-    The following predicted concentrations of Fecal Indicator Bacteria (FIB) are
-    based on modeled correlations between FIB and weather or water conditions.
-</p>
-<p>
-    Flagging is based on safety thresholds for boating. The weather and water
-    data is sourced from the CESN weather station at Community Boating and the
-    USGS Waltham river flow gauge.
-</p> -->
-<!-- Newer language -->
 <p>
     CRWA's Flagging Program uses a system of color-coded flags to indicate whether or not the river's water quality is
     safe for boating at eleven boating locations between Watertown and Boston. Flag colors are based on E. coli and
@@ -32,12 +21,6 @@
 <!-- optional 2019 report button here? -->
 
 <h2>Water Quality Today</h2>
-<!-- Older language
-<p>
-    Water quality flags, with forecasted E.coli concentrations and
-    probabilities (updated hourly).
-</p> -->
-<!-- Newer language -->
 <p>
     CRWA's water quality models are predicting blue flags for all boathouses.
 
@@ -58,8 +41,8 @@
         <td class="home-reach">
             <div> Reach {{ reach_no }} </div>
             <ul class="home-boat-house">
-                {% for attr, vals in reach.names.items() %}
-                <li> {{ vals }} </li>
+                {% for boathouse in reach['boathouses'] %}
+                <li> {{ boathouse }} </li>
                 {% endfor %}
             </ul>
         </td>
@@ -75,7 +58,7 @@
 <p class="home-centered">
     <!-- Currently uses time of last row for reach 5 table. Needs unit test to ensure this matches the times for reach 2, 3, and 4 -->
     {% if loop.last %}
-    (Last updated: {{value.time}})
+    (Last updated: {{model_last_updated_time}})
     {% endif %}
 </p>
 {% endfor %}
