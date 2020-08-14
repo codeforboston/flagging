@@ -47,6 +47,16 @@ def create_app(config: Optional[Config] = None) -> Flask:
     from .data import db
     db.init_app(app)
 
+    @app.cli.command('create-db')
+    def create_db_command():
+        """Create database (after verifying that it isn't already there)"""
+        from .data.database import create_db
+        if create_db():
+            click.echo('The database was created.')
+        else:
+            click.echo('The database was already there.')
+
+
     @app.cli.command('init-db')
     def init_db_command():
         """Clear existing data and create new tables."""

@@ -8,7 +8,7 @@ from typing import Optional
 from flask import current_app
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import ResourceClosedError
-
+from psycopg2 import connect
 
 db = SQLAlchemy()
 
@@ -31,6 +31,45 @@ def execute_sql_from_file(file_name: str):
     path = os.path.join(current_app.config['QUERIES_DIR'], file_name)
     with current_app.open_resource(path) as f:
         return execute_sql(f.read().decode('utf8'))
+
+
+def create_db():
+    """If database doesn't exist, create it and a and return True, 
+    otherwise leave it alone and return False"""
+
+    # create local variables for database values in the config file:
+    db_user = current_app.config['POSTGRES_USER']
+    db_pswd = current_app.config['POSTGRES_PASSWORD']
+    db_host = current_app.config['POSTGRES_HOST']
+    db_port = current_app.config['POSTGRES_PORT']
+    db_name = current_app.config['POSTGRES_DBNAME']
+
+    # connect to postgres database, get cursor
+    conn = connect(dbname='postgres', user=db_user, host=db_host, password=db_pswd)
+    cursor = conn.cursor()
+
+    # get a list of all databases:
+    cursor.execute('SELECT datname FROM pg_database;')
+    db_list =  cursor.fetchall()      # db_list here is a list of one-element tuples
+    db_list = [d[0] for d in db_list] # this converts db_list to a list of db names
+
+    # if that database is already there, exit out of this function
+    if db_name in db_list:
+        return False
+    # since the database isn't already there, proceed ...
+    
+    # create the database
+    cursor.execute('commit;')
+    cursor.execute('create database ' + db_name)
+    cursor.execute('commit;')
+    
+    # ask the user for the password to use for the flagging user
+    # (the user name will be the same as the database name, 
+    # which is db_name, which is set in the config as POSTGRES_DBNAME)
+
+    # create flagging user
+    
+    return True
 
 
 def init_db():

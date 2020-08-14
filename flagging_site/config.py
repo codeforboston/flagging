@@ -47,7 +47,7 @@ class Config:
     POSTGRES_PASSWORD: str = os.getenv('POSTGRES_PASSWORD')
     POSTGRES_HOST: str = 'localhost'
     POSTGRES_PORT: int = 5432
-    POSTGRES_DBNAME: str = 'flagging'
+    POSTGRES_DBNAME: str = 'the_test_db2'
 
     @property
     def SQLALCHEMY_DATABASE_URI(self) -> str:
@@ -58,7 +58,7 @@ class Config:
         db = self.POSTGRES_DBNAME
         return f'postgres://{user}:{password}@{host}:{port}/{db}'
 
-    SQLALCHEMY_ECHO: bool = True
+    SQLALCHEMY_ECHO: bool = False
     SQLALCHEMY_RECORD_QUERIES: bool = True
     SQLALCHEMY_TRACK_MODIFICATIONS: bool = False
 
