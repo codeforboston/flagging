@@ -47,7 +47,7 @@ class Config:
     POSTGRES_PASSWORD: str = os.getenv('POSTGRES_PASSWORD')
     POSTGRES_HOST: str = 'localhost'
     POSTGRES_PORT: int = 5432
-    POSTGRES_DBNAME: str = 'the_test_db2'
+    POSTGRES_DBNAME: str = 'flagging'
 
     @property
     def SQLALCHEMY_DATABASE_URI(self) -> str:

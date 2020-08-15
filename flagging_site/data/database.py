@@ -45,7 +45,7 @@ def create_db():
     db_name = current_app.config['POSTGRES_DBNAME']
 
     # connect to postgres database, get cursor
-    conn = connect(dbname='postgres', user=db_user, host=db_host, password=db_pswd)
+    conn = connect(dbname='postgres', user='postgres', host=db_host, password=db_pswd)
     cursor = conn.cursor()
 
     # get a list of all databases:
@@ -59,16 +59,19 @@ def create_db():
     # since the database isn't already there, proceed ...
     
     # create the database
-    cursor.execute('commit;')
-    cursor.execute('create database ' + db_name)
-    cursor.execute('commit;')
-    
+    cursor.execute('COMMIT;')
+    cursor.execute('CREATE DATABASE ' + db_name)
+    cursor.execute('COMMIT;')
+
     # ask the user for the password to use for the flagging user
     # (the user name will be the same as the database name, 
     # which is db_name, which is set in the config as POSTGRES_DBNAME)
-
-    # create flagging user
+    new_db_user_pswd = 'super'
     
+    # create flagging user (same as db_name)
+    cursor.execute("DROP USER IF EXISTS " + db_name + ";" )
+    cursor.execute("COMMIT;")
+    cursor.execute("CREATE USER " + db_name + " WITH SUPERUSER PASSWORD '" + new_db_user_pswd + "';")
     return True
 
 
