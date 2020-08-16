@@ -66,12 +66,29 @@ def create_db():
     # ask the user for the password to use for the flagging user
     # (the user name will be the same as the database name, 
     # which is db_name, which is set in the config as POSTGRES_DBNAME)
-    new_db_user_pswd = 'super'
-    
+
+
+    print('\n\n')
+    print('original flagging password: ' + current_app.config['POSTGRES_PASSWORD'] )
+    print('\n\n')
+    print('original sqlalchemy_db_uri: ' + current_app.config['SQLALCHEMY_DATABASE_URI'] )
+
+    # modify the password in the local variable and in the config file:
+    db_pswd = 'shush'
+    current_app.config['POSTGRES_PASSWORD'] = db_pswd
+    current_app.config['SQLALCHEMY_DATABASE_URI'] = f'postgres://{db_user}:{db_pswd}@{db_host}:{db_port}/{db_name}'
+    # change this, instead
+
+    print('\n\n')
+    print('modified flagging password: ' + current_app.config['POSTGRES_PASSWORD'] )
+    print('\n\n')
+    print('modified sqlalchemy_db_uri: ' + current_app.config['SQLALCHEMY_DATABASE_URI'] )
+    print('\n\n')
+
     # create flagging user (same as db_name)
     cursor.execute("DROP USER IF EXISTS " + db_name + ";" )
     cursor.execute("COMMIT;")
-    cursor.execute("CREATE USER " + db_name + " WITH SUPERUSER PASSWORD '" + new_db_user_pswd + "';")
+    cursor.execute("CREATE USER " + db_name + " WITH SUPERUSER PASSWORD '" + db_pswd + "';")
     return True
 
 
