@@ -20,6 +20,7 @@ def test_usgs_data_is_recent(app):
         df = get_live_usgs_data()
         last_timestamp = df['time'].iloc[-1]
         time_difference = (pd.to_datetime('today') - last_timestamp)
+<<<<<<< HEAD
         assert time_difference < pd.Timedelta(hours=2)
 
 
@@ -45,3 +46,6 @@ def test_hobolink_handles_erroneous_csv(app, monkeypatch):
 
     with app.app_context():
         assert get_live_hobolink_data().equals(expected_dataframe)
+=======
+        assert time_difference < pd.Timedelta('30 minutes')
+>>>>>>> 03c9ec721cb3b9980986fa847b8d2b665074d4ba

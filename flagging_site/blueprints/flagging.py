@@ -55,13 +55,46 @@ def index() -> str:
         The website's home page with the latest flag updates.
     """
     df = get_data()
-    flags = {
-        2: reach_2_model(df, rows=1)['safe'].iloc[0],
-        3: reach_3_model(df, rows=1)['safe'].iloc[0],
-        4: reach_4_model(df, rows=1)['safe'].iloc[0],
-        5: reach_5_model(df, rows=1)['safe'].iloc[0]
+    
+    homepage = {
+        2: {
+            'flag': reach_2_model(df, rows=1)['safe'].iloc[0],
+            'boathouses': [
+                'Newton Yacht Club',
+                'Watertown Yacht Club',
+                'Community Rowing, Inc.',
+                'Northeastern\s Henderson Boathouse', 
+                'Paddle Boston at Herter Park'
+            ]
+        },
+        3: {
+            'flag': reach_3_model(df, rows=1)['safe'].iloc[0],
+            'boathouses': [
+                'Harvard\'s Weld Boathouse'
+            ]
+        },
+        4: {
+            'flag': reach_4_model(df, rows=1)['safe'].iloc[0],
+            'boathouses': [
+                'Riverside Boat Club'
+            ]
+        },
+        5: {
+            'flag': reach_5_model(df, rows=1)['safe'].iloc[0],
+            'boathouses': [
+                'Charles River Yacht Club', 
+                'Union Boat Club', 
+                'Community Boating', 
+                'Paddle Boston at Kendall Square'
+            ]
+        }
     }
-    return render_template('index.html', flags=flags)
+
+    model_last_updated_time = reach_5_model(df, rows=1)['time'].iloc[0]
+
+    return render_template('index.html', homepage=homepage, model_last_updated_time=model_last_updated_time)
+    # return render_template('index.html', flags=flags)
+    
 
 
 @bp.route('/about')
@@ -82,18 +115,11 @@ def output_model() -> str:
     # Parse contents of the query string to get reach and hours parameters.
     # Defaults are hours = 24, and reach = -1.
     # When reach = -1, we utilize all reaches.
-    try:
-        reach = int(request.args.get('reach'))
-    except (TypeError, ValueError):
-        reach = -1
-
-    try:
-        hours = int(request.args.get('hours'))
-    except (TypeError, ValueError):
-        hours = 24
+    reach = request.args.get('reach', -1, type=int)
+    hours = request.args.get('hours', 24, type=int)
 
     # Look at no more than x_MAX_HOURS
-    hours = min(max(hours, 1),current_app.config['API_MAX_HOURS'])
+    hours = min(max(hours, 1), current_app.config['API_MAX_HOURS'])
 
     df = get_data()
 
