@@ -17,6 +17,7 @@ from ..data.model import reach_3_model
 from ..data.model import reach_4_model
 from ..data.model import reach_5_model
 
+from flasgger import swag_from
 
 bp = Blueprint('api', __name__, url_prefix='/api')
 api = Api(bp)
@@ -99,6 +100,7 @@ def model_api(reaches: Optional[List[int]], hours: Optional[int]) -> dict:
 
 
 class ReachesApi(Resource):
+    @swag_from('reach_api.yml')
     def get(self):
         reaches = request.args.getlist('reach', type=int)
         hours = request.args.get('hours', type=int)

@@ -16,12 +16,13 @@
         the data. Additional APIs may be added to the project as development progresses. This is a volunteer
         driven project and we appreciate developers' and researchers' input on what would be most useful.
     </p>
+    <p>
+        <a href="{{ url_for('flasgger.apidocs') }}" target="_blank">
+            Click here to view API documentation powered by Swagger.
+        </a>
+    </p>
     <h2>Available Endpoints</h2>
     <ul>
-        <li><a href="{{ url_for('api.reachesapi') }}">Flagging Model Outputs</a></li>
+        <li><a href="{{ url_for('api.reachesapi') }}" target="_blank">Flagging Model Outputs</a></li>
     </ul>
-    <h2>Documentation</h2>
-    <p>
-        Documentation for the API is currently in development. When it is done, it will be available <a href="/api/docs">here</a>.
-    </p>
 {% endblock %}

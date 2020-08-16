@@ -12,7 +12,7 @@ def test_hobolink_data_is_recent(app):
         df = get_live_hobolink_data()
         last_timestamp = df['time'].iloc[-1]
         time_difference = (pd.to_datetime('today') - last_timestamp)
-        assert time_difference < pd.Timedelta(hours=1)
+        assert time_difference < pd.Timedelta(hours=2)
 
 
 def test_usgs_data_is_recent(app):
@@ -20,7 +20,7 @@ def test_usgs_data_is_recent(app):
         df = get_live_usgs_data()
         last_timestamp = df['time'].iloc[-1]
         time_difference = (pd.to_datetime('today') - last_timestamp)
-        assert time_difference < pd.Timedelta(hours=1)
+        assert time_difference < pd.Timedelta(hours=2)
 
 
 def test_hobolink_handles_erroneous_csv(app, monkeypatch):
