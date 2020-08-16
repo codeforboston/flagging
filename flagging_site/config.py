@@ -7,6 +7,7 @@ this module, they won't refresh.
 """
 import os
 from typing import Dict, Any, Optional, List
+from flask.cli import load_dotenv
 
 
 # Constants
@@ -15,6 +16,18 @@ from typing import Dict, Any, Optional, List
 ROOT_DIR = os.path.abspath(os.path.dirname(__file__))
 DATA_STORE = os.path.join(ROOT_DIR, 'data', '_store')
 VAULT_FILE = os.path.join(ROOT_DIR, 'vault.zip')
+
+# Dotenv
+# ~~~~~~
+
+# If you are using a .env file, please double check that it is gitignored.
+# The `.flaskenv` file should not be gitignored, only `.env`.
+# See this for more:
+# https://flask.palletsprojects.com/en/1.1.x/cli/
+load_dotenv(os.path.join(ROOT_DIR, '..', '.flaskenv'))
+load_dotenv(os.path.join(ROOT_DIR, '..', '.env'))
+
+
 # Configs
 # ~~~~~~~
 

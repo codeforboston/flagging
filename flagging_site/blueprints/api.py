@@ -1,3 +1,6 @@
+from typing import Optional
+from typing import List
+
 import pandas as pd
 from flask import Blueprint
 from flask import render_template
@@ -49,32 +52,32 @@ def add_to_dict(models, df, reach) -> None:
     models[f'reach_{reach}'] = df.to_dict(orient='list')
 
 
-def model_api(reach_param: list, hour: str) -> dict:
+def model_api(reaches: Optional[List[int]], hours: Optional[int]) -> dict:
     """
     Class method that retrieves data from hobolink and usgs and processes
     data, then creates json-like dictionary structure for model output.
 
     returns: json-like dictionary
     """
-    if reach_param:
-        reach_param = list(map(int, reach_param))
+    # Set defaults
+    if reaches is None:
+        reaches = [2, 3, 4, 5]
+    if hours is None:
+        hours = 24
 
-    reach_param = reach_param or [2, 3, 4, 5]
-
-    hour = int(hour)
-
-    if hour > current_app.config['API_MAX_HOURS']:
-        hour = current_app.config['API_MAX_HOURS']
-    elif hour < 1:
-        hour = 1
+    # `hours` must be between 1 and `API_MAX_HOURS`
+    if hours > current_app.config['API_MAX_HOURS']:
+        hours = current_app.config['API_MAX_HOURS']
+    elif hours < 1:
+        hours = 1
 
     df = get_data()
 
     dfs = {
-        2: reach_2_model(df, hour),
-        3: reach_3_model(df, hour),
-        4: reach_4_model(df, hour),
-        5: reach_5_model(df, hour)
+        2: reach_2_model,
+        3: reach_3_model,
+        4: reach_4_model,
+        5: reach_5_model
     }
 
     main = {}
@@ -84,9 +87,10 @@ def model_api(reach_param: list, hour: str) -> dict:
     main['version'] = '2020'
     main['time_returned'] = str(pd.to_datetime('today'))
 
-    for reach, df in dfs.items():
-        if reach in reach_param:
-            add_to_dict(models, df, reach)
+    for reach, model_func in dfs.items():
+        if reach in reaches:
+            _df = model_func(df, hours)
+            add_to_dict(models, _df, reach)
 
     # adds models dict to main dict
     main['models'] = models
@@ -96,9 +100,9 @@ def model_api(reach_param: list, hour: str) -> dict:
 
 class ReachesApi(Resource):
     def get(self):
-        reach = request.args.getlist('reach', None)
-        hour = request.args.get('hour', current_app.config['API_MAX_HOURS'])
-        return model_api(reach,hour)
+        reaches = request.args.getlist('reach', type=int)
+        hours = request.args.get('hours', type=int)
+        return model_api(reaches, hours)
 
 
 api.add_resource(ReachesApi, '/v1/model')
