@@ -34,7 +34,7 @@ def create_app(config: Optional[Config] = None) -> Flask:
     # Use the stuff inside `vault.zip` file to update the app.
     update_config_from_vault(app)
 
-    # Register th   e "blueprints." Blueprints are basically like mini web apps
+    # Register the "blueprints." Blueprints are basically like mini web apps
     # that can be joined to the main web app. In this particular app, the way
     # blueprints are imported is: If BLUEPRINTS is in the config, then import
     # only from that list. Otherwise, import everything that's inside of
@@ -52,6 +52,7 @@ def create_app(config: Optional[Config] = None) -> Flask:
 
     # And we're all set! We can hand the app over to flask at this point.
     return app
+
 
 def update_config_from_vault(app: Flask) -> None:
     """
@@ -82,6 +83,9 @@ def update_config_from_vault(app: Flask) -> None:
 
 
 def add_swagger_plugin_to_app(app: Flask):
+    """This function hnadles all the logic for adding Swagger automated
+    documentation to the application instance.
+    """
     from flasgger import Swagger
     from flasgger import LazyString
     from flask import url_for
