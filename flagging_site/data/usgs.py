@@ -8,7 +8,7 @@ https://waterdata.usgs.gov/nwis/uv?site_no=01104500
 import pandas as pd
 import requests
 from flask import abort
-from .keys import offline_mode
+from flask import current_app
 from .keys import get_data_store_file_path
 
 # Constants
@@ -25,7 +25,7 @@ def get_live_usgs_data() -> pd.DataFrame:
     Returns:
         Pandas Dataframe containing the usgs data.
     """
-    if offline_mode():
+    if current_app.config['OFFLINE_MODE']:
         df = pd.read_pickle(get_data_store_file_path(STATIC_FILE_NAME))
     else:
         res = request_to_usgs()
