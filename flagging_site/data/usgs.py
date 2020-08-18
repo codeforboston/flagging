@@ -18,7 +18,7 @@ STATIC_FILE_NAME = 'usgs.pickle'
 # ~ ~ ~ ~
 
 
-def get_usgs_data() -> pd.DataFrame:
+def get_live_usgs_data() -> pd.DataFrame:
     """This function  runs through the whole process for retrieving data from
     usgs: first we perform the request, and then we clean the data.
 

@@ -1,25 +1,24 @@
 import pandas as pd
 from flask import Blueprint
 from flask import render_template
-from flagging_site.data.hobolink import get_hobolink_data
-from flagging_site.data.usgs import get_usgs_data
-from flagging_site.data.model import process_data
-from flagging_site.data.model import reach_2_model
-from flagging_site.data.model import reach_3_model
-from flagging_site.data.model import reach_4_model
-from flagging_site.data.model import reach_5_model
-from flask_restful import Resource, Api
-
 from flask import request
+from flask import current_app
+
+from ..data.hobolink import get_live_hobolink_data
+from ..data.usgs import get_live_usgs_data
+from ..data.model import process_data
+from ..data.model import reach_2_model
+from ..data.model import reach_3_model
+from ..data.model import reach_4_model
+from ..data.model import reach_5_model
 
 bp = Blueprint('flagging', __name__)
-api = Api(bp)
 
 
 def get_data() -> pd.DataFrame:
-    """Retrieves the data that gets plugged into the the model."""
-    df_hobolink = get_hobolink_data('code_for_boston_export_21d')
-    df_usgs = get_usgs_data()
+    """Retrieves the processed data that gets plugged into the the model."""
+    df_hobolink = get_live_hobolink_data('code_for_boston_export_21d')
+    df_usgs = get_live_usgs_data()
     df = process_data(df_hobolink, df_usgs)
     return df
 
@@ -46,39 +45,56 @@ def stylize_model_output(df: pd.DataFrame) -> str:
     return df.to_html(index=False, escape=False)
 
 
-def add_to_dict(models, df, reach) -> None:
-    """
-    Iterates through dataframe from model output, adds to model dict where
-    key equals column name, value equals column values as list type
-
-    args:
-        models: dictionary
-        df: pd.DataFrame
-        reach:int
-
-    returns: None
-        """
-    # converts time column to type string because of conversion to json error
-    df['time'] = df['time'].astype(str)
-    models[f'model_{reach}'] = df.to_dict(orient='list')
-
-
 @bp.route('/')
 def index() -> str:
     """
-    Retrieves data from hobolink and usgs and processes data, then displays data 
-    on `index_model.html`     
+    The home page of the website. This page contains a brief description of the
+    purpose of the website, and the latest outputs for the flagging model.
 
-    returns: render model on index.html
+    Returns:
+        The website's home page with the latest flag updates.
     """
     df = get_data()
-    flags = {
-        2: reach_2_model(df, rows=1)['safe'].iloc[0],
-        3: reach_3_model(df, rows=1)['safe'].iloc[0],
-        4: reach_4_model(df, rows=1)['safe'].iloc[0],
-        5: reach_5_model(df, rows=1)['safe'].iloc[0]
+    
+    homepage = {
+        2: {
+            'flag': reach_2_model(df, rows=1)['safe'].iloc[0],
+            'boathouses': [
+                'Newton Yacht Club',
+                'Watertown Yacht Club',
+                'Community Rowing, Inc.',
+                'Northeastern\s Henderson Boathouse', 
+                'Paddle Boston at Herter Park'
+            ]
+        },
+        3: {
+            'flag': reach_3_model(df, rows=1)['safe'].iloc[0],
+            'boathouses': [
+                'Harvard\'s Weld Boathouse'
+            ]
+        },
+        4: {
+            'flag': reach_4_model(df, rows=1)['safe'].iloc[0],
+            'boathouses': [
+                'Riverside Boat Club'
+            ]
+        },
+        5: {
+            'flag': reach_5_model(df, rows=1)['safe'].iloc[0],
+            'boathouses': [
+                'Charles River Yacht Club', 
+                'Union Boat Club', 
+                'Community Boating', 
+                'Paddle Boston at Kendall Square'
+            ]
+        }
     }
-    return render_template('index.html', flags=flags)
+
+    model_last_updated_time = reach_5_model(df, rows=1)['time'].iloc[0]
+
+    return render_template('index.html', homepage=homepage, model_last_updated_time=model_last_updated_time)
+    # return render_template('index.html', flags=flags)
+    
 
 
 @bp.route('/about')
@@ -89,29 +105,21 @@ def about() -> str:
 @bp.route('/output_model', methods=['GET'])
 def output_model() -> str:
     """
-    Retrieves data from hobolink and usgs and processes data and then
-    displays data on 'output_model.html'
+    Retrieves data from hobolink and usgs, processes that data, and then
+    displays the data as a human-readable, stylized HTML table.
 
-    args: no argument
-
-    returns: render model on output_model.html
+    Returns:
+        Rendering of the model outputs via the `output_model.html` template.
     """
 
     # Parse contents of the query string to get reach and hours parameters.
     # Defaults are hours = 24, and reach = -1.
     # When reach = -1, we utilize all reaches.
-    try:
-        reach = int(request.args.get('reach'))
-    except (TypeError, ValueError):
-        reach = -1
+    reach = request.args.get('reach', -1, type=int)
+    hours = request.args.get('hours', 24, type=int)
 
-    try:
-        hours = int(request.args.get('hours'))
-    except (TypeError, ValueError):
-        hours = 24
-
-    # Look at no more than 72 hours.
-    hours = min(max(hours, 1), 72)
+    # Look at no more than x_MAX_HOURS
+    hours = min(max(hours, 1), current_app.config['API_MAX_HOURS'])
 
     df = get_data()
 
@@ -135,43 +143,3 @@ def output_model() -> str:
         }
 
     return render_template('output_model.html', tables=reach_html_tables)
-
-
-class ReachApi(Resource):
-
-    def model_api(self) -> dict:
-        """
-        Class method that retrieves data from hobolink and usgs and processes
-        data, then creates json-like dictionary structure for model output.
-
-        returns: json-like dictionary
-        """
-        df = get_data()
-
-        dfs = {
-            2: reach_2_model(df),
-            3: reach_3_model(df),
-            4: reach_4_model(df),
-            5: reach_5_model(df)
-        }
-
-        main = {}
-        models = {}
-
-        # adds metadata
-        main['version'] = '2020'
-        main['time_returned'] = str(pd.to_datetime('today'))
-
-        for reach, df in dfs.items():
-            add_to_dict(models, df, reach)
-
-        # adds models dict to main dict
-        main['models'] = models
-
-        return main
-
-    def get(self):
-        return self.model_api()
-
-
-api.add_resource(ReachApi, '/api/v1/model')

@@ -33,14 +33,14 @@ def refresh_data_store(vault_password: Optional[str] = None) -> None:
 
     from flagging_site.data.keys import get_data_store_file_path
 
-    from flagging_site.data.hobolink import get_hobolink_data
+    from flagging_site.data.hobolink import get_live_hobolink_data
     from flagging_site.data.hobolink import STATIC_FILE_NAME as hobolink_file
-    get_hobolink_data('code_for_boston_export_21d')\
+    get_live_hobolink_data('code_for_boston_export_21d')\
         .to_pickle(get_data_store_file_path(hobolink_file))
 
-    from flagging_site.data.usgs import get_usgs_data
+    from flagging_site.data.usgs import get_live_usgs_data
     from flagging_site.data.usgs import STATIC_FILE_NAME as usgs_file
-    get_usgs_data().to_pickle(get_data_store_file_path(usgs_file))
+    get_live_usgs_data().to_pickle(get_data_store_file_path(usgs_file))
 
 
 if __name__ == '__main__':

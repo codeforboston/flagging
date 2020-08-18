@@ -37,7 +37,7 @@ STATIC_FILE_NAME = 'hobolink.pickle'
 # ~ ~ ~ ~
 
 
-def get_hobolink_data(export_name: str = EXPORT_NAME) -> pd.DataFrame:
+def get_live_hobolink_data(export_name: str = EXPORT_NAME) -> pd.DataFrame:
     """This function runs through the whole process for retrieving data from
     HOBOlink: first we perform the request, and then we clean the data.
 
