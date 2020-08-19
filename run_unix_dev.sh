@@ -30,7 +30,7 @@ export OFFLINE_MODE=${offline_mode}
 read -p "Enter vault password: " vault_pw
 export VAULT_PASSWORD=${vault_pw}
 read -p "Enter Postgres password: " postgres_pw
-export VAULT_PASSWORD=${postgres_pw}
+export POSTGRES_PASSWORD=${postgres_pw}
 
 flask init-db
 flask run
