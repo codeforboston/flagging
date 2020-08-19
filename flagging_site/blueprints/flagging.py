@@ -2,8 +2,11 @@ import pandas as pd
 from flask import Blueprint
 from flask import render_template
 from flask import request
-from flask_restful import Resource, Api
+from flask import Response
+from flask_restful import Api
+from flask_restful import Resource
 
+from ..data.cyano_overrides import get_currently_overridden_reaches
 from ..data.hobolink import get_live_hobolink_data
 from ..data.usgs import get_live_usgs_data
 from ..data.model import process_data
@@ -76,8 +79,11 @@ def index() -> str:
     
     df = latest_model_outputs()
     df = df.set_index('reach')
+
+    overridden_reaches = get_currently_overridden_reaches()
+
     flags = {
-        key: val['safe']
+        key: val['safe'] and key not in overridden_reaches
         for key, val
         in df.to_dict(orient='index').items()
     }

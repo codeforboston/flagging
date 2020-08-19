@@ -37,4 +37,11 @@ CREATE TABLE IF NOT EXISTS model_outputs (
     safe            boolean
 );
 
+DROP TABLE IF EXISTS cyano_overrides;
+CREATE TABLE IF NOT EXISTS cyano_overrides (
+    reach           int,
+    start_time      timestamp,
+    end_time        timestamp
+);
+
 COMMIT;

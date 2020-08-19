@@ -140,6 +140,8 @@ class DevelopmentConfig(Config):
     DEBUG: bool = True
     TESTING: bool = True
     OFFLINE_MODE = strtobool(os.getenv('OFFLINE_MODE', 'false'))
+    BASIC_AUTH_USERNAME: str = 'admin'
+    BASIC_AUTH_PASSWORD: str = 'password'
 
 
 class TestingConfig(Config):
