@@ -4,7 +4,6 @@ from sqlalchemy import Column
 from sqlalchemy import Integer
 from sqlalchemy import TIMESTAMP
 from sqlalchemy import VARCHAR
-from sqlalchemy.ext.declarative import declarative_base
 
 from ..admin import AdminModelView
 from .database import Base
