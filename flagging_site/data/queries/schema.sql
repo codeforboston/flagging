@@ -41,7 +41,8 @@ DROP TABLE IF EXISTS cyano_overrides;
 CREATE TABLE IF NOT EXISTS cyano_overrides (
     reach           int,
     start_time      timestamp,
-    end_time        timestamp
+    end_time        timestamp,
+    reason          varchar(255)
 );
 
 COMMIT;

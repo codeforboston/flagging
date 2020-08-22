@@ -13,7 +13,6 @@ from werkzeug.exceptions import HTTPException
 from .auth import AuthException
 from .auth import basic_auth
 from .data import db
-from .data.cyano_overrides import CyanoOverrides
 
 
 admin = Admin(template_mode='bootstrap3')
@@ -24,7 +23,9 @@ def init_admin(app: Flask):
         admin.init_app(app)
 
         # Register /admin sub-views
-        admin.add_view(AdminModelView(CyanoOverrides, db.session))
+        from .data.cyano_overrides import CyanoOverridesModelView
+        admin.add_view(CyanoOverridesModelView(db.session))
+        
         admin.add_view(LogoutView(name="Logout"))
 
 
