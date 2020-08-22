@@ -83,8 +83,8 @@ def index() -> str:
     overridden_reaches = get_currently_overridden_reaches()
 
     flags = {
-        key: val['safe'] and key not in overridden_reaches
-        for key, val
+        reach: val['safe'] and reach not in overridden_reaches
+        for reach, val
         in df.to_dict(orient='index').items()
     }
     return render_template('index.html', flags=flags)
