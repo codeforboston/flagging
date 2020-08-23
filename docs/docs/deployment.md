@@ -106,10 +106,8 @@ In addition, Heroku has an add-on that lets us schedule db refreshes to avoid do
 
 3. On dashboard.heroku.com/apps/[app name]/scheduler, click on Add Job in the Time Scheduler section.
 
-4.  Choose to update db every 10 minutes, hour, or day. 
+4. Choose to update db every 10 minutes, hour, or day. 
 
-5. Enter command: python flask update-db and click Save Job.
-
-4. Confirm it runs then you should be good to go!   
+5. Enter command: ```python flask update-db``` and Save Job. 
 
 ```For more info: https://devcenter.heroku.com/articles/scheduler``` 
