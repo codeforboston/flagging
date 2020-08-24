@@ -16,8 +16,6 @@ def test_model_output_api_schema(app):
 
         for key, value in res.items():
             assert isinstance(key, str)
-            #assert isinstance(value, dict)
-            #assert isinstance(value, schema[key])
 
 
 def test_model_output_api_parameters(app):
