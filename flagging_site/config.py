@@ -43,7 +43,7 @@ class Config:
     # ==========================================================================
     # DATABASE CONFIG OPTIONS
     # ==========================================================================
-    POSTGRES_USER: str = os.getenv('POSTGRES_USER', 'flagging')
+    POSTGRES_USER: str = os.getenv('POSTGRES_USER', 'postgres')
     POSTGRES_PASSWORD: str = os.getenv('POSTGRES_PASSWORD')
     POSTGRES_HOST: str = 'localhost'
     POSTGRES_PORT: int = 5432
@@ -58,7 +58,7 @@ class Config:
         db = self.POSTGRES_DBNAME
         return f'postgres://{user}:{password}@{host}:{port}/{db}'
 
-    SQLALCHEMY_ECHO: bool = False
+    SQLALCHEMY_ECHO: bool = True
     SQLALCHEMY_RECORD_QUERIES: bool = True
     SQLALCHEMY_TRACK_MODIFICATIONS: bool = False
 
