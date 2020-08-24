@@ -45,6 +45,9 @@ def stylize_model_output(df: pd.DataFrame) -> str:
     df['safe'] = df['safe'].apply(_apply_flag)
     df.columns = [i.title().replace('_', ' ') for i in df.columns]
 
+    # remove reach number
+    df = df.drop('Reach', 1)
+
     return df.to_html(index=False, escape=False)
 
 
