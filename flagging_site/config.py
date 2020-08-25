@@ -65,6 +65,12 @@ class Config:
     QUERIES_DIR: str = QUERIES_DIR
 
     # ==========================================================================
+    # BASIC AUTH CONFIG OPTIONS
+    # ==========================================================================
+    BASIC_AUTH_USERNAME: str = os.environ['BASIC_AUTH_USERNAME']
+    BASIC_AUTH_PASSWORD: str = os.environ['BASIC_AUTH_PASSWORD']
+
+    # ==========================================================================
     # MISC. CUSTOM CONFIG OPTIONS
     #
     # These are options that Flask does not know how to interpret, but our
@@ -140,8 +146,8 @@ class DevelopmentConfig(Config):
     DEBUG: bool = True
     TESTING: bool = True
     OFFLINE_MODE = strtobool(os.getenv('OFFLINE_MODE', 'false'))
-    BASIC_AUTH_USERNAME: str = 'admin'
-    BASIC_AUTH_PASSWORD: str = 'password'
+    BASIC_AUTH_USERNAME: str = os.getenv('BASIC_AUTH_USERNAME', 'admin')
+    BASIC_AUTH_PASSWORD: str = os.getenv('BASIC_AUTH_PASSWORD', 'password')
 
 
 class TestingConfig(Config):
@@ -149,6 +155,8 @@ class TestingConfig(Config):
     website.
     """
     TESTING: bool = True
+    BASIC_AUTH_USERNAME: str = os.getenv('BASIC_AUTH_USERNAME', 'admin')
+    BASIC_AUTH_PASSWORD: str = os.getenv('BASIC_AUTH_PASSWORD', 'password')
 
 
 def get_config_from_env(env: str) -> Config:
