@@ -65,12 +65,6 @@ class Config:
     QUERIES_DIR: str = QUERIES_DIR
 
     # ==========================================================================
-    # BASIC AUTH CONFIG OPTIONS
-    # ==========================================================================
-    BASIC_AUTH_USERNAME: str = os.environ['BASIC_AUTH_USERNAME']
-    BASIC_AUTH_PASSWORD: str = os.environ['BASIC_AUTH_PASSWORD']
-
-    # ==========================================================================
     # MISC. CUSTOM CONFIG OPTIONS
     #
     # These are options that Flask does not know how to interpret, but our
@@ -127,6 +121,10 @@ class ProductionConfig(Config):
     is the `flagging` part, so that's the only blueprint we import.
     """
     BLUEPRINTS: Optional[List[str]] = ['flagging']
+
+    def __init__(self):
+        self.BASIC_AUTH_USERNAME: str = os.environ['BASIC_AUTH_USERNAME']
+        self.BASIC_AUTH_PASSWORD: str = os.environ['BASIC_AUTH_PASSWORD']
 
 
 class DevelopmentConfig(Config):
