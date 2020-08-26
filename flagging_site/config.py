@@ -43,7 +43,7 @@ class Config:
     # ==========================================================================
     # DATABASE CONFIG OPTIONS
     # ==========================================================================
-    POSTGRES_USER: str = os.getenv('POSTGRES_USER', 'flagging')
+    POSTGRES_USER: str = os.getenv('POSTGRES_USER', 'postgres')
     POSTGRES_PASSWORD: str = os.getenv('POSTGRES_PASSWORD')
     POSTGRES_HOST: str = 'localhost'
     POSTGRES_PORT: int = 5432

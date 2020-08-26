@@ -9,5 +9,6 @@ set /p OFFLINE_MODE="Offline mode? [y/n]: "
 set /p VAULT_PASSWORD="Enter vault password: "
 set /p POSTGRES_PASSWORD="Enter Postgres password: "
 
+flask create-db
 flask init-db
 flask run
