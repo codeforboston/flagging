@@ -3,6 +3,7 @@ from flask import Blueprint
 from flask import render_template
 from flask import request
 from flask_restful import Resource, Api
+from flask import current_app
 
 from ..data.hobolink import get_live_hobolink_data
 from ..data.usgs import get_live_usgs_data
@@ -11,15 +12,12 @@ from ..data.model import reach_2_model
 from ..data.model import reach_3_model
 from ..data.model import reach_4_model
 from ..data.model import reach_5_model
-from ..data.model import latest_model_outputs
-
 
 bp = Blueprint('flagging', __name__)
-api = Api(bp)
 
 
 def get_data() -> pd.DataFrame:
-    """Retrieves the data that gets plugged into the the model."""
+    """Retrieves the processed data that gets plugged into the the model."""
     df_hobolink = get_live_hobolink_data('code_for_boston_export_21d')
     df_usgs = get_live_usgs_data()
     df = process_data(df_hobolink, df_usgs)
@@ -54,10 +52,8 @@ def stylize_model_output(df: pd.DataFrame) -> str:
 @bp.route('/')
 def index() -> str:
     """
-    Retrieves data from database, 
-    then displays data on `index_model.html`     
-
-    returns: render model on index.html
+    The home page of the website. This page contains a brief description of the
+    purpose of the website, and the latest outputs for the flagging model.
     """
     
     df = latest_model_outputs()
@@ -66,8 +62,46 @@ def index() -> str:
         key: val['safe']
         for key, val
         in df.to_dict(orient='index').items()
+    
+    homepage = {
+        2: {
+            'flag': flags[2],
+            'boathouses': [
+                'Newton Yacht Club',
+                'Watertown Yacht Club',
+                'Community Rowing, Inc.',
+                'Northeastern\s Henderson Boathouse', 
+                'Paddle Boston at Herter Park'
+            ]
+        },
+        3: {
+            'flag': flags[3],
+            'boathouses': [
+                'Harvard\'s Weld Boathouse'
+            ]
+        },
+        4: {
+            'flag': flags[4],
+            'boathouses': [
+                'Riverside Boat Club'
+            ]
+        },
+        5: {
+            'flag': flags[5],
+            'boathouses': [
+                'Charles River Yacht Club', 
+                'Union Boat Club', 
+                'Community Boating', 
+                'Paddle Boston at Kendall Square'
+            ]
+        }
     }
-    return render_template('index.html', flags=flags)
+
+    model_last_updated_time = reach_5_model(df, rows=1)['time'].iloc[0]
+
+    return render_template('index.html', homepage=homepage, model_last_updated_time=model_last_updated_time)
+    # return render_template('index.html', flags=flags)
+    
 
 
 @bp.route('/about')
@@ -78,29 +112,21 @@ def about() -> str:
 @bp.route('/output_model', methods=['GET'])
 def output_model() -> str:
     """
-    Retrieves data from hobolink and usgs and processes data and then
-    displays data on 'output_model.html'
+    Retrieves data from hobolink and usgs, processes that data, and then
+    displays the data as a human-readable, stylized HTML table.
 
-    args: no argument
-
-    returns: render model on output_model.html
+    Returns:
+        Rendering of the model outputs via the `output_model.html` template.
     """
 
     # Parse contents of the query string to get reach and hours parameters.
     # Defaults are hours = 24, and reach = -1.
     # When reach = -1, we utilize all reaches.
-    try:
-        reach = int(request.args.get('reach'))
-    except (TypeError, ValueError):
-        reach = -1
+    reach = request.args.get('reach', -1, type=int)
+    hours = request.args.get('hours', 24, type=int)
 
-    try:
-        hours = int(request.args.get('hours'))
-    except (TypeError, ValueError):
-        hours = 24
-
-    # Look at no more than 72 hours.
-    hours = min(max(hours, 1), 72)
+    # Look at no more than x_MAX_HOURS
+    hours = min(max(hours, 1), current_app.config['API_MAX_HOURS'])
 
     df = latest_model_outputs(hours)
 

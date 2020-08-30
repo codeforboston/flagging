@@ -7,7 +7,7 @@ this module, they won't refresh.
 """
 import os
 from typing import Dict, Any, Optional, List
-from distutils.util import strtobool
+from flask.cli import load_dotenv
 
 
 # Constants
@@ -17,6 +17,16 @@ ROOT_DIR = os.path.abspath(os.path.dirname(__file__))
 QUERIES_DIR = os.path.join(ROOT_DIR, 'data', 'queries')
 DATA_STORE = os.path.join(ROOT_DIR, 'data', '_store')
 VAULT_FILE = os.path.join(ROOT_DIR, 'vault.zip')
+
+# Dotenv
+# ~~~~~~
+
+# If you are using a .env file, please double check that it is gitignored.
+# The `.flaskenv` file should not be gitignored, only `.env`.
+# See this for more:
+# https://flask.palletsprojects.com/en/1.1.x/cli/
+load_dotenv(os.path.join(ROOT_DIR, '..', '.flaskenv'))
+load_dotenv(os.path.join(ROOT_DIR, '..', '.env'))
 
 
 # Configs
@@ -114,13 +124,19 @@ class Config:
     find in the `blueprints` module.
     """
 
+    API_MAX_HOURS: int = 48
+    """The maximum number of hours of data that the API will return. We are not trying 
+    to be stingy about our data, we just want this in order to avoid any odd behaviors 
+    if the user requests more data than exists.
+    """
+
 
 class ProductionConfig(Config):
     """The Production Config is used for deployment of the website to the
     internet. Currently the only part of the website that's pretty fleshed out
     is the `flagging` part, so that's the only blueprint we import.
     """
-    BLUEPRINTS: Optional[List[str]] = ['flagging']
+    BLUEPRINTS: Optional[List[str]] = ['flagging', 'api']
 
 
 class DevelopmentConfig(Config):
@@ -139,7 +155,7 @@ class DevelopmentConfig(Config):
     VAULT_OPTIONAL: bool = True
     DEBUG: bool = True
     TESTING: bool = True
-    OFFLINE_MODE = strtobool(os.getenv('OFFLINE_MODE', 'false'))
+    OFFLINE_MODE = bool(os.getenv('OFFLINE_MODE', 'false'))
 
 
 class TestingConfig(Config):
