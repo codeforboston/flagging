@@ -12,6 +12,7 @@ from ..data.model import reach_2_model
 from ..data.model import reach_3_model
 from ..data.model import reach_4_model
 from ..data.model import reach_5_model
+from ..data.model import latest_model_outputs
 
 bp = Blueprint('flagging', __name__)
 
@@ -62,6 +63,7 @@ def index() -> str:
         key: val['safe']
         for key, val
         in df.to_dict(orient='index').items()
+    }
     
     homepage = {
         2: {
@@ -70,7 +72,7 @@ def index() -> str:
                 'Newton Yacht Club',
                 'Watertown Yacht Club',
                 'Community Rowing, Inc.',
-                'Northeastern\s Henderson Boathouse', 
+                'Northeastern\'s Henderson Boathouse', 
                 'Paddle Boston at Herter Park'
             ]
         },
@@ -97,11 +99,9 @@ def index() -> str:
         }
     }
 
-    model_last_updated_time = reach_5_model(df, rows=1)['time'].iloc[0]
+    model_last_updated_time = df['time'].iloc[0]
 
     return render_template('index.html', homepage=homepage, model_last_updated_time=model_last_updated_time)
-    # return render_template('index.html', flags=flags)
-    
 
 
 @bp.route('/about')
@@ -197,4 +197,4 @@ class ReachApi(Resource):
         return self.model_api()
 
 
-api.add_resource(ReachApi, '/api/v1/model')
+# api.add_resource(ReachApi, '/api/v1/model')
