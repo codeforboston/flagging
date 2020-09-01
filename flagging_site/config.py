@@ -68,7 +68,7 @@ class Config:
         db = self.POSTGRES_DBNAME
         return f'postgres://{user}:{password}@{host}:{port}/{db}'
 
-    SQLALCHEMY_ECHO: bool = True
+    SQLALCHEMY_ECHO: bool = False
     SQLALCHEMY_RECORD_QUERIES: bool = True
     SQLALCHEMY_TRACK_MODIFICATIONS: bool = False
 
