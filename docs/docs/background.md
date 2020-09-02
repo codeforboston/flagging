@@ -1,11 +1,6 @@
 # Background 
 # Charles River
 
-![](https://www.epa.gov/sites/production/files/styles/large/public/2015-04/cr-watershed-map.jpg)
-
-[Via the EPA:](https://www.epa.gov/charlesriver/about-charles-river#HistoricalTimeline)
-
-> The Charles River flows 80 miles from Hopkinton, Mass. to Boston Harbor. The Charles River is the most prominent urban river in New England. It is a major source of recreation and a readily-available connection to the natural world for residents of the Boston metropolitan area. The entire Charles River drains rain and melted snow from a watershed area of 310 square miles.
 
 Throughout most of the 20th century, the Charles River in Boston was known for its contaminated water. The reputation of the Charles River was popularized out of state by the song [Dirty Water by the Standells](https://en.wikipedia.org/wiki/Dirty_Water), which peaked at #11 on the Billboard singles chart on June 11, 1965. (The song has a chorus containing the lines "Well I love that dirty water / Boston you're my home.")
 
@@ -21,7 +16,7 @@ The EPA also relies on sample data collected by the CRWA to construct its report
 
 ## Flagging Program
 
-Of the many services that the CRWA provides to the greater Boston community, one of those is monitoring whether it is safe to swim and/or boat in the Charles River. Traditionally, this was accomplished by running some data through a predictive model hosted on a PHP website and outputting the results through that PHP website. However, that website is currently out of commission. At Code for Boston, we attempted to fix the website, although we have had trouble maintaining a steady stream of PHP expertise inside the "Safe Water Project" (the flagging website's parent project). So we are going to be focusing now on building the website from scratch in Python. See the "Stack Justification" documentation for why we chose this path, and why we chose Python + Flask.
+Of the many services that the CRWA provides to the greater Boston community, one of those is monitoring whether it is safe to swim and/or boat in the Charles River. 
 
 ## Code for Boston
 
@@ -35,12 +30,3 @@ Code for Boston is a volunteer Civic Technology meetup. We are part of the Code 
 
 ## More Information on Code For Boston  
 
-If you are interested more about our organization, go to our [website](https://www.codeforboston.org/about/). 
-
-If you wish to contact the project team
-
-- Join our [Slack channel](https://cfb-public.slack.com): `#water`.
- 
- - Meet us on Tuesday Night for our general meetings by [Signing up to attend Code for Boston events here](https://www.meetup.com/Code-for-Boston/).
- 
- - More contact information on various projects in this [tab of our website](https://www.codeforboston.org/projects/). Search for our Safe Water Project which will provide link to our github project and google hangout/video chat link.

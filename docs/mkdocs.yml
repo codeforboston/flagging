@@ -1,8 +1,35 @@
-site_name: Water MKDocs
+site_name: CRWA Flagging Website Documentation
 nav:
-    - Home: index.md
-    - Background: background.md
-    - Deployment: deployment.md
-    - System: system.md
-    
-theme: readthedocs
+- Home: index.md
+- Admin: admin.md
+- Background: background.md
+- Deployment: deployment.md
+- System: system.md
+- Development:
+    - History: development/history.md
+theme:
+  name: material
+  palette:
+    scheme: default
+    primary: teal
+    accent: cyan
+  font:
+    text: Opens Sans
+    code: Roboto Mono
+markdown_extensions:
+- admonition
+- pymdownx.tabbed # https://facelessuser.github.io/pymdown-extensions/
+- pymdownx.superfences:
+    custom_fences:
+    - name: mermaid
+      class: mermaid
+      format: !!python/name:pymdownx.superfences.fence_div_format
+- sane_lists
+extra:
+  social:
+  - icon: fontawesome/brands/github
+    link: https://github.com/codeforboston/flagging
+  - icon: fontawesome/brands/meetup
+    link: https://www.meetup.com/Code-for-Boston/
+  - icon: fontawesome/brands/twitter
+    link: https://twitter.com/codeforboston
