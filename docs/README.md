@@ -10,7 +10,7 @@ If you have write permission to the upstream repository (i.e. you are a project 
 pip install mkdocs
 pip install pymdown-extensions
 pip install mkdocs-material
-mkdocs gh-deploy --remote-branch upstream
+mkdocs gh-deploy --remote-name upstream
 ```
 
 If you do not have write permission to the upstream repository, you can do one of the following:
