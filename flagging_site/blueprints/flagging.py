@@ -48,24 +48,10 @@ def stylize_model_output(df: pd.DataFrame) -> str:
     df['safe'] = df['safe'].apply(_apply_flag)
     df.columns = [i.title().replace('_', ' ') for i in df.columns]
 
+    # remove reach number
+    df = df.drop('Reach', 1)
+
     return df.to_html(index=False, escape=False)
-
-
-def add_to_dict(models, df, reach) -> None:
-    """
-    Iterates through dataframe from model output, adds to model dict where
-    key equals column name, value equals column values as list type
-
-    args:
-        models: dictionary
-        df: pd.DataFrame
-        reach:int
-
-    returns: None
-        """
-    # converts time column to type string because of conversion to json error
-    df['time'] = df['time'].astype(str)
-    models[f'model_{reach}'] = df.to_dict(orient='list')
 
 
 @bp.route('/')
@@ -130,11 +116,13 @@ def output_model() -> str:
     reach_html_tables = {}
 
     # loop through each reach in df
-    #    extract the subset from the df for that reach
-    #    then convert that df subset to HTML code
-    #    and then add that HTML subset to reach_html_tables
+    #    compare with reach to determine whether to display that reach
+    #       extract the subset from the df for that reach
+    #       then convert that df subset to HTML code
+    #       and then add that HTML subset to reach_html_tables
     for i in df.reach.unique():
-        reach_html_tables[i] = stylize_model_output(  df.loc[df['reach'] == i ]  )
+        if (reach==-1 or reach==i):
+            reach_html_tables[i] = stylize_model_output(  df.loc[df['reach'] == i ]  )
     
     return render_template('output_model.html', tables=reach_html_tables)
 
@@ -143,34 +131,47 @@ class ReachApi(Resource):
 
     def model_api(self) -> dict:
         """
-        Class method that retrieves data from hobolink and usgs and processes
-        data, then creates json-like dictionary structure for model output.
+        This class method retrieves data from the database,
+        and then returns a json-like dictionary, prim_dict
 
-        returns: json-like dictionary
+        (note that there are three levels of dictionaries:
+        prim_dict, sec_dict, and tri_dict)
+
+        prim_dict has three items: 
+        key version with value version number,
+        key time_returned with value timestamp,
+        key models, and with value of a dictionary, sec_dict
+            sec_dict has four items, 
+            the key for each of one of the reach models (model_2 ... model_5), and 
+            the value for each item is another dictionary, tri_dict
+                tri_dict has five items,
+                the keys are: reach, time, log_odds, probability, and safe
+                the value for each is a list of values 
         """
-        df = get_data()
 
-        dfs = {
-            2: reach_2_model(df),
-            3: reach_3_model(df),
-            4: reach_4_model(df),
-            5: reach_5_model(df)
+        # get model output data from database
+        df = latest_model_outputs(48)
+
+        # converts time column to type string because of conversion to json error
+        df['time'] = df['time'].astype(str)
+
+        # construct secondary dictionary from the file (tertiary dicts will be built along the way)
+        sec_dict = {}
+        for reach_num in df.reach.unique():
+            tri_dict = {}
+            for field in df.columns:
+                tri_dict[field] = df[df['reach']==reach_num][field].tolist()
+            sec_dict["model_"+str(reach_num)] = tri_dict
+
+        # create return value (primary dictionary)
+        prim_dict = { 
+            "version" : "2020", 
+            "time_returned":str( pd.to_datetime('today') ),
+            "models": sec_dict
         }
 
-        main = {}
-        models = {}
+        return prim_dict
 
-        # adds metadata
-        main['version'] = '2020'
-        main['time_returned'] = str(pd.to_datetime('today'))
-
-        for reach, df in dfs.items():
-            add_to_dict(models, df, reach)
-
-        # adds models dict to main dict
-        main['models'] = models
-
-        return main
 
     def get(self):
         return self.model_api()

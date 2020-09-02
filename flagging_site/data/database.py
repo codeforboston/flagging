@@ -9,7 +9,7 @@ from flask import current_app
 from flask_sqlalchemy import SQLAlchemy
 from flask_sqlalchemy import declarative_base
 from sqlalchemy.exc import ResourceClosedError
-
+from psycopg2 import connect
 
 db = SQLAlchemy()
 Base = declarative_base()
@@ -35,6 +35,34 @@ def execute_sql_from_file(file_name: str):
     path = os.path.join(current_app.config['QUERIES_DIR'], file_name)
     with current_app.open_resource(path) as f:
         return execute_sql(f.read().decode('utf8'))
+
+
+def create_db():
+    """If database doesn't exist, create it and return True, 
+    otherwise leave it alone and return False"""
+
+    # connect to postgres database, get cursor
+    conn = connect(dbname='postgres', user=current_app.config['POSTGRES_USER'],
+        host=current_app.config['POSTGRES_HOST'],
+            password=current_app.config['POSTGRES_PASSWORD'])
+    cursor = conn.cursor()
+
+    # get a list of all databases:
+    cursor.execute('SELECT datname FROM pg_database;')
+    db_list =  cursor.fetchall()      # db_list here is a list of one-element tuples
+    db_list = [d[0] for d in db_list] # this converts db_list to a list of db names
+
+    # if that database is already there, exit out of this function
+    if current_app.config['POSTGRES_DBNAME'] in db_list:
+        return False
+    # since the database isn't already there, proceed ...
+    
+    # create the database
+    cursor.execute('COMMIT;')
+    cursor.execute('CREATE DATABASE ' + current_app.config['POSTGRES_DBNAME'])
+    cursor.execute('COMMIT;')
+
+    return True
 
 
 def init_db():

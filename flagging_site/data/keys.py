@@ -69,13 +69,6 @@ def load_keys_from_vault(
     return d
 
 
-def offline_mode() -> bool:
-    if current_app:
-        return current_app.config['OFFLINE_MODE']
-    else:
-        return bool(strtobool(os.getenv('OFFLINE_MODE', 'false')))
-
-
 def get_data_store_file_path(file_name: str) -> str:
     if current_app:
         return os.path.join(current_app.config['DATA_STORE'], file_name)

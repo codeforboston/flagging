@@ -6,7 +6,11 @@ import click
 from typing import Optional
 from flask import Flask
 
+from .blueprints.flagging import get_data
+from .data.hobolink import get_live_hobolink_data
 from .data.keys import get_keys
+from .data.model import process_data
+from .data.usgs import get_live_usgs_data
 from .config import Config
 from .config import get_config_from_env
 
@@ -55,6 +59,15 @@ def create_app(config: Optional[Config] = None) -> Flask:
     from .admin import init_admin
     init_admin(app)
 
+    @app.cli.command('create-db')
+    def create_db_command():
+        """Create database (after verifying that it isn't already there)"""
+        from .data.database import create_db
+        if create_db():
+            click.echo('The database was created.')
+        else:
+            click.echo('The database was already there.')
+
     @app.cli.command('init-db')
     def init_db_command():
         """Clear existing data and create new tables."""
@@ -67,6 +80,17 @@ def create_app(config: Optional[Config] = None) -> Flask:
         from .data.database import update_database
         update_database()
         click.echo('Updated the database.')
+
+    # Make a few useful functions available in Flask shell without imports
+    @app.shell_context_processor
+    def make_shell_context():
+        return {
+            'db': db,
+            'get_data': get_data,
+            'get_live_hobolink_data': get_live_hobolink_data,
+            'get_live_usgs_data': get_live_usgs_data,
+            'process_data': process_data,
+        }
 
     # And we're all set! We can hand the app over to flask at this point.
     return app
