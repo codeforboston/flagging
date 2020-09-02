@@ -122,6 +122,10 @@ class ProductionConfig(Config):
     """
     BLUEPRINTS: Optional[List[str]] = ['flagging']
 
+    def __init__(self):
+        self.BASIC_AUTH_USERNAME: str = os.environ['BASIC_AUTH_USERNAME']
+        self.BASIC_AUTH_PASSWORD: str = os.environ['BASIC_AUTH_PASSWORD']
+
 
 class DevelopmentConfig(Config):
     """The Development Config is used for running the website on your own
@@ -140,6 +144,8 @@ class DevelopmentConfig(Config):
     DEBUG: bool = True
     TESTING: bool = True
     OFFLINE_MODE = strtobool(os.getenv('OFFLINE_MODE', 'false'))
+    BASIC_AUTH_USERNAME: str = os.getenv('BASIC_AUTH_USERNAME', 'admin')
+    BASIC_AUTH_PASSWORD: str = os.getenv('BASIC_AUTH_PASSWORD', 'password')
 
 
 class TestingConfig(Config):
@@ -147,6 +153,8 @@ class TestingConfig(Config):
     website.
     """
     TESTING: bool = True
+    BASIC_AUTH_USERNAME: str = os.getenv('BASIC_AUTH_USERNAME', 'admin')
+    BASIC_AUTH_PASSWORD: str = os.getenv('BASIC_AUTH_PASSWORD', 'password')
 
 
 def get_config_from_env(env: str) -> Config:

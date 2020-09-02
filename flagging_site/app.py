@@ -51,6 +51,14 @@ def create_app(config: Optional[Config] = None) -> Flask:
     from .data import db
     db.init_app(app)
 
+    # Register auth
+    from .auth import init_auth
+    init_auth(app)
+
+    # Register admin
+    from .admin import init_admin
+    init_admin(app)
+
     @app.cli.command('create-db')
     def create_db_command():
         """Create database (after verifying that it isn't already there)"""
@@ -59,7 +67,6 @@ def create_app(config: Optional[Config] = None) -> Flask:
             click.echo('The database was created.')
         else:
             click.echo('The database was already there.')
-
 
     @app.cli.command('init-db')
     def init_db_command():
@@ -112,7 +119,7 @@ def update_config_from_vault(app: Flask) -> None:
         else:
             print(f'Warning: {msg}')
             app.config['KEYS'] = None
-            app.config['SECRET_KEY'] = None
+            app.config['SECRET_KEY'] = os.urandom(16)
     else:
         app.config['SECRET_KEY'] = app.config['KEYS']['flask']['secret_key']
 

@@ -7,10 +7,12 @@ import pandas as pd
 from typing import Optional
 from flask import current_app
 from flask_sqlalchemy import SQLAlchemy
+from flask_sqlalchemy import declarative_base
 from sqlalchemy.exc import ResourceClosedError
 from psycopg2 import connect
 
 db = SQLAlchemy()
+Base = declarative_base()
 
 
 def execute_sql(query: str) -> Optional[pd.DataFrame]:
@@ -20,8 +22,10 @@ def execute_sql(query: str) -> Optional[pd.DataFrame]:
     with db.engine.connect() as conn:
         res = conn.execute(query)
         try:
-            df = pd.DataFrame(res.fetchall())
-            df.columns = res.keys()
+            df = pd.DataFrame(
+                res.fetchall(),
+                columns=res.keys()
+            )
             return df
         except ResourceClosedError:
             return None
@@ -68,6 +72,7 @@ def init_db():
         execute_sql_from_file('schema.sql')
         execute_sql_from_file('define_boathouse.sql')
         update_database()
+        Base.metadata.create_all(db.engine)
 
 
 def update_database():
