@@ -5,8 +5,6 @@ In development, the username is 'admin' and the password is 'password', but thes
 be set as config variables `BASIC_AUTH_USERNAME` and `BASIC_AUTH_PASSWORD`. Remember to log out
 by clicking the `Logout` button in the nav bar.
 
-!!! tip foo bar
-
 ## Cyanobacteria Overrides
 
 There should be a link to this page in the admin navigation bar.

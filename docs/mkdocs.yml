@@ -1,10 +1,12 @@
 site_name: CRWA Flagging Website Documentation
 nav:
 - Home: index.md
+- About: about.md
 - Admin: admin.md
-- Background: background.md
 - Deployment: deployment.md
 - System: system.md
+- Database: database.md
+- Shell: shell.md
 - Development:
     - History: development/history.md
 theme:
