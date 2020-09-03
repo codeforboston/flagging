@@ -8,7 +8,7 @@ this module, they won't refresh.
 import os
 from typing import Dict, Any, Optional, List
 from flask.cli import load_dotenv
-
+from distutils.util import strtobool
 
 # Constants
 # ~~~~~~~~~
@@ -155,7 +155,7 @@ class DevelopmentConfig(Config):
     VAULT_OPTIONAL: bool = True
     DEBUG: bool = True
     TESTING: bool = True
-    OFFLINE_MODE = bool(os.getenv('OFFLINE_MODE', 'false'))
+    OFFLINE_MODE = strtobool(os.getenv('OFFLINE_MODE', 'false'))
 
 
 class TestingConfig(Config):

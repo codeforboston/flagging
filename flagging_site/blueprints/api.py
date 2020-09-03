@@ -8,14 +8,6 @@ from flask import request
 from flask_restful import Api
 from flask_restful import Resource
 from flask import current_app
-
-# from ..data.hobolink import get_live_hobolink_data
-# from ..data.usgs import get_live_usgs_data
-# from ..data.model import process_data
-# from ..data.model import reach_2_model
-# from ..data.model import reach_3_model
-# from ..data.model import reach_4_model
-# from ..data.model import reach_5_model
 from ..data.model import latest_model_outputs
 
 from flasgger import swag_from
@@ -74,10 +66,6 @@ def model_api(reaches: Optional[List[int]], hours: Optional[int]) -> dict:
     if not reaches:
         reaches = df.reach.unique()
     
-    print('\n\nreaches')
-    print(reaches)
-    print('\n\n')
-
     # construct secondary dictionary from the file (tertiary dicts will be built along the way)
     sec_dict = {}
     for reach_num in reaches:
