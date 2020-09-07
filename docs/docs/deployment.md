@@ -91,3 +91,23 @@ heroku logs --app crwa-flagging-staging --tail
 ```
 
 4. Check out the website and make sure it looks right.
+
+## Scheduling periodic database updates
+
+Refreshing the database on a schedule ensures the most accurate data is available to users. 
+
+Fortunately, the app is equipped with a CLI that triggers a database refresh: ```flask update-db```
+
+In addition, Heroku has an add-on that lets us schedule db refreshes to avoid doing the work manually.
+
+1. Go to dashboard.com/heroku/apps/[app name], click on "Configure Add-ons" 
+
+2. Choose Heroku Time Scheduler from the list of Add-ons. This should now appear in your list of Add-ons.
+
+3. On dashboard.heroku.com/apps/[app name]/scheduler, click on Add Job in the Time Scheduler section.
+
+4. Choose to update db every 10 minutes, hour, or day. 
+
+5. Enter command: ```python flask update-db``` and Save Job. 
+
+```For more info: https://devcenter.heroku.com/articles/scheduler``` 
