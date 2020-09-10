@@ -59,7 +59,7 @@ class Config:
         #     db = self.POSTGRES_DBNAME
         #     return f'postgres://{user}:{password}@{host}:{port}/{db}'
         # else:
-            return 'postgres://yuqwhsktykmrqa:34cec8b5de36ee64 db9bbc6e6390e1a'\
+            return 'postgres://yuqwhsktykmrqa:34cec8b5de36ee64db9bbc6e6390e1a'\
                 '9ab961008cfcb1640931cd8199fedd971@ec2-34-232-212-164.compute-1'\
                 '.amazonaws.com:5432/devrsq7prgrrfc'
     
