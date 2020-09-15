@@ -1,6 +1,6 @@
 # Deployment
 
-!!! note
+???+ note
     This guide is an instruction manual on how to deploy the flagging website to internet via Heroku. If you just want to run the website locally, you do not need Heroku. Instead, check out the [development](/development) guide.
 
 The following tools are required to deploy the website:
@@ -8,9 +8,9 @@ The following tools are required to deploy the website:
 - [Heroku CLI](https://devcenter.heroku.com/articles/heroku-cli)
 - [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 
-## Deploying for the first time
+## First Time Deployment
 
-!!! note
+???+ note
     In this section, the project name is assumed to be `crwa-flagging`. If you are deploying to another URL, such as `crwa-flagging-staging` or another personal domain, then replace each reference to `crwa-flagging` with that.
 
 If you've never deployed the app from your computer, follow these instructions.
@@ -28,7 +28,7 @@ cd ./flagging
     ```shell
     set VAULT_PASSWORD=replace_me_with_pw
     ```
-=== "OSX or Linux (Bash)"
+=== "OSX (Bash)"
     ```shell
     export VAULT_PASSWORD=replace_me_with_pw
     ```
@@ -46,7 +46,7 @@ heroku git:remote -a crwa-flagging
     ```shell
     heroku config:set VAULT_PASSWORD=%VAULT_PASSWORD%
     ```
-=== "OSX or Linux (Bash)"
+=== "OSX (Bash)"
     ```shell
     heroku config:set VAULT_PASSWORD=${VAULT_PASSWORD}
     ```
@@ -69,16 +69,18 @@ heroku logs --tail
 2020-06-13T23:17:54.000000+00:00 app[api]: Build succeeded
 ```
 
-!!! note
+???+ note
     If you see instead see something like `[...] State changed from starting to crashed`, then read the rest of the output to see what happened. The most common error when deploying to production will be a `RuntimeError: Unable to load the vault; bad password provided` which is self-explanatory. Update the password, and the website will automatically attempt to redeploy. If you don't see that error, then try to self-diagnose.
 
 7. Go see the website for yourself!
 
-## Subsequent deployments
+8. You are still not done; you need to do one more step, which is to set up the task scheduler.
+
+## Subsequent Deployments
 
 1. Heroku doesn't allow you to redeploy the website unless you create a new commit. Add some updates if you need to with `git add .` then `git commit -m "describe your changes here"`.
 
-!!! note
+???+ note
     In the _very_ rare case you simply need to redeploy without making any changes to the site, in lieu of the above, simply do `git commit --allow-empty -m "redeploy"`.
 
 2. Once you have done that, Heroku will redeploy the site when you merge your working branch:
@@ -86,6 +88,14 @@ heroku logs --tail
 ```shell
 git push heroku master
 ```
+
+???+ tip
+    If you are having any issues here related to merge conflicts, instead of deleting everything and starting over, try to pull the data from the `heroku` branch in and merge it into your local branch.
+    
+    ```shell
+    git fetch heroku
+    git pull heroku master
+    ```
 
 ## Staging and Production Split
 
@@ -106,14 +116,14 @@ git remote add staging https://git.heroku.com/crwa-flagging-staging.git
 git remote -v
 ```
 
-!!! tip
+???+ success
     The above command should output something like this:
   
     ```shell
     heroku  https://git.heroku.com/crwa-flagging.git (fetch)
     heroku  https://git.heroku.com/crwa-flagging.git (push)
-    origin  https://github.com/<your_github_username_here>/flagging.git (fetch)
-    origin  https://github.com/<your_github_username_here>/flagging.git (push)
+    origin  https://github.com/YOUR_USERNAME_HERE/flagging.git (fetch)
+    origin  https://github.com/YOUR_USERNAME_HERE/flagging.git (push)
     staging https://git.heroku.com/crwa-flagging-staging.git (fetch)
     staging https://git.heroku.com/crwa-flagging-staging.git (push)
     upstream        https://github.com/codeforboston/flagging.git (fetch)
@@ -130,7 +140,7 @@ git remote -v
     heroku logs --app crwa-flagging-staging --tail
     ```
 
-=== "OSX or Linux (Bash)"
+=== "OSX (Bash)"
     ```shell
     heroku config:set --app crwa-flagging-staging VAULT_PASSWORD=${VAULT_PASSWORD}
     git push staging master

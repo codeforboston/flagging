@@ -31,5 +31,15 @@ With that said, Heroku does provide some excellent benefits focused around how l
 - Heroku integrates much more nicely into Flask's extensive use of CLIs. For example, Heroku's task scheduler tool (which is very easy to set up) can simply run a command line script built in Flask. Google App Engine lets you do a simple cron job setup that [sends GET requests to your app](https://cloud.google.com/appengine/docs/flexible/python/scheduling-jobs-with-cron-yaml), but doing something that doesn't publicly expose the interface requires use of [three additional services](https://cloud.google.com/python/getting-started/background-processing): Pub/Sub, Firestore, and Cloud Scheduler.
 - We want to publicly host this website, but we don't want to expose the keys we use for various things. This is a bit easier to do with Heroku, as it has the concept of an environment that lives on the instance's memory and can be set through the CLI. Google App Engine lets you configure the environment [only](https://cloud.google.com/appengine/docs/flexible/python/reference/app-yaml) through `app.yaml`, which is an issue because it means we'd need to gitignore the `app.yaml`. (We want to just gitignore the keys, not the whole cloud deployment config!)
 
-!!! warning
-    If you ever want to run this website on Google App Engine, you'll have to make some changes to the repository (such as adding an `app.yaml`) and may also involve making changes to the code-- mainly the data backend and the task scheduler interface.
+???+ warning
+    If you ever want to run this website on Google App Engine, you'll have to make some changes to the repository (such as adding an `app.yaml`), and it may also involve making changes to the code-- mainly the data backend and the task scheduler interface.
+
+## Why Pandas?
+
+We made the decision to use Pandas to manipulate data in the backend of the website because it has an interface that should feel familiar to users of Stata, R, or other statistical software packages commonly used by scientists and academics. This ultimately helps with the maintainability of the website for its intended audience. Data manipulation in SQL can sometimes be unintuitive and require advanced trickery (CTEs, window functions) compared to Pandas code that achieves the same results. Additionally, SQL code tends to be formatted in a non-chronological way, e.g. subqueries run before the query that references them, but occur somewhere in the middle of a query. This isn't hard if you use SQL a bit, but it's not intuitive until you've done a bit of SQL.
+
+It's true that Pandas is not as efficient as SQL, but we're not processing millions of rows of data, we're only processing a few hundred rows at a time and at infrequent intervals. (And even if efficiency was a concern, we'd sooner use something like [Dask](https://dask.org/) than SQL.)
+
+One possible downside of Pandas compared to SQL is that SQL has been around for a very long time, and is more of a "standardized" thing than Pandas is or perhaps ever will be. We went with the choice for Pandas after discussing it with some academic friends, but we are aware that in the non-academic world, there are more people who know SQL than Pandas.
+
+We do use SQL in this website, but primarily to store and retrieve data and to access some features that integrate nicely with the SQLAlchemy ORM (notably the Flask-Admin extension).

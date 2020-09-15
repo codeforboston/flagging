@@ -1,9 +1,16 @@
-# Admin Pages
+# Admin Panel
 
-You can reach all admin pages by going to /admin and inputting a username and password.
-In development, the username is 'admin' and the password is 'password', but these should
-be set as config variables `BASIC_AUTH_USERNAME` and `BASIC_AUTH_PASSWORD`. Remember to log out
-by clicking the `Logout` button in the nav bar.
+???+ Note
+    This page discusses how to use the admin panel for the website. For how to set up the admin page username and password during deployment, see the [deployment](../deployment) documentation.
+
+The admin panel is used to manually override the model outputs during events and advisories that would adversely effect the river quality.
+
+You can reach the admin panel by going to `/admin` after the base URL for the flagging website. (You need to it in manually.)
+
+You will be asked a username and password, which will be provided to you by the person who deployed the website. Enter the correct credentials to enter the admin panel.
+
+???+ note
+    In "development" mode, the default username is `admin` and the password is `password`. In production, the environment variables `BASIC_AUTH_USERNAME` and `BASIC_AUTH_PASSWORD` are used to set the credentials.
 
 ## Cyanobacteria Overrides
 

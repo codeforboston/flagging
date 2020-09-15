@@ -56,7 +56,7 @@ Here we assume you have already started the Flask shell.
 This example shows how to download the Hobolink data and
 save it as a CSV file.
 
-```shell
+```python
 >>> hobolink_data = get_live_hobolink_data()
 >>> hobolink_data.to_csv('path/where/to/save/my-CSV-file.csv')
 ```
