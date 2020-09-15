@@ -10,7 +10,6 @@ from flask import current_app
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import ResourceClosedError
 from psycopg2 import connect
-from sqlalchemy import Column
 
 db = SQLAlchemy()
 
@@ -101,10 +100,10 @@ def update_database():
     model_outs.to_sql('model_outputs', **options)
 
 class boathouses(db.Model):
-    reach = Column(db.Integer, unique=False)
-    boathouse = Column(db.String(255), primary_key=True)
-    latitude = Column(db.Numeric, unique=False)
-    longitude = Column(db.Numeric, unique=False)
+    reach = db.Column(db.Integer, unique=False)
+    boathouse = db.Column(db.String(255), primary_key=True)
+    latitude = db.Column(db.Numeric, unique=False)
+    longitude = db.Column(db.Numeric, unique=False)
     def __repr__(self):
         return '<Boathouse {}>'.format(self.boathouse)
 
