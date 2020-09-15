@@ -4,11 +4,13 @@ retrieving data.
 """
 import os
 import pandas as pd
+import re
 from typing import Optional
 from flask import current_app
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import ResourceClosedError
 from psycopg2 import connect
+from sqlalchemy import Column
 
 db = SQLAlchemy()
 
@@ -97,3 +99,32 @@ def update_database():
     from .model import all_models
     model_outs = all_models(df)
     model_outs.to_sql('model_outputs', **options)
+
+class boathouses(db.Model):
+    reach = Column(db.Integer, unique=False)
+    boathouse = Column(db.String(255), primary_key=True)
+    latitude = Column(db.Numeric, unique=False)
+    longitude = Column(db.Numeric, unique=False)
+    def __repr__(self):
+        return '<Boathouse {}>'.format(self.boathouse)
+
+def get_boathouse_dict():
+    """
+    Return a dict of boathouses
+    """
+    # return value is an outer dictionary with the reach number as the keys 
+    # and the a sub-dict as the values each sub-dict has the string 'boathouses' 
+    # as the key, and an array of boathouse names as the value
+    boathouse_dict = {}
+    
+    # outer boathouse loop:  take one reach at a time
+    for bh_out in boathouses.query.distinct(boathouses.reach):
+        bh_list = []
+        # inner boathouse loop:  get all boathouse names within 
+        # the reach (the reach that was selected by outer loop)
+        for bh_in in boathouses.query.filter(boathouses.reach == bh_out.reach).all():
+            bh_list.append( bh_in.boathouse )
+
+        boathouse_dict[ bh_out.reach ] = {'boathouses': bh_list}
+
+    return boathouse_dict

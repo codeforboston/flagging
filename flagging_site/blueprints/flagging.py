@@ -9,6 +9,7 @@ from ..data.hobolink import get_live_hobolink_data
 from ..data.usgs import get_live_usgs_data
 from ..data.model import process_data
 from ..data.model import latest_model_outputs
+from ..data.database import get_boathouse_dict
 
 bp = Blueprint('flagging', __name__)
 
@@ -60,40 +61,15 @@ def index() -> str:
         for key, val
         in df.to_dict(orient='index').items()
     }
-    
-    homepage = {
-        2: {
-            'flag': flags[2],
-            'boathouses': [
-                'Newton Yacht Club',
-                'Watertown Yacht Club',
-                'Community Rowing, Inc.',
-                'Northeastern\'s Henderson Boathouse', 
-                'Paddle Boston at Herter Park'
-            ]
-        },
-        3: {
-            'flag': flags[3],
-            'boathouses': [
-                'Harvard\'s Weld Boathouse'
-            ]
-        },
-        4: {
-            'flag': flags[4],
-            'boathouses': [
-                'Riverside Boat Club'
-            ]
-        },
-        5: {
-            'flag': flags[5],
-            'boathouses': [
-                'Charles River Yacht Club', 
-                'Union Boat Club', 
-                'Community Boating', 
-                'Paddle Boston at Kendall Square'
-            ]
-        }
-    }
+
+    homepage = get_boathouse_dict()
+
+    # verify that the same reaches are in boathouse list and model outputs
+    if flags.keys() != homepage.keys():
+        print('ERROR!  the reaches are\'t identical between boathouse list and model outputs!')
+
+    for (flag_reach, flag_safe) in flags.items():
+        homepage[flag_reach]['flag']=flag_safe
 
     model_last_updated_time = df['time'].iloc[0]
 
