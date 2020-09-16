@@ -28,10 +28,10 @@
         <img src="{{ url_for('static', filename='images/CRWA_banner_main.jpg') }}" />
         <header>{{ self.title() }}</header>
         <div class="navigation">
-            <a href="/">Home</a>
-            &nbsp; | &nbsp; <a href="/about">About</a>
-            &nbsp; | &nbsp; <a href="/output_model">Detailed Outputs</a>
-            &nbsp; | &nbsp; <a href="/api/v1/model">API</a>
+            <a href="{{ url_for('flagging.index') }}">Home</a>
+            &nbsp; | &nbsp; <a href="{{ url_for('flagging.about') }}">About</a>
+            &nbsp; | &nbsp; <a href="{{ url_for('flagging.output_model') }}">Detailed Outputs</a>
+            &nbsp; | &nbsp; <a href="{{ url_for('api.index') }}">API</a>
         </div>
         {% endblock %}
     </section>

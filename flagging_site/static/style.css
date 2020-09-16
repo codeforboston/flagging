@@ -19,6 +19,9 @@ hr {
   border: none;
   border-top: 1px solid lightgray;
 }
+p {
+  line-height: 25px;
+}
 nav h1 {
   flex: auto;
   margin: 0;
@@ -38,6 +41,15 @@ nav ul li span,
 header .action {
   display: block;
   padding: 0.5rem;
+}
+ul {
+  line-height: 25px;
+}
+ul.home-boat-house {
+  list-style-type: square;
+  padding-left: 15px;
+  padding-right: 15px;
+  text-align: left;
 }
 section.page-header {
   text-align: center;
@@ -117,6 +129,16 @@ section.page-header {
 .content textarea {
   min-height: 12em;
   resize: vertical;
+}
+
+.home-centered{
+  text-align: center;
+}
+.home-reach{
+  border: 1px solid black;
+  border-collapse: collapse;
+  padding: 15px;
+  margin: 0 auto;            
 }
 input.danger {
   color: #cc2f2e;
