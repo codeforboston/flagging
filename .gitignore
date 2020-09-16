@@ -6,6 +6,7 @@ keys.json
 .DS_Store
 Pipfile
 Pipfile.lock
+pgadmin4/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
