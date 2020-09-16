@@ -7,10 +7,8 @@ The full docs are available at: https://codeforboston.github.io/flagging/
 If you have write permission to the upstream repository (i.e. you are a project manager), point your terminal to this directory and run the following:
 
 ```shell script
-pip install mkdocs
-pip install pymdown-extensions
-pip install mkdocs-material
-mkdocs gh-d`eploy --remote-name upstream
+pip install mkdocs pymdown-extensions mkdocs-material
+mkdocs gh-deploy --remote-name upstream
 ```
 
 If you do not have write permission to the upstream repository, you can do one of the following:
@@ -21,9 +19,7 @@ If you do not have write permission to the upstream repository, you can do one o
  If you are a project manager but you're having issues, you can do a more manual git approach to updating the docs:
  
 ```shell script
-pip install mkdocs
-pip install pymdown-extensions
-pip install mkdocs-material
+pip install mkdocs pymdown-extensions mkdocs-material
 mkdocs gh-deploy
 git checkout gh-pages
 git push upstream gh-pages

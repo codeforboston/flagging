@@ -47,8 +47,8 @@ brew services start postgresql
 To begin initialize a database which we call `flagging`, enter into the bash terminal: 
 
 ```shell script
-export POSTGRES_PASSWORD=*enter_password_here*
-createdb -U *enter_username_here* flagging
+export POSTGRES_PASSWORD=enter_password_here
+createdb flagging
 psql -U *enter_username_here* -d flagging -c "DROP USER IF EXISTS flagging; CREATE USER flagging SUPERUSER PASSWORD '${POSTGRES_PASSWORD}'"
 ```
 

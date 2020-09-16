@@ -3,6 +3,7 @@ This file handles the construction of the Flask application object.
 """
 import os
 import click
+import time
 from typing import Optional
 from flask import Flask
 
@@ -58,6 +59,12 @@ def create_app(config: Optional[Config] = None) -> Flask:
     # Register admin
     from .admin import init_admin
     init_admin(app)
+
+    @app.before_request
+    def before_request():
+        from flask import g
+        g.request_start_time = time.time()
+        g.request_time = lambda: '%.5fs' % (time.time() - g.request_start_time)
 
     @app.cli.command('create-db')
     def create_db_command():

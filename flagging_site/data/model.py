@@ -79,7 +79,7 @@ def process_data(
         .agg({
             'pressure': np.mean,
             'par': np.mean,
-            'rain': sum,
+            'rain': np.sum,
             'rh': np.mean,
             'dew_point': np.mean,
             'wind_speed': np.mean,
@@ -105,28 +105,16 @@ def process_data(
     if df.iloc[-1, :][['stream_flow', 'rain']].isna().any():
         df = df.drop(df.index[-1])
 
-    # Next, do the following:
-    #
-    # 1 day avg of:
-    #   - wind_speed
-    #   - water_temp
-    #   - air_temp
-    #   - stream_flow (via USGS)
-    # 2 day avg of:
-    #   - par
-    #   - stream_flow (via USGS)
-    # sum of rain at following increments:
-    #   - 1 day
-    #   - 2 day
-    #   - 7 day
-    for col in ['par', 'stream_flow']:
-        df[f'{col}_1d_mean'] = df[col].rolling(24).mean()
+    # The code from here on consists of feature transformations.
 
-    for incr in [24, 48]:
-        df[f'rain_0_to_{str(incr)}h_sum'] = df['rain'].rolling(incr).sum()
-    df[f'rain_24_to_48h_sum'] = (
-        df[f'rain_0_to_48h_sum'] - df[f'rain_0_to_24h_sum']
-    )
+    # Calculate rolling means
+    df['par_1d_mean'] = df['par'].rolling(24).mean()
+    df['stream_flow_1d_mean'] = df['stream_flow'].rolling(24).mean()
+
+    # Calculate rolling sums
+    df[f'rain_0_to_24h_sum'] = df['rain'].rolling(24).sum()
+    df[f'rain_0_to_48h_sum'] = df['rain'].rolling(48).sum()
+    df[f'rain_24_to_48h_sum'] = df[f'rain_0_to_48h_sum'] - df[f'rain_0_to_24h_sum']
 
     # Lastly, they measure the "time since last significant rain." Significant
     # rain is defined as a cumulative sum of 0.2 in over a 24 hour time period.
@@ -134,7 +122,6 @@ def process_data(
     df['last_sig_rain'] = (
         df['time']
         .where(df['sig_rain'])
-        .shift()
         .ffill()
         .fillna(df['time'].min())
     )
@@ -166,9 +153,11 @@ def reach_2_model(df: pd.DataFrame, rows: int = 48) -> pd.DataFrame:
         - 0.0362 * df['days_since_sig_rain']
         - 0.000312 * df['par_1d_mean']
     )
+
     df['probability'] = sigmoid(df['log_odds'])
     df['safe'] = df['probability'] <= SAFETY_THRESHOLD
     df['reach'] = 2
+
     return df[['reach', 'time', 'log_odds', 'probability', 'safe']]
 
 
@@ -186,7 +175,6 @@ def reach_3_model(df: pd.DataFrame, rows: int = 48) -> pd.DataFrame:
     Returns:
         Outputs for model as a dataframe.
     """
-
     df = df.tail(n=rows).copy()
 
     df['log_odds'] = (
@@ -195,9 +183,11 @@ def reach_3_model(df: pd.DataFrame, rows: int = 48) -> pd.DataFrame:
         + 0.1681 * df['rain_24_to_48h_sum']
         - 0.02855 * df['days_since_sig_rain']
     )
+
     df['probability'] = sigmoid(df['log_odds'])
     df['safe'] = df['probability'] <= SAFETY_THRESHOLD
     df['reach'] = 3
+
     return df[['reach', 'time', 'log_odds', 'probability', 'safe']]
 
 
@@ -217,6 +207,7 @@ def reach_4_model(df: pd.DataFrame, rows: int = 48) -> pd.DataFrame:
         Outputs for model as a dataframe.
     """
     df = df.tail(n=rows).copy()
+
     df['log_odds'] = (
         0.5791
         + 0.30276 * df['rain_0_to_24h_sum']
@@ -224,9 +215,11 @@ def reach_4_model(df: pd.DataFrame, rows: int = 48) -> pd.DataFrame:
         - 0.02267 * df['days_since_sig_rain']
         - 0.000427 * df['par_1d_mean']
     )
+
     df['probability'] = sigmoid(df['log_odds'])
     df['safe'] = df['probability'] <= SAFETY_THRESHOLD
     df['reach'] = 4
+
     return df[['reach', 'time', 'log_odds', 'probability', 'safe']]
 
 
@@ -245,15 +238,18 @@ def reach_5_model(df: pd.DataFrame, rows: int = 48) -> pd.DataFrame:
         Outputs for model as a dataframe.
     """
     df = df.tail(n=rows).copy()
+
     df['log_odds'] = (
         0.3333
         + 0.1091 * df['rain_0_to_48h_sum']
         - 0.01355 * df['days_since_sig_rain']
         + 0.000342 * df['stream_flow_1d_mean']
     )
+
     df['probability'] = sigmoid(df['log_odds'])
     df['safe'] = df['probability'] <= SAFETY_THRESHOLD
     df['reach'] = 5
+
     return df[['reach', 'time', 'log_odds', 'probability', 'safe']]
 
 

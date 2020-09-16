@@ -143,7 +143,7 @@ class DevelopmentConfig(Config):
     VAULT_OPTIONAL: bool = True
     DEBUG: bool = True
     TESTING: bool = True
-    OFFLINE_MODE = strtobool(os.getenv('OFFLINE_MODE', 'false'))
+    OFFLINE_MODE = strtobool(os.getenv('OFFLINE_MODE') or 'false')
     BASIC_AUTH_USERNAME: str = os.getenv('BASIC_AUTH_USERNAME', 'admin')
     BASIC_AUTH_PASSWORD: str = os.getenv('BASIC_AUTH_PASSWORD', 'password')
 

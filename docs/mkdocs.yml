@@ -1,26 +1,47 @@
 site_name: CRWA Flagging Website Documentation
+site_description: Guide on developing and deploying the flagging website
 nav:
 - Home: index.md
 - About: about.md
+- Setup: setup.md
 - Admin: admin.md
 - Deployment: deployment.md
 - System: system.md
-- Database: database.md
 - Shell: shell.md
-- Development:
+- Development Background:
     - History: development/history.md
+    - Learning Resources: development/learning_resources.md
+- Development:
+    # - Overview: development/index.md
+        # ^ (Explain the vault here too)
+    # - Config: development/config.md
+    - Data: development/data.md
+    - Predictive Models: development/predictive_models.md
+    # - Front-End: development/front-end.md
 theme:
   name: material
   palette:
     scheme: default
     primary: teal
     accent: cyan
+  icon:
+    logo: fontawesome/regular/flag
   font:
     text: Opens Sans
     code: Roboto Mono
+repo_name: codeforboston/flagging
+repo_url: https://github.com/codeforboston/flagging
+edit_uri: ""
 markdown_extensions:
 - admonition
 - pymdownx.tabbed # https://facelessuser.github.io/pymdown-extensions/
+- pymdownx.keys
+- pymdownx.details
+- pymdownx.inlinehilite
+- pymdownx.magiclink:
+    repo_url_shorthand: true
+    user: squidfunk
+    repo: mkdocs-material
 - pymdownx.superfences:
     custom_fences:
     - name: mermaid
