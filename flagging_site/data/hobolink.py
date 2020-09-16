@@ -6,12 +6,13 @@ formatting of the data that we receive from it.
 #  Pandas is inefficient. It should go to SQL, not to Pandas. I am currently
 #  using pandas because we do not have any cron jobs or any caching or SQL, but
 #  I think in future versions we should not be using Pandas at all.
+from .database import db
 import io
 import requests
 import pandas as pd
 from flask import abort
+from flask import current_app
 from .keys import get_keys
-from .keys import offline_mode
 from .keys import get_data_store_file_path
 
 # Constants
@@ -48,7 +49,7 @@ def get_live_hobolink_data(export_name: str = EXPORT_NAME) -> pd.DataFrame:
     Returns:
         Pandas Dataframe containing the cleaned-up Hobolink data.
     """
-    if offline_mode():
+    if current_app.config['OFFLINE_MODE']:
         df = pd.read_pickle(get_data_store_file_path(STATIC_FILE_NAME))
     else:
         res = request_to_hobolink(export_name=export_name)

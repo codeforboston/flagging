@@ -145,7 +145,7 @@ def process_data(
     return df
 
 
-def reach_2_model(df: pd.DataFrame, rows: int = 24) -> pd.DataFrame:
+def reach_2_model(df: pd.DataFrame, rows: int = 48) -> pd.DataFrame:
     """Model params:
     a- rainfall sum 0-24 hrs
     d- Days since last rain
@@ -168,10 +168,11 @@ def reach_2_model(df: pd.DataFrame, rows: int = 24) -> pd.DataFrame:
     )
     df['probability'] = sigmoid(df['log_odds'])
     df['safe'] = df['probability'] <= SAFETY_THRESHOLD
-    return df[['time', 'log_odds', 'probability', 'safe']]
+    df['reach'] = 2
+    return df[['reach', 'time', 'log_odds', 'probability', 'safe']]
 
 
-def reach_3_model(df: pd.DataFrame, rows: int = 24) -> pd.DataFrame:
+def reach_3_model(df: pd.DataFrame, rows: int = 48) -> pd.DataFrame:
     """
     a- rainfall sum 0-24 hrs
     b- rainfall sum 24-48 hr
@@ -196,10 +197,11 @@ def reach_3_model(df: pd.DataFrame, rows: int = 24) -> pd.DataFrame:
     )
     df['probability'] = sigmoid(df['log_odds'])
     df['safe'] = df['probability'] <= SAFETY_THRESHOLD
-    return df[['time', 'log_odds', 'probability', 'safe']]
+    df['reach'] = 3
+    return df[['reach', 'time', 'log_odds', 'probability', 'safe']]
 
 
-def reach_4_model(df: pd.DataFrame, rows: int = 24) -> pd.DataFrame:
+def reach_4_model(df: pd.DataFrame, rows: int = 48) -> pd.DataFrame:
     """
     a- rainfall sum 0-24 hrs
     b- rainfall sum 24-48 hr
@@ -224,10 +226,11 @@ def reach_4_model(df: pd.DataFrame, rows: int = 24) -> pd.DataFrame:
     )
     df['probability'] = sigmoid(df['log_odds'])
     df['safe'] = df['probability'] <= SAFETY_THRESHOLD
-    return df[['time', 'log_odds', 'probability', 'safe']]
+    df['reach'] = 4
+    return df[['reach', 'time', 'log_odds', 'probability', 'safe']]
 
 
-def reach_5_model(df: pd.DataFrame, rows: int = 24) -> pd.DataFrame:
+def reach_5_model(df: pd.DataFrame, rows: int = 48) -> pd.DataFrame:
     """
     c- rainfall sum 0-48 hr
     d- Days since last rain
@@ -250,4 +253,33 @@ def reach_5_model(df: pd.DataFrame, rows: int = 24) -> pd.DataFrame:
     )
     df['probability'] = sigmoid(df['log_odds'])
     df['safe'] = df['probability'] <= SAFETY_THRESHOLD
-    return df[['time', 'log_odds', 'probability', 'safe']]
+    df['reach'] = 5
+    return df[['reach', 'time', 'log_odds', 'probability', 'safe']]
+
+
+def all_models(df: pd.DataFrame, *args, **kwargs):
+    out = pd.concat([
+        reach_2_model(df, *args, **kwargs),
+        reach_3_model(df, *args, **kwargs),
+        reach_4_model(df, *args, **kwargs),
+        reach_5_model(df, *args, **kwargs),
+    ], axis=0)
+    out = out.sort_values(['reach', 'time'])
+    return out
+
+
+def latest_model_outputs(hours: int = 1) -> dict:
+    from .database import execute_sql_from_file
+
+    if hours == 1:
+        df = execute_sql_from_file('return_1_hour_of_model_outputs.sql')
+    elif hours > 1:
+        df = execute_sql_from_file('return_48_hours_of_model_outputs.sql') # pull out 48 hours of model outputs
+        latest_time = max(df['time']) # find most recent timestamp
+        time_interval = pd.Timedelta(str(hours) + ' hours') # create pandas Timedelta, based on input parameter hours
+        df = df[ latest_time - df['time']< time_interval ] # reset df to exclude anything from before time_interval ago
+        
+    else:
+        raise ValueError('hours of data to pull cannot be less than one')
+
+    return df

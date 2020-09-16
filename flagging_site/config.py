@@ -8,12 +8,13 @@ this module, they won't refresh.
 import os
 from typing import Dict, Any, Optional, List
 from flask.cli import load_dotenv
-
+from distutils.util import strtobool
 
 # Constants
 # ~~~~~~~~~
 
 ROOT_DIR = os.path.abspath(os.path.dirname(__file__))
+QUERIES_DIR = os.path.join(ROOT_DIR, 'data', 'queries')
 DATA_STORE = os.path.join(ROOT_DIR, 'data', '_store')
 VAULT_FILE = os.path.join(ROOT_DIR, 'vault.zip')
 
@@ -51,11 +52,27 @@ class Config:
 
     # ==========================================================================
     # DATABASE CONFIG OPTIONS
-    #
-    # Not currently used, but soon we'll want to start using the config to set
-    # up references to the database, data storage, and data retrieval.
     # ==========================================================================
-    DATABASE: str = None
+    POSTGRES_USER: str = os.getenv('POSTGRES_USER', 'postgres')
+    POSTGRES_PASSWORD: str = os.getenv('POSTGRES_PASSWORD')
+    POSTGRES_HOST: str = 'localhost'
+    POSTGRES_PORT: int = 5432
+    POSTGRES_DBNAME: str = 'flagging'
+
+    @property
+    def SQLALCHEMY_DATABASE_URI(self) -> str:
+        user = self.POSTGRES_USER
+        password = self.POSTGRES_PASSWORD
+        host = self.POSTGRES_HOST
+        port = self.POSTGRES_PORT
+        db = self.POSTGRES_DBNAME
+        return f'postgres://{user}:{password}@{host}:{port}/{db}'
+
+    SQLALCHEMY_ECHO: bool = True
+    SQLALCHEMY_RECORD_QUERIES: bool = True
+    SQLALCHEMY_TRACK_MODIFICATIONS: bool = False
+
+    QUERIES_DIR: str = QUERIES_DIR
 
     # ==========================================================================
     # MISC. CUSTOM CONFIG OPTIONS
@@ -138,7 +155,7 @@ class DevelopmentConfig(Config):
     VAULT_OPTIONAL: bool = True
     DEBUG: bool = True
     TESTING: bool = True
-    OFFLINE_MODE = bool(os.getenv('OFFLINE_MODE', 'false'))
+    OFFLINE_MODE = strtobool(os.getenv('OFFLINE_MODE', 'false'))
 
 
 class TestingConfig(Config):

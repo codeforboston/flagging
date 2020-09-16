@@ -1,4 +1,5 @@
 import pandas as pd
+
 from flask import Blueprint
 from flask import render_template
 from flask import request
@@ -7,10 +8,8 @@ from flask import current_app
 from ..data.hobolink import get_live_hobolink_data
 from ..data.usgs import get_live_usgs_data
 from ..data.model import process_data
-from ..data.model import reach_2_model
-from ..data.model import reach_3_model
-from ..data.model import reach_4_model
-from ..data.model import reach_5_model
+from ..data.model import latest_model_outputs
+from ..data.database import get_boathouse_dict
 
 bp = Blueprint('flagging', __name__)
 
@@ -42,6 +41,9 @@ def stylize_model_output(df: pd.DataFrame) -> str:
     df['safe'] = df['safe'].apply(_apply_flag)
     df.columns = [i.title().replace('_', ' ') for i in df.columns]
 
+    # remove reach number
+    df = df.drop('Reach', 1)
+
     return df.to_html(index=False, escape=False)
 
 
@@ -50,51 +52,28 @@ def index() -> str:
     """
     The home page of the website. This page contains a brief description of the
     purpose of the website, and the latest outputs for the flagging model.
-
-    Returns:
-        The website's home page with the latest flag updates.
     """
-    df = get_data()
     
-    homepage = {
-        2: {
-            'flag': reach_2_model(df, rows=1)['safe'].iloc[0],
-            'boathouses': [
-                'Newton Yacht Club',
-                'Watertown Yacht Club',
-                'Community Rowing, Inc.',
-                'Northeastern\s Henderson Boathouse', 
-                'Paddle Boston at Herter Park'
-            ]
-        },
-        3: {
-            'flag': reach_3_model(df, rows=1)['safe'].iloc[0],
-            'boathouses': [
-                'Harvard\'s Weld Boathouse'
-            ]
-        },
-        4: {
-            'flag': reach_4_model(df, rows=1)['safe'].iloc[0],
-            'boathouses': [
-                'Riverside Boat Club'
-            ]
-        },
-        5: {
-            'flag': reach_5_model(df, rows=1)['safe'].iloc[0],
-            'boathouses': [
-                'Charles River Yacht Club', 
-                'Union Boat Club', 
-                'Community Boating', 
-                'Paddle Boston at Kendall Square'
-            ]
-        }
+    df = latest_model_outputs()
+    df = df.set_index('reach')
+    flags = {
+        key: val['safe']
+        for key, val
+        in df.to_dict(orient='index').items()
     }
 
-    model_last_updated_time = reach_5_model(df, rows=1)['time'].iloc[0]
+    homepage = get_boathouse_dict()
+
+    # verify that the same reaches are in boathouse list and model outputs
+    if flags.keys() != homepage.keys():
+        print('ERROR!  the reaches are\'t identical between boathouse list and model outputs!')
+
+    for (flag_reach, flag_safe) in flags.items():
+        homepage[flag_reach]['flag']=flag_safe
+
+    model_last_updated_time = df['time'].iloc[0]
 
     return render_template('index.html', homepage=homepage, model_last_updated_time=model_last_updated_time)
-    # return render_template('index.html', flags=flags)
-    
 
 
 @bp.route('/about')
@@ -121,25 +100,20 @@ def output_model() -> str:
     # Look at no more than x_MAX_HOURS
     hours = min(max(hours, 1), current_app.config['API_MAX_HOURS'])
 
-    df = get_data()
+    df = latest_model_outputs(hours)
 
-    reach_model_mapping = {
-        2: reach_2_model,
-        3: reach_3_model,
-        4: reach_4_model,
-        5: reach_5_model
-    }
+    # reach_html_tables is a dict where the index is the reach number
+    # and the values are HTML code for the table of data to display for
+    # that particular reach
+    reach_html_tables = {}
+
+    # loop through each reach in df
+    #    compare with reach to determine whether to display that reach
+    #       extract the subset from the df for that reach
+    #       then convert that df subset to HTML code
+    #       and then add that HTML subset to reach_html_tables
+    for i in df.reach.unique():
+        if (reach==-1 or reach==i):
+            reach_html_tables[i] = stylize_model_output(  df.loc[df['reach'] == i ]  )
     
-    if reach in reach_model_mapping:
-        reach_func = reach_model_mapping[int(reach)]
-        reach_html_tables = {
-            reach: stylize_model_output(reach_func(df, rows=hours))
-        }
-    else:
-        reach_html_tables = {
-            reach: stylize_model_output(reach_func(df, rows=hours))
-            for reach, reach_func
-            in reach_model_mapping.items()
-        }
-
     return render_template('output_model.html', tables=reach_html_tables)
