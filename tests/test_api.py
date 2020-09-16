@@ -1,5 +1,5 @@
-from flagging_site.blueprints.api import model_api
 from flask import current_app
+from flagging_site.blueprints.api import model_api
 
 
 def test_max_hours(app):
