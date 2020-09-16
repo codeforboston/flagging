@@ -28,7 +28,6 @@ VAULT_FILE = os.path.join(ROOT_DIR, 'vault.zip')
 load_dotenv(os.path.join(ROOT_DIR, '..', '.flaskenv'))
 load_dotenv(os.path.join(ROOT_DIR, '..', '.env'))
 
-
 # Configs
 # ~~~~~~~
 
@@ -87,6 +86,8 @@ class Config:
     wasn't opened. Usually set alongside DEBUG mode.
     """
 
+    VAULT_PASSWORD: str = os.getenv('VAULT_PASSWORD')
+
     KEYS: Dict[str, Dict[str, Any]] = None
     """These are where the keys from the vault are stored. It should be a dict 
     of dicts. Each key in the first level dict corresponds to a different
@@ -117,13 +118,6 @@ class Config:
     when doing requests.
     """
 
-    BLUEPRINTS: Optional[List[str]] = None
-    """Names of the blueprints available to the app. We can use this to turn
-    parts of the website off or on depending on if they're fully developed
-    or not. If BLUEPRINTS is `None`, then it imports all the blueprints it can
-    find in the `blueprints` module.
-    """
-
     API_MAX_HOURS: int = 48
     """The maximum number of hours of data that the API will return. We are not trying 
     to be stingy about our data, we just want this in order to avoid any odd behaviors 
@@ -136,8 +130,6 @@ class ProductionConfig(Config):
     internet. Currently the only part of the website that's pretty fleshed out
     is the `flagging` part, so that's the only blueprint we import.
     """
-    BLUEPRINTS: Optional[List[str]] = ['flagging', 'api']
-
     def __init__(self):
         self.BASIC_AUTH_USERNAME: str = os.environ['BASIC_AUTH_USERNAME']
         self.BASIC_AUTH_PASSWORD: str = os.environ['BASIC_AUTH_PASSWORD']

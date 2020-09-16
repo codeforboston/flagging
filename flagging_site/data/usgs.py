@@ -5,16 +5,16 @@ gauge.
 Link  to the web interface (not the api) 
 https://waterdata.usgs.gov/nwis/uv?site_no=01104500
 """
+import os
 import pandas as pd
 import requests
 from flask import abort
 from flask import current_app
-from .keys import get_data_store_file_path
 
 # Constants
 USGS_URL = 'https://waterservices.usgs.gov/nwis/iv/'
 
-STATIC_FILE_NAME = 'usgs.pickle'
+USGS_STATIC_FILE_NAME = 'usgs.pickle'
 # ~ ~ ~ ~
 
 
@@ -26,7 +26,10 @@ def get_live_usgs_data() -> pd.DataFrame:
         Pandas Dataframe containing the usgs data.
     """
     if current_app.config['OFFLINE_MODE']:
-        df = pd.read_pickle(get_data_store_file_path(STATIC_FILE_NAME))
+        fpath = os.path.join(
+            current_app.config['DATA_STORE'], USGS_STATIC_FILE_NAME
+        )
+        df = pd.read_pickle(fpath)
     else:
         res = request_to_usgs()
         df = parse_usgs_data(res)

@@ -4,14 +4,12 @@ This file handles the construction of the Flask application object.
 import os
 import click
 import time
+import json
+import zipfile
 from typing import Optional
+
 from flask import Flask
 
-from .blueprints.flagging import get_data
-from .data.hobolink import get_live_hobolink_data
-from .data.keys import get_keys
-from .data.model import process_data
-from .data.usgs import get_live_usgs_data
 from .config import Config
 from .config import get_config_from_env
 
@@ -45,8 +43,11 @@ def create_app(config: Optional[Config] = None) -> Flask:
     # blueprints are imported is: If BLUEPRINTS is in the config, then import
     # only from that list. Otherwise, import everything that's inside of
     # `blueprints/__init__.py`.
-    from . import blueprints
-    register_blueprints_from_module(app, blueprints)
+    from .blueprints.api import bp as api_bp
+    app.register_blueprint(api_bp)
+
+    from .blueprints.flagging import bp as flagging_bp
+    app.register_blueprint(flagging_bp)
 
     # Add Swagger to the app. Swagger automates the API documentation and
     # provides an interface for users to query the API on the website.
@@ -68,7 +69,7 @@ def create_app(config: Optional[Config] = None) -> Flask:
     def before_request():
         from flask import g
         g.request_start_time = time.time()
-        g.request_time = lambda: '%.5fs' % (time.time() - g.request_start_time)
+        g.request_time = lambda: '%.3fs' % (time.time() - g.request_start_time)
 
     @app.cli.command('create-db')
     def create_db_command():
@@ -95,6 +96,11 @@ def create_app(config: Optional[Config] = None) -> Flask:
     # Make a few useful functions available in Flask shell without imports
     @app.shell_context_processor
     def make_shell_context():
+        from .blueprints.flagging import get_data
+        from .data.hobolink import get_live_hobolink_data
+        from .data.model import process_data
+        from .data.usgs import get_live_usgs_data
+
         return {
             'db': db,
             'get_data': get_data,
@@ -105,34 +111,6 @@ def create_app(config: Optional[Config] = None) -> Flask:
 
     # And we're all set! We can hand the app over to flask at this point.
     return app
-
-
-def update_config_from_vault(app: Flask) -> None:
-    """
-    This updates the state of the `app` to have the keys from the vault. The
-    vault also stores the "SECRET_KEY", which is a Flask builtin configuration
-    variable (i.e. Flask treats the "SECRET_KEY" as special). So we also
-    populate the "SECRET_KEY" in this step.
-
-    If we fail to load the vault in development mode, then the user is warned
-    that the vault was not loaded successfully. In production mode, failing to
-    load the vault raises a RuntimeError.
-
-    Args:
-        app: A Flask application instance.
-    """
-    try:
-        app.config['KEYS'] = get_keys()
-    except (RuntimeError, KeyError):
-        msg = 'Unable to load the vault; bad password provided.'
-        if app.env == 'production':
-            raise RuntimeError(msg)
-        else:
-            print(f'Warning: {msg}')
-            app.config['KEYS'] = None
-            app.config['SECRET_KEY'] = os.urandom(16)
-    else:
-        app.config['SECRET_KEY'] = app.config['KEYS']['flask']['secret_key']
 
 
 def add_swagger_plugin_to_app(app: Flask):
@@ -178,20 +156,53 @@ def add_swagger_plugin_to_app(app: Flask):
     Swagger(app, config=swagger_config, template=template)
 
 
-def register_blueprints_from_module(app: Flask, module: object) -> None:
-    """
-    This function looks within the submodules of a module for objects
-    specifically named `bp`. It then assumes those objects are blueprints, and
-    registers them to the app.
+def _load_keys_from_vault(
+        vault_password: str,
+        vault_file: str
+) -> dict:
+    """This code loads the keys directly from the vault zip file.
 
     Args:
-        app: (Flask) Flask instance to which we will register blueprints.
-        module: (object) A module that contains submodules which themselves
-                contain `bp` objects.
+        vault_password: (str) Password for opening up the `vault_file`.
+        vault_file: (str) File path of the zip file containing `keys.json`.
+
+    Returns:
+        Dict of credentials.
     """
-    if app.config.get('BLUEPRINTS'):
-        blueprint_list = app.config['BLUEPRINTS']
+    pwd = bytes(vault_password, 'utf-8')
+    with zipfile.ZipFile(vault_file) as f:
+        with f.open('keys.json', pwd=pwd, mode='r') as keys_file:
+            d = json.load(keys_file)
+    return d
+
+
+def update_config_from_vault(app: Flask) -> None:
+    """
+    This updates the state of the `app` to have the keys from the vault. The
+    vault also stores the "SECRET_KEY", which is a Flask builtin configuration
+    variable (i.e. Flask treats the "SECRET_KEY" as special). So we also
+    populate the "SECRET_KEY" in this step.
+
+    If we fail to load the vault in development mode, then the user is warned
+    that the vault was not loaded successfully. In production mode, failing to
+    load the vault raises a RuntimeError.
+
+    Args:
+        app: A Flask application instance.
+    """
+    try:
+        keys = _load_keys_from_vault(
+            vault_password=app.config['VAULT_PASSWORD'],
+            vault_file=app.config['VAULT_FILE']
+        )
+    except (RuntimeError, KeyError):
+        msg = 'Unable to load the vault; bad password provided.'
+        if app.env == 'production':
+            raise RuntimeError(msg)
+        else:
+            print(f'Warning: {msg}')
+            app.config['KEYS'] = None
+            app.config['SECRET_KEY'] = os.urandom(16)
     else:
-        blueprint_list = filter(lambda x: not x.startswith('_'), dir(module))
-    for submodule in blueprint_list:
-        app.register_blueprint(getattr(module, submodule).bp)
+        app.config['KEYS'] = keys
+        app.config['SECRET_KEY'] = keys['flask']['secret_key']

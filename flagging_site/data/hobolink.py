@@ -6,19 +6,17 @@ formatting of the data that we receive from it.
 #  Pandas is inefficient. It should go to SQL, not to Pandas. I am currently
 #  using pandas because we do not have any cron jobs or any caching or SQL, but
 #  I think in future versions we should not be using Pandas at all.
-from .database import db
+import os
 import io
 import requests
 import pandas as pd
 from flask import abort
 from flask import current_app
-from .keys import get_keys
-from .keys import get_data_store_file_path
 
 # Constants
 
 HOBOLINK_URL = 'http://webservice.hobolink.com/restv2/data/custom/file'
-EXPORT_NAME = 'code_for_boston_export'
+DEFAULT_HOBOLINK_EXPORT_NAME = 'code_for_boston_export'
 # Each key is the original column name; the value is the renamed column.
 HOBOLINK_COLUMNS = {
     'Time, GMT-04:00': 'time',
@@ -34,11 +32,13 @@ HOBOLINK_COLUMNS = {
     'Temp': 'air_temp',
     # 'Batt, V, Charles River Weather Station': 'battery'
 }
-STATIC_FILE_NAME = 'hobolink.pickle'
+HOBOLINK_STATIC_FILE_NAME = 'hobolink.pickle'
 # ~ ~ ~ ~
 
 
-def get_live_hobolink_data(export_name: str = EXPORT_NAME) -> pd.DataFrame:
+def get_live_hobolink_data(
+        export_name: str = DEFAULT_HOBOLINK_EXPORT_NAME
+) -> pd.DataFrame:
     """This function runs through the whole process for retrieving data from
     HOBOlink: first we perform the request, and then we clean the data.
 
@@ -50,7 +50,10 @@ def get_live_hobolink_data(export_name: str = EXPORT_NAME) -> pd.DataFrame:
         Pandas Dataframe containing the cleaned-up Hobolink data.
     """
     if current_app.config['OFFLINE_MODE']:
-        df = pd.read_pickle(get_data_store_file_path(STATIC_FILE_NAME))
+        fpath = os.path.join(
+            current_app.config['DATA_STORE'], HOBOLINK_STATIC_FILE_NAME
+        )
+        df = pd.read_pickle(fpath)
     else:
         res = request_to_hobolink(export_name=export_name)
         df = parse_hobolink_data(res.text)
@@ -58,7 +61,7 @@ def get_live_hobolink_data(export_name: str = EXPORT_NAME) -> pd.DataFrame:
 
 
 def request_to_hobolink(
-        export_name: str = EXPORT_NAME,
+        export_name: str = DEFAULT_HOBOLINK_EXPORT_NAME,
 ) -> requests.models.Response:
     """
     Get a request from the Hobolink server.
