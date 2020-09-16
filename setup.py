@@ -12,7 +12,7 @@ with open('README.md', encoding='utf8') as f:
 
 setup(
     name='CRWA Flagging Website',
-    version='0.3.0',
+    version=version,
     packages=find_packages(),
     author='Code for Boston',
     python_requires='>=3.7.1',
