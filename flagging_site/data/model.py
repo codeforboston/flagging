@@ -141,6 +141,7 @@ def reach_2_model(df: pd.DataFrame, rows: int = 48) -> pd.DataFrame:
 
     Args:
         df: Input data from `process_data()`
+        rows: (int) Number of rows to return.
 
     Returns:
         Outputs for model as a dataframe.
@@ -269,13 +270,22 @@ def latest_model_outputs(hours: int = 1) -> dict:
 
     if hours == 1:
         df = execute_sql_from_file('return_1_hour_of_model_outputs.sql')
+
     elif hours > 1:
-        df = execute_sql_from_file('return_48_hours_of_model_outputs.sql') # pull out 48 hours of model outputs
-        latest_time = max(df['time']) # find most recent timestamp
-        time_interval = pd.Timedelta(str(hours) + ' hours') # create pandas Timedelta, based on input parameter hours
-        df = df[ latest_time - df['time']< time_interval ] # reset df to exclude anything from before time_interval ago
+        # pull out 48 hours of model outputs
+        df = execute_sql_from_file('return_48_hours_of_model_outputs.sql')
+
+        # find most recent timestamp
+        latest_time = df['time'].max()
+
+        # create pandas Timedelta, based on input parameter hours
+        time_interval = pd.Timedelta(str(hours) + ' hours')
+
+        # reset df to exclude anything from before time_interval ago
+        df = df[latest_time - df['time'] < time_interval]
         
     else:
-        raise ValueError('hours of data to pull cannot be less than one')
+        raise ValueError('Hours of data to pull must be a number and it '
+                         'cannot be less than one')
 
     return df

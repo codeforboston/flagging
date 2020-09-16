@@ -16,7 +16,7 @@ from flask import current_app
 # Constants
 
 HOBOLINK_URL = 'http://webservice.hobolink.com/restv2/data/custom/file'
-DEFAULT_HOBOLINK_EXPORT_NAME = 'code_for_boston_export'
+DEFAULT_HOBOLINK_EXPORT_NAME = 'code_for_boston_export_21d'
 # Each key is the original column name; the value is the renamed column.
 HOBOLINK_COLUMNS = {
     'Time, GMT-04:00': 'time',
@@ -97,15 +97,16 @@ def parse_hobolink_data(res: str) -> pd.DataFrame:
     Returns:
         Pandas DataFrame containing the HOBOlink data.
     """
-    # TODO:
-    #  The first half of the output is a yaml-formatted text stream. Is there
-    #  anything useful in it? Can we store it and make use of it somehow?
     if isinstance(res, requests.models.Response):
         res = res.text
 
-    # Turn the text from the API response into a Pandas DataFrame.
+    # The first half of the text from the response is a yaml. The part below
+    # the yaml is the actual data. The following lines split the text and grab
+    # the csv:
     split_by = '------------'
     str_table = res[res.find(split_by) + len(split_by):]
+
+    # Turn the text from the API response into a Pandas DataFrame.
     df = pd.read_csv(io.StringIO(str_table), sep=',')
 
     # There is a weird issue in the HOBOlink data where it sometimes returns
@@ -137,6 +138,6 @@ def parse_hobolink_data(res: str) -> pd.DataFrame:
     df = df.loc[df['water_temp'].notna()]
 
     # Convert time column to Pandas datetime
-    df['time'] = pd.to_datetime(df['time'])
+    df['time'] = pd.to_datetime(df['time'], format='%m/%d/%y %H:%M:%S')
 
     return df

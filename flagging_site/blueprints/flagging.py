@@ -36,6 +36,8 @@ def stylize_model_output(df: pd.DataFrame) -> str:
     Returns:
         HTML table.
     """
+    df = df.copy()
+
     def _apply_flag(x: bool) -> str:
         flag_class = 'blue-flag' if x else 'red-flag'
         return f'<span class="{flag_class}">{x}</span>'
@@ -44,7 +46,7 @@ def stylize_model_output(df: pd.DataFrame) -> str:
     df.columns = [i.title().replace('_', ' ') for i in df.columns]
 
     # remove reach number
-    df = df.drop('Reach', 1)
+    df = df.drop(columns=['Reach'])
 
     return df.to_html(index=False, escape=False)
 
