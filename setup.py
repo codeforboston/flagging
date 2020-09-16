@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
-import io
+import os
 from setuptools import setup, find_packages
 
 
-with io.open('README.md', 'rt', encoding='utf8') as f:
+with open(os.path.join('flagging_site', '__init__.py'), encoding='utf8') as f:
+    version = re.search(r"__version__ = '(.*?)'", f.read()).group(1)
+
+with open('README.md', encoding='utf8') as f:
     readme = f.read()
 
 
@@ -27,8 +30,8 @@ setup(
         'pandas',
         'flask',
         'flasgger',
-        # 'psycopg2',
-        # 'Flask-SQLAlchemy'
+        'psycopg2',
+        'Flask-SQLAlchemy'
     ],
     url='https://github.com/codeforboston/flagging',
     description='Flagging website for the CRWA',
