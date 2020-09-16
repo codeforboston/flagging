@@ -32,5 +32,6 @@ export VAULT_PASSWORD=${vault_pw}
 read -p "Enter Postgres password: " postgres_pw
 export POSTGRES_PASSWORD=${postgres_pw}
 
+flask create-db
 flask init-db
 flask run

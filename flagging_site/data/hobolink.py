@@ -79,7 +79,7 @@ def request_to_hobolink(
     # handle HOBOLINK errors by checking HTTP status code
     # status codes in 400's are client errors, in 500's are server errors
     if res.status_code // 100 in [4, 5]:
-        error_message = "link has failed with error # " + str(res.status_code)  
+        error_message = "link has failed with error # " + str(res.status_code)
         return abort(res.status_code, error_message)
     return res
 
