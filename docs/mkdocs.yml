@@ -5,18 +5,19 @@ nav:
 - About: about.md
 - Setup: setup.md
 - Admin: admin.md
-- Deployment: deployment.md
+- Remote Deployment: deployment.md
 - System: system.md
 - Shell: shell.md
 - Development Background:
     - History: development/history.md
     - Learning Resources: development/learning_resources.md
 - Development:
-    # - Overview: development/index.md
+    - Overview: development/index.md
         # ^ (Explain the vault here too)
-    # - Config: development/config.md
+    - Config: development/config.md
     - Data: development/data.md
     - Predictive Models: development/predictive_models.md
+    - Twitter Bot: development/twitter_bot.md
     # - Front-End: development/front-end.md
 theme:
   name: material
@@ -56,3 +57,5 @@ extra:
     link: https://www.meetup.com/Code-for-Boston/
   - icon: fontawesome/brands/twitter
     link: https://twitter.com/codeforboston
+extra_javascript:
+- https://unpkg.com/mermaid@8.4.6/dist/mermaid.min.js

@@ -7,8 +7,13 @@ import time
 import json
 import zipfile
 from typing import Optional
+from typing import Dict
+from typing import Union
 
 from flask import Flask
+
+import py7zr
+from lzma import LZMAError
 
 from .config import Config
 from .config import get_config_from_env
@@ -25,7 +30,7 @@ def create_app(config: Optional[Config] = None) -> Flask:
     Returns:
         The fully configured Flask app instance.
     """
-    app = Flask(__name__, instance_relative_config=True)
+    app = Flask(__name__)
 
     # Get a config for the website. If one was not passed in the function, then
     # a config will be used depending on the `FLASK_ENV`.
@@ -51,7 +56,7 @@ def create_app(config: Optional[Config] = None) -> Flask:
 
     # Add Swagger to the app. Swagger automates the API documentation and
     # provides an interface for users to query the API on the website.
-    add_swagger_plugin_to_app(app)
+    init_swagger(app)
 
     # Register the database commands
     from .data import db
@@ -64,6 +69,10 @@ def create_app(config: Optional[Config] = None) -> Flask:
     # Register admin
     from .admin import init_admin
     init_admin(app)
+
+    # Register Twitter bot
+    from .twitter_bot import init_tweepy
+    init_tweepy(app)
 
     @app.before_request
     def before_request():
@@ -94,6 +103,13 @@ def create_app(config: Optional[Config] = None) -> Flask:
         update_database()
         click.echo('Updated the database.')
 
+    @app.cli.command('update-website')
+    def update_db_command():
+        """Update the database with the latest live data."""
+        update_db_command()
+        from .twitter_bot import tweet_out_status
+        tweet_out_status()
+
     # Make a few useful functions available in Flask shell without imports
     @app.shell_context_processor
     def make_shell_context():
@@ -119,8 +135,8 @@ def create_app(config: Optional[Config] = None) -> Flask:
     return app
 
 
-def add_swagger_plugin_to_app(app: Flask):
-    """This function hnadles all the logic for adding Swagger automated
+def init_swagger(app: Flask):
+    """This function handles all the logic for adding Swagger automated
     documentation to the application instance.
     """
     from flasgger import Swagger
@@ -163,11 +179,29 @@ def add_swagger_plugin_to_app(app: Flask):
     Swagger(app, config=swagger_config, template=template)
 
 
-def _load_keys_from_vault(
-        vault_password: str,
+def _load_secrets_from_vault(
+        password: str,
         vault_file: str
-) -> dict:
+) -> Dict[str, Union[str, Dict[str, str]]]:
     """This code loads the keys directly from the vault zip file.
+
+    The schema of the vault's `secrets.json` file looks like this:
+
+    >>> {
+    >>>     "SECRET_KEY": str,
+    >>>     "HOBOLINK_AUTH": {
+    >>>         "password": str,
+    >>>         "user": str,
+    >>>         "token": str
+    >>>     },
+    >>>     "TWITTER_AUTH": {
+    >>>         "api_key": str,
+    >>>         "api_key_secret": str,
+    >>>         "access_token": str,
+    >>>         "access_token_secret": str,
+    >>>         "bearer_token": str
+    >>>     }
+    >>> }
 
     Args:
         vault_password: (str) Password for opening up the `vault_file`.
@@ -176,16 +210,15 @@ def _load_keys_from_vault(
     Returns:
         Dict of credentials.
     """
-    pwd = bytes(vault_password, 'utf-8')
-    with zipfile.ZipFile(vault_file) as f:
-        with f.open('keys.json', pwd=pwd, mode='r') as keys_file:
-            d = json.load(keys_file)
+    with py7zr.SevenZipFile(vault_file, mode='r', password=password) as f:
+        archive = f.readall()
+        d = json.load(archive['secrets.json'])
     return d
 
 
 def update_config_from_vault(app: Flask) -> None:
     """
-    This updates the state of the `app` to have the keys from the vault. The
+    This updates the state of the `app` to have the secrets from the vault. The
     vault also stores the "SECRET_KEY", which is a Flask builtin configuration
     variable (i.e. Flask treats the "SECRET_KEY" as special). So we also
     populate the "SECRET_KEY" in this step.
@@ -198,18 +231,29 @@ def update_config_from_vault(app: Flask) -> None:
         app: A Flask application instance.
     """
     try:
-        keys = _load_keys_from_vault(
-            vault_password=app.config['VAULT_PASSWORD'],
+        secrets = _load_secrets_from_vault(
+            password=app.config['VAULT_PASSWORD'],
             vault_file=app.config['VAULT_FILE']
         )
-    except (RuntimeError, KeyError):
+    except (LZMAError, KeyError):
         msg = 'Unable to load the vault; bad password provided.'
         if app.env == 'production':
             raise RuntimeError(msg)
         else:
             print(f'Warning: {msg}')
-            app.config['KEYS'] = None
+            app.config['HOBOLINK_AUTH'] = {
+               'password': None,
+               'user': None,
+               'token': None
+            }
+            app.config['TWITTER_AUTH'] = {
+                'api_key': None,
+                'api_key_secret': None,
+                'access_token': None,
+                'access_token_secret': None,
+                'bearer_token': None
+            }
             app.config['SECRET_KEY'] = os.urandom(16)
     else:
-        app.config['KEYS'] = keys
-        app.config['SECRET_KEY'] = keys['flask']['secret_key']
+        # Add 'SECRET_KEY', 'HOBOLINK_AUTH', AND 'TWITTER_AUTH' to the config.
+        app.config.update(secrets)

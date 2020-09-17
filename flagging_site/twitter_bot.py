@@ -1,42 +1,52 @@
-"""
-This is a basic script to output a message to twitter
-User must input public and private key from Consumer
-and access. They will be imported from keys file
-
-Future Plans: 
-Allow more functionality allowing user input
-
-"""
-
+import pandas as pd
 import tweepy
-
-# Constants for secret and public keys
-
-CONSUMER_KEY = '' 
-CONSUMER_SECRET = ''
-ACCESS_KEY = ''
-ACCESS_SECRET = ''
-
-def post_tweet(msg): 
-    """
-        Posts tweet onto twitter handle
-
-        arg: accept string message msg
-
-        returns: string message that have been inputed
-    """
-
-    # Authenticates using consumer key and secret
-    auth=tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
-
-    # Authenticates using access key and secret
-    auth.set_access_token(ACCESS_KEY, ACCESS_SECRET)
-    api = tweepy.API(auth)
+from flask import Flask
 
 
-    #print message on terminal and update status 
-    # to twitter handle
-    print ('Tweeting' + msg) 
-    api.update_status(msg)
+tweepy_api = tweepy.API()
 
-    return msg 
+
+def init_tweepy(app: Flask):
+    # Pass Twitter API tokens into Tweepy's OAuthHandler
+    auth = tweepy.OAuthHandler(
+        consumer_key=app.config['TWITTER_AUTH']['api_key'],
+        consumer_secret=app.config['TWITTER_AUTH']['api_key_secret']
+    )
+    auth.set_access_token(
+        key=app.config['TWITTER_AUTH']['access_token'],
+        secret=app.config['TWITTER_AUTH']['access_token_secret']
+    )
+
+    # Register the auth defined above
+    tweepy_api.auth = auth
+
+
+def tweet_out_status():
+    from .data.predictive_models import latest_model_outputs
+    from .data.cyano_overrides import get_currently_overridden_reaches
+
+    df = latest_model_outputs()
+    df = df.set_index('reach')
+
+    overridden_reaches = get_currently_overridden_reaches()
+
+    flags = {
+        reach: val['safe'] and reach not in overridden_reaches
+        for reach, val
+        in df.to_dict(orient='index').items()
+    }
+
+    current_time = pd.to_datetime('today').strftime('%I:%M:%S %p, %m/%d/%Y')
+
+    if all(i for i in flags.values()):
+        msg = (
+            'Our predictive model is reporting all reaches are safe for '
+            f'recreational activities as of {current_time}.'
+        )
+    else:
+        unsafe = ', '.join([str(k) for k, v in flags.items() if v is False])
+        msg = (
+            'Our predictive model is reporting that the following reaches are '
+            f'unsafe as of {current_time}: {unsafe}.'
+        )
+    tweepy_api.update_status(msg)
