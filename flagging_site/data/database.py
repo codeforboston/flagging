@@ -1,6 +1,13 @@
-"""
-This file should handle all database connection stuff, namely: writing and
-retrieving data.
+"""This file handles all database stuff, i.e. writing and retrieving data to
+the Postgres database. Note that of the functionality in this file is available
+directly in the command line.
+
+While the app is running, the database connection is managed by SQLAlchemy. The
+`db` object defined near the top of the file is that connector, and is used
+throughout both this file and other files in the code base. The `db` object is
+connected to the actual database in the `create_app` function: the app instance
+is passed in via `db.init_app(app)`, and the `db` object looks for the config
+variable `SQLALCHEMY_DATABASE_URI`.
 """
 import os
 import pandas as pd
@@ -17,9 +24,17 @@ Base = declarative_base()
 
 
 def execute_sql(query: str) -> Optional[pd.DataFrame]:
-    """Execute arbitrary SQL in the database. This works for both read and write
-    operations. If it is a write operation, it will return None; otherwise it
-    returns a Pandas dataframe."""
+    """Execute arbitrary SQL in the database. This works for both read and
+    write operations. If it is a write operation, it will return None;
+    otherwise it returns a Pandas dataframe.
+
+    Args:
+        query: (str) A string that contains the contents of a SQL query.
+
+    Returns:
+        Either a Pandas Dataframe the selected data for read queries, or None
+        for write queries.
+    """
     with db.engine.connect() as conn:
         res = conn.execute(query)
         try:
@@ -32,32 +47,53 @@ def execute_sql(query: str) -> Optional[pd.DataFrame]:
             return None
 
 
-def execute_sql_from_file(file_name: str):
+def execute_sql_from_file(file_name: str) -> Optional[pd.DataFrame]:
+    """Execute SQL from a file in the `QUERIES_DIR` directory, which should be
+    located at `flagging_site/data/queries`.
+
+    Args:
+        file_name: (str) A file name inside the `QUERIES_DIR` directory. It
+                   should be only the file name alone and not the full path.
+
+    Returns:
+        Either a Pandas Dataframe the selected data for read queries, or None
+        for write queries.
+    """
     path = os.path.join(current_app.config['QUERIES_DIR'], file_name)
     with current_app.open_resource(path) as f:
         return execute_sql(f.read().decode('utf8'))
 
 
-def create_db():
-    """If database doesn't exist, create it and return True, 
-    otherwise leave it alone and return False"""
+def create_db() -> bool:
+    """If the database defined by `POSTGRES_DBNAME` doesn't exist, create it
+    and return True, otherwise do nothing and return False. By default, the
+    config variable `POSTGRES_DBNAME` is set to "flagging".
+
+    Returns:
+        bool for whether the database needed to be created.
+    """
 
     # connect to postgres database, get cursor
-    conn = connect(dbname='postgres', user=current_app.config['POSTGRES_USER'],
+    conn = connect(
+        dbname='postgres',
+        user=current_app.config['POSTGRES_USER'],
         host=current_app.config['POSTGRES_HOST'],
-            password=current_app.config['POSTGRES_PASSWORD'])
+        password=current_app.config['POSTGRES_PASSWORD']
+    )
     cursor = conn.cursor()
 
     # get a list of all databases:
     cursor.execute('SELECT datname FROM pg_database;')
-    db_list =  cursor.fetchall()      # db_list here is a list of one-element tuples
-    db_list = [d[0] for d in db_list] # this converts db_list to a list of db names
+
+    # create a list of all available database names:
+    db_list = cursor.fetchall()
+    db_list = [d[0] for d in db_list]
 
     # if that database is already there, exit out of this function
     if current_app.config['POSTGRES_DBNAME'] in db_list:
         return False
-    # since the database isn't already there, proceed ...
-    
+    # if the database isn't already there, proceed ...
+
     # create the database
     cursor.execute('COMMIT;')
     cursor.execute('CREATE DATABASE ' + current_app.config['POSTGRES_DBNAME'])
@@ -67,18 +103,30 @@ def create_db():
 
 
 def init_db():
-    """Clear existing data and create new tables."""
+    """This data clears and then populates the database from scratch. You only
+    need to run this function once per instance of the database.
+    """
     with current_app.app_context():
-        # Read the `schema.sql` file, which initializes the database.
+        # This file drops the tables if they already exist, and then defines
+        # the tables. This is the only query that CREATES tables.
         execute_sql_from_file('schema.sql')
+
+        # The boathouses table is populated. This table doesn't change, so it
+        # only needs to be populated once.
         execute_sql_from_file('define_boathouse.sql')
+
+        # The function that updates the database periodically is run for the
+        # first time.
         update_database()
+
+        # The models available in Base are given corresponding tables if they
+        # do not already exist.
         Base.metadata.create_all(db.engine)
 
 
 def update_database():
-    """At the moment this overwrites the entire database. In the future we want
-    this to simply update it.
+    """This function basically controls all of our data refreshes. The
+    following tables
     """
     options = {
         'con': db.engine,
@@ -96,11 +144,13 @@ def update_database():
     df_hobolink = get_live_hobolink_data()
     df_hobolink.to_sql('hobolink', **options)
 
-    from .model import process_data
+    # Populate the `processed_data` table.
+    from .predictive_models import process_data
     df = process_data(df_hobolink=df_hobolink, df_usgs=df_usgs)
     df.to_sql('processed_data', **options)
 
-    from .model import all_models
+    # Populate the `model_outputs` table.
+    from .predictive_models import all_models
     model_outs = all_models(df)
     model_outs.to_sql('model_outputs', **options)
 

@@ -9,8 +9,8 @@ from flask import current_app
 from ..data.cyano_overrides import get_currently_overridden_reaches
 from ..data.hobolink import get_live_hobolink_data
 from ..data.usgs import get_live_usgs_data
-from ..data.model import process_data
-from ..data.model import latest_model_outputs
+from ..data.predictive_models import process_data
+from ..data.predictive_models import latest_model_outputs
 from ..data.database import get_boathouse_dict
 
 bp = Blueprint('flagging', __name__)

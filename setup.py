@@ -17,6 +17,7 @@ setup(
     author='Code for Boston',
     python_requires='>=3.7.1',
     maintainer='Charles River Watershed Association',
+    license='MIT',
     include_package_data=True,
     setup_requires=[
         'pytest-runner',
@@ -26,14 +27,21 @@ setup(
         'pytest-cov'
     ],
     install_requires=[
-        'pyyaml',
         'pandas',
         'flask',
+        'jinja2',
         'flasgger',
-        'psycopg2',
-        'Flask-SQLAlchemy'
+        'requests',
+        'Flask-SQLAlchemy',
+        'Flask-Admin',
+        'Flask-BasicAuth'
     ],
+    extras_require={
+        'windows': ['psycopg2'],
+        'osx': ['psycopg2-binary']
+    },
     url='https://github.com/codeforboston/flagging',
     description='Flagging website for the CRWA',
-    long_description=readme
+    long_description=readme,
+    long_description_content_type='text/markdown',
 )

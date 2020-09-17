@@ -19,8 +19,8 @@ USGS_STATIC_FILE_NAME = 'usgs.pickle'
 
 
 def get_live_usgs_data() -> pd.DataFrame:
-    """This function  runs through the whole process for retrieving data from
-    usgs: first we perform the request, and then we clean the data.
+    """This function runs through the whole process for retrieving data from
+    usgs: first we perform the request, and then we parse the data.
 
     Returns:
         Pandas Dataframe containing the usgs data.
@@ -37,13 +37,12 @@ def get_live_usgs_data() -> pd.DataFrame:
 
 
 def request_to_usgs() -> requests.models.Response:
-    """
-    Get a request from the USGS.
+    """Get a request from the USGS.
 
     Returns:
         Request Response containing the data from the request.
     """
-    
+
     payload = {
         'format': 'json',
         'sites': '01104500',
@@ -51,7 +50,7 @@ def request_to_usgs() -> requests.models.Response:
         'parameterCd': '00060,00065',
         'siteStatus': 'all'
     }
-    
+
     res = requests.get(USGS_URL, params=payload)
     if res.status_code // 100 in [4, 5]:
         error_msg = 'API request to the USGS endpoint failed with status code '\
@@ -92,7 +91,7 @@ def parse_usgs_data(res) -> pd.DataFrame:
         df['time'] = (
             pd.to_datetime(df['time'])  # Convert to Pandas datetime format
             .dt.tz_localize('UTC')  # This is UTC; define it as such
-            .dt.tz_convert('US/Eastern')  # Take the UTC time and convert to EST
+            .dt.tz_convert('US/Eastern')  # Take UTC time and convert to EST
             .dt.tz_localize(None)  # Remove the timezone from the datetime
         )
     except TypeError:

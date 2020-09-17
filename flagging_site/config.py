@@ -10,6 +10,7 @@ from typing import Dict, Any, Optional, List
 from flask.cli import load_dotenv
 from distutils.util import strtobool
 
+
 # Constants
 # ~~~~~~~~~
 
@@ -18,15 +19,6 @@ QUERIES_DIR = os.path.join(ROOT_DIR, 'data', 'queries')
 DATA_STORE = os.path.join(ROOT_DIR, 'data', '_store')
 VAULT_FILE = os.path.join(ROOT_DIR, 'vault.zip')
 
-# Dotenv
-# ~~~~~~
-
-# If you are using a .env file, please double check that it is gitignored.
-# The `.flaskenv` file should not be gitignored, only `.env`.
-# See this for more:
-# https://flask.palletsprojects.com/en/1.1.x/cli/
-load_dotenv(os.path.join(ROOT_DIR, '..', '.flaskenv'))
-load_dotenv(os.path.join(ROOT_DIR, '..', '.env'))
 
 # Configs
 # ~~~~~~~
@@ -60,6 +52,13 @@ class Config:
 
     @property
     def SQLALCHEMY_DATABASE_URI(self) -> str:
+        """
+        Returns the URI for the Postgres database.
+
+        Example:
+            >>> Config().SQLALCHEMY_DATABASE_URI
+            'postgres://postgres:password_here@localhost:5432/flagging'
+        """
         user = self.POSTGRES_USER
         password = self.POSTGRES_PASSWORD
         host = self.POSTGRES_HOST
@@ -72,6 +71,9 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS: bool = False
 
     QUERIES_DIR: str = QUERIES_DIR
+    """Directory that contains various queries that are accessible throughout
+    the rest of the code base.
+    """
 
     # ==========================================================================
     # MISC. CUSTOM CONFIG OPTIONS
@@ -87,6 +89,7 @@ class Config:
     """
 
     VAULT_PASSWORD: str = os.getenv('VAULT_PASSWORD')
+    """Password """
 
     KEYS: Dict[str, Dict[str, Any]] = None
     """These are where the keys from the vault are stored. It should be a dict 
@@ -131,8 +134,20 @@ class ProductionConfig(Config):
     is the `flagging` part, so that's the only blueprint we import.
     """
     def __init__(self):
-        self.BASIC_AUTH_USERNAME: str = os.environ['BASIC_AUTH_USERNAME']
-        self.BASIC_AUTH_PASSWORD: str = os.environ['BASIC_AUTH_PASSWORD']
+        """Initializing the production config allows us to ensure the existence
+        of these variables in the environment."""
+        try:
+            self.VAULT_PASSWORD: str = os.environ['VAULT_PASSWORD']
+            self.BASIC_AUTH_USERNAME: str = os.environ['BASIC_AUTH_USERNAME']
+            self.BASIC_AUTH_PASSWORD: str = os.environ['BASIC_AUTH_PASSWORD']
+        except KeyError:
+            msg = (
+                'You did not set all of the environment variables required to '
+                'initiate the app in production mode. If you are deploying '
+                'the website to Heroku, read the Deployment docs page to '
+                'learn how to set env variables in Heroku.'
+            )
+            raise KeyError(msg)
 
 
 class DevelopmentConfig(Config):
@@ -152,8 +167,6 @@ class DevelopmentConfig(Config):
     DEBUG: bool = True
     TESTING: bool = True
     OFFLINE_MODE = strtobool(os.getenv('OFFLINE_MODE') or 'false')
-    BASIC_AUTH_USERNAME: str = os.getenv('BASIC_AUTH_USERNAME', 'admin')
-    BASIC_AUTH_PASSWORD: str = os.getenv('BASIC_AUTH_PASSWORD', 'password')
 
 
 class TestingConfig(Config):
@@ -161,8 +174,6 @@ class TestingConfig(Config):
     website.
     """
     TESTING: bool = True
-    BASIC_AUTH_USERNAME: str = os.getenv('BASIC_AUTH_USERNAME', 'admin')
-    BASIC_AUTH_PASSWORD: str = os.getenv('BASIC_AUTH_PASSWORD', 'password')
 
 
 def get_config_from_env(env: str) -> Config:

@@ -8,7 +8,7 @@ from flask import request
 from flask_restful import Api
 from flask_restful import Resource
 from flask import current_app
-from ..data.model import latest_model_outputs
+from ..data.predictive_models import latest_model_outputs
 
 from flasgger import swag_from
 

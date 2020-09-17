@@ -89,6 +89,7 @@ def create_app(config: Optional[Config] = None) -> Flask:
 
     @app.cli.command('update-db')
     def update_db_command():
+        """Update the database with the latest live data."""
         from .data.database import update_database
         update_database()
         click.echo('Updated the database.')
@@ -96,12 +97,17 @@ def create_app(config: Optional[Config] = None) -> Flask:
     # Make a few useful functions available in Flask shell without imports
     @app.shell_context_processor
     def make_shell_context():
+        import pandas as pd
+        import numpy as np
         from .blueprints.flagging import get_data
+        from .data import db
         from .data.hobolink import get_live_hobolink_data
-        from .data.model import process_data
+        from .data.predictive_models import process_data
         from .data.usgs import get_live_usgs_data
 
         return {
+            'pd': pd,
+            'np': np,
             'db': db,
             'get_data': get_data,
             'get_live_hobolink_data': get_live_hobolink_data,
@@ -150,7 +156,8 @@ def add_swagger_plugin_to_app(app: Flask):
     }
     app.config['SWAGGER'] = {
         'uiversion': 3,
-        'favicon': LazyString(lambda: url_for('static', filename='favicon/favicon.ico'))
+        'favicon': LazyString(
+            lambda: url_for('static', filename='favicon/favicon.ico'))
     }
 
     Swagger(app, config=swagger_config, template=template)
