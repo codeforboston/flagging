@@ -104,9 +104,10 @@ def create_app(config: Optional[Config] = None) -> Flask:
         click.echo('Updated the database.')
 
     @app.cli.command('update-website')
-    def update_db_command():
+    @click.pass_context
+    def update_website_command(ctx):
         """Update the database with the latest live data."""
-        update_db_command()
+        ctx.invoke(update_db_command)
         from .twitter_bot import tweet_out_status
         tweet_out_status()
 
