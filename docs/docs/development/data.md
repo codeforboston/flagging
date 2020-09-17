@@ -52,7 +52,7 @@ The HOBOlink data is also notoriously slow to retrieve (regardless of whether yo
 
 ### Combining the data
 
-Additional information related to combining the data and how the models work is in the [Predictive Models](../predictive_models.md) page.
+Additional information related to combining the data and how the models work is in the [Predictive Models](../predictive_models) page.
 
 ## Postgres Database
 

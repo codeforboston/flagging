@@ -7,6 +7,7 @@ keys.json
 Pipfile
 Pipfile.lock
 pgadmin4/
+mkdocs_env/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
