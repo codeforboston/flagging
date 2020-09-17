@@ -34,7 +34,8 @@ setup(
         'requests',
         'Flask-SQLAlchemy',
         'Flask-Admin',
-        'Flask-BasicAuth'
+        'Flask-BasicAuth',
+        'py7zr'
     ],
     extras_require={
         'windows': ['psycopg2'],

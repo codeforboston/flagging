@@ -1,5 +1,7 @@
 # Data
 
+# High-Level Overview
+
 Here is a "TLDR" of the data engineering for this website:
 
 - To get data, we ping two different APIs, combine the responses from those API requests, do some processing and feature engineering of the data, and then run a predictive model on the processed data.
@@ -7,6 +9,19 @@ Here is a "TLDR" of the data engineering for this website:
 - To store the data and then later retrieve it for the front-end of the website, we use PostgreSQL database.
 
 - To actually run the functionality that gets data, processes it, and stores it. we run a [scheduled job](https://en.wikipedia.org/wiki/Job_scheduler) that runs the command `flask update-db` at a set time intervals.
+
+Actually setting up the database requires a few additional steps during either remote or local deployment (`flask create-db` and `flask init-db`), however those steps are covered elsewhere in the docs.
+
+The `update_database()` inside of `database.py` runs four functions elsewhere in the data folder. This flow chart shows how those functions relate to one another (each block is a function; the arrows represent that the function's output is used as an input in the function being pointed at).
+
+```mermaid
+graph TD
+A(get_live_hobolink_data) --> C(process_data)
+B(get_live_usgs_data) --> C
+C --> D(all_models)
+```
+
+The rest of this document explains in more detail what's happening in these functions individually.
 
 ## Sources
 
@@ -39,13 +54,13 @@ The HOBOlink data is accessed through a REST API using some credentials stored i
 
 The data actually returned by the API is a combination of a yaml file with a CSV below it, and we just use the CSV part. We then do the following to preprocess the CSV:
 
-- We remove all timestamps ending `:05`, `:15`, `:25`, `:35`, `:45`, and `:55`. These only contain battery information, not weather information. The final dataframe returned is ultimately in 10 minute incremenets.
-- We make the timestamp consistently report eastern standard times. There is a weird issue in which the HOBOlink API returns slightly different datetime formats that messes with Pandas's timestamp parser. We are able to coerce the timestamp into something consistent and predictable.
+- We remove all timestamps ending `:05`, `:15`, `:25`, `:35`, `:45`, and `:55`. These only contain battery information, not weather information. The final dataframe returned is ultimately in 10 minute increments.
+- We make the timestamp consistently report eastern standard times.
 - We consolidate duplicative columns. The HOBOlink API has a weird issue where sometimes it splits columns of data with the same name, seemingly at random. This issue causes serious data issues if untreated (at one point, it caused our model to fail to update for a couple days), so our function cleans the data.
 
 As you can see from the above, the HOBOlink API is a bit finicky for whatever reason, but we have a good data processing solution for these problems.
 
-The HOBOlink data is also notoriously slow to retrieve (regardless of whether you ask for 1 hour of data or multiple weeks of data), which is why we belabored building the database portion of the flagging website out in the first place.
+The HOBOlink data is also notoriously slow to retrieve (regardless of whether you ask for 1 hour of data or multiple weeks of data), which is why we belabored building the database portion of the flagging website out in the first place. The HOBOlink API does not seem to be rate limited or subject to fees that scale with usage.
 
 ???+ tip
     You can manually download the latest raw data from this device [here](https://www.hobolink.com/p/0cdac4a6910cef5a8883deb005d73ae1). If you want some preprocessed data that implements the above modifications to the output, there is a better way to get that data explained in the shell guide.
