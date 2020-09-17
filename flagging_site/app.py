@@ -241,18 +241,6 @@ def update_config_from_vault(app: Flask) -> None:
             raise RuntimeError(msg)
         else:
             print(f'Warning: {msg}')
-            app.config['HOBOLINK_AUTH'] = {
-               'password': None,
-               'user': None,
-               'token': None
-            }
-            app.config['TWITTER_AUTH'] = {
-                'api_key': None,
-                'api_key_secret': None,
-                'access_token': None,
-                'access_token_secret': None,
-                'bearer_token': None
-            }
             app.config['SECRET_KEY'] = os.urandom(16)
     else:
         # Add 'SECRET_KEY', 'HOBOLINK_AUTH', AND 'TWITTER_AUTH' to the config.

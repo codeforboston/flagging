@@ -6,9 +6,11 @@ from werkzeug.exceptions import HTTPException
 
 basic_auth = BasicAuth()
 
+
 def init_auth(app: Flask):
     with app.app_context():
         basic_auth.init_app(app)
+
 
 # Taken from https://computableverse.com/blog/flask-admin-using-basicauth
 class AuthException(HTTPException):

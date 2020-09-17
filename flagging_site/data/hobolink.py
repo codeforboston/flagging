@@ -71,7 +71,7 @@ def request_to_hobolink(
     """
     data = {
         'query': export_name,
-        'authentication': current_app.config['KEYS']['hobolink']
+        'authentication': current_app.config['HOBOLINK_AUTH']
     }
 
     res = requests.post(HOBOLINK_URL, json=data)

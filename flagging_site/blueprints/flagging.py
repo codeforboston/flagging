@@ -76,7 +76,7 @@ def index() -> str:
         print('ERROR!  the reaches are\'t identical between boathouse list and model outputs!')
 
     for (flag_reach, flag_safe) in flags.items():
-        homepage[flag_reach]['flag']=flag_safe
+        homepage[flag_reach]['flag'] = flag_safe
 
     model_last_updated_time = df['time'].iloc[0]
 

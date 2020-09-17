@@ -1,2 +1,1 @@
 FLASK_APP=flagging_site
-FLASK_ENV=development

@@ -17,8 +17,14 @@ from distutils.util import strtobool
 ROOT_DIR = os.path.abspath(os.path.dirname(__file__))
 QUERIES_DIR = os.path.join(ROOT_DIR, 'data', 'queries')
 DATA_STORE = os.path.join(ROOT_DIR, 'data', '_store')
-VAULT_FILE = os.path.join(ROOT_DIR, 'vault.zip')
+VAULT_FILE = os.path.join(ROOT_DIR, 'vault.7z')
 
+
+# Load dotenv
+# ~~~~~~~~~~~
+if os.getenv('FLASK_ENV') == 'development':
+    load_dotenv(os.path.join(ROOT_DIR, '..', '.flaskenv'))
+    load_dotenv(os.path.join(ROOT_DIR, '..', '.env'))
 
 # Configs
 # ~~~~~~~
@@ -89,15 +95,25 @@ class Config:
     """
 
     VAULT_PASSWORD: str = os.getenv('VAULT_PASSWORD')
-    """Password """
 
-    KEYS: Dict[str, Dict[str, Any]] = None
-    """These are where the keys from the vault are stored. It should be a dict 
-    of dicts. Each key in the first level dict corresponds to a different
-    service that needs keys / secured credentials stored.
-    
-    Currently, HOBOlink and Flask's `SECRET_KEY` are the two services that pass
-    through the vault.
+    HOBOLINK_AUTH: dict = {
+       'password': None,
+       'user': None,
+       'token': None
+    }
+    """Note: Do not fill these out manually; the HOBOlink auth gets populated
+    from the vault.
+    """
+
+    TWITTER_AUTH: dict = {
+        'api_key': None,
+        'api_key_secret': None,
+        'access_token': None,
+        'access_token_secret': None,
+        'bearer_token': None
+    }
+    """Note: Do not fill these out manually; the Twitter auth gets populated
+    from the vault.
     """
 
     VAULT_FILE: str = VAULT_FILE

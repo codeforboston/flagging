@@ -126,7 +126,15 @@ def init_db():
 
 def update_database():
     """This function basically controls all of our data refreshes. The
-    following tables
+    following tables are updated in order:
+
+    - usgs
+    - hobolink
+    - processed_data
+    - model_outputs
+
+    The functions run to calculate the data are imported from other files
+    within the data folder.
     """
     options = {
         'con': db.engine,
