@@ -7,6 +7,9 @@ tweepy_api = tweepy.API()
 
 
 def init_tweepy(app: Flask):
+    """Uses the app instance's config to add requisite credentials to the
+    tweepy API instance.
+    """
     # Pass Twitter API tokens into Tweepy's OAuthHandler
     auth = tweepy.OAuthHandler(
         consumer_key=app.config['TWITTER_AUTH']['api_key'],

@@ -81,7 +81,7 @@ def create_app(config: Optional[Union[Config, str]] = None) -> Flask:
 
     @app.cli.command('create-db')
     def create_db_command():
-        """Create database (after verifying that it isn't already there)"""
+        """Create database (after verifying that it isn't already there)."""
         from .data.database import create_db
         if create_db():
             click.echo('The database was created.')
@@ -105,7 +105,7 @@ def create_app(config: Optional[Union[Config, str]] = None) -> Flask:
     @app.cli.command('update-website')
     @click.pass_context
     def update_website_command(ctx):
-        """Update the database with the latest live data."""
+        """Updates the database, then Tweets a message."""
         ctx.invoke(update_db_command)
         from .twitter import tweet_current_status
         msg = tweet_current_status()

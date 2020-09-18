@@ -7,6 +7,35 @@ The reason why the shell is useful is because there may be cases where you want 
 
 The way Flask works makes it impossible to run the website's functions outside the Flask app context, which means importing the functions into a naked shell doesn't work as intended. The `flask shell` provides all the tools needed to let coders access the functions the exact same way the website does, except in a shell environment.
 
+## Run the Shell
+
+1. Open up a terminal at the `flagging` folder.
+
+2. Activate a Python virtual environment:
+
+```shell
+python3 -m venv venv
+source venv/bin/activate
+python3 -m pip install -r requirements.txt
+```
+
+3. Set up the `FLASK_ENV` environment variable:
+
+```shell
+export FLASK_ENV=development
+```
+
+4. Run the shell:
+
+```shell
+flask shell
+```
+
+And you should be good to go! The functions listed below should be available for use, and the section below contains some example use cases for the shell.
+
+???+ tip
+    To exit from the shell, type `exit()` then ++enter++.
+
 ## Available Shell Functions and Variables
 
 - **`app`** (*flask.Flask*):
@@ -28,42 +57,36 @@ Additionally, Pandas and Numpy are already pre-imported via `import pandas as pd
 
 ???+ tip
     To add more functions and variables that pre-load in the Flask shell, simply add another entry to the dictionary returned by the function `make_shell_context()` in `flagging_site/app.py:creat_app()`.
+    
+???+ tip
+    All of the website's functions can be run in the Flask shell, even those that are not pre-loaded in the shell's global context. All you need to do is import it. For example, let's say you want to get the un-parsed request object from USGS.gov. You can import the function we use and run it like this:
+    
+    ```python
+    # (in Flask shell)
+    from flagging_site.data.usgs import request_to_usgs
+    res = request_to_usgs()
+    print(res.json())
+    ```
 
-## Running the Shell
-
-First, open up a terminal at the `flagging` folder.
-
-Make sure you have Python 3 installed. Set up your environment with the following commands:
-
-```shell
-python3 -m venv venv
-source venv/bin/activate
-python3 -m pip install -r requirements.txt
-```
-
-Export the following environment variables like so:
-
-```shell
-export VAULT_PASSWORD=replace_me_with_pw
-export FLASK_APP=flagging_site:create_app
-export FLASK_ENV=development
-```
-
-Finally, start the Flask shell:
-
-```shell
-flask shell
-```
-
-And you should be good to go! The functions listed above should be available for use. See below for an example.
-
-## Example: Export Hobolink Data to CSV
+## Example 1: Export Hobolink Data to CSV
 
 Here we assume you have already started the Flask shell.
 This example shows how to download the Hobolink data and
 save it as a CSV file.
 
 ```python
->>> hobolink_data = get_live_hobolink_data()
->>> hobolink_data.to_csv('path/where/to/save/my-CSV-file.csv')
+# (in Flask shell)
+hobolink_data = get_live_hobolink_data()
+hobolink_data.to_csv('path/where/to/save/my-CSV-file.csv')
+```
+
+Downloading the data may be useful if you want to see 
+
+## Example 2: Preview Tweet
+
+Let's say you want to preview a Tweet that would be sent out without actually sending it. The `compose_tweet()` function returns a string of this message:
+
+```python
+# (in Flask shell)
+print(compose_tweet())
 ```
