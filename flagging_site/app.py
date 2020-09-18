@@ -109,7 +109,8 @@ def create_app(config: Optional[Config] = None) -> Flask:
         """Update the database with the latest live data."""
         ctx.invoke(update_db_command)
         from .twitter_bot import tweet_out_status
-        tweet_out_status()
+        msg = tweet_out_status()
+        click.echo(f'Sent out tweet: {msg!r}')
 
     # Make a few useful functions available in Flask shell without imports
     @app.shell_context_processor

@@ -50,3 +50,4 @@ def tweet_out_status():
             f'unsafe as of {current_time}: {unsafe}.'
         )
     tweepy_api.update_status(msg)
+    return msg
