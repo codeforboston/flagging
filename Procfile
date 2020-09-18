@@ -5,4 +5,4 @@
 # https://devcenter.heroku.com/articles/procfile
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-web: gunicorn "flagging_site:create_app()"
+web: gunicorn "flagging_site:create_app('production')"

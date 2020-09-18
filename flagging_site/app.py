@@ -19,7 +19,7 @@ from .config import Config
 from .config import get_config_from_env
 
 
-def create_app(config: Optional[Config] = None) -> Flask:
+def create_app(config: Optional[Union[Config, str]] = None) -> Flask:
     """Create and configure an instance of the Flask application. We use the
     `create_app` scheme over defining the `app` directly at the module level so
     the app isn't loaded immediately by importing the module.
@@ -34,9 +34,12 @@ def create_app(config: Optional[Config] = None) -> Flask:
 
     # Get a config for the website. If one was not passed in the function, then
     # a config will be used depending on the `FLASK_ENV`.
-    if not config:
+    if config is None:
         # Determine the config based on the `FLASK_ENV`.
         config = get_config_from_env(app.env)
+    elif isinstance(config, str):
+        # If config is string, parse it as if it's an env.
+        config = get_config_from_env(config)
 
     app.config.from_object(config)
 
@@ -62,16 +65,12 @@ def create_app(config: Optional[Config] = None) -> Flask:
     from .data import db
     db.init_app(app)
 
-    # Register auth
-    from .auth import init_auth
-    init_auth(app)
-
     # Register admin
     from .admin import init_admin
     init_admin(app)
 
     # Register Twitter bot
-    from .twitter_bot import init_tweepy
+    from .twitter import init_tweepy
     init_tweepy(app)
 
     @app.before_request
@@ -108,8 +107,8 @@ def create_app(config: Optional[Config] = None) -> Flask:
     def update_website_command(ctx):
         """Update the database with the latest live data."""
         ctx.invoke(update_db_command)
-        from .twitter_bot import tweet_out_status
-        msg = tweet_out_status()
+        from .twitter import tweet_current_status
+        msg = tweet_current_status()
         click.echo(f'Sent out tweet: {msg!r}')
 
     # Make a few useful functions available in Flask shell without imports
@@ -117,20 +116,24 @@ def create_app(config: Optional[Config] = None) -> Flask:
     def make_shell_context():
         import pandas as pd
         import numpy as np
+        from .flask import current_app
         from .blueprints.flagging import get_data
         from .data import db
         from .data.hobolink import get_live_hobolink_data
         from .data.predictive_models import process_data
         from .data.usgs import get_live_usgs_data
+        from .twitter import compose_tweet
 
         return {
             'pd': pd,
             'np': np,
+            'app': current_app,
             'db': db,
             'get_data': get_data,
             'get_live_hobolink_data': get_live_hobolink_data,
             'get_live_usgs_data': get_live_usgs_data,
             'process_data': process_data,
+            'compose_tweet': compose_tweet
         }
 
     # And we're all set! We can hand the app over to flask at this point.
@@ -140,6 +143,9 @@ def create_app(config: Optional[Config] = None) -> Flask:
 def init_swagger(app: Flask):
     """This function handles all the logic for adding Swagger automated
     documentation to the application instance.
+
+    Args:
+        app: A Flask application instance.
     """
     from flasgger import Swagger
     from flasgger import LazyString
@@ -237,13 +243,12 @@ def update_config_from_vault(app: Flask) -> None:
             password=app.config['VAULT_PASSWORD'],
             vault_file=app.config['VAULT_FILE']
         )
-    except (LZMAError, KeyError):
-        msg = 'Unable to load the vault; bad password provided.'
-        if app.env == 'production':
-            raise RuntimeError(msg)
-        else:
-            print(f'Warning: {msg}')
-            app.config['SECRET_KEY'] = os.urandom(16)
-    else:
         # Add 'SECRET_KEY', 'HOBOLINK_AUTH', AND 'TWITTER_AUTH' to the config.
         app.config.update(secrets)
+    except (LZMAError, KeyError):
+        msg = 'Unable to load the vault; bad password provided.'
+        if app.config.get('VAULT_OPTIONAL'):
+            print(f'Warning: {msg}')
+            app.config['SECRET_KEY'] = os.urandom(16)
+        else:
+            raise RuntimeError(msg)

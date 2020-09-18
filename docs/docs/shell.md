@@ -3,24 +3,31 @@
 The shell is used to access app functions and data, such as Hobolink and USGS
 data and access to the database.
 
+The reason why the shell is useful is because there may be cases where you want to play around with the app's functions. For example, maybe you see something that seems fishy in the data, so you want to have direct access to the function the website is running. You may also want to 
+
+The way Flask works makes it impossible to run the website's functions outside the Flask app context, which means importing the functions into a naked shell doesn't work as intended. The `flask shell` provides all the tools needed to let coders access the functions the exact same way the website does, except in a shell environment.
+
 ## Available Shell Functions and Variables
 
-- `db` (*flask_sqlalchemy.SQLAlchemy*):
+- **`app`** (*flask.Flask*):
+  The actual Flask app instance.
+- **`db`** (*flask_sqlalchemy.SQLAlchemy*):
   The object used to interact with the Postgres database.
-- `get_live_hobolink_data` (*(Optional[str]) -> pd.DataFrame*):
-  Gets the Hobolink data table based on the given "export" name.
-  See `flagging_site/data/hobolink.py` for details.
-- `get_live_usgs_data` (*() -> pd.DataFrame*):
+- **`get_live_hobolink_data`** (*(Optional[str]) -> pd.DataFrame*):
+  Gets the HOBOlink data table based on the given "export" name.
+- **`get_live_usgs_data`** (*() -> pd.DataFrame*):
   Gets the USGS data table.
-  See `flagging_site/data/usgs.py` for details.
-- `get_data` (*() -> pd.DataFrame*):
+- **`get_data`** (*() -> pd.DataFrame*):
   Gets the Hobolink and USGS data tables and returns a combined table.
-- `process_data` (*(pd.DataFrame, pd.DataFrame) -> pd.DataFrame*):
+- **`process_data`** (*(pd.DataFrame, pd.DataFrame) -> pd.DataFrame*):
   Combines the Hobolink and USGS tables.
-  See `flagging_site/data/model.py` for details.
+- **`compose_tweet`** (*() -> str*):
+  Generates a message for Twitter that represents the current status of the flagging program (note: this function does not actually send the Tweet to Twitter.com). 
 
-To add more functions and variables, simply add an entry to the dictionary
-returned by the function `make_shell_context()` in `flagging_site/app.py:creat_app()`.
+Additionally, Pandas and Numpy are already pre-imported via `import pandas as pd` and `import numpy as np`.
+
+???+ tip
+    To add more functions and variables that pre-load in the Flask shell, simply add another entry to the dictionary returned by the function `make_shell_context()` in `flagging_site/app.py:creat_app()`.
 
 ## Running the Shell
 

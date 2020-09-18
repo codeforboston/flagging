@@ -21,7 +21,16 @@ def init_tweepy(app: Flask):
     tweepy_api.auth = auth
 
 
-def tweet_out_status():
+def compose_tweet() -> str:
+    """Generates the message that gets tweeted out. This function does not
+    actually send the Tweet out; this function is separated from the function
+    that sends the Tweet in order to assist with testing and development, in
+    addition to addressing separation of concerns.
+
+    Returns:
+        Message intended to be tweeted that conveys the status of the Charles
+        River.
+    """
     from .data.predictive_models import latest_model_outputs
     from .data.cyano_overrides import get_currently_overridden_reaches
 
@@ -49,5 +58,16 @@ def tweet_out_status():
             'Our predictive model is reporting that the following reaches are '
             f'unsafe as of {current_time}: {unsafe}.'
         )
-    tweepy_api.update_status(msg)
+    return msg
+
+
+def tweet_current_status() -> str:
+    """Tweet a message about the status of the Charles River.
+
+    Returns:
+        The message that was tweeted out.
+    """
+    msg = compose_tweet()
+    if current_app.config['SEND_TWEETS']:
+        tweepy_api.update_status(msg)
     return msg

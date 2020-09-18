@@ -138,9 +138,15 @@ class Config:
     """
 
     API_MAX_HOURS: int = 48
-    """The maximum number of hours of data that the API will return. We are not trying 
-    to be stingy about our data, we just want this in order to avoid any odd behaviors 
-    if the user requests more data than exists.
+    """The maximum number of hours of data that the API will return. We are not
+    trying to be stingy about our data, we just want this in order to avoid any
+    odd behaviors if the user requests more data than exists.
+    """
+
+    SEND_TWEETS: bool = strtobool(os.getenv('SEND_TWEETS') or 'false')
+    """If True, the website behaves normally. If False, any time the app would
+    send a Tweet, it does not do so. It is useful to turn this off when
+    developing to test Twitter messages.
     """
 
 
@@ -149,6 +155,8 @@ class ProductionConfig(Config):
     internet. Currently the only part of the website that's pretty fleshed out
     is the `flagging` part, so that's the only blueprint we import.
     """
+    SEND_TWEETS: str = True
+
     def __init__(self):
         """Initializing the production config allows us to ensure the existence
         of these variables in the environment."""
@@ -211,7 +219,7 @@ def get_config_from_env(env: str) -> Config:
     config_mapping = {
         'production': ProductionConfig,
         'development': DevelopmentConfig,
-        'testing': TestingConfig
+        'testing': TestingConfig,
     }
     try:
         config = config_mapping[env]

@@ -1,3 +1,7 @@
+# Twitter Bot
+
+Every time the website updates, it sends out a tweet.
+
 ## First Time Setup
 
 Follow these steps to set up the Twitter bot for the first time, such as on a new Twitter account.

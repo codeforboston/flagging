@@ -23,7 +23,7 @@ class Config
 Config : /config.py
 Config : config = get_config_from_env(...)
 class vault
-vault : /vault.zip
+vault : /vault.7z
 vault : /app.py
 Config <.. vault : update_config_from_vault(app)
 class Swagger
@@ -52,7 +52,7 @@ Admin: admin = Admin(...)
 SQLAlchemy <.. Admin
 Flask <.. Admin : init_admin(app)
 class BasicAuth
-BasicAuth : /auth.py
+BasicAuth : /admin.py
 BasicAuth : auth = BasicAuth()
-BasicAuth ..> Admin : init_auth(app)
+BasicAuth ..> Admin
 ```
