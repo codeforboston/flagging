@@ -1,6 +1,6 @@
 # Twitter Bot
 
-Every time the website updates, it sends out a tweet.
+Every time the website updates, it sends out a tweet. In order for it to do that though, you need to set up a Twitter account.
 
 ## First Time Setup
 
@@ -21,13 +21,13 @@ Follow these steps to set up the Twitter bot for the first time, such as on a ne
 4. In the code base, use the `VAULT_PASSWORD` to unzip the `vault.7z` manually. You should have a file called `secrets.json`. Open up `secrets.json` in the plaintext editor of your choosing.
 
 ???+ danger
-    Make sure that you delete the unencrpyted, unarchived version of the `secrets.json` file after you are done with it.
+    Make sure that you delete the unencrypted, unarchived version of the `secrets.json` file after you are done with it.
 
 5. Now go back to your browser with the Twitter Developer Portal. At the top of the screen, flip to the `Keys and tokens`. Now it's time to go through the dashboard and get your copy+paste ready. We will be inserting these values into the `secrets.json` (remember to wrap the keys in double quotes `"like this"` when you insert them).
 
-  - The `API Key & Secret` should should go in the corresponding fields for `"api_key": "..."` and `"api_key_secret": "..."`.
-  - The `Bearer Token` should go in the field `"bearer_token": "..."`.
-  - The `Access Token & Secret` should go in the corresponding fields for `"access_token": "..."` and `"access_token_secret": "..."`. _But first, you will need to regenerate the `Access Token & Secret` so that it has both read and write permissions._
+  - The `API Key & Secret` should should go in the corresponding fields for `#!json "api_key": "..."` and `#!json "api_key_secret": "..."`.
+  - The `Bearer Token` should go in the field `#!json "bearer_token": "..."`.
+  - The `Access Token & Secret` should go in the corresponding fields for `#!json "access_token": "..."` and `#!json "access_token_secret": "..."`. _But first, you will need to regenerate the `Access Token & Secret` so that it has both read and write permissions._
 
 ???+ success
     The `secrets.json` file should look something like this, with the ellipses replacing the actual values:

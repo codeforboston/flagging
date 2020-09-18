@@ -53,10 +53,10 @@ And you should be good to go! The functions listed below should be available for
 - **`compose_tweet`** (*() -> str*):
   Generates a message for Twitter that represents the current status of the flagging program (note: this function does not actually send the Tweet to Twitter.com). 
 
-Additionally, Pandas and Numpy are already pre-imported via `import pandas as pd` and `import numpy as np`.
+Additionally, Pandas and Numpy are already pre-imported via `#!python import pandas as pd` and `#!python import numpy as np`.
 
 ???+ tip
-    To add more functions and variables that pre-load in the Flask shell, simply add another entry to the dictionary returned by the function `make_shell_context()` in `flagging_site/app.py:creat_app()`.
+    To add more functions and variables that pre-load in the Flask shell, simply add another entry to the dictionary returned by the function `#!python make_shell_context()` in `flagging_site/app.py:creat_app()`.
     
 ???+ tip
     All of the website's functions can be run in the Flask shell, even those that are not pre-loaded in the shell's global context. All you need to do is import it. For example, let's say you want to get the un-parsed request object from USGS.gov. You can import the function we use and run it like this:
