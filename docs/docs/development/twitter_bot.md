@@ -20,7 +20,7 @@ Follow these steps to set up the Twitter bot for the first time, such as on a ne
 
 4. In the code base, use the `VAULT_PASSWORD` to unzip the `vault.7z` manually. You should have a file called `secrets.json`. Open up `secrets.json` in the plaintext editor of your choosing.
 
-???+ critical
+???+ danger
     Make sure that you delete the unencrpyted, unarchived version of the `secrets.json` file after you are done with it.
 
 5. Now go back to your browser with the Twitter Developer Portal. At the top of the screen, flip to the `Keys and tokens`. Now it's time to go through the dashboard and get your copy+paste ready. We will be inserting these values into the `secrets.json` (remember to wrap the keys in double quotes `"like this"` when you insert them).
