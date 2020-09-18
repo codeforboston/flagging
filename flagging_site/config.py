@@ -149,6 +149,9 @@ class Config:
     developing to test Twitter messages.
     """
 
+    BASIC_AUTH_USERNAME: str = os.getenv('BASIC_AUTH_USERNAME', 'admin')
+    BASIC_AUTH_PASSWORD: str = os.getenv('BASIC_AUTH_PASSWORD', 'password')
+
 
 class ProductionConfig(Config):
     """The Production Config is used for deployment of the website to the
