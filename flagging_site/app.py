@@ -116,7 +116,7 @@ def create_app(config: Optional[Union[Config, str]] = None) -> Flask:
     def make_shell_context():
         import pandas as pd
         import numpy as np
-        from .flask import current_app
+        from flask import current_app
         from .blueprints.flagging import get_data
         from .data import db
         from .data.hobolink import get_live_hobolink_data
