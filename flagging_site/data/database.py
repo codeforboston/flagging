@@ -7,10 +7,12 @@ import pandas as pd
 import re
 from typing import Optional
 from flask import current_app
+from flask import jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_sqlalchemy import declarative_base
 from sqlalchemy.exc import ResourceClosedError
 from psycopg2 import connect
+from dataclasses import dataclass
 
 db = SQLAlchemy()
 Base = declarative_base()
@@ -105,17 +107,22 @@ def update_database():
     model_outs.to_sql('model_outputs', **options)
 
 
+@dataclass
 class boathouses(db.Model):
+    reach: int
+    boathouse: str
+    latitude: float
+    longitude: float
+
     reach = db.Column(db.Integer, unique=False)
     boathouse = db.Column(db.String(255), primary_key=True)
     latitude = db.Column(db.Numeric, unique=False)
     longitude = db.Column(db.Numeric, unique=False)
-    def __repr__(self):
-        return '<Boathouse {}>'.format(self.boathouse)
 
-def get_boathouse_dict():
+
+def get_boathouse_by_reach_dict():
     """
-    Return a dict of boathouses
+    Return a dict of boathouses, indexed by reach
     """
     # return value is an outer dictionary with the reach number as the keys 
     # and the a sub-dict as the values each sub-dict has the string 'boathouses' 
@@ -133,3 +140,11 @@ def get_boathouse_dict():
         boathouse_dict[ bh_out.reach ] = {'boathouses': bh_list}
 
     return boathouse_dict
+
+def get_boathouse_metadata_dict():
+    """
+    Return a dictionary of boathouses' metadata
+    """
+    boathouse_query = (boathouses.query.all())
+    return jsonify({"boathouses" : boathouse_query})
+

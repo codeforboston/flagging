@@ -11,7 +11,7 @@ from ..data.hobolink import get_live_hobolink_data
 from ..data.usgs import get_live_usgs_data
 from ..data.model import process_data
 from ..data.model import latest_model_outputs
-from ..data.database import get_boathouse_dict
+from ..data.database import get_boathouse_by_reach_dict
 
 bp = Blueprint('flagging', __name__)
 
@@ -67,7 +67,7 @@ def index() -> str:
         in df.to_dict(orient='index').items()
     }
 
-    homepage = get_boathouse_dict()
+    homepage = get_boathouse_by_reach_dict()
 
     # verify that the same reaches are in boathouse list and model outputs
     if flags.keys() != homepage.keys():

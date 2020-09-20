@@ -9,6 +9,7 @@ from flask_restful import Api
 from flask_restful import Resource
 from flask import current_app
 from ..data.model import latest_model_outputs
+from ..data.database import get_boathouse_metadata_dict
 
 from flasgger import swag_from
 
@@ -93,3 +94,12 @@ class ReachesApi(Resource):
 
 
 api.add_resource(ReachesApi, '/v1/model')
+
+
+class BoathousesApi(Resource):
+    def get(self):
+        boathouse_metadata_dict = get_boathouse_metadata_dict()
+        return boathouse_metadata_dict
+
+
+api.add_resource(BoathousesApi, '/v1/boathouses')
