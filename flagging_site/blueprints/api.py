@@ -97,6 +97,7 @@ api.add_resource(ReachesApi, '/v1/model')
 
 
 class BoathousesApi(Resource):
+    @swag_from('boathouses_api.yml')
     def get(self):
         boathouse_metadata_dict = get_boathouse_metadata_dict()
         return boathouse_metadata_dict
