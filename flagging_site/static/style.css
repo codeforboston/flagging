@@ -1,79 +1,149 @@
+/***** Start Element Styling *****/
 html {
   font-family: sans-serif;
-  background: #dce9f2;
-  padding: 1rem;
 }
+
 body {
   max-width: 1260px;
   margin: 0 auto;
-  background: white;
+  background: #dce9f2;
 }
+
 h1, h2, h3, h4 {
   color: #27475e;
-  margin: 1rem 0;
 }
+
 a {
   color: #377ba8;
+  text-decoration: none;
 }
+
 hr {
   border: none;
-  border-top: 1px solid lightgray;
+  border-top: thin solid #dce9f2;
 }
+
 p {
   line-height: 25px;
 }
-nav h1 {
-  flex: auto;
-  margin: 0;
-}
-nav h1 a {
-  text-decoration: none;
-  padding: 0.25rem 0.5rem;
-}
-nav ul {
-  display: flex;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-nav ul li a,
-nav ul li span,
-header .action {
-  display: block;
-  padding: 0.5rem;
-}
+
 ul {
   line-height: 25px;
-}
-ul.home-boat-house {
   list-style-type: square;
-  padding-left: 15px;
-  padding-right: 15px;
-  text-align: left;
 }
-section.page-header {
+/***** End Element Styling *****/
+
+/***** Start Common Classes *****/
+.above-fold {
+  /* Everything above the bottom of the screen */
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.centered {
   text-align: center;
-  border-bottom: 1px solid lightgray;
-   padding-bottom: 0.7em;
 }
+
+.non-breaking {
+  display: inline-block;
+}
+/***** End Common Classes *****/
+
+/***** Start Header Section *****/
+.page-header {
+  text-align: center;
+  border-bottom: thin solid #dce9f2;
+  padding: 15px;
+  background: white;
+}
+
 .page-header > header {
   padding: 0.4em 0 0.4em 0;
   text-align: center;
   font-size: 1.5em;
 }
-.content {
-  padding: 0 1rem 1rem;
+
+.header-logo {
+  max-width: 100%;
 }
+/***** End Header Section *****/
+
+/***** Start Content Section *****/
+.content {
+  background: white;
+  padding: 24px;
+  flex-grow: 1;
+}
+
+@media(min-width: 1024px) {
+  .content {
+    padding: 48px 10%;
+  }
+}
+
 .content > header h1 {
   flex: auto;
   margin: 1rem 0 0.25rem 0;
 }
-.flash {
-  margin: 1em 0;
-  padding: 1em;
-  background: #cae6f6;
-  border: 1px solid #377ba8;
+
+.content:last-child {
+  margin-bottom: 0;
 }
+
+.content form {
+  margin: 1em 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.content label {
+  font-weight: bold;
+  margin-bottom: 0.5em;
+}
+
+.content input,
+.content textarea {
+  margin-bottom: 1em;
+}
+
+.content textarea {
+  min-height: 12em;
+  resize: vertical;
+}
+/***** End Content Section *****/
+
+/***** Start Footer Section *****/
+.footer {
+  text-align: center;
+  padding: 3em 1em 3em 1em;
+  font-size: 0.85em;
+  background: white;
+  border-top: thin solid #dce9f2;
+}
+
+.footer p {
+  line-height: normal;
+}
+
+.footer .footer-section:not(:first-child) {
+  padding-top: 30px;
+}
+/***** End Footer *****/
+
+/***** Start Home Page *****/
+.home-boat-house {
+  margin: 5px 0;
+  text-align: left;
+}
+
+.home-reach {
+  border: 1px solid black;
+  border-collapse: collapse;
+  padding: 15px;
+  margin: 0 auto;            
+}
+
 .flag {
   width: 2rem;
   height: auto;
@@ -81,69 +151,4 @@ section.page-header {
   padding-left: 1rem;
   padding-right: 1rem;
 }
-.post > header {
-  display: flex;
-  align-items: flex-end;
-  font-size: 0.85em;
-}
-.post > header > div:first-of-type {
-  flex: auto;
-}
-.post > header h1 {
-  font-size: 1.5em;
-  margin-bottom: 0;
-}
-.post .about {
-  color: slategray;
-  font-style: italic;
-}
-.post .body {
-  white-space: pre-line;
-}
-.content:last-child {
-  margin-bottom: 0;
-}
-.content form {
-  margin: 1em 0;
-  display: flex;
-  flex-direction: column;
-}
-.content label {
-  font-weight: bold;
-  margin-bottom: 0.5em;
-}
-.content input,
-.content textarea {
-  margin-bottom: 1em;
-}
-.footer {
-  padding: 3em 1em 3em 1em;
-  font-size: 0.85em;
-
-}
-.footer > .footer-content {
-  width: 30em;
-  text-align: center;
-  margin: 0 auto;
-}
-.content textarea {
-  min-height: 12em;
-  resize: vertical;
-}
-
-.home-centered{
-  text-align: center;
-}
-.home-reach{
-  border: 1px solid black;
-  border-collapse: collapse;
-  padding: 15px;
-  margin: 0 auto;            
-}
-input.danger {
-  color: #cc2f2e;
-}
-input[type="submit"] {
-  align-self: start;
-  min-width: 10em;
-}
+/***** End Home Page *****/

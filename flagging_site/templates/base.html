@@ -23,32 +23,33 @@
 </head>
 
 <body>
-    <section class="page-header">
-        {% block header %}
-        <img src="{{ url_for('static', filename='images/CRWA_banner_main.jpg') }}" />
-        <header>{{ self.title() }}</header>
-        <div class="navigation">
-            <a href="{{ url_for('flagging.index') }}">Home</a>
-            &nbsp; | &nbsp; <a href="{{ url_for('flagging.about') }}">About</a>
-            &nbsp; | &nbsp; <a href="{{ url_for('flagging.output_model') }}">Detailed Outputs</a>
-            &nbsp; | &nbsp; <a href="{{ url_for('api.index') }}">API</a>
+    <div class="above-fold">
+        <div class="page-header">
+            {% block header %}
+            <img class="header-logo" src="{{ url_for('static', filename='images/CRWA_banner_main.jpg') }}" />
+            <header>{{ self.title() }}</header>
+            <nav>
+                <a href="{{ url_for('flagging.index') }}">Home</a>
+                &nbsp; | &nbsp; <a href="{{ url_for('flagging.about') }}">About</a>
+                &nbsp; | &nbsp; <a href="{{ url_for('flagging.output_model') }}">Detailed Outputs</a>
+                &nbsp; | &nbsp; <a href="{{ url_for('api.index') }}">API</a>
+            </nav>
+            {% endblock %}
         </div>
-        {% endblock %}
-    </section>
-    <section class="content">{% block content %}{% endblock %}</section>
+        <section class="content">{% block content %}{% endblock %}</section>
+    </div>
     <section class="footer">
         {% block footer %}
-        <hr />
-        <div class="footer-content">
-            <strong>Charles River Watershed Association</strong><br />
-            <a href="https://goo.gl/maps/sTNPQ5fLwnV3ja7A7" target="_blank">190 Park Rd, Weston, MA 02493</a><br />
-            <strong>t</strong> (781) 788-0007 &nbsp; &nbsp;
-            <strong>e</strong> <a href="mailto:charles@crwa.org">charles@crwa.org</a><br />
-            <br />
-            This website was built by <a href="https://www.codeforboston.org/" target="_blank">Code for Boston</a> in
-            collaboration with <a href="https://www.crwa.org/">Charles River Watershed Association</a>.<br />
-            <br />
-            Page loaded in {{ g.request_time() }} seconds.
+        <div class="footer-section">
+            <p><strong>Charles River Watershed Association</strong></p>
+            <p><a href="https://goo.gl/maps/sTNPQ5fLwnV3ja7A7" target="_blank">190 Park Rd, Weston, MA 02493</a></p>
+            <p>
+                Phone: <a href="tel:+17817880007">(781) 788-0007</a> &nbsp; &nbsp;
+                Email: <a href="mailto:charles@crwa.org">charles@crwa.org</a>
+            </p>
+        </div>
+        <div class="footer-section">
+            <p>This website was built by <a href="https://www.codeforboston.org/" class="non-breaking" target="_blank">Code for Boston</a> in collaboration with <a href="https://www.crwa.org/" class="non-breaking">Charles River Watershed Association</a>.</p>
         </div>
         {% endblock %}
     </section>
