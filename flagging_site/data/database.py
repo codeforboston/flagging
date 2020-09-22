@@ -108,7 +108,7 @@ def update_database():
 
 
 @dataclass
-class boathouses(db.Model):
+class Boathouses(db.Model):
     reach: int
     boathouse: str
     latitude: float
@@ -130,11 +130,11 @@ def get_boathouse_by_reach_dict():
     boathouse_dict = {}
     
     # outer boathouse loop:  take one reach at a time
-    for bh_out in boathouses.query.distinct(boathouses.reach):
+    for bh_out in Boathouses.query.distinct(Boathouses.reach):
         bh_list = []
         # inner boathouse loop:  get all boathouse names within 
         # the reach (the reach that was selected by outer loop)
-        for bh_in in boathouses.query.filter(boathouses.reach == bh_out.reach).all():
+        for bh_in in Boathouses.query.filter(Boathouses.reach == bh_out.reach).all():
             bh_list.append( bh_in.boathouse )
 
         boathouse_dict[ bh_out.reach ] = {'boathouses': bh_list}
@@ -145,6 +145,6 @@ def get_boathouse_metadata_dict():
     """
     Return a dictionary of boathouses' metadata
     """
-    boathouse_query = (boathouses.query.all())
+    boathouse_query = (Boathouses.query.all())
     return jsonify({"boathouses" : boathouse_query})
 
