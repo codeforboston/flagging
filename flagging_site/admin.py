@@ -1,5 +1,4 @@
 import os
-
 from flask import Flask
 from flask import redirect
 from flask import request
@@ -10,22 +9,41 @@ from flask_admin import expose
 from flask_admin.contrib import sqla
 from werkzeug.exceptions import HTTPException
 
-from .auth import AuthException
-from .auth import basic_auth
-from .data import db
+from flask_basicauth import BasicAuth
+from werkzeug.exceptions import HTTPException
 
+from .data import db
 
 admin = Admin(template_mode='bootstrap3')
 
-def init_admin(app: Flask):
-    with app.app_context():
-        # Register /admin
-        admin.init_app(app)
+basic_auth = BasicAuth()
 
+
+# Taken from https://computableverse.com/blog/flask-admin-using-basicauth
+class AuthException(HTTPException):
+    def __init__(self, message):
+        """HTTP Forbidden error that prompts for login"""
+        super().__init__(message, Response(
+            'You could not be authenticated. Please refresh the page.',
+            status=401,
+            headers={'WWW-Authenticate': 'Basic realm="Login Required"'}
+        ))
+
+
+def init_admin(app: Flask):
+    """Registers the Flask-Admin extensions to the app, and attaches the
+    model views to the admin panel.
+
+    Args:
+        app: A Flask application instance.
+    """
+    basic_auth.init_app(app)
+    admin.init_app(app)
+
+    with app.app_context():
         # Register /admin sub-views
         from .data.cyano_overrides import CyanoOverridesModelView
         admin.add_view(CyanoOverridesModelView(db.session))
-        
         admin.add_view(LogoutView(name="Logout"))
 
 

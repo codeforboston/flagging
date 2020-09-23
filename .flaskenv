@@ -1,1 +1,1 @@
-FLASK_APP=flagging_site
+FLASK_APP="flagging_site:create_app"

@@ -1,7 +1,7 @@
-# Deployment
+# Remote Deployment
 
 ???+ note
-    This guide is an instruction manual on how to deploy the flagging website to internet via Heroku. If you just want to run the website locally, you do not need Heroku. Instead, check out the [development](/development) guide.
+    This guide is an instruction manual on how to deploy the flagging website to the internet via Heroku. If you just want to run the website locally, you do not need Heroku.
 
 The following tools are required to deploy the website:
 
@@ -119,7 +119,7 @@ git remote -v
 ???+ success
     The above command should output something like this:
   
-    ```shell
+    ```
     heroku  https://git.heroku.com/crwa-flagging.git (fetch)
     heroku  https://git.heroku.com/crwa-flagging.git (push)
     origin  https://github.com/YOUR_USERNAME_HERE/flagging.git (fetch)
@@ -133,7 +133,6 @@ git remote -v
 3. Now all of your `heroku` commands are going to require specifying the app, but the steps to deploy in staging are otherwise similar to the production deployment:
 
 
-<<<<<<< HEAD
 === "Windows (CMD)"
     ```shell
     heroku config:set --app crwa-flagging-staging VAULT_PASSWORD=%VAULT_PASSWORD%

@@ -10,24 +10,21 @@ from typing import Dict, Any, Optional, List
 from flask.cli import load_dotenv
 from distutils.util import strtobool
 
+
 # Constants
 # ~~~~~~~~~
 
 ROOT_DIR = os.path.abspath(os.path.dirname(__file__))
 QUERIES_DIR = os.path.join(ROOT_DIR, 'data', 'queries')
 DATA_STORE = os.path.join(ROOT_DIR, 'data', '_store')
-VAULT_FILE = os.path.join(ROOT_DIR, 'vault.zip')
+VAULT_FILE = os.path.join(ROOT_DIR, 'vault.7z')
 
-# Dotenv
-# ~~~~~~
 
-# If you are using a .env file, please double check that it is gitignored.
-# The `.flaskenv` file should not be gitignored, only `.env`.
-# See this for more:
-# https://flask.palletsprojects.com/en/1.1.x/cli/
-load_dotenv(os.path.join(ROOT_DIR, '..', '.flaskenv'))
-load_dotenv(os.path.join(ROOT_DIR, '..', '.env'))
-
+# Load dotenv
+# ~~~~~~~~~~~
+if os.getenv('FLASK_ENV') == 'development':
+    load_dotenv(os.path.join(ROOT_DIR, '..', '.flaskenv'))
+    load_dotenv(os.path.join(ROOT_DIR, '..', '.env'))
 
 # Configs
 # ~~~~~~~
@@ -61,6 +58,13 @@ class Config:
 
     @property
     def SQLALCHEMY_DATABASE_URI(self) -> str:
+        """
+        Returns the URI for the Postgres database.
+
+        Example:
+            >>> Config().SQLALCHEMY_DATABASE_URI
+            'postgres://postgres:password_here@localhost:5432/flagging'
+        """
         user = self.POSTGRES_USER
         password = self.POSTGRES_PASSWORD
         host = self.POSTGRES_HOST
@@ -73,6 +77,9 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS: bool = False
 
     QUERIES_DIR: str = QUERIES_DIR
+    """Directory that contains various queries that are accessible throughout
+    the rest of the code base.
+    """
 
     # ==========================================================================
     # MISC. CUSTOM CONFIG OPTIONS
@@ -87,13 +94,26 @@ class Config:
     wasn't opened. Usually set alongside DEBUG mode.
     """
 
-    KEYS: Dict[str, Dict[str, Any]] = None
-    """These are where the keys from the vault are stored. It should be a dict 
-    of dicts. Each key in the first level dict corresponds to a different
-    service that needs keys / secured credentials stored.
-    
-    Currently, HOBOlink and Flask's `SECRET_KEY` are the two services that pass
-    through the vault.
+    VAULT_PASSWORD: str = os.getenv('VAULT_PASSWORD')
+
+    HOBOLINK_AUTH: dict = {
+       'password': None,
+       'user': None,
+       'token': None
+    }
+    """Note: Do not fill these out manually; the HOBOlink auth gets populated
+    from the vault.
+    """
+
+    TWITTER_AUTH: dict = {
+        'api_key': None,
+        'api_key_secret': None,
+        'access_token': None,
+        'access_token_secret': None,
+        'bearer_token': None
+    }
+    """Note: Do not fill these out manually; the Twitter auth gets populated
+    from the vault.
     """
 
     VAULT_FILE: str = VAULT_FILE
@@ -117,18 +137,20 @@ class Config:
     when doing requests.
     """
 
-    BLUEPRINTS: Optional[List[str]] = None
-    """Names of the blueprints available to the app. We can use this to turn
-    parts of the website off or on depending on if they're fully developed
-    or not. If BLUEPRINTS is `None`, then it imports all the blueprints it can
-    find in the `blueprints` module.
+    API_MAX_HOURS: int = 48
+    """The maximum number of hours of data that the API will return. We are not
+    trying to be stingy about our data, we just want this in order to avoid any
+    odd behaviors if the user requests more data than exists.
     """
 
-    API_MAX_HOURS: int = 48
-    """The maximum number of hours of data that the API will return. We are not trying 
-    to be stingy about our data, we just want this in order to avoid any odd behaviors 
-    if the user requests more data than exists.
+    SEND_TWEETS: bool = strtobool(os.getenv('SEND_TWEETS') or 'false')
+    """If True, the website behaves normally. If False, any time the app would
+    send a Tweet, it does not do so. It is useful to turn this off when
+    developing to test Twitter messages.
     """
+
+    BASIC_AUTH_USERNAME: str = os.getenv('BASIC_AUTH_USERNAME', 'admin')
+    BASIC_AUTH_PASSWORD: str = os.getenv('BASIC_AUTH_PASSWORD', 'password')
 
 
 class ProductionConfig(Config):
@@ -136,11 +158,23 @@ class ProductionConfig(Config):
     internet. Currently the only part of the website that's pretty fleshed out
     is the `flagging` part, so that's the only blueprint we import.
     """
-    BLUEPRINTS: Optional[List[str]] = ['flagging', 'api']
+    SEND_TWEETS: str = True
 
     def __init__(self):
-        self.BASIC_AUTH_USERNAME: str = os.environ['BASIC_AUTH_USERNAME']
-        self.BASIC_AUTH_PASSWORD: str = os.environ['BASIC_AUTH_PASSWORD']
+        """Initializing the production config allows us to ensure the existence
+        of these variables in the environment."""
+        try:
+            self.VAULT_PASSWORD: str = os.environ['VAULT_PASSWORD']
+            self.BASIC_AUTH_USERNAME: str = os.environ['BASIC_AUTH_USERNAME']
+            self.BASIC_AUTH_PASSWORD: str = os.environ['BASIC_AUTH_PASSWORD']
+        except KeyError:
+            msg = (
+                'You did not set all of the environment variables required to '
+                'initiate the app in production mode. If you are deploying '
+                'the website to Heroku, read the Deployment docs page to '
+                'learn how to set env variables in Heroku.'
+            )
+            raise KeyError(msg)
 
 
 class DevelopmentConfig(Config):
@@ -160,8 +194,6 @@ class DevelopmentConfig(Config):
     DEBUG: bool = True
     TESTING: bool = True
     OFFLINE_MODE = strtobool(os.getenv('OFFLINE_MODE') or 'false')
-    BASIC_AUTH_USERNAME: str = os.getenv('BASIC_AUTH_USERNAME', 'admin')
-    BASIC_AUTH_PASSWORD: str = os.getenv('BASIC_AUTH_PASSWORD', 'password')
 
 
 class TestingConfig(Config):
@@ -169,8 +201,6 @@ class TestingConfig(Config):
     website.
     """
     TESTING: bool = True
-    BASIC_AUTH_USERNAME: str = os.getenv('BASIC_AUTH_USERNAME', 'admin')
-    BASIC_AUTH_PASSWORD: str = os.getenv('BASIC_AUTH_PASSWORD', 'password')
 
 
 def get_config_from_env(env: str) -> Config:
@@ -192,7 +222,7 @@ def get_config_from_env(env: str) -> Config:
     config_mapping = {
         'production': ProductionConfig,
         'development': DevelopmentConfig,
-        'testing': TestingConfig
+        'testing': TestingConfig,
     }
     try:
         config = config_mapping[env]

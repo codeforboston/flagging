@@ -3,6 +3,6 @@
 SELECT *
 FROM model_outputs
 WHERE time BETWEEN 
-	(SELECT MAX(time) - interval '47 hours' FROM model_outputs)
-	AND 
-	(SELECT MAX(time) FROM model_outputs)
+    (SELECT MAX(time) - interval '47 hours' FROM model_outputs)
+    AND
+    (SELECT MAX(time) FROM model_outputs)

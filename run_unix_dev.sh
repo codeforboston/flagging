@@ -25,12 +25,9 @@ $PYEXEC -m pip install $(cat requirements.txt | grep -v "psycopg2==")
 # Set up and run the Flask application
 export FLASK_APP=flagging_site:create_app
 export FLASK_ENV=development
+
 read -p "Offline mode? [y/n]: " offline_mode
-export OFFLINE_MODE=${offline_mode}
-read -p "Enter vault password: " vault_pw
-export VAULT_PASSWORD=${vault_pw}
-read -p "Enter Postgres password: " postgres_pw
-export POSTGRES_PASSWORD=${postgres_pw}
+export OFFLINE_MODE=${offline_mode:-${OFFLINE_MODE}}
 
 flask create-db
 flask init-db

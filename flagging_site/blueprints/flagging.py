@@ -9,8 +9,8 @@ from flask import current_app
 from ..data.cyano_overrides import get_currently_overridden_reaches
 from ..data.hobolink import get_live_hobolink_data
 from ..data.usgs import get_live_usgs_data
-from ..data.model import process_data
-from ..data.model import latest_model_outputs
+from ..data.predictive_models import process_data
+from ..data.predictive_models import latest_model_outputs
 from ..data.database import get_boathouse_dict
 
 bp = Blueprint('flagging', __name__)
@@ -36,6 +36,8 @@ def stylize_model_output(df: pd.DataFrame) -> str:
     Returns:
         HTML table.
     """
+    df = df.copy()
+
     def _apply_flag(x: bool) -> str:
         flag_class = 'blue-flag' if x else 'red-flag'
         return f'<span class="{flag_class}">{x}</span>'
@@ -44,7 +46,7 @@ def stylize_model_output(df: pd.DataFrame) -> str:
     df.columns = [i.title().replace('_', ' ') for i in df.columns]
 
     # remove reach number
-    df = df.drop('Reach', 1)
+    df = df.drop(columns=['Reach'])
 
     return df.to_html(index=False, escape=False)
 
@@ -74,7 +76,7 @@ def index() -> str:
         print('ERROR!  the reaches are\'t identical between boathouse list and model outputs!')
 
     for (flag_reach, flag_safe) in flags.items():
-        homepage[flag_reach]['flag']=flag_safe
+        homepage[flag_reach]['flag'] = flag_safe
 
     model_last_updated_time = df['time'].iloc[0]
 

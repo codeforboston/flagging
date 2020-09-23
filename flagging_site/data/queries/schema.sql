@@ -9,9 +9,9 @@ DROP TABLE IF EXISTS hobolink;
 CREATE TABLE IF NOT EXISTS hobolink (
     time            timestamp,
     pressure        decimal,
-    par             decimal, /* photosynthetically active radiation */
+    par             decimal, -- photosynthetically active radiation
     rain            decimal,
-    rh              decimal, /* relative humidity */
+    rh              decimal, -- relative humidity
     dew_point       decimal,
     wind_speed      decimal,
     gust_speed      decimal,
