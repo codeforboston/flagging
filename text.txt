@@ -1,0 +1,1 @@
+postgres://vqbycjflywscak:7a90ac18811c359b0ba66b5d5b20827010da20480a33207b0f05dc25554f8c67@ec2-54-86-57-171.compute-1.amazonaws.com:5432/darm6akv3sd2a1
