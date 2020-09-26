@@ -58,6 +58,24 @@ class Config:
 
     @property
     def SQLALCHEMY_DATABASE_URI(self) -> str:
+<<<<<<< HEAD
+        if (self.OFFLINE_MODE == True):
+            user = self.POSTGRES_USER
+            password = self.POSTGRES_PASSWORD
+            host = self.POSTGRES_HOST
+            port = self.POSTGRES_PORT
+            db = self.POSTGRES_DBNAME
+            return f'postgres://{user}:{password}@{host}:{port}/{db}'
+        else:
+            return 'postgres://yuqwhsktykmrqa:34cec8b5de36ee64db9bbc6e6390e1a9'\
+                'ab961008cfcb1640931cd8199fedd971@ec2-34-232-212-164.compute-1'\
+                '.amazonaws.com:5432/devrsq7prgrrfc'
+    
+    # SQLALCHEMY_DATABASE_URI: str = 'postgres://yuqwhsktykmrqa:34cec8b5de36ee64'\
+    # 'db9bbc6e6390e1a9ab961008cfcb1640931cd8199fedd971@ec2-34-232-212-164.compu'\
+    # 'te-1.amazonaws.com:5432/devrsq7prgrrfc'
+        
+=======
         """
         Returns the URI for the Postgres database.
 
@@ -72,6 +90,7 @@ class Config:
         db = self.POSTGRES_DBNAME
         return f'postgres://{user}:{password}@{host}:{port}/{db}'
 
+>>>>>>> 8aaa6df7a89686ff35dda4c000ac350ed5aed894
     SQLALCHEMY_ECHO: bool = True
     SQLALCHEMY_RECORD_QUERIES: bool = True
     SQLALCHEMY_TRACK_MODIFICATIONS: bool = False
