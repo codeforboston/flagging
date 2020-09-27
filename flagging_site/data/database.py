@@ -76,7 +76,7 @@ def create_db() -> bool:
     # connect to postgres database, get cursor
     conn = connect(
         user=current_app.config['POSTGRES_USER'],
-        password=current_app.config['POSTGRES_PASSOWRD'],
+        password=current_app.config['POSTGRES_PASSWORD'],
         host=current_app.config['POSTGRES_HOST'],
         port=current_app.config['POSTGRES_PORT'],
         dbname='postgres'
