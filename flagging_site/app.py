@@ -5,7 +5,6 @@ import os
 import click
 import time
 import json
-import zipfile
 from typing import Optional
 from typing import Dict
 from typing import Union
@@ -14,6 +13,7 @@ from flask import Flask
 
 import py7zr
 from lzma import LZMAError
+from py7zr.exceptions import PasswordRequired
 
 from .config import Config
 from .config import get_config_from_env
@@ -245,7 +245,7 @@ def update_config_from_vault(app: Flask) -> None:
         )
         # Add 'SECRET_KEY', 'HOBOLINK_AUTH', AND 'TWITTER_AUTH' to the config.
         app.config.update(secrets)
-    except (LZMAError, KeyError):
+    except (LZMAError, PasswordRequired, KeyError):
         msg = 'Unable to load the vault; bad password provided.'
         if app.config.get('VAULT_OPTIONAL'):
             print(f'Warning: {msg}')

@@ -1,0 +1,25 @@
+Endpoint returning json of boathouse metadata
+---
+tags:
+  - Boathouse API
+responses:
+  200:
+    description: Dictionary-like json of the boathouses
+    schema:
+      id: boathouse_metadata_dict
+      type: object
+      properties:
+        boathouses:
+          description:
+          type: array
+          items:
+            type: object
+            properties:
+              boathouse:
+                type: string
+              latitude:
+                type: number
+              longitude:
+                type: number
+              reach:
+                type: integer

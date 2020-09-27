@@ -22,9 +22,11 @@ VAULT_FILE = os.path.join(ROOT_DIR, 'vault.7z')
 
 # Load dotenv
 # ~~~~~~~~~~~
+
 if os.getenv('FLASK_ENV') == 'development':
     load_dotenv(os.path.join(ROOT_DIR, '..', '.flaskenv'))
     load_dotenv(os.path.join(ROOT_DIR, '..', '.env'))
+
 
 # Configs
 # ~~~~~~~
@@ -50,7 +52,7 @@ class Config:
     # ==========================================================================
     # DATABASE CONFIG OPTIONS
     # ==========================================================================
-    POSTGRES_USER: str = os.getenv('POSTGRES_USER', 'postgres')
+    POSTGRES_USER: str = os.getenv('POSTGRES_USER', os.getenv('USER', 'postgres'))
     POSTGRES_PASSWORD: str = os.getenv('POSTGRES_PASSWORD')
     POSTGRES_HOST: str = 'localhost'
     POSTGRES_PORT: int = 5432

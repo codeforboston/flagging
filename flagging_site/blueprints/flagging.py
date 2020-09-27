@@ -12,6 +12,9 @@ from ..data.usgs import get_live_usgs_data
 from ..data.predictive_models import process_data
 from ..data.predictive_models import latest_model_outputs
 from ..data.database import get_boathouse_dict
+from ..data.model import process_data
+from ..data.model import latest_model_outputs
+from ..data.database import get_boathouse_by_reach_dict
 
 bp = Blueprint('flagging', __name__)
 
@@ -69,7 +72,7 @@ def index() -> str:
         in df.to_dict(orient='index').items()
     }
 
-    homepage = get_boathouse_dict()
+    homepage = get_boathouse_by_reach_dict()
 
     # verify that the same reaches are in boathouse list and model outputs
     if flags.keys() != homepage.keys():
@@ -119,8 +122,8 @@ def output_model() -> str:
     #       extract the subset from the df for that reach
     #       then convert that df subset to HTML code
     #       and then add that HTML subset to reach_html_tables
-    for i in df.reach.unique():
-        if (reach==-1 or reach==i):
-            reach_html_tables[i] = stylize_model_output(  df.loc[df['reach'] == i ]  )
-    
+    for i in df['reach'].unique():
+        if (reach == -1 or reach == i):
+            reach_html_tables[i] = stylize_model_output(df.loc[df['reach'] == i ])
+
     return render_template('output_model.html', tables=reach_html_tables)
