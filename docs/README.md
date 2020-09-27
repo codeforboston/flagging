@@ -9,7 +9,7 @@ If you have write permission to the upstream repository (i.e. you are a project 
 ```shell script
 python3 -m venv mkdocs_env
 source mkdocs_env/bin/activate
-pip install mkdocs pymdown-extensions mkdocs-material
+pip install mkdocs pymdown-extensions mkdocs-material pygments
 mkdocs gh-deploy --remote-name upstream
 deactivate
 source ../venv/bin/activate
