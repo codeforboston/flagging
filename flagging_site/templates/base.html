@@ -13,18 +13,23 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta property="og:title" content="CRWA Flagging Website" />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="">
-    <meta property="og:image" content="">
-    <meta name="description" content="Flask App Website Monitoring River Quality">
-    <meta name="keywords" content="CRWA, Charles River, Flagging, Water Quality, E. Coli, Cyanobacteria">
-    <meta name="author" content="CodeForBoston">
     {% block head %}
-    <title>
-        {% block title %}{% endblock %} - CRWA Flagging Program
-    </title>
+    <meta charset="UTF-8">
+    <title>{% block title %}{% endblock %} - CRWA Flagging Program</title>
+    <meta property="og:title" content="CRWA Flagging - {{ self.title() }}" />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="{{ url_for('static', filename='images/CRWA_banner_main.jpg', _external=True) }}">
+    <meta property="og:url" content="{{ request.url }}">
+    <meta property="og:description" content="CRWA program for monitoring the Charles River water quality.">
+    <meta name="twitter:title" content="CRWA Flagging - {{ self.title() }}">
+    <meta name="twitter:description" content="CRWA program for monitoring the Charles River water quality.">
+    <meta name="twitter:image" content="{{ url_for('static', filename='images/CRWA_banner_main.jpg', _external=True) }}">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="crwaflagging">
+    <meta name="twitter:creator" content="codeforboston">
+    <meta name="description" content="Flask App Website Monitoring River Quality">
+    <meta name="og:keywords" content="CRWA, Charles River, Flagging, Water Quality, E. Coli, Cyanobacteria">
+    <meta name="og:author" content="Code for Boston">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
     <link rel="icon" type="image/ico" href="{{ url_for('static', filename='favicon/favicon.ico') }}">
     {% endblock %}
