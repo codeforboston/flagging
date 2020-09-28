@@ -67,6 +67,8 @@ class Config:
             >>> Config().SQLALCHEMY_DATABASE_URI
             'postgres://postgres:password_here@localhost:5432/flagging'
         """
+        if os.getenv('FLASK_ENV') == 'production':
+            return os.getenv('DATABASE_URL')
         user = self.POSTGRES_USER
         password = self.POSTGRES_PASSWORD
         host = self.POSTGRES_HOST
