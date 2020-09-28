@@ -67,8 +67,6 @@ class Config:
             >>> Config().SQLALCHEMY_DATABASE_URI
             'postgres://postgres:password_here@localhost:5432/flagging'
         """
-        if os.getenv('FLASK_ENV') == 'production':
-            return os.getenv('DATABASE_URL')
         user = self.POSTGRES_USER
         password = self.POSTGRES_PASSWORD
         host = self.POSTGRES_HOST
@@ -179,6 +177,10 @@ class ProductionConfig(Config):
                 'learn how to set env variables in Heroku.'
             )
             raise KeyError(msg)
+
+    @property
+    def SQLALCHEMY_DATABASE_URI(self) -> str:
+        return os.getenv('DATABASE_URL')
 
 
 class DevelopmentConfig(Config):
