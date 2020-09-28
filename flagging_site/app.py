@@ -5,11 +5,13 @@ import os
 import click
 import time
 import json
+import decimal
 from typing import Optional
 from typing import Dict
 from typing import Union
 
 from flask import Flask
+from flask.json import JSONEncoder
 
 import py7zr
 from lzma import LZMAError
@@ -72,6 +74,17 @@ def create_app(config: Optional[Union[Config, str]] = None) -> Flask:
     # Register Twitter bot
     from .twitter import init_tweepy
     init_tweepy(app)
+
+    class CustomJSONEncoder(JSONEncoder):
+        """Add support for Decimal types"""
+
+        def default(self, o):
+            if isinstance(o, decimal.Decimal):
+                return float(o)
+            else:
+                return super().default(o)
+
+    app.json_encoder = CustomJSONEncoder
 
     @app.before_request
     def before_request():

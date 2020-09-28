@@ -3,7 +3,6 @@ import pandas as pd
 from flask import Blueprint
 from flask import render_template
 from flask import request
-from flask import Response
 from flask import current_app
 
 from ..data.cyano_overrides import get_currently_overridden_reaches
@@ -11,9 +10,6 @@ from ..data.hobolink import get_live_hobolink_data
 from ..data.usgs import get_live_usgs_data
 from ..data.predictive_models import process_data
 from ..data.predictive_models import latest_model_outputs
-from ..data.database import get_boathouse_dict
-from ..data.model import process_data
-from ..data.model import latest_model_outputs
 from ..data.database import get_boathouse_by_reach_dict
 
 bp = Blueprint('flagging', __name__)

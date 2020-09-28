@@ -168,15 +168,10 @@ def update_database():
 
 @dataclass
 class Boathouses(db.Model):
-    reach: int
-    boathouse: str
-    latitude: float
-    longitude: float
-
-    reach = db.Column(db.Integer, unique=False)
-    boathouse = db.Column(db.String(255), primary_key=True)
-    latitude = db.Column(db.Numeric, unique=False)
-    longitude = db.Column(db.Numeric, unique=False)
+    reach: int = db.Column(db.Integer, unique=False)
+    boathouse: str = db.Column(db.String(255), primary_key=True)
+    latitude: float = db.Column(db.Numeric, unique=False)
+    longitude: float = db.Column(db.Numeric, unique=False)
 
 
 def get_boathouse_by_reach_dict():
