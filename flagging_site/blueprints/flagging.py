@@ -56,7 +56,7 @@ def index() -> str:
     The home page of the website. This page contains a brief description of the
     purpose of the website, and the latest outputs for the flagging model.
     """
-    
+
     df = latest_model_outputs()
     df = df.set_index('reach')
 
@@ -120,6 +120,36 @@ def output_model() -> str:
     #       and then add that HTML subset to reach_html_tables
     for i in df['reach'].unique():
         if (reach == -1 or reach == i):
-            reach_html_tables[i] = stylize_model_output(df.loc[df['reach'] == i ])
+            reach_html_tables[i] = stylize_model_output(df.loc[df['reach'] == i])
 
     return render_template('output_model.html', tables=reach_html_tables)
+
+
+@bp.route('/flags')
+def flags() -> str:
+    # TODO: Update to use combination of Boathouses and the predictive model
+    #  outputs
+    from ..data.predictive_models import reach_2_model
+    from ..data.predictive_models import reach_3_model
+    from ..data.predictive_models import reach_4_model
+    from ..data.predictive_models import reach_5_model
+
+    df = get_data()
+
+    flags_1 = {
+        'Newton Yacht Club': reach_2_model(df, rows=1)['safe'].iloc[0],
+        'Watertown Yacht Club': reach_2_model(df, rows=1)['safe'].iloc[0],
+        'Community Rowing, Inc.': reach_2_model(df, rows=1)['safe'].iloc[0],
+        'Northeastern\'s Henderson Boathouse': reach_2_model(df, rows=1)['safe'].iloc[0],
+        'Paddle Boston at Herter Park': reach_2_model(df, rows=1)['safe'].iloc[0],
+        'Harvard\'s Weld Boathouse': reach_3_model(df, rows=1)['safe'].iloc[0],
+        'Riverside Boat Club': reach_4_model(df, rows=1)['safe'].iloc[0],
+        'Charles River Yacht Club': reach_5_model(df, rows=1)['safe'].iloc[0],
+        'Union Boat Club': reach_5_model(df, rows=1)['safe'].iloc[0],
+        'Community Boating': reach_5_model(df, rows=1)['safe'].iloc[0],
+        'Paddle Boston at Kendall Square': reach_5_model(df, rows=1)['safe'].iloc[0]
+    }
+
+    flags = [flags_1]
+
+    return render_template('flags.html', flags=flags)
