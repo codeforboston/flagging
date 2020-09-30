@@ -1,6 +1,7 @@
 import pandas as pd
 import tweepy
 from flask import Flask
+from flask import current_app
 
 
 tweepy_api = tweepy.API()
