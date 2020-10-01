@@ -50,7 +50,7 @@
                 using Python<br/>
                 <pre class="prettyprint">
                     import pandas as pd
-                    url = "http://127.0.0.1:5000/api/v1/boathouses"
+                    url = "{{ url_for('api.index', _external=True) }}v1/boathouses"
                     data = pd.read_json(url)
                     print(data.head())
                 </pre>
@@ -60,7 +60,8 @@
                 using R
                 <pre class="prettyprint">
                     library(jsonlite)
-                    boathouse_metadata <- fromJSON("http://127.0.0.1:5000/api/v1/boathouses")
+                    url = "{{ url_for('api.index', _external=True) }}v1/boathouses"
+                    boathouse_metadata <- fromJSON(url)
                     
                     print('Print boathouse metadata head')
                     print( head(boathouse_metadata$boathouses) )
