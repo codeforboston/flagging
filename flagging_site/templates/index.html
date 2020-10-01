@@ -7,9 +7,9 @@
     safe for boating at eleven boating locations between Watertown and Boston. Flag colors are based on E. coli and
     cyanobacteria (blue-green algae) levels:
 </p>
-<ul>
+<ul class="flag-explanation">
     <li><font color="navy">Blue</font> flags indicate suitable boating conditions.
-    <li><font color="darkred">Red</font> flags indicate potential health risks. flags indicate potential health risks. Consider avoiding areas where red flags are posted or make sure you wash after boating nearby.</li>
+    <li><font color="darkred">Red</font> flags indicate potential health risks. Consider avoiding areas where red flags are posted or make sure you wash after boating nearby.</li>
 </ul>
 <p>
     CRWA estimates E. coli bacteria levels using models that take into account a variety of environmental factors
@@ -43,11 +43,11 @@
     {% endfor %}
 </table>
 {% for key, value in homepage.items() %}
-<p class="home-centered">
+    <p class="centered">
     <!-- Currently uses time of last row for reach 5 table. Needs unit test to ensure this matches the times for reach 2, 3, and 4 -->
     {% if loop.last %}
     (Last updated: {{model_last_updated_time}})
     {% endif %}
-</p>
+    </p>
 {% endfor %}
 {% endblock %}

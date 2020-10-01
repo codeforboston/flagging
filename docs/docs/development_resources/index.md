@@ -1,3 +1,7 @@
+# Stack
+
+## Project History
+
 Traditionally, the CRWA Flagging Program was hosted on a PHP-built website that hosted a predictive model and ran it. However, that website was out of commission due to some bugs and the CRWA's lack of PHP development resources.
 
 We at Code for Boston attempted to fix the website, although we have had trouble maintaining a steady stream of PHP expertise, so we rebuilt the website from scratch in Python. The project's source code is available [on GitHub](https://github.com/codeforboston/flagging/wiki), and the docs we used for project management and some dev stuff are available in [the repo's wiki](https://github.com/codeforboston/flagging/wiki).

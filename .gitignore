@@ -2,10 +2,13 @@ docs/site/
 .vscode/
 *.code-workspace
 .idea/
-keys.json
 .DS_Store
 Pipfile
 Pipfile.lock
+pgadmin4/
+mkdocs_env/
+secrets.json
+keys.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -145,8 +148,3 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/l
-
-flagging_site/keys.json
-
-# ignore file with database credentials
-flagging_site/data/db_creds.json

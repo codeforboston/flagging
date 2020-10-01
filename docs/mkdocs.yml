@@ -5,19 +5,20 @@ nav:
 - About: about.md
 - Setup: setup.md
 - Admin: admin.md
-- Deployment: deployment.md
-- System: system.md
-- Shell: shell.md
-- Development Background:
-    - History: development/history.md
-    - Learning Resources: development/learning_resources.md
+- Cloud:
+    - Overview: cloud/index.md
+    - Heroku Deployment: cloud/heroku_deployment.md
+    - Twitter Bot: cloud/twitter_bot.md
 - Development:
-    # - Overview: development/index.md
-        # ^ (Explain the vault here too)
+    - Overview: development/index.md
     # - Config: development/config.md
     - Data: development/data.md
     - Predictive Models: development/predictive_models.md
     # - Front-End: development/front-end.md
+- Development Resources:
+    - Overview: development_resources/index.md
+    - Learning Resources: development_resources/learning_resources.md
+    - Shell: development_resources/shell.md
 theme:
   name: material
   palette:
@@ -56,3 +57,5 @@ extra:
     link: https://www.meetup.com/Code-for-Boston/
   - icon: fontawesome/brands/twitter
     link: https://twitter.com/codeforboston
+extra_javascript:
+- https://unpkg.com/mermaid@8.4.6/dist/mermaid.min.js

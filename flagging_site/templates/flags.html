@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+{#
+    This template is for
+#}
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Flags - CRWA Flagging Program</title>
+</head>
+
+<body>
+{% for row in flags %}
+    {% for boathouse, flag in row.items() %}
+
+    <div style="display:inline-block; margin:1em">
+        {% if flag %}
+            <img class="flag" src="{{ url_for('static', filename='images/blue_flag.jpg') }}" />
+        {% else %}
+            <img class="flag" src="{{ url_for('static', filename='images/red_flag.jpg') }}" />
+        {% endif %}
+
+        <br/>
+        <br/>
+        {{ boathouse }}
+    </div>
+    {% endfor %}
+    <br/>
+    <br/>
+    {% endfor %}
+</body>
+</html>
