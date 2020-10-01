@@ -32,7 +32,7 @@ After you run the script for your respective OS, it will ask you if you want to 
 
 After that, it will ask if you have the vault password. If you do, enter it here. If not, you can skip this.
 
-Note that the website will _not_ without either the vault password or offline mode turned on; you must do one or the other.
+Note that the website will _not_ work without either the vault password or offline mode turned on; you must do one or the other.
 
 ## Deploy
 
