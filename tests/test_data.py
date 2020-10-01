@@ -8,6 +8,9 @@ from flagging_site.data.usgs import get_live_usgs_data
 
 
 def test_hobolink_data_is_recent(app):
+    """
+    Tests Hobolink data is recent (within 2 hours)
+    """
     with app.app_context():
         df = get_live_hobolink_data()
         last_timestamp = df['time'].iloc[-1]
@@ -16,6 +19,9 @@ def test_hobolink_data_is_recent(app):
 
 
 def test_usgs_data_is_recent(app):
+    """
+    Tests USGS data is recent (within 2 hours)
+    """
     with app.app_context():
         df = get_live_usgs_data()
         last_timestamp = df['time'].iloc[-1]
