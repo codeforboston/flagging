@@ -34,13 +34,19 @@
             <li>
                 using Python
                 <pre class="prettyprint">
-
+                    import pandas as pd   
+                    url = "http://127.0.0.1:5000/api/v1/model"
+                    model_output = pd.read_json(url)
+                    print(model_output.head())
                 </pre>
             </li>
             <li>
                 using R
                 <pre class="prettyprint">
-
+                    library(jsonlite)
+                    url = "http://127.0.0.1:5000/api/v1/model"
+                    model_output <- fromJSON(url)
+                    print( head(model_output) )
                 </pre>
             </li>
         </ul>
