@@ -138,7 +138,16 @@ After you get everything set up, you should run the website at least once. Te pr
     5. Set up the Postgres database and update it with data.
     6. Run the actual website.
 
-2. For the first prompt, type `y` to run the website in offline mode. For the subsequent two prompts, ++enter++ through them without inputting anything.
+???+ tip
+    If you are receiving any errors related to the Postgres database and you are certain that Postgres is running on your computer, you can modify the `POSTGRES_USERNAME` and `POSTGRES_PASSWORD` environment variables to connect to your local Postgres instance properly.
+
+2. You will be prompted asking if you want to run the website in offline mode. "Offline mode" is a way to run the website with dummy data without accessing the credentials. It is useful for anyone who wants to run a demo of the website regardless of their affiliation with the CRWA or this project. It can also be useful for development purposes.
+
+???+ tip
+    - If you have a working `VAULT_PASSWORD`, type ++n++ -> ++enter++. This runs the website as normal.
+    - If you do _not_ have the `VAULT_PASSWORD`, type ++y++ -> ++enter++ to turn offline mode on.
+
+3. Now just wait for the database to start filling in and for the website to eventually run.
 
 ???+ success
     You should be good if you eventually see something like the following in your terminal:
@@ -151,4 +160,6 @@ After you get everything set up, you should run the website at least once. Te pr
      * Restarting with stat
     ```
 
-3. Point your browser of choice to the URL shown in the terminal output. If everything worked out, the website should be running on your local computer!
+4. Point your browser of choice to the URL shown in the terminal output. If everything worked out, the website should be running on your local computer!
+
+![](img/successful_run.png)
