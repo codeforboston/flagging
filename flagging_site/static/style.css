@@ -133,6 +133,19 @@ nav {
 .footer .footer-section:not(:first-child) {
   padding-top: 30px;
 }
+
+.footer .social {
+  display: inline-block;
+  width: 1.6rem;
+  height: 1.6rem;
+  text-align: center;
+}
+
+.footer .social img:hover {
+  -webkit-transition: all 0.25s;
+  transition: all 0.25s;
+  opacity: .5;
+}
 /***** End Footer *****/
 
 /***** Start Home Page *****/
@@ -155,4 +168,9 @@ nav {
   padding-left: 1rem;
   padding-right: 1rem;
 }
+
+.twitter-tweet {
+  margin: 0 auto;
+}
+
 /***** End Home Page *****/

@@ -64,6 +64,18 @@
         <div class="footer-section">
             <p>This website was built by <a href="https://www.codeforboston.org/" class="non-breaking" target="_blank">Code for Boston</a> in collaboration with <a href="https://www.crwa.org/" class="non-breaking">Charles River Watershed Association</a>.</p>
         </div>
+        <div class="footer-section">
+            <span class="social">
+                <a href="https://twitter.com/crwaflagging">
+                    <img src="{{ url_for('static', filename='images/twitter.svg') }}" />
+                </a>
+            </span> &nbsp;
+            <span class="social">
+                <a href="https://github.com/codeforboston/flagging">
+                    <img src="{{ url_for('static', filename='images/github.svg') }}" />
+                </a>
+            </span> &nbsp;
+        </div>
         {% endblock %}
     </section>
 </body>
