@@ -60,7 +60,7 @@ def compose_tweet() -> str:
         unsafe = ', '.join([str(k) for k, v in flags.items() if v is False])
         msg = (
             'Our predictive model is reporting that the following reaches are '
-            f'unsafe as of {current_time}: {unsafe}.'
+            f'unsafe as of {current_time}: {unsafe}. http://crwa-flagging.herokuapp.com/'
         )
     return msg
 
