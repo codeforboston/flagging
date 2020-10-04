@@ -67,12 +67,15 @@ class Config:
             >>> Config().SQLALCHEMY_DATABASE_URI
             'postgres://postgres:password_here@localhost:5432/flagging'
         """
-        user = self.POSTGRES_USER
-        password = self.POSTGRES_PASSWORD
-        host = self.POSTGRES_HOST
-        port = self.POSTGRES_PORT
-        db = self.POSTGRES_DBNAME
-        return f'postgres://{user}:{password}@{host}:{port}/{db}'
+        if self.OFFLINE_MODE == False:
+            user = self.POSTGRES_USER
+            password = self.POSTGRES_PASSWORD
+            host = self.POSTGRES_HOST
+            port = self.POSTGRES_PORT
+            db = self.POSTGRES_DBNAME
+            return f'postgres://{user}:{password}@{host}:{port}/{db}'
+        else:
+            return os.getenv('DATABASE_URL')
 
     SQLALCHEMY_ECHO: bool = True
     SQLALCHEMY_RECORD_QUERIES: bool = True
