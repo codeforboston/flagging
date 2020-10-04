@@ -43,11 +43,11 @@
     {% endfor %}
 </table>
 {% for key, value in homepage.items() %}
-<p class="centered">
+    <p class="centered">
     <!-- Currently uses time of last row for reach 5 table. Needs unit test to ensure this matches the times for reach 2, 3, and 4 -->
     {% if loop.last %}
     (Last updated: {{model_last_updated_time}})
     {% endif %}
-</p>
+    </p>
 {% endfor %}
 {% endblock %}

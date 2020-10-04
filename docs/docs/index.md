@@ -11,7 +11,14 @@ If the website is already deployed and you want to implement a manual override, 
 
 ## Connecting to Weebly
 
-Work in progress
+The outputs of the model can be exported as an iFrame, which allows the flagging website's live data to be viewed on a statically rendered web page (such as those hosted by Weebly).
+
+To export the model outputs using an iFrame, use the following HTML:
+
+```html
+<div style="position: relative;overflow: hidden;width: 100%;padding-top: 75%">
+<iframe src="{{ flagging_website_url }}/flags" style="position: absolute;top: 0;left: 0;bottom: 0;right: 0; width: 100%; height: 100%"></iframe>
+```
 
 ## For Developers
 

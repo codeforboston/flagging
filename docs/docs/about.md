@@ -4,7 +4,7 @@
 
 Of the many services that the CRWA provides to the greater Boston community, one of those is monitoring whether it is safe to swim and/or boat in the Charles River. The CRWA Flagging Program uses a system of color-coded flags to indicate whether or not the river's water quality is safe for boating at various boating locations between Watertown and Boston. Flag colors are based on E. coli and cyanobacteria (blue-green algae) levels; blue flags indicate suitable boating conditions and red flags indicate potential health risks.
 
-See the website's [about page](https://crwa-flagging.herokuapp.com/about) for more about the website functionality and how it relates to the flagging program's objectives.
+See the website's [about page]({{ flagging_website_url }}/about) for more about the website functionality and how it relates to the flagging program's objectives.
 
 See the [development resources overview](development/history) for more information on how this project started and how we came to make the design decisions that you see here today.
 
