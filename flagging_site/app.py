@@ -138,7 +138,6 @@ def create_app(config: Optional[Union[Config, str]] = None) -> Flask:
         import pandas as pd
         import numpy as np
         from flask import current_app
-        from .blueprints.flagging import get_data
         from .data import db
         from .data.hobolink import get_live_hobolink_data
         from .data.predictive_models import process_data
@@ -150,7 +149,6 @@ def create_app(config: Optional[Union[Config, str]] = None) -> Flask:
             'np': np,
             'app': current_app,
             'db': db,
-            'get_data': get_data,
             'get_live_hobolink_data': get_live_hobolink_data,
             'get_live_usgs_data': get_live_usgs_data,
             'process_data': process_data,

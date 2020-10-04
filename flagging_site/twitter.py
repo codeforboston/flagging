@@ -49,7 +49,11 @@ def compose_tweet() -> str:
         in df.to_dict(orient='index').items()
     }
 
-    current_time = pd.to_datetime('today').strftime('%I:%M:%S %p, %m/%d/%Y')
+    current_time = (
+        pd.Timestamp('now', tz='UTC')
+        .tz_convert('US/Eastern')
+        .strftime('%I:%M:%S %p, %m/%d/%Y')
+    )
 
     if all(i for i in flags.values()):
         msg = (
