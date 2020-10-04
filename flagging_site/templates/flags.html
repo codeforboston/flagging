@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+{#
+    This template is for the flagging iFrame, which is used to embed the flagging model in other websites.
+#}
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Flags - CRWA Flagging Program</title>
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Open+Sans" />
+    <style>
+        body { font-family: Open Sans; font-size: 14px; margin-bottom: 5em; }
+        a { color: #377ba8; text-decoration: none; }
+        .flag-container { display:inline-block; vertical-align: top; margin: 1em;
+                          width: 140px;  height: 190px; margin-bottom: 3em;
+                          margin-right: 1.5em; }
+        .flag-container img { width: 138px; height: 138px; }
+        .last-updated {text-align: center; font-size: 16px; margin-bottom: 0.3em; }
+        .info {text-align: center; font-size: 16px; }
+    </style>
+</head>
+
+<body>
+    {% for reach, data in boathouse_statuses.items() %}
+        {% for boathouse in data['boathouses'] %}
+        <div class="flag-container">
+            {% if data['flag'] %}
+                <img class="flag" src="{{ url_for('static', filename='images/blue_flag.jpg') }}" />
+            {% else %}
+                <img class="flag" src="{{ url_for('static', filename='images/red_flag.jpg') }}" />
+            {% endif %}
+            <br />
+            {{ boathouse }}
+        </div>
+        {% endfor %}
+    {% endfor %}
+
+    <div class="last-updated">
+        ( Last updated: {{ model_last_updated_time }} )
+    </div>
+    <div class="info">
+        <a href="{{ url_for('flagging.index', _external=True) }}" target="_blank">Click here for more information.</a>
+    </div>
+</body>
+</html>

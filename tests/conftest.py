@@ -5,7 +5,7 @@ from flagging_site import create_app
 from flagging_site.config import TestingConfig
 
 
-@pytest.fixture
+@pytest.fixture(scope='session')
 def app():
     """Create and configure a new app instance for each test."""
     if 'VAULT_PASSWORD' not in os.environ:

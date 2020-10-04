@@ -6,26 +6,26 @@ this module is loaded, meaning if you change the env variables _after_ you load
 this module, they won't refresh.
 """
 import os
-from typing import Dict, Any, Optional, List
+import re
 from flask.cli import load_dotenv
+from distutils.util import strtobool
 
 
 # Constants
 # ~~~~~~~~~
 
 ROOT_DIR = os.path.abspath(os.path.dirname(__file__))
+QUERIES_DIR = os.path.join(ROOT_DIR, 'data', 'queries')
 DATA_STORE = os.path.join(ROOT_DIR, 'data', '_store')
-VAULT_FILE = os.path.join(ROOT_DIR, 'vault.zip')
+VAULT_FILE = os.path.join(ROOT_DIR, 'vault.7z')
 
-# Dotenv
-# ~~~~~~
 
-# If you are using a .env file, please double check that it is gitignored.
-# The `.flaskenv` file should not be gitignored, only `.env`.
-# See this for more:
-# https://flask.palletsprojects.com/en/1.1.x/cli/
-load_dotenv(os.path.join(ROOT_DIR, '..', '.flaskenv'))
-load_dotenv(os.path.join(ROOT_DIR, '..', '.env'))
+# Load dotenv
+# ~~~~~~~~~~~
+
+if os.getenv('FLASK_ENV') == 'development':
+    load_dotenv(os.path.join(ROOT_DIR, '..', '.flaskenv'))
+    load_dotenv(os.path.join(ROOT_DIR, '..', '.env'))
 
 
 # Configs
@@ -51,11 +51,40 @@ class Config:
 
     # ==========================================================================
     # DATABASE CONFIG OPTIONS
-    #
-    # Not currently used, but soon we'll want to start using the config to set
-    # up references to the database, data storage, and data retrieval.
     # ==========================================================================
-    DATABASE: str = None
+    POSTGRES_USER: str = os.getenv('POSTGRES_USER', os.getenv('USER', 'postgres'))
+    POSTGRES_PASSWORD: str = os.getenv('POSTGRES_PASSWORD')
+    POSTGRES_HOST: str = 'localhost'
+    POSTGRES_PORT: str = '5432'
+    POSTGRES_DBNAME: str = 'flagging'
+
+    @property
+    def SQLALCHEMY_DATABASE_URI(self) -> str:
+        """
+        Returns the URI for the Postgres database.
+
+        Example:
+            >>> Config().SQLALCHEMY_DATABASE_URI
+            'postgres://postgres:password_here@localhost:5432/flagging'
+        """
+        if self.OFFLINE_MODE == False:
+            user = self.POSTGRES_USER
+            password = self.POSTGRES_PASSWORD
+            host = self.POSTGRES_HOST
+            port = self.POSTGRES_PORT
+            db = self.POSTGRES_DBNAME
+            return f'postgres://{user}:{password}@{host}:{port}/{db}'
+        else:
+            return os.getenv('DATABASE_URL')
+
+    SQLALCHEMY_ECHO: bool = True
+    SQLALCHEMY_RECORD_QUERIES: bool = True
+    SQLALCHEMY_TRACK_MODIFICATIONS: bool = False
+
+    QUERIES_DIR: str = QUERIES_DIR
+    """Directory that contains various queries that are accessible throughout
+    the rest of the code base.
+    """
 
     # ==========================================================================
     # MISC. CUSTOM CONFIG OPTIONS
@@ -70,13 +99,26 @@ class Config:
     wasn't opened. Usually set alongside DEBUG mode.
     """
 
-    KEYS: Dict[str, Dict[str, Any]] = None
-    """These are where the keys from the vault are stored. It should be a dict 
-    of dicts. Each key in the first level dict corresponds to a different
-    service that needs keys / secured credentials stored.
-    
-    Currently, HOBOlink and Flask's `SECRET_KEY` are the two services that pass
-    through the vault.
+    VAULT_PASSWORD: str = os.getenv('VAULT_PASSWORD')
+
+    HOBOLINK_AUTH: dict = {
+       'password': None,
+       'user': None,
+       'token': None
+    }
+    """Note: Do not fill these out manually; the HOBOlink auth gets populated
+    from the vault.
+    """
+
+    TWITTER_AUTH: dict = {
+        'api_key': None,
+        'api_key_secret': None,
+        'access_token': None,
+        'access_token_secret': None,
+        'bearer_token': None
+    }
+    """Note: Do not fill these out manually; the Twitter auth gets populated
+    from the vault.
     """
 
     VAULT_FILE: str = VAULT_FILE
@@ -100,18 +142,20 @@ class Config:
     when doing requests.
     """
 
-    BLUEPRINTS: Optional[List[str]] = None
-    """Names of the blueprints available to the app. We can use this to turn
-    parts of the website off or on depending on if they're fully developed
-    or not. If BLUEPRINTS is `None`, then it imports all the blueprints it can
-    find in the `blueprints` module.
+    API_MAX_HOURS: int = 48
+    """The maximum number of hours of data that the API will return. We are not
+    trying to be stingy about our data, we just want this in order to avoid any
+    odd behaviors if the user requests more data than exists.
     """
 
-    API_MAX_HOURS: int = 48
-    """The maximum number of hours of data that the API will return. We are not trying 
-    to be stingy about our data, we just want this in order to avoid any odd behaviors 
-    if the user requests more data than exists.
+    SEND_TWEETS: bool = strtobool(os.getenv('SEND_TWEETS') or 'false')
+    """If True, the website behaves normally. If False, any time the app would
+    send a Tweet, it does not do so. It is useful to turn this off when
+    developing to test Twitter messages.
     """
+
+    BASIC_AUTH_USERNAME: str = os.getenv('BASIC_AUTH_USERNAME', 'admin')
+    BASIC_AUTH_PASSWORD: str = os.getenv('BASIC_AUTH_PASSWORD', 'password')
 
 
 class ProductionConfig(Config):
@@ -119,7 +163,58 @@ class ProductionConfig(Config):
     internet. Currently the only part of the website that's pretty fleshed out
     is the `flagging` part, so that's the only blueprint we import.
     """
-    BLUEPRINTS: Optional[List[str]] = ['flagging', 'api']
+    SEND_TWEETS: str = True
+
+    def __init__(self):
+        """Initializing the production config allows us to ensure the existence
+        of these variables in the environment."""
+        try:
+            self.VAULT_PASSWORD: str = os.environ['VAULT_PASSWORD']
+            self.BASIC_AUTH_USERNAME: str = os.environ['BASIC_AUTH_USERNAME']
+            self.BASIC_AUTH_PASSWORD: str = os.environ['BASIC_AUTH_PASSWORD']
+        except KeyError:
+            msg = (
+                'You did not set all of the environment variables required to '
+                'initiate the app in production mode. If you are deploying '
+                'the website to Heroku, read the Deployment docs page to '
+                'learn how to set env variables in Heroku.'
+            )
+            raise KeyError(msg)
+
+        # Production does things in reverse: Instead of defining the database
+        # using the POSTGRES_* environment variables, the database is set with
+        # the `DATABASE_URL` (provided automatically by Postgres), and the
+        # POSTGRES_* variables are not used.
+        #
+        # In the rare event that they are needed in production, they are set
+        # to be consistent with the `DATABASE_URL` below:
+        postgres_url_schema = re.compile('''
+            ^
+            postgres://
+            ([^\s:@/]+) # Username
+            :([^\s:@/]+) # Password
+            @([^\s:@/]+) # Host
+            :([^\s:@/]+) # Port
+            /([^\s:@/]*?) # Database
+            $
+        ''', re.VERBOSE)
+        matches = re.search(postgres_url_schema, self.SQLALCHEMY_DATABASE_URI)
+        self.POSTGRES_USER = matches.group(1)
+        self.POSTGRES_PASSWORD = matches.group(2)
+        self.POSTGRES_HOST = matches.group(3)
+        self.POSTGRES_PORT = matches.group(4)
+        self.POSTGRES_DBNAME = matches.group(5)
+
+    @property
+    def SQLALCHEMY_DATABASE_URI(self) -> str:
+        return os.getenv('DATABASE_URL')
+
+
+class StagingConfig(ProductionConfig):
+    """The ProductionConfig is the as the ProductionConfig, except it does not
+    send Tweets unless told to with a `SEND_TWEETS` environment variable.
+    """
+    SEND_TWEETS = strtobool(os.getenv('SEND_TWEETS') or 'false')
 
 
 class DevelopmentConfig(Config):
@@ -138,13 +233,14 @@ class DevelopmentConfig(Config):
     VAULT_OPTIONAL: bool = True
     DEBUG: bool = True
     TESTING: bool = True
-    OFFLINE_MODE = bool(os.getenv('OFFLINE_MODE', 'false'))
+    OFFLINE_MODE = strtobool(os.getenv('OFFLINE_MODE') or 'false')
 
 
 class TestingConfig(Config):
     """The Testing Config is used for unit-testing and integration-testing the
     website.
     """
+    SEND_TWEETS: bool = False
     TESTING: bool = True
 
 
@@ -166,8 +262,9 @@ def get_config_from_env(env: str) -> Config:
     """
     config_mapping = {
         'production': ProductionConfig,
+        'staging': StagingConfig,
         'development': DevelopmentConfig,
-        'testing': TestingConfig
+        'testing': TestingConfig,
     }
     try:
         config = config_mapping[env]

@@ -5,28 +5,31 @@ gauge.
 Link  to the web interface (not the api) 
 https://waterdata.usgs.gov/nwis/uv?site_no=01104500
 """
+import os
 import pandas as pd
 import requests
 from flask import abort
-from .keys import offline_mode
-from .keys import get_data_store_file_path
+from flask import current_app
 
 # Constants
 USGS_URL = 'https://waterservices.usgs.gov/nwis/iv/'
 
-STATIC_FILE_NAME = 'usgs.pickle'
+USGS_STATIC_FILE_NAME = 'usgs.pickle'
 # ~ ~ ~ ~
 
 
 def get_live_usgs_data() -> pd.DataFrame:
-    """This function  runs through the whole process for retrieving data from
-    usgs: first we perform the request, and then we clean the data.
+    """This function runs through the whole process for retrieving data from
+    usgs: first we perform the request, and then we parse the data.
 
     Returns:
         Pandas Dataframe containing the usgs data.
     """
-    if offline_mode():
-        df = pd.read_pickle(get_data_store_file_path(STATIC_FILE_NAME))
+    if current_app.config['OFFLINE_MODE']:
+        fpath = os.path.join(
+            current_app.config['DATA_STORE'], USGS_STATIC_FILE_NAME
+        )
+        df = pd.read_pickle(fpath)
     else:
         res = request_to_usgs()
         df = parse_usgs_data(res)
@@ -34,13 +37,12 @@ def get_live_usgs_data() -> pd.DataFrame:
 
 
 def request_to_usgs() -> requests.models.Response:
-    """
-    Get a request from the USGS.
+    """Get a request from the USGS.
 
     Returns:
         Request Response containing the data from the request.
     """
-    
+
     payload = {
         'format': 'json',
         'sites': '01104500',
@@ -48,7 +50,7 @@ def request_to_usgs() -> requests.models.Response:
         'parameterCd': '00060,00065',
         'siteStatus': 'all'
     }
-    
+
     res = requests.get(USGS_URL, params=payload)
     if res.status_code // 100 in [4, 5]:
         error_msg = 'API request to the USGS endpoint failed with status code '\
@@ -89,7 +91,7 @@ def parse_usgs_data(res) -> pd.DataFrame:
         df['time'] = (
             pd.to_datetime(df['time'])  # Convert to Pandas datetime format
             .dt.tz_localize('UTC')  # This is UTC; define it as such
-            .dt.tz_convert('US/Eastern')  # Take the UTC time and convert to EST
+            .dt.tz_convert('US/Eastern')  # Take UTC time and convert to EST
             .dt.tz_localize(None)  # Remove the timezone from the datetime
         )
     except TypeError:
