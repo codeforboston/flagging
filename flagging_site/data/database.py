@@ -11,10 +11,8 @@ variable `SQLALCHEMY_DATABASE_URI`.
 """
 import os
 import pandas as pd
-import re
 from typing import Optional
 from flask import current_app
-from flask import jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_sqlalchemy import declarative_base
 from sqlalchemy.exc import ResourceClosedError
@@ -127,6 +125,10 @@ def init_db():
         Base.metadata.create_all(db.engine)
 
 
+def database_is_empty():
+    execute_sql('SELECT * FROM asdf')
+
+
 def update_database():
     """This function basically controls all of our data refreshes. The
     following tables are updated in order:
@@ -165,6 +167,8 @@ def update_database():
     model_outs = all_models(df)
     model_outs.to_sql('model_outputs', **options)
 
+    return True
+
 
 @dataclass
 class Boathouses(db.Model):
@@ -189,16 +193,16 @@ def get_boathouse_by_reach_dict():
         # inner boathouse loop:  get all boathouse names within 
         # the reach (the reach that was selected by outer loop)
         for bh_in in Boathouses.query.filter(Boathouses.reach == bh_out.reach).all():
-            bh_list.append( bh_in.boathouse )
+            bh_list.append(bh_in.boathouse)
 
-        boathouse_dict[ bh_out.reach ] = {'boathouses': bh_list}
+        boathouse_dict[bh_out.reach] = {'boathouses': bh_list}
 
     return boathouse_dict
+
 
 def get_boathouse_metadata_dict():
     """
     Return a dictionary of boathouses' metadata
     """
     boathouse_query = (Boathouses.query.all())
-    return jsonify({"boathouses" : boathouse_query})
-
+    return {'boathouses': boathouse_query}

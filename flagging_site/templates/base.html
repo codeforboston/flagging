@@ -18,7 +18,7 @@
     <title>{% block title %}{% endblock %} - CRWA Flagging Program</title>
     <meta property="og:title" content="CRWA Flagging - {{ self.title() }}" />
     <meta property="og:type" content="website" />
-    <meta property="og:image" content="{{ url_for('static', filename='images/CRWA_banner_main.jpg', _external=True) }}">
+    <meta property="og:image" content="{{ url_for('static', filename='images/og_preview.png', _external=True) }}">
     <meta property="og:url" content="{{ request.url }}">
     <meta property="og:description" content="CRWA program for monitoring the Charles River water quality.">
     <meta name="twitter:title" content="CRWA Flagging - {{ self.title() }}">
@@ -63,6 +63,18 @@
         </div>
         <div class="footer-section">
             <p>This website was built by <a href="https://www.codeforboston.org/" class="non-breaking" target="_blank">Code for Boston</a> in collaboration with <a href="https://www.crwa.org/" class="non-breaking">Charles River Watershed Association</a>.</p>
+        </div>
+        <div class="footer-section">
+            <span class="social">
+                <a href="https://twitter.com/crwaflagging">
+                    <img src="{{ url_for('static', filename='images/twitter.svg') }}" />
+                </a>
+            </span> &nbsp;
+            <span class="social">
+                <a href="https://github.com/codeforboston/flagging">
+                    <img src="{{ url_for('static', filename='images/github.svg') }}" />
+                </a>
+            </span>
         </div>
         {% endblock %}
     </section>

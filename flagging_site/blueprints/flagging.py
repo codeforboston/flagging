@@ -6,21 +6,10 @@ from flask import request
 from flask import current_app
 
 from ..data.cyano_overrides import get_currently_overridden_reaches
-from ..data.hobolink import get_live_hobolink_data
-from ..data.usgs import get_live_usgs_data
-from ..data.predictive_models import process_data
 from ..data.predictive_models import latest_model_outputs
 from ..data.database import get_boathouse_by_reach_dict
 
 bp = Blueprint('flagging', __name__)
-
-
-def get_data() -> pd.DataFrame:
-    """Retrieves the processed data that gets plugged into the the model."""
-    df_hobolink = get_live_hobolink_data('code_for_boston_export_21d')
-    df_usgs = get_live_usgs_data()
-    df = process_data(df_hobolink, df_usgs)
-    return df
 
 
 def stylize_model_output(df: pd.DataFrame) -> str:
@@ -50,14 +39,7 @@ def stylize_model_output(df: pd.DataFrame) -> str:
     return df.to_html(index=False, escape=False)
 
 
-@bp.route('/')
-def index() -> str:
-    """
-    The home page of the website. This page contains a brief description of the
-    purpose of the website, and the latest outputs for the flagging model.
-    """
-
-    df = latest_model_outputs()
+def parse_model_outputs(df: pd.DataFrame) -> dict:
     df = df.set_index('reach')
 
     overridden_reaches = get_currently_overridden_reaches()
@@ -68,18 +50,31 @@ def index() -> str:
         in df.to_dict(orient='index').items()
     }
 
-    homepage = get_boathouse_by_reach_dict()
+    boathouse_statuses = get_boathouse_by_reach_dict()
 
     # verify that the same reaches are in boathouse list and model outputs
-    if flags.keys() != homepage.keys():
+    if flags.keys() != boathouse_statuses.keys():
         print('ERROR!  the reaches are\'t identical between boathouse list and model outputs!')
 
-    for (flag_reach, flag_safe) in flags.items():
-        homepage[flag_reach]['flag'] = flag_safe
+    for flag_reach, flag_safe in flags.items():
+        boathouse_statuses[flag_reach]['flag'] = flag_safe
 
+    return boathouse_statuses
+
+
+@bp.route('/')
+def index() -> str:
+    """
+    The home page of the website. This page contains a brief description of the
+    purpose of the website, and the latest outputs for the flagging model.
+    """
+    df = latest_model_outputs()
+    homepage = parse_model_outputs(df)
     model_last_updated_time = df['time'].iloc[0]
 
-    return render_template('index.html', homepage=homepage, model_last_updated_time=model_last_updated_time)
+    return render_template('index.html',
+                           homepage=homepage,
+                           model_last_updated_time=model_last_updated_time)
 
 
 @bp.route('/about')
@@ -129,27 +124,10 @@ def output_model() -> str:
 def flags() -> str:
     # TODO: Update to use combination of Boathouses and the predictive model
     #  outputs
-    from ..data.predictive_models import reach_2_model
-    from ..data.predictive_models import reach_3_model
-    from ..data.predictive_models import reach_4_model
-    from ..data.predictive_models import reach_5_model
+    df = latest_model_outputs()
+    boathouse_statuses = parse_model_outputs(df)
+    model_last_updated_time = df['time'].iloc[0]
 
-    df = get_data()
-
-    flags_1 = {
-        'Newton Yacht Club': reach_2_model(df, rows=1)['safe'].iloc[0],
-        'Watertown Yacht Club': reach_2_model(df, rows=1)['safe'].iloc[0],
-        'Community Rowing, Inc.': reach_2_model(df, rows=1)['safe'].iloc[0],
-        'Northeastern\'s Henderson Boathouse': reach_2_model(df, rows=1)['safe'].iloc[0],
-        'Paddle Boston at Herter Park': reach_2_model(df, rows=1)['safe'].iloc[0],
-        'Harvard\'s Weld Boathouse': reach_3_model(df, rows=1)['safe'].iloc[0],
-        'Riverside Boat Club': reach_4_model(df, rows=1)['safe'].iloc[0],
-        'Charles River Yacht Club': reach_5_model(df, rows=1)['safe'].iloc[0],
-        'Union Boat Club': reach_5_model(df, rows=1)['safe'].iloc[0],
-        'Community Boating': reach_5_model(df, rows=1)['safe'].iloc[0],
-        'Paddle Boston at Kendall Square': reach_5_model(df, rows=1)['safe'].iloc[0]
-    }
-
-    flags = [flags_1]
-
-    return render_template('flags.html', flags=flags)
+    return render_template('flags.html',
+                           boathouse_statuses=boathouse_statuses,
+                           model_last_updated_time=model_last_updated_time)
