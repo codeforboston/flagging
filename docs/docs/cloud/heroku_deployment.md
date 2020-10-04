@@ -43,7 +43,13 @@ heroku git:remote -a crwa-flagging
 heroku config:set VAULT_PASSWORD=vault_password_goes_here -a crwa-flagging
 ```
 
-4. Add a `BASIC_AUTH_USERNAME` and `BASIC_AUTH_PASSWORD` for the admin panel. The username can be whatever you want; e.g. `admin` does the trick. The password should be hard to guess.
+4. You need to setup the `FLASK_ENV` environment variable. This is mainly used for the scheduler and other potential add-ons as a way to ensure that the production config is always being used.
+
+```shell
+heroku config:set FLASK_ENV=production -a crwa-flagging
+```
+
+5. Add a `BASIC_AUTH_USERNAME` and `BASIC_AUTH_PASSWORD` for the admin panel. The username can be whatever you want; e.g. `admin` does the trick. The password should be hard to guess.
 
 ```shell
 heroku config:set BASIC_AUTH_USERNAME=admin -a crwa-flagging
@@ -53,7 +59,7 @@ heroku config:set BASIC_AUTH_PASSWORD=admin_password_goes_here -a crwa-flagging
 ???+ danger
     The password should be _unique_ to this platform, not a universal password you use for everything. The password is _not_ encrypted when stoerd, and it is visible to anyone who has access to the Heroku dashboard.
 
-5. Add some Heroku add-ons.
+6. Add some Heroku add-ons.
 
 ```shell
 heroku addons:create scheduler -a crwa-flagging
@@ -74,7 +80,7 @@ heroku addons:create heroku-postgresql -a crwa-flagging
     In the above case, `postgresql-ukulele-12345` is the "name" of the PostgreSQL add-on's dyno. We will be using this name in the next step.
 
 
-6. Push your local copy of the flagging database to the cloud. In the following command, replace `postgresql-ukulele-12345` with whatever the name of your PostgreSQL dyno is, which should have output from the previous step.
+7. Push your local copy of the flagging database to the cloud. In the following command, replace `postgresql-ukulele-12345` with whatever the name of your PostgreSQL dyno is, which should have output from the previous step.
 
 ```shell
 heroku pg:push flagging postgresql-ukulele-12345 -a crwa-flagging
@@ -83,19 +89,19 @@ heroku pg:push flagging postgresql-ukulele-12345 -a crwa-flagging
 ???+ note
     The above command assumes that your local Postgres database is up-to-date.
 
-7. Deploy the app.
+8. Deploy the app.
 
 ```shell
 git push heroku master
 ```
 
-8. Now try the following:
+9. Now try the following:
 
 ```shell
-heroku logs --tail
+heroku logs --tail -a crwa-flagging
 ```
 
-9. If everything worked out, you should see the following at or near the bottom of the log:
+10. If everything worked out, you should see the following at or near the bottom of the log:
 
 ```
 2020-06-13T23:17:54.000000+00:00 app[api]: Build succeeded
@@ -104,15 +110,15 @@ heroku logs --tail
 ???+ note
     If you see instead see something like `[...] State changed from starting to crashed`, then read the rest of the output to see what happened. The most common error when deploying to production will be a `RuntimeError: Unable to load the vault; bad password provided` which is self-explanatory. Update the password, and the website will automatically attempt to redeploy. If you don't see that error, then try to self-diagnose.
 
-10. Go see the website for yourself!
+11. Go see the website for yourself!
 
-11. You are still not done; you need to do one more step, which is to set up the task scheduler. Run the following command:
+12. You are still not done; you need to do one more step, which is to set up the task scheduler. Run the following command:
 
 ```shell
 heroku addons:open scheduler -a crwa-flagging
 ```
 
-12. The above command should open up a new window in your browser that lets you add a command that runs on a schedule. That command you set should be `python3 -m flask update-website`, and you should run it once a day at 11:00 AM UTC:
+13. The above command should open up a new window in your browser that lets you add a command that runs on a schedule. That command you set should be `python3 -m flask update-website`, and you should run it once a day at 11:00 AM UTC:
 
 ![](../img/scheduler_config.png)
 
