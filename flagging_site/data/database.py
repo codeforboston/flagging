@@ -169,6 +169,8 @@ def update_database():
     model_outs = all_models(df)
     model_outs.to_sql('model_outputs', **options)
 
+    return True
+
 
 @dataclass
 class Boathouses(db.Model):
