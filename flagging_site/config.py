@@ -178,6 +178,10 @@ class ProductionConfig(Config):
             )
             raise KeyError(msg)
 
+    @property
+    def SQLALCHEMY_DATABASE_URI(self):
+        return os.getenv('DATABASE_URL')
+
 
 class DevelopmentConfig(Config):
     """The Development Config is used for running the website on your own

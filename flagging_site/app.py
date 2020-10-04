@@ -112,17 +112,22 @@ def create_app(config: Optional[Union[Config, str]] = None) -> Flask:
     def update_db_command():
         """Update the database with the latest live data."""
         from .data.database import update_database
-        update_database()
+        updated = update_database()
         click.echo('Updated the database.')
+        if not updated:
+            click.echo('Note: while updating database, the predictive model '
+                       'did not run.')
+        return updated
 
     @app.cli.command('update-website')
     @click.pass_context
     def update_website_command(ctx):
         """Updates the database, then Tweets a message."""
-        ctx.invoke(update_db_command)
-        from .twitter import tweet_current_status
-        msg = tweet_current_status()
-        click.echo(f'Sent out tweet: {msg!r}')
+        updated = ctx.invoke(update_db_command)
+        if updated:
+            from .twitter import tweet_current_status
+            msg = tweet_current_status()
+            click.echo(f'Sent out tweet: {msg!r}')
 
     # Make a few useful functions available in Flask shell without imports
     @app.shell_context_processor
