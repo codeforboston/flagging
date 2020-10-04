@@ -9,6 +9,7 @@ from ..admin import AdminModelView
 from .database import Base
 from .database import execute_sql_from_file
 
+
 class CyanoOverrides(Base):
     __tablename__ = 'cyano_overrides'
     reach = Column(Integer, primary_key=True)

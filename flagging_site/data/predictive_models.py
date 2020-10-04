@@ -36,6 +36,8 @@ https://www.mass.gov/files/documents/2016/08/tz/36wqara.pdf
 import numpy as np
 import pandas as pd
 
+MODEL_VERSION = '2020'
+
 SIGNIFICANT_RAIN = 0.2
 SAFETY_THRESHOLD = 0.65
 
@@ -265,7 +267,7 @@ def all_models(df: pd.DataFrame, *args, **kwargs):
     return out
 
 
-def latest_model_outputs(hours: int = 1) -> dict:
+def latest_model_outputs(hours: int = 1) -> pd.DataFrame:
     from .database import execute_sql_from_file
 
     if hours == 1:

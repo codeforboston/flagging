@@ -6,6 +6,7 @@ import click
 import time
 import json
 import decimal
+import datetime
 from typing import Optional
 from typing import Dict
 from typing import Union
@@ -81,6 +82,8 @@ def create_app(config: Optional[Union[Config, str]] = None) -> Flask:
         def default(self, o):
             if isinstance(o, decimal.Decimal):
                 return float(o)
+            elif isinstance(o, datetime.date):
+                return o.isoformat()
             else:
                 return super().default(o)
 
@@ -173,11 +176,11 @@ def init_swagger(app: Flask):
         'headers': [],
         'specs': [
             {
-                'endpoint': 'reach_api',
-                'route': '/api/reach_api.json',
+                'endpoint': 'flagging_api',
+                'route': '/api/flagging_api.json',
                 'rule_filter': lambda rule: True,  # all in
                 'model_filter': lambda tag: True,  # all in
-            }
+            },
         ],
         'static_url_path': '/flasgger_static',
         # 'static_folder': '/static/flasgger',
