@@ -114,7 +114,7 @@ echo "VAULT_PASSWORD=vault_password_here" > .env
 ???+ note
     From here on in the documentation, each terminal command assumes your terminal's working directory is pointed toward the `flagging` directory.
 
-After you get everything set up, you should run the website at least once. Te process of running the website installs the remaining dependencies, and sets up a virtual environment to work in.
+After you get everything set up, you should run the website at least once. The process of running the website installs the remaining dependencies, and sets up a virtual environment to work in.
 
 1. Run the following:
 
