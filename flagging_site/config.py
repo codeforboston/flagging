@@ -1,7 +1,7 @@
 """Configurations for the website.
 
 Be careful with any config variables that reference the system environment, e.g.
-OFFLINE_MODE when it loads from `os.getenv`. These values are filled in when
+USE_MOCK_DATA when it loads from `os.getenv`. These values are filled in when
 this module is loaded, meaning if you change the env variables _after_ you load
 this module, they won't refresh.
 """
@@ -124,7 +124,7 @@ class Config:
     importing from config.py.
     """
 
-    OFFLINE_MODE: bool = False
+    USE_MOCK_DATA: bool = False
     """If Offline Mode is turned on, the data used when performing requests will
     be a static pickled version of the data instead of actively pulled from HTTP
     requests.
@@ -230,7 +230,7 @@ class DevelopmentConfig(Config):
     VAULT_OPTIONAL: bool = True
     DEBUG: bool = True
     TESTING: bool = True
-    OFFLINE_MODE = strtobool(os.getenv('OFFLINE_MODE') or 'false')
+    USE_MOCK_DATA = strtobool(os.getenv('USE_MOCK_DATA') or 'false')
 
 
 class TestingConfig(Config):
