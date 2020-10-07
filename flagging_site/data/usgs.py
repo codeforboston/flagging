@@ -25,7 +25,7 @@ def get_live_usgs_data() -> pd.DataFrame:
     Returns:
         Pandas Dataframe containing the usgs data.
     """
-    if current_app.config['OFFLINE_MODE']:
+    if current_app.config['USE_MOCK_DATA']:
         fpath = os.path.join(
             current_app.config['DATA_STORE'], USGS_STATIC_FILE_NAME
         )

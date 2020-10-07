@@ -141,11 +141,11 @@ After you get everything set up, you should run the website at least once. Te pr
 ???+ tip
     If you are receiving any errors related to the Postgres database and you are certain that Postgres is running on your computer, you can modify the `POSTGRES_USERNAME` and `POSTGRES_PASSWORD` environment variables to connect to your local Postgres instance properly.
 
-2. You will be prompted asking if you want to run the website in offline mode. "Offline mode" is a way to run the website with dummy data without accessing the credentials. It is useful for anyone who wants to run a demo of the website regardless of their affiliation with the CRWA or this project. It can also be useful for development purposes.
+2. You will be prompted asking if you want to run the website with mock data. The `USE_MOCK_DATA` variable is a way to run the website with dummy data without accessing the credentials. It is useful for anyone who wants to run a demo of the website regardless of their affiliation with the CRWA or this project. It has also been useful for development purposes in the past for us.
 
 ???+ tip
     - If you have a working `VAULT_PASSWORD`, type ++n++ -> ++enter++. This runs the website as normal.
-    - If you do _not_ have the `VAULT_PASSWORD`, type ++y++ -> ++enter++ to turn offline mode on.
+    - If you do _not_ have the `VAULT_PASSWORD`, type ++y++ -> ++enter++ to turn on mock data.
 
 3. Now just wait for the database to start filling in and for the website to eventually run.
 
