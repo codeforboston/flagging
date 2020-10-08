@@ -1,4 +1,5 @@
 import os
+from inspect import cleandoc
 from flask import Flask
 from flask import redirect
 from flask import request
@@ -45,6 +46,9 @@ def init_admin(app: Flask):
         from .data.cyano_overrides import CyanoOverridesModelView
         admin.add_view(CyanoOverridesModelView(db.session))
         admin.add_view(LogoutView(name="Logout"))
+
+    # Add an endpoint to the app that lets the database be updated manually.
+    app.add_url_rule('/admin/update_db', 'admin.update_db', update_database_manually)
 
 
 # Adapted from https://computableverse.com/blog/flask-admin-using-basicauth
@@ -116,3 +120,30 @@ class LogoutView(BaseView):
                 status=401
             )
         )
+
+
+def update_database_manually():
+    """When this function is called, the database updates. This function is
+    designed to be available in the app during runtime, and is protected by
+    BasicAuth so that only administrators can run it.
+    """
+    if not basic_auth.authenticate():
+        raise AuthException('Not authenticated. Refresh the page.')
+
+    # If auth passed, then update database.
+    from .data.database import update_database
+    update_database()
+
+    # Notify the user that the update was successful, then redirect:
+    return '''<!DOCTYPE html>
+        <html>
+            <body>
+                <script>
+                    setTimeout(function(){
+                        window.location.href = '/';
+                    }, 5000);
+                </script>
+                <p>Databases updated. Redirecting in 5 seconds...</p>
+            </body>
+        </html>
+    '''
