@@ -23,6 +23,6 @@ unsafe on the main website, regardless of the model data.
 
 ## Update Database Manually
 
-Going to `/admin/update_db` will update the database manually. (If you have not yet been authenticated, you will be asked to enter your credentials.)
+Going to `/admin/update-db` will update the database manually. (If you have not yet been authenticated, you will be asked to enter your credentials.)
 
 Be patient, as updating the database will take a few moments. If the database updates succesfully, you will see a message indicating that the update worked, and you will be redirected to the home page.

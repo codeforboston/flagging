@@ -48,7 +48,7 @@ def init_admin(app: Flask):
         admin.add_view(LogoutView(name="Logout"))
 
     # Add an endpoint to the app that lets the database be updated manually.
-    app.add_url_rule('/admin/update_db', 'admin.update_db', update_database_manually)
+    app.add_url_rule('/admin/update-db', 'admin.update_db', update_database_manually)
 
 
 # Adapted from https://computableverse.com/blog/flask-admin-using-basicauth
