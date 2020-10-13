@@ -35,9 +35,9 @@
             </ul>
         </td>
         {% if reach.flag %}
-        <td class="home-reach"><img class="flag" src="{{ url_for('static', filename='images/blue_flag.jpg') }}" /></td>
+        <td class="home-reach flag"><img class="flag" src="{{ url_for('static', filename='images/blue_flag.jpg') }}" /></td>
         {% else %}
-        <td><img class="flag home_reach" src="{{ url_for('static', filename='images/red_flag.jpg') }}" /></td>
+        <td class="home-reach flag"><img class="flag" src="{{ url_for('static', filename='images/red_flag.jpg') }}" /></td>
         {% endif %}
     </tr>
     {% endfor %}

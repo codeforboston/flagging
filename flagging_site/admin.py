@@ -41,14 +41,15 @@ def init_admin(app: Flask):
     basic_auth.init_app(app)
     admin.init_app(app)
 
+    # Add an endpoint to the app that lets the database be updated manually.
+    # app.add_url_rule('/admin/update-db', 'admin.update_db', update_database_manually)
+
     with app.app_context():
         # Register /admin sub-views
-        from .data.cyano_overrides import CyanoOverridesModelView
-        admin.add_view(CyanoOverridesModelView(db.session))
-        admin.add_view(LogoutView(name="Logout"))
-
-    # Add an endpoint to the app that lets the database be updated manually.
-    app.add_url_rule('/admin/update-db', 'admin.update_db', update_database_manually)
+        from .data.cyano_overrides import ManualOverridesModelView
+        admin.add_view(ManualOverridesModelView(db.session))
+        admin.add_view(DatabaseView(name='Update Database', endpoint='update-db', category='Database'))
+        admin.add_view(LogoutView(name='Logout'))
 
 
 # Adapted from https://computableverse.com/blog/flask-admin-using-basicauth
@@ -122,28 +123,30 @@ class LogoutView(BaseView):
         )
 
 
-def update_database_manually():
-    """When this function is called, the database updates. This function is
-    designed to be available in the app during runtime, and is protected by
-    BasicAuth so that only administrators can run it.
-    """
-    if not basic_auth.authenticate():
-        raise AuthException('Not authenticated. Refresh the page.')
+class DatabaseView(BaseView):
+    @expose('/')
+    def update_db(self):
+        """When this function is called, the database updates. This function is
+        designed to be available in the app during runtime, and is protected by
+        BasicAuth so that only administrators can run it.
+        """
+        if not basic_auth.authenticate():
+            raise AuthException('Not authenticated. Refresh the page.')
 
-    # If auth passed, then update database.
-    from .data.database import update_database
-    update_database()
+        # If auth passed, then update database.
+        from .data.database import update_database
+        update_database()
 
-    # Notify the user that the update was successful, then redirect:
-    return '''<!DOCTYPE html>
-        <html>
-            <body>
-                <script>
-                    setTimeout(function(){
-                        window.location.href = '/';
-                    }, 5000);
-                </script>
-                <p>Databases updated. Redirecting in 5 seconds...</p>
-            </body>
-        </html>
-    '''
+        # Notify the user that the update was successful, then redirect:
+        return '''<!DOCTYPE html>
+            <html>
+                <body>
+                    <script>
+                        setTimeout(function(){
+                            window.location.href = '/admin/';
+                        }, 3000);
+                    </script>
+                    <p>Databases updated. Redirecting in 3 seconds...</p>
+                </body>
+            </html>
+        '''

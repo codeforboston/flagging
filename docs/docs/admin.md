@@ -3,7 +3,7 @@
 ## Admin Panel
 
 ???+ Note
-    This section discusses how to use the admin panel for the website. For how to set up the admin page username and password during deployment, see the [Heroku deployment](cloud/heroku_deployment) documentation.
+    This section discusses how to use the admin panel for the website. For how to set up the admin page username and password during deployment, see the [Heroku deployment](cloud/heroku_deployment.md) documentation.
 
 The admin panel is used to manually override the model outputs during events and advisories that would adversely effect the river quality.
 
