@@ -202,3 +202,8 @@ def get_boathouse_metadata_dict():
     boathouse_query = (Boathouses.query.all())
     return jsonify({"boathouses" : boathouse_query})
 
+def get_latest_time():
+    """
+    Returns the latest time in the processed data
+    """
+    return execute_sql('SELECT MAX(time) FROM processed_data;').iloc[0]['max']
