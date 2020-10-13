@@ -42,12 +42,25 @@
     </tr>
     {% endfor %}
 </table>
-{% for key, value in homepage.items() %}
-    <p class="centered">
-    <!-- Currently uses time of last row for reach 5 table. Needs unit test to ensure this matches the times for reach 2, 3, and 4 -->
-    {% if loop.last %}
-    (Last updated: {{model_last_updated_time}})
-    {% endif %}
-    </p>
-{% endfor %}
+    {% for key, value in homepage.items() %}
+        <p class="centered">
+            {% if loop.last %}
+            (Last updated: {{model_last_updated_time}})
+            {% endif %}
+        </p>
+    {% endfor %}
+<h2>Stay Updated</h2>
+<p>
+    The best way to keep up with the CRWA flagging updates is to <a href="https://www.crwa.org/flagging-program.html">sign
+    up for email alerts</a>. Email communications from the CRWA are the official source for status updates relating to
+    the Charles River.
+</p>
+<p>
+    You can also <a href="https://twitter.com/crwaflagging">follow the CRWA Flagging Program on Twitter</a> to get
+    automated updates from this website. Our Twitterr bot posts automatic updates every time the predictive model is run.
+</p>
+<div class="centered">
+    <a class="twitter-timeline" data-lang="en" data-width="400" data-height="400" href="https://twitter.com/crwaflagging?ref_src=twsrc%5Etfw">Tweets by crwaflagging</a>
+    <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+</div>
 {% endblock %}

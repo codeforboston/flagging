@@ -6,6 +6,7 @@ import click
 import time
 import json
 import decimal
+import datetime
 from typing import Optional
 from typing import Dict
 from typing import Union
@@ -81,6 +82,8 @@ def create_app(config: Optional[Union[Config, str]] = None) -> Flask:
         def default(self, o):
             if isinstance(o, decimal.Decimal):
                 return float(o)
+            elif isinstance(o, datetime.date):
+                return o.isoformat()
             else:
                 return super().default(o)
 
@@ -112,17 +115,22 @@ def create_app(config: Optional[Union[Config, str]] = None) -> Flask:
     def update_db_command():
         """Update the database with the latest live data."""
         from .data.database import update_database
-        update_database()
+        updated = update_database()
         click.echo('Updated the database.')
+        if not updated:
+            click.echo('Note: while updating database, the predictive model '
+                       'did not run.')
+        return updated
 
     @app.cli.command('update-website')
     @click.pass_context
     def update_website_command(ctx):
         """Updates the database, then Tweets a message."""
-        ctx.invoke(update_db_command)
-        from .twitter import tweet_current_status
-        msg = tweet_current_status()
-        click.echo(f'Sent out tweet: {msg!r}')
+        updated = ctx.invoke(update_db_command)
+        if updated:
+            from .twitter import tweet_current_status
+            msg = tweet_current_status()
+            click.echo(f'Sent out tweet: {msg!r}')
 
     # Make a few useful functions available in Flask shell without imports
     @app.shell_context_processor
@@ -130,7 +138,6 @@ def create_app(config: Optional[Union[Config, str]] = None) -> Flask:
         import pandas as pd
         import numpy as np
         from flask import current_app
-        from .blueprints.flagging import get_data
         from .data import db
         from .data.hobolink import get_live_hobolink_data
         from .data.predictive_models import process_data
@@ -142,7 +149,6 @@ def create_app(config: Optional[Union[Config, str]] = None) -> Flask:
             'np': np,
             'app': current_app,
             'db': db,
-            'get_data': get_data,
             'get_live_hobolink_data': get_live_hobolink_data,
             'get_live_usgs_data': get_live_usgs_data,
             'process_data': process_data,
@@ -168,11 +174,11 @@ def init_swagger(app: Flask):
         'headers': [],
         'specs': [
             {
-                'endpoint': 'reach_api',
-                'route': '/api/reach_api.json',
+                'endpoint': 'flagging_api',
+                'route': '/api/flagging_api.json',
                 'rule_filter': lambda rule: True,  # all in
                 'model_filter': lambda tag: True,  # all in
-            }
+            },
         ],
         'static_url_path': '/flasgger_static',
         # 'static_folder': '/static/flasgger',

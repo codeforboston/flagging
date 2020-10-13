@@ -7,10 +7,13 @@ import pytest
         ('/', 200),
         ('/about', 200),
         ('/output_model', 200),
+        ('/flags', 200),
         ('/api/', 200),
         ('/api/docs', 200),
         ('/api/v1/model', 200),
-        ('/api/v1/model?reach=4&hours=20', 200)
+        ('/api/v1/model?reach=4&hours=20', 200),
+        ('/api/v1/boathouses', 200),
+        ('/api/v1/model_input_data', 200),
     ]
 )
 def test_pages(client, page, result):

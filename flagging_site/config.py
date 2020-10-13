@@ -6,7 +6,7 @@ this module is loaded, meaning if you change the env variables _after_ you load
 this module, they won't refresh.
 """
 import os
-from typing import Dict, Any, Optional, List
+import re
 from flask.cli import load_dotenv
 from distutils.util import strtobool
 
@@ -55,7 +55,7 @@ class Config:
     POSTGRES_USER: str = os.getenv('POSTGRES_USER', os.getenv('USER', 'postgres'))
     POSTGRES_PASSWORD: str = os.getenv('POSTGRES_PASSWORD')
     POSTGRES_HOST: str = 'localhost'
-    POSTGRES_PORT: int = 5432
+    POSTGRES_PORT: str = '5432'
     POSTGRES_DBNAME: str = 'flagging'
 
     @property
@@ -178,6 +178,41 @@ class ProductionConfig(Config):
             )
             raise KeyError(msg)
 
+        # Production does things in reverse: Instead of defining the database
+        # using the POSTGRES_* environment variables, the database is set with
+        # the `DATABASE_URL` (provided automatically by Postgres), and the
+        # POSTGRES_* variables are not used.
+        #
+        # In the rare event that they are needed in production, they are set
+        # to be consistent with the `DATABASE_URL` below:
+        postgres_url_schema = re.compile('''
+            ^
+            postgres://
+            ([^\s:@/]+) # Username
+            :([^\s:@/]+) # Password
+            @([^\s:@/]+) # Host
+            :([^\s:@/]+) # Port
+            /([^\s:@/]*?) # Database
+            $
+        ''', re.VERBOSE)
+        matches = re.search(postgres_url_schema, self.SQLALCHEMY_DATABASE_URI)
+        self.POSTGRES_USER = matches.group(1)
+        self.POSTGRES_PASSWORD = matches.group(2)
+        self.POSTGRES_HOST = matches.group(3)
+        self.POSTGRES_PORT = matches.group(4)
+        self.POSTGRES_DBNAME = matches.group(5)
+
+    @property
+    def SQLALCHEMY_DATABASE_URI(self) -> str:
+        return os.getenv('DATABASE_URL')
+
+
+class StagingConfig(ProductionConfig):
+    """The ProductionConfig is the as the ProductionConfig, except it does not
+    send Tweets unless told to with a `SEND_TWEETS` environment variable.
+    """
+    SEND_TWEETS = strtobool(os.getenv('SEND_TWEETS') or 'false')
+
 
 class DevelopmentConfig(Config):
     """The Development Config is used for running the website on your own
@@ -202,6 +237,7 @@ class TestingConfig(Config):
     """The Testing Config is used for unit-testing and integration-testing the
     website.
     """
+    SEND_TWEETS: bool = False
     TESTING: bool = True
 
 
@@ -223,6 +259,7 @@ def get_config_from_env(env: str) -> Config:
     """
     config_mapping = {
         'production': ProductionConfig,
+        'staging': StagingConfig,
         'development': DevelopmentConfig,
         'testing': TestingConfig,
     }

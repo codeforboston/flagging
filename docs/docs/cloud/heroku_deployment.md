@@ -8,32 +8,29 @@ The following tools are required to deploy the website:
 - [Heroku CLI](https://devcenter.heroku.com/articles/heroku-cli)
 - [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 
+Additionally, you will have to have set up the website locally to deploy to Heroku, notably including setting up the Postgres database.
+
+???+ tip
+    Read the [setup guide](../setup) to learn how to run the website locally.
+
 ## First Time Deployment
 
 ???+ note
-    In this section, the project name is assumed to be `crwa-flagging`. If you are deploying to another URL, such as `crwa-flagging-staging` or another personal domain, then replace each reference to `crwa-flagging` with that.
+    In this section, the project name is assumed to be `crwa-flagging`. If you are deploying to another URL, such as `crwa-flagging-staging` or a personal domain, then replace each reference to `crwa-flagging` with that.
 
 If you've never deployed the app from your computer, follow these instructions.
 
-1. If you have not already done so, pull the repository to your computer, and then change your directory to it:
+1. If you have not already done so, follow the [setup guide](../setup). The following should now be true:
 
-```shell
-git clone https://github.com/codeforboston/flagging.git
-cd ./flagging
-```
+  - Your terminal is pointed to the root directory of the project `/flagging`.
+  - You should have a copy of the `VAULT_PASSWORD`.
+  - The Postgres database should be set up and up-to-date locally.
+  - Your Heroku account needs to be "verified," which means it needs to have a valid credit card registered to it. Registering a credit card does not incur any charges on its own. See [here](https://devcenter.heroku.com/categories/billing) for Heroku's billing page for more information.
 
-  Additionally, make sure the `VAULT_PASSWORD` environment variable is set if it has not already been:
-  
-=== "Windows (CMD)"
-    ```shell
-    set VAULT_PASSWORD=replace_me_with_pw
-    ```
-=== "OSX (Bash)"
-    ```shell
-    export VAULT_PASSWORD=replace_me_with_pw
-    ```
+???+ tip
+    If you are especially weary of cloud costs, you can plug a prepaid credit card in with a small nominal amount for the balance. See [here](https://help.heroku.com/U32408KR/does-heroku-support-pre-paid-credit-cards-for-billing-and-account-verification) for more.
 
-2. Login to Heroku, and add Heroku as a remote repo using Heroku's CLI:
+2. Via the command line: login to Heroku, and add Heroku as a remote repo using Heroku's CLI:
 
 ```shell
 heroku login
@@ -42,28 +39,69 @@ heroku git:remote -a crwa-flagging
 
 3. Add the vault password as an environment variable to Heroku.
 
-=== "Windows (CMD)"
-    ```shell
-    heroku config:set VAULT_PASSWORD=%VAULT_PASSWORD%
-    ```
-=== "OSX (Bash)"
-    ```shell
-    heroku config:set VAULT_PASSWORD=${VAULT_PASSWORD}
-    ```
+```shell
+heroku config:set VAULT_PASSWORD=vault_password_goes_here -a crwa-flagging
+```
 
-4. Now deploy the app!
+4. You need to setup the `FLASK_ENV` environment variable. This is mainly used for the scheduler and other potential add-ons as a way to ensure that the production config is always being used.
+
+```shell
+heroku config:set FLASK_ENV=production -a crwa-flagging
+```
+
+5. Add a `BASIC_AUTH_USERNAME` and `BASIC_AUTH_PASSWORD` for the admin panel. The username can be whatever you want; e.g. `admin` does the trick. The password should be hard to guess.
+
+```shell
+heroku config:set BASIC_AUTH_USERNAME=admin -a crwa-flagging
+heroku config:set BASIC_AUTH_PASSWORD=admin_password_goes_here -a crwa-flagging
+```
+
+???+ danger
+    The password should be _unique_ to this platform, not a universal password you use for everything. The password is _not_ encrypted when stoerd, and it is visible to anyone who has access to the Heroku dashboard.
+
+6. Add some Heroku add-ons.
+
+```shell
+heroku addons:create scheduler -a crwa-flagging
+heroku addons:create heroku-postgresql -a crwa-flagging
+```
+
+???+ success
+    Pay attention to the last line of output: 
+
+    ```
+    Creating heroku-postgresql on ⬢ crwa-flagging... free
+    Database has been created and is available
+     ! This database is empty. If upgrading, you can transfer
+     ! data from another database with pg:copy
+    Created postgresql-ukulele-12345 as DATABASE_URL
+    ```
+    
+    In the above case, `postgresql-ukulele-12345` is the "name" of the PostgreSQL add-on's dyno. We will be using this name in the next step.
+
+
+7. Push your local copy of the flagging database to the cloud. In the following command, replace `postgresql-ukulele-12345` with whatever the name of your PostgreSQL dyno is, which should have output from the previous step.
+
+```shell
+heroku pg:push flagging postgresql-ukulele-12345 -a crwa-flagging
+```
+
+???+ note
+    The above command assumes that your local Postgres database is up-to-date.
+
+8. Deploy the app.
 
 ```shell
 git push heroku master
 ```
 
-5. Now try the following:
+9. Now try the following:
 
 ```shell
-heroku logs --tail
+heroku logs --tail -a crwa-flagging
 ```
 
-6. If everything worked out, you should see the following at or near the bottom of the log:
+10. If everything worked out, you should see the following at or near the bottom of the log:
 
 ```
 2020-06-13T23:17:54.000000+00:00 app[api]: Build succeeded
@@ -72,9 +110,23 @@ heroku logs --tail
 ???+ note
     If you see instead see something like `[...] State changed from starting to crashed`, then read the rest of the output to see what happened. The most common error when deploying to production will be a `RuntimeError: Unable to load the vault; bad password provided` which is self-explanatory. Update the password, and the website will automatically attempt to redeploy. If you don't see that error, then try to self-diagnose.
 
-7. Go see the website for yourself!
+11. Go see the website for yourself!
 
-8. You are still not done; you need to do one more step, which is to set up the task scheduler.
+12. You are still not done; you need to do one more step, which is to set up the task scheduler. Run the following command:
+
+```shell
+heroku addons:open scheduler -a crwa-flagging
+```
+
+13. The above command should open up a new window in your browser that lets you add a command that runs on a schedule. That command you set should be `python3 -m flask update-website`, and you should run it once a day at 11:00 AM UTC:
+
+![](../img/scheduler_config.png)
+
+???+ tip
+    If you want to have the website update more than once a day, it's probably better to run multiple scheduled jobs that run the same command on 24 hour intervals than it is to run a single scheduled job on hourly intervals.
+
+???+ note
+    The `update-website` command sends out a Tweet as well as re-running the predictive model. You can make the scheduled task only update the website without sending a tweet by replacing `update-website` with `update-db`.
 
 ## Subsequent Deployments
 
@@ -96,6 +148,13 @@ git push heroku master
     git fetch heroku
     git pull heroku master
     ```
+
+3. If you make any changes that affect the database, you should create the database locally, and then push it to the cloud, similar to the step above where we push the database for the first time. Note that updating the database this way requires that you reset it first.
+
+```shell
+heroku pg:reset -a crwa-flagging
+heroku pg:push flagging postgresql-ukulele-12345 -a crwa-flagging
+```
 
 ## Staging and Production Split
 
@@ -130,21 +189,10 @@ git remote -v
     upstream        https://github.com/codeforboston/flagging.git (push)
     ```
 
-3. Now all of your `heroku` commands are going to require specifying the app, but the steps to deploy in staging are otherwise similar to the production deployment:
+3. Now all of your `heroku` commands are going to require specifying this new app instance, but the steps to deploy in staging are otherwise similar to the production deployment, with the exception of `git push heroku master`.
 
+4. Deployment via git requires pushing to the new remote like so:
 
-=== "Windows (CMD)"
-    ```shell
-    heroku config:set --app crwa-flagging-staging VAULT_PASSWORD=%VAULT_PASSWORD%
-    git push staging master
-    heroku logs --app crwa-flagging-staging --tail
-    ```
-
-=== "OSX (Bash)"
-    ```shell
-    heroku config:set --app crwa-flagging-staging VAULT_PASSWORD=${VAULT_PASSWORD}
-    git push staging master
-    heroku logs --app crwa-flagging-staging --tail
-    ```
-
-4. Check out the website in the staging environment and make sure it looks right.
+```
+git push staging master
+```

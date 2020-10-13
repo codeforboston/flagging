@@ -25,6 +25,7 @@ $PYEXEC -m pip install $(cat requirements.txt | grep -v "psycopg2==")
 # Set up and run the Flask application
 export FLASK_APP=flagging_site:create_app
 export FLASK_ENV=development
+export DATABASE_URL=$(heroku config:get DATABASE_URL)
 
 read -p "Offline mode? [y/n]: " offline_mode
 export OFFLINE_MODE=${offline_mode:-${OFFLINE_MODE}}
