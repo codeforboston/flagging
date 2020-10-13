@@ -148,3 +148,6 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/l
+
+# Flask's environment variables file
+.flaskenv

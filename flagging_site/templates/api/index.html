@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% block title %}API{% endblock %}
 {% block content %}
+<script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
     <p>
         <strong>Note: The v1 API is still tentative and under development at this time. It will be
         finalized when this messsage is removed. The schemas may break in the meanwhile.</strong>
@@ -26,5 +27,53 @@
         <li><a href="{{ url_for('api.predictive_model_api') }}" target="_blank">Predictive Model Outputs</a></li>
         <li><a href="{{ url_for('api.boathouses_api') }}" target="_blank">Boathouses</a></li>
         <li><a href="{{ url_for('api.model_input_data_api') }}" target="_blank">Model Input Data</a></li>
+    </ul>
+    <h2>Sample code to call API</h2>
+    <ul>
+        <li>Calling Flagging Model Outputs</li>
+        <ul>
+            <li>
+                using Python
+                <pre class="prettyprint">
+                    import pandas as pd   
+                    url = "http://127.0.0.1:5000/api/v1/model"
+                    model_output = pd.read_json(url)
+                    print(model_output.head())
+                </pre>
+            </li>
+            <li>
+                using R
+                <pre class="prettyprint">
+                    library(jsonlite)
+                    url = "http://127.0.0.1:5000/api/v1/model"
+                    model_output <- fromJSON(url)
+                    print( head(model_output) )
+                </pre>
+            </li>
+        </ul>
+        <li>Calling Boathouse Metadata</li>
+        <ul>
+            <li>
+                using Python<br/>
+                <pre class="prettyprint">
+                    import pandas as pd
+                    url = "{{ url_for('api.index', _external=True) }}v1/boathouses"
+                    data = pd.read_json(url)
+                    print(data.head())
+                </pre>
+
+            </li>
+            <li>
+                using R
+                <pre class="prettyprint">
+                    library(jsonlite)
+                    url = "{{ url_for('api.index', _external=True) }}v1/boathouses"
+                    boathouse_metadata <- fromJSON(url)
+                    
+                    print('Print boathouse metadata head')
+                    print( head(boathouse_metadata$boathouses) )
+                </pre>
+            </li>
+        </ul>
     </ul>
 {% endblock %}
