@@ -19,7 +19,7 @@ Install all of the following programs onto your computer:
 **Recommended:**
 
 - A good text editor or IDE, such as [Atom.io](https://atom.io/) (which is lightweight and beginner friendly) or [PyCharm](https://www.jetbrains.com/pycharm/) (which is powerful but bulky and geared toward advanced users).
-- [Heroku CLI](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) _(required for remote deployment to Heroku.)_
+- [Heroku CLI](https://devcenter.heroku.com/articles/heroku-cli) _(required for remote deployment to Heroku.)_
 
 **Other:**
 

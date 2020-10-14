@@ -110,7 +110,6 @@ class AdminModelView(sqla.ModelView, AdminBaseView):
         # Show all columns in form
         self.column_list = [c.key for c in model.__table__.columns]
         self.form_columns = self.column_list
-
         super().__init__(model, *args, **kwargs)
 
 
