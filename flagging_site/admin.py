@@ -1,17 +1,19 @@
-import os
-from inspect import cleandoc
+import io
+import datetime
+
 from flask import Flask
 from flask import redirect
 from flask import request
 from flask import Response
+from flask import send_file
 from flask_admin import Admin
 from flask_admin import BaseView
 from flask_admin import expose
 from flask_admin.contrib import sqla
-from werkzeug.exceptions import HTTPException
 
 from flask_basicauth import BasicAuth
 from werkzeug.exceptions import HTTPException
+from sqlalchemy.exc import ProgrammingError
 
 from .data import db
 
@@ -47,14 +49,33 @@ def init_admin(app: Flask):
         if request.path.startswith('/admin/'):
             validate_credentials()
 
-    # Add an endpoint to the app that lets the database be updated manually.
-    # app.add_url_rule('/admin/update-db', 'admin.update_db', update_database_manually)
-
     with app.app_context():
         # Register /admin sub-views
         from .data.cyano_overrides import ManualOverridesModelView
         admin.add_view(ManualOverridesModelView(db.session))
-        admin.add_view(DatabaseView(name='Update Database', endpoint='update-db', category='Database'))
+
+        # Database functions
+        admin.add_view(DatabaseView(
+            name='Update Database', endpoint='update-db', category='Database'
+        ))
+
+        # Download data
+        admin.add_view(DownloadHobolinkView(
+            name='HOBOlink', endpoint='data/hobolink', category='Download Data'
+        ))
+        admin.add_view(DownloadUsgsView(
+            name='USGS', endpoint='data/usgs', category='Download Data'
+        ))
+        admin.add_view(DownloadProcessedDataView(
+            name='Processed Data', endpoint='data/processed-data', category='Download Data'
+        ))
+        admin.add_view(DownloadModelOutputsView(
+            name='Model Outputs', endpoint='data/model-outputs', category='Download Data'
+        ))
+        admin.add_view(DownloadBoathousesView(
+            name='Boathouses', endpoint='data/boathouses', category='Download Data'
+        ))
+
         admin.add_view(LogoutView(name='Logout'))
 
 
@@ -157,3 +178,68 @@ class DatabaseView(AdminBaseView):
                 </body>
             </html>
         '''
+
+
+def create_download_data_view(sql_table_name: str) -> type:
+    """This is a factory function that makes the data downloadable in the admin
+    panel. It returns a type that can be initialized later as an admin view.
+
+    Args:
+        sql_table_name: (str) A valid name for a PostgreSQL table in the
+                        database. It will cause an error if the table is
+                        invalid.
+
+    Returns:
+        A class that can be initialized as an admin view.
+
+    """
+    class _DownloadView(AdminBaseView):
+        @expose('/')
+        def download(self):
+            from .data.database import execute_sql
+
+            # WARNING:
+            # Be careful when parameterizing queries like how we do it below.
+            # The reason it's OK in this case is because users don't touch it.
+            # However it is dangerous to do this in some other contexts.
+            # We are doing it like this to avoid needing to utilize sessions.
+            query = f'''SELECT * FROM {sql_table_name}'''
+            try:
+                df = execute_sql(query)
+            except ProgrammingError:
+                raise HTTPException(
+                    'Invalid SQL.',
+                    Response(
+                        f'<b>Invalid SQL query:</b> <tt>{query}</tt>',
+                        status=500
+                    )
+                )
+
+            strio = io.StringIO()
+            df.to_csv(strio)
+
+            # Convert to bytes
+            bytesio = io.BytesIO()
+            bytesio.write(strio.getvalue().encode('utf-8'))
+            # seeking was necessary. Python 3.5.2, Flask 0.12.2
+            bytesio.seek(0)
+            strio.close()
+
+            return send_file(
+                bytesio,
+                as_attachment=True,
+                attachment_filename=f'{sql_table_name}.csv',
+                mimetype='text/csv'
+            )
+
+    pascal_case_tbl = sql_table_name.title().replace('_', '')
+    _DownloadView.__name__ = f'Download{pascal_case_tbl}View'
+    return _DownloadView
+
+
+# All of these
+DownloadHobolinkView = create_download_data_view('hobolink')
+DownloadUsgsView = create_download_data_view('usgs')
+DownloadProcessedDataView = create_download_data_view('processed_data')
+DownloadModelOutputsView = create_download_data_view('model_outputs')
+DownloadBoathousesView = create_download_data_view('boathouses')
