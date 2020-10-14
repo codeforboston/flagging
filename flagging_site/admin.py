@@ -41,6 +41,12 @@ def init_admin(app: Flask):
     basic_auth.init_app(app)
     admin.init_app(app)
 
+    @app.before_request
+    def auth():
+        """Authorize all paths that start with /admin/."""
+        if request.path.startswith('/admin/'):
+            validate_credentials()
+
     # Add an endpoint to the app that lets the database be updated manually.
     # app.add_url_rule('/admin/update-db', 'admin.update_db', update_database_manually)
 
@@ -52,8 +58,49 @@ def init_admin(app: Flask):
         admin.add_view(LogoutView(name='Logout'))
 
 
+def validate_credentials() -> bool:
+    """
+    Protect admin pages with basic_auth.
+    If logged out and current page is /admin/, then ask for credentials.
+    Otherwise, raises HTTP 401 error and redirects user to /admin/ on the
+    frontend (redirecting with HTTP redirect causes user to always be
+    redirected to /admin/ even after logging in).
+
+    We redirect to /admin/ because our logout method only works if the path to
+    /logout is the same as the path to where we put in our credentials. So if
+    we put in credentials at /admin/cyanooverride, then we would need to logout
+    at /admin/cyanooverride/logout, which would be difficult to arrange. Instead,
+    we always redirect to /admin/ to put in credentials, and then logout at
+    /admin/logout.
+    """
+    if not basic_auth.authenticate():
+        if request.path.startswith('/admin/'):
+            raise AuthException('Not authenticated. Refresh the page.')
+        else:
+            raise HTTPException(
+                'Attempted to visit admin page but not authenticated.',
+                Response(
+                    '''
+                    Not authenticated. Navigate to /admin/ to login.
+                    <script>window.location = "/admin/";</script>
+                    ''',
+                    status=401  # 'Forbidden' status
+                )
+            )
+    return True
+
+
+class AdminBaseView(BaseView):
+    def is_accessible(self):
+        return validate_credentials()
+
+    def inaccessible_callback(self, name, **kwargs):
+        """Ask for credentials when access fails"""
+        return redirect(basic_auth.challenge())
+
+
 # Adapted from https://computableverse.com/blog/flask-admin-using-basicauth
-class AdminModelView(sqla.ModelView):
+class AdminModelView(sqla.ModelView, AdminBaseView):
     """
     Extension of SQLAlchemy ModelView that requires BasicAuth authentication,
     and shows all columns in the form (including primary keys).
@@ -66,44 +113,8 @@ class AdminModelView(sqla.ModelView):
 
         super().__init__(model, *args, **kwargs)
 
-    def is_accessible(self):
-        """
-        Protect admin pages with basic_auth.
-        If logged out and current page is /admin/, then ask for credentials.
-        Otherwise, raises HTTP 401 error and redirects user to /admin/ on the
-        frontend (redirecting with HTTP redirect causes user to always be
-        redirected to /admin/ even after logging in).
 
-        We redirect to /admin/ because our logout method only works if the path to
-        /logout is the same as the path to where we put in our credentials. So if
-        we put in credentials at /admin/cyanooverride, then we would need to logout
-        at /admin/cyanooverride/logout, which would be difficult to arrange. Instead,
-        we always redirect to /admin/ to put in credentials, and then logout at
-        /admin/logout.
-        """
-        if not basic_auth.authenticate():
-            if '/admin/' == request.path:
-                raise AuthException('Not authenticated. Refresh the page.')
-            else:
-                raise HTTPException(
-                    'Attempted to visit admin page but not authenticated.',
-                    Response(
-                        '''
-                        Not authenticated. Navigate to /admin/ to login.
-                        <script>window.location = "/admin/";</script>
-                        ''',
-                        status=401  # 'Forbidden' status
-                    )
-                )
-        else:
-            return True
-
-    def inaccessible_callback(self, name, **kwargs):
-        """Ask for credentials when access fails"""
-        return redirect(basic_auth.challenge())
-
-
-class LogoutView(BaseView):
+class LogoutView(AdminBaseView):
     @expose('/')
     def index(self):
         """
@@ -123,16 +134,13 @@ class LogoutView(BaseView):
         )
 
 
-class DatabaseView(BaseView):
+class DatabaseView(AdminBaseView):
     @expose('/')
     def update_db(self):
         """When this function is called, the database updates. This function is
         designed to be available in the app during runtime, and is protected by
         BasicAuth so that only administrators can run it.
         """
-        if not basic_auth.authenticate():
-            raise AuthException('Not authenticated. Refresh the page.')
-
         # If auth passed, then update database.
         from .data.database import update_database
         update_database()
