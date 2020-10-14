@@ -49,7 +49,11 @@ def compose_tweet() -> str:
         in df.to_dict(orient='index').items()
     }
 
-    current_time = pd.to_datetime('today').strftime('%I:%M:%S %p, %m/%d/%Y')
+    current_time = (
+        pd.Timestamp('now', tz='UTC')
+        .tz_convert('US/Eastern')
+        .strftime('%I:%M:%S %p, %m/%d/%Y')
+    )
 
     if all(i for i in flags.values()):
         msg = (
@@ -60,7 +64,7 @@ def compose_tweet() -> str:
         unsafe = ', '.join([str(k) for k, v in flags.items() if v is False])
         msg = (
             'Our predictive model is reporting that the following reaches are '
-            f'unsafe as of {current_time}: {unsafe}.'
+            f'unsafe as of {current_time}: {unsafe}. http://crwa-flagging.herokuapp.com/'
         )
     return msg
 

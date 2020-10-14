@@ -25,9 +25,10 @@ $PYEXEC -m pip install $(cat requirements.txt | grep -v "psycopg2==")
 # Set up and run the Flask application
 export FLASK_APP=flagging_site:create_app
 export FLASK_ENV=development
+export DATABASE_URL=$(heroku config:get DATABASE_URL)
 
-read -p "Offline mode? [y/n]: " offline_mode
-export OFFLINE_MODE=${offline_mode:-${OFFLINE_MODE}}
+read -p "Use mock data? [y/n]: " use_mock_data
+export USE_MOCK_DATA=${use_mock_data:-${USE_MOCK_DATA}}
 
 flask create-db
 flask init-db

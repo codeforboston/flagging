@@ -33,6 +33,8 @@ theme:
 repo_name: codeforboston/flagging
 repo_url: https://github.com/codeforboston/flagging
 edit_uri: ""
+plugins:
+  - macros
 markdown_extensions:
 - admonition
 - pymdownx.tabbed # https://facelessuser.github.io/pymdown-extensions/
@@ -50,6 +52,7 @@ markdown_extensions:
       format: !!python/name:pymdownx.superfences.fence_div_format
 - sane_lists
 extra:
+  flagging_website_url: https://crwa-flagging.herokuapp.com
   social:
   - icon: fontawesome/brands/github
     link: https://github.com/codeforboston/flagging

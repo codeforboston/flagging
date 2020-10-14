@@ -46,8 +46,6 @@ And you should be good to go! The functions listed below should be available for
   Gets the HOBOlink data table based on the given "export" name.
 - **`get_live_usgs_data`** (*() -> pd.DataFrame*):
   Gets the USGS data table.
-- **`get_data`** (*() -> pd.DataFrame*):
-  Gets the Hobolink and USGS data tables and returns a combined table.
 - **`process_data`** (*(pd.DataFrame, pd.DataFrame) -> pd.DataFrame*):
   Combines the Hobolink and USGS tables.
 - **`compose_tweet`** (*() -> str*):
@@ -79,8 +77,6 @@ save it as a CSV file.
 hobolink_data = get_live_hobolink_data()
 hobolink_data.to_csv('path/where/to/save/my-CSV-file.csv')
 ```
-
-Downloading the data may be useful if you want to see 
 
 ## Example 2: Preview Tweet
 
