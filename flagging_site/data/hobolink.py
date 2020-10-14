@@ -45,7 +45,7 @@ def get_live_hobolink_data(
     Returns:
         Pandas Dataframe containing the cleaned-up Hobolink data.
     """
-    if current_app.config['OFFLINE_MODE']:
+    if current_app.config['USE_MOCK_DATA']:
         fpath = os.path.join(
             current_app.config['DATA_STORE'], HOBOLINK_STATIC_FILE_NAME
         )

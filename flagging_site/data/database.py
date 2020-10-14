@@ -125,10 +125,6 @@ def init_db():
         Base.metadata.create_all(db.engine)
 
 
-def database_is_empty():
-    execute_sql('SELECT * FROM asdf')
-
-
 def update_database():
     """This function basically controls all of our data refreshes. The
     following tables are updated in order:

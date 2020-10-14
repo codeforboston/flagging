@@ -127,6 +127,7 @@ def create_app(config: Optional[Union[Config, str]] = None) -> Flask:
     def update_website_command(ctx):
         """Updates the database, then Tweets a message."""
         updated = ctx.invoke(update_db_command)
+        # If the model updated, send tweet. Otherwise do nothing.
         if updated:
             from .twitter import tweet_current_status
             msg = tweet_current_status()
