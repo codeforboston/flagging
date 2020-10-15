@@ -16,7 +16,6 @@ from typing import Union
 
 from flask import Flask
 from flask.json import JSONEncoder
-from flask import flash
 
 import py7zr
 from lzma import LZMAError
@@ -25,7 +24,6 @@ from py7zr.exceptions import PasswordRequired
 from .config import Config
 from .config import get_config_from_env
 
-from .data.database import get_latest_time
 
 def create_app(config: Optional[Union[Config, str]] = None) -> Flask:
     """Create and configure an instance of the Flask application. We use the
@@ -99,13 +97,6 @@ def create_app(config: Optional[Union[Config, str]] = None) -> Flask:
         from flask import g
         g.request_start_time = time.time()
         g.request_time = lambda: '%.3fs' % (time.time() - g.request_start_time)
-
-        ltime = get_latest_time() # get the latest time shown in the database
-        ttime = pd.Timestamp.now() # get current time from the computer clock
-        diff = ttime - ltime # calculate difference between now and d.b. time
-        seventytwo_hrs = pd.Timedelta(72, 'hr') # duration of 72 hrs.
-        if (diff >= seventytwo_hrs):
-            flash('The model is currently offline.')
 
     @app.cli.command('create-db')
     def create_db_command():
