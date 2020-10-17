@@ -7,8 +7,6 @@ import time
 import json
 import decimal
 
-import pandas as pd
-
 import datetime
 from typing import Optional
 from typing import Dict
@@ -195,10 +193,10 @@ def init_swagger(app: Flask):
             'description':
                 "API for the Charles River Watershed Association's predictive "
                 'models, and the data used for those models.',
-            # 'contact': {
-            #     'responsibleOrganization': 'x-Charles River Watershed Association',
-            #     'responsibleDeveloper': 'x-Code for Boston',
-            # },
+            'contact': {
+                'x-responsibleOrganization': 'Charles River Watershed Association',
+                'x-responsibleDeveloper': 'Code for Boston',
+            },
             'version': '1.0',
         }
     }
