@@ -6,6 +6,9 @@ import click
 import time
 import json
 import decimal
+
+import pandas as pd
+
 import datetime
 from typing import Optional
 from typing import Dict
