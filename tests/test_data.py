@@ -37,6 +37,7 @@ def test_hobolink_handles_erroneous_csv(app, monkeypatch):
 
     class MockHobolinkResponse:
         text = csv_text
+
     monkeypatch.setattr(
         hobolink,
         'request_to_hobolink',

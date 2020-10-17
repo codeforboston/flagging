@@ -14,6 +14,7 @@ def app():
         importlib.reload(_config)
 
     app = create_app(config=_config.TestingConfig())
+
     yield app
 
 
