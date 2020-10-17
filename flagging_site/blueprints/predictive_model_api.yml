@@ -33,6 +33,11 @@ responses:
         time_returned:
           description: The timestamp of when the model was run.
           type: string
+        is_boating_season:
+          description: A boolean reporting whether it is currently boating season or not. When it is not boating season,
+                       the model's outputs are not considered valid and actionable predictions as far as recreational
+                       activities along the Charles River are concerned.
+          type: boolean
         model_outputs:
           description: The most recent predictive model outputs
           type: array

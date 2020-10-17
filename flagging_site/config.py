@@ -95,6 +95,8 @@ class Config:
     wasn't opened. Usually set alongside DEBUG mode.
     """
 
+    BOATING_SEASON: bool = strtobool(os.getenv('BOATING_SEASON') or 'true')
+
     VAULT_PASSWORD: str = os.getenv('VAULT_PASSWORD')
 
     HOBOLINK_AUTH: dict = {

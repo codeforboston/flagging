@@ -2,46 +2,41 @@
 {% block title %}Flagging Program - Live Water Quality Alerts{% endblock %}
 {% block content %}
 <h2>Overview</h2>
-<p>
-    CRWA's Flagging Program uses a system of color-coded flags to indicate whether or not the river's water quality is
-    safe for boating at eleven boating locations between Watertown and Boston. Flag colors are based on E. coli and
-    cyanobacteria (blue-green algae) levels:
-</p>
-<ul class="flag-explanation">
-    <li><font color="navy">Blue</font> flags indicate suitable boating conditions.
-    <li><font color="darkred">Red</font> flags indicate potential health risks. Consider avoiding areas where red flags are posted or make sure you wash after boating nearby.</li>
-</ul>
-<p>
-    CRWA estimates E. coli bacteria levels using models that take into account a variety of environmental factors
-    including rainfall and river flow. CRWA collects water samples weekly to verify the model forecasts. Cyanobacteria
-    monitoring is conducted every 1-2 weeks.
-</p>
+    <p>
+        CRWA's Flagging Program uses a system of color-coded flags to indicate whether or not the river's water quality is
+        safe for boating at eleven boating locations between Watertown and Boston. Flag colors are based on E. coli and
+        cyanobacteria (blue-green algae) levels:
+    </p>
+    <ul class="flag-explanation">
+        <li><font color="navy">Blue</font> flags indicate suitable boating conditions.
+        <li><font color="darkred">Red</font> flags indicate potential health risks. Consider avoiding areas where red flags are posted or make sure you wash after boating nearby.</li>
+    </ul>
+    <p>
+        CRWA estimates E. coli bacteria levels using models that take into account a variety of environmental factors
+        including rainfall and river flow. CRWA collects water samples weekly to verify the model forecasts. Cyanobacteria
+        monitoring is conducted every 1-2 weeks.
+    </p>
+{% if boating_season %}
 <h2>Water Quality Today</h2>
-<p>
-    Note that the predictions are based only on the CRWA's predictive modeling of E. coli levels. Please see
-    <a href="https://www.crwa.org/flagging-program.html">the CRWA's website</a> for official flag determinations that incorporate
-    CSO monitoring and cyanobacteria monitoring.
-</p>
-<br />
-<table class="home-reach">
-    {% for reach_no, reach in homepage.items() %}
-    <tr>
-        <td class="home-reach">
-            <div><strong>Reach {{ reach_no }}</strong></div>
-            <ul class="home-boat-house">
-                {% for boathouse in reach['boathouses'] %}
-                <li> {{ boathouse }} </li>
-                {% endfor %}
-            </ul>
-        </td>
-        {% if reach.flag %}
-        <td class="home-reach flag"><img class="flag" src="{{ url_for('static', filename='images/blue_flag.png') }}" /></td>
-        {% else %}
-        <td class="home-reach flag"><img class="flag" src="{{ url_for('static', filename='images/red_flag.png') }}" /></td>
-        {% endif %}
-    </tr>
-    {% endfor %}
-</table>
+    <table class="home-reach">
+        {% for reach_no, reach in homepage.items() %}
+        <tr>
+            <td class="home-reach">
+                <div><strong>Reach {{ reach_no }}</strong></div>
+                <ul class="home-boat-house">
+                    {% for boathouse in reach['boathouses'] %}
+                    <li> {{ boathouse }} </li>
+                    {% endfor %}
+                </ul>
+            </td>
+            {% if reach.flag %}
+            <td class="home-reach flag"><img class="flag" src="{{ url_for('static', filename='images/blue_flag.png') }}" /></td>
+            {% else %}
+            <td class="home-reach flag"><img class="flag" src="{{ url_for('static', filename='images/red_flag.png') }}" /></td>
+            {% endif %}
+        </tr>
+        {% endfor %}
+    </table>
     {% for key, value in homepage.items() %}
         <p class="centered">
             {% if loop.last %}
@@ -49,6 +44,7 @@
             {% endif %}
         </p>
     {% endfor %}
+{% endif %}
 <h2>Stay Updated</h2>
 <p>
     The best way to keep up with the CRWA flagging updates is to <a href="https://www.crwa.org/flagging-program.html">sign

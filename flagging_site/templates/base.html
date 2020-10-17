@@ -51,7 +51,7 @@
                     {% if messages %}
                         <div class="flash">
                             {% for message in messages %}
-                                <div class="flash-message">{{ message }}</div>
+                                <div class="flash-message">{{ message | safe }}</div>
                             {% endfor %}
                         </div>
                     {% endif %}
