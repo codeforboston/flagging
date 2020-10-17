@@ -74,7 +74,6 @@ class Config:
         db = self.POSTGRES_DBNAME
         return f'postgres://{user}:{password}@{host}:{port}/{db}'
 
-    SQLALCHEMY_ECHO: bool = True
     SQLALCHEMY_RECORD_QUERIES: bool = True
     SQLALCHEMY_TRACK_MODIFICATIONS: bool = False
 
@@ -227,6 +226,7 @@ class DevelopmentConfig(Config):
     the vault hasn't been loaded but doesn't prevent the website from loading
     just because the vault is not open.
     """
+    SQLALCHEMY_ECHO: bool = True
     VAULT_OPTIONAL: bool = True
     DEBUG: bool = True
     TESTING: bool = True

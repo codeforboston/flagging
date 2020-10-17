@@ -14,6 +14,23 @@ from ..data.database import get_latest_time
 bp = Blueprint('flagging', __name__)
 
 
+@bp.before_request
+def before_request():
+    # Get the latest time shown in the database
+    ltime = get_latest_time()
+
+    # Get current time from the computer clock
+    ttime = pd.Timestamp.now()
+
+    # Calculate difference between now and d.b. time
+    diff = ttime - ltime
+
+    # If more than 48 hours, flash message.
+    if diff >= pd.Timedelta(48, 'hr'):
+        flash('Note: The database has not updated in at least 48 hours. The '
+              'information displayed on this page may be outdated.')
+
+
 def stylize_model_output(df: pd.DataFrame) -> str:
     """
     This function function stylizes the dataframe that we will output for our
@@ -135,11 +152,7 @@ def flags() -> str:
                            model_last_updated_time=model_last_updated_time)
 
 
-@bp.before_request
-def before_request():
-    ltime = get_latest_time() # get the latest time shown in the database
-    ttime = pd.Timestamp.now() # get current time from the computer clock
-    diff = ttime - ltime # calculate difference between now and d.b. time
-    seventytwo_hrs = pd.Timedelta(72, 'hr') # duration of 72 hrs.
-    if (diff >= seventytwo_hrs):
-        flash('The model is currently offline.')
+@bp.route('/api')
+def api_index() -> str:
+    """Landing page for the API."""
+    return render_template('api/index.html')

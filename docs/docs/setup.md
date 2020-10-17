@@ -160,6 +160,9 @@ After you get everything set up, you should run the website at least once. The p
      * Restarting with stat
     ```
 
+???+ error
+    If you get an error that says something like "`Microsoft Visual C++ 14.0 or greater is required.`," you need to follow the link provided by the error message, download and install it, then reboot your computer.
+
 4. Point your browser of choice to the URL shown in the terminal output. If everything worked out, the website should be running on your local computer!
 
 ![](img/successful_run.png)

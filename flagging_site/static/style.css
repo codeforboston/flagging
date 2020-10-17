@@ -71,6 +71,18 @@ nav {
 .header-logo {
   max-width: 100%;
 }
+
+.flash {
+  padding: 0.2em;
+  width: 80%;
+  margin: auto;
+}
+
+.flash-message {
+  background-color: #ffff6f;
+  padding: 0.8em;
+  margin: 0.6em auto;
+}
 /***** End Header Section *****/
 
 /***** Start Content Section *****/
@@ -174,3 +186,14 @@ nav {
 }
 
 /***** End Home Page *****/
+
+/***** Start API Index Page *****/
+
+pre.prettyprint {
+  width: 90%;
+  margin: 2em auto;
+  white-space: pre-wrap;
+  border: none !important;
+}
+
+/***** End API Index Page *****/

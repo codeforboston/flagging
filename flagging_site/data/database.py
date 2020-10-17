@@ -201,7 +201,8 @@ def get_boathouse_metadata_dict():
     Return a dictionary of boathouses' metadata
     """
     boathouse_query = (Boathouses.query.all())
-    return jsonify({"boathouses" : boathouse_query})
+    return {'boathouses': boathouse_query}
+
 
 def get_latest_time():
     """
