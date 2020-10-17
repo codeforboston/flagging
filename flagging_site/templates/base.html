@@ -47,6 +47,15 @@
                 &nbsp; | &nbsp; <a href="{{ url_for('flagging.output_model') }}">Detailed Outputs</a>
                 &nbsp; | &nbsp; <a href="{{ url_for('api.index') }}">API</a>
             </nav>
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <ul class=flashes>
+                    {% for message in messages %}
+                    <li style="background-color: #ffff6f;">{{ message }}</li>
+                    {% endfor %}
+                    </ul>
+                {% endif %}
+            {% endwith %}
             {% endblock %}
         </div>
         <section class="content">{% block content %}{% endblock %}</section>

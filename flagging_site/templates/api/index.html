@@ -34,20 +34,45 @@
         <ul>
             <li>
                 using Python
-                <pre class="prettyprint">
-                    import pandas as pd   
-                    url = "http://127.0.0.1:5000/api/v1/model"
-                    model_output = pd.read_json(url)
-                    print(model_output.head())
+                <pre class="prettyprint lang-python">
+import pandas as pd
+url = "{{ url_for('api.index', _external=True) }}v1/model"
+model_output = pd.read_json(url)
+
+print('version: '  + str(model_output['version'][0]) )
+print('time_returned: ' + model_output['time_returned'][0])
+for ind in model_output.index:
+	print(ind + ":")  
+	for param in model_output['models'][ind].keys():
+		print('     ' + param + ':')
+		print('          ' + str(model_output['models'][ind][param][-3:]))
+
                 </pre>
             </li>
             <li>
                 using R
-                <pre class="prettyprint">
-                    library(jsonlite)
-                    url = "http://127.0.0.1:5000/api/v1/model"
-                    model_output <- fromJSON(url)
-                    print( head(model_output) )
+                <pre class="prettyprint lang-r">
+library(jsonlite)
+url = "{{ url_for('api.index', _external=True) }}v1/model"
+model_output <- fromJSON(url)
+
+print("Version:")
+print(model_output$version)
+cat("\n")
+
+print("time_returned")
+print(model_output$time_returned)
+cat("\n")
+
+for (i in 1 : length(model_output$models) ) {
+  print( names(model_output$models)[[i]] )
+  for (j in 1: length(model_output$models[[i]]) ) {
+    print( names(model_output$models[[i]])[[j]] )
+    k = length(model_output$models[[i]][[j]])
+    print (model_output$models[[i]][[j]][c(k-2,k-1,k)])
+  }
+  cat("\n")
+}
                 </pre>
             </li>
         </ul>
@@ -55,23 +80,25 @@
         <ul>
             <li>
                 using Python<br/>
-                <pre class="prettyprint">
-                    import pandas as pd
-                    url = "{{ url_for('api.index', _external=True) }}v1/boathouses"
-                    data = pd.read_json(url)
-                    print(data.head())
+                <pre class="prettyprint lang-python">
+import pandas as pd
+import requests
+url = "{{ url_for('api.index', _external=True) }}v1/boathouses"
+records = requests.get(url).json()["boathouses"]
+data = pd.DataFrame(records)
+print(data.head())
                 </pre>
 
             </li>
             <li>
                 using R
-                <pre class="prettyprint">
-                    library(jsonlite)
-                    url = "{{ url_for('api.index', _external=True) }}v1/boathouses"
-                    boathouse_metadata <- fromJSON(url)
+                <pre class="prettyprint lang-r">
+library(jsonlite)
+url = "{{ url_for('api.index', _external=True) }}v1/boathouses"
+boathouse_metadata <- fromJSON(url)
                     
-                    print('Print boathouse metadata head')
-                    print( head(boathouse_metadata$boathouses) )
+print('Print boathouse metadata head')
+print( head(boathouse_metadata$boathouses) )
                 </pre>
             </li>
         </ul>

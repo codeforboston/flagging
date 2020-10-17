@@ -4,10 +4,12 @@ from flask import Blueprint
 from flask import render_template
 from flask import request
 from flask import current_app
+from flask import flash
 
 from ..data.cyano_overrides import get_currently_overridden_reaches
 from ..data.predictive_models import latest_model_outputs
 from ..data.database import get_boathouse_by_reach_dict
+from ..data.database import get_latest_time
 
 bp = Blueprint('flagging', __name__)
 
@@ -131,3 +133,13 @@ def flags() -> str:
     return render_template('flags.html',
                            boathouse_statuses=boathouse_statuses,
                            model_last_updated_time=model_last_updated_time)
+
+
+@bp.before_request
+def before_request():
+    ltime = get_latest_time() # get the latest time shown in the database
+    ttime = pd.Timestamp.now() # get current time from the computer clock
+    diff = ttime - ltime # calculate difference between now and d.b. time
+    seventytwo_hrs = pd.Timedelta(72, 'hr') # duration of 72 hrs.
+    if (diff >= seventytwo_hrs):
+        flash('The model is currently offline.')
