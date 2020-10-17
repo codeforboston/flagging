@@ -195,10 +195,11 @@ def init_swagger(app: Flask):
             'description':
                 "API for the Charles River Watershed Association's predictive "
                 'models, and the data used for those models.',
-            'contact': {
-                'responsibleOrganization': 'Charles River Watershed Association',
-                'responsibleDeveloper': 'Code for Boston',
-            },
+            # 'contact': {
+            #     'responsibleOrganization': 'x-Charles River Watershed Association',
+            #     'responsibleDeveloper': 'x-Code for Boston',
+            # },
+            'version': '1.0',
         }
     }
     app.config['SWAGGER'] = {
