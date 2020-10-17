@@ -27,8 +27,27 @@ def before_request():
 
     # If more than 48 hours, flash message.
     if diff >= pd.Timedelta(48, 'hr'):
-        flash('Note: The database has not updated in at least 48 hours. The '
-              'information displayed on this page may be outdated.')
+        flash('<b>Note:</b> The database has not updated in at least 48 '
+              'hours. The information displayed on this page may be outdated.')
+
+    # ~~~
+
+    if not current_app.config['BOATING_SEASON']:
+        msg = '<b>Note:</b> It is currently not boating season. '
+        if request.path.startswith('/flags'):
+            # If the path is the iframe...
+            msg += (
+                'We do not display flags when it is not boating season. We '
+                'hope to see you again this spring!'
+            )
+        else:
+            msg += (
+                'We may update our database and (consequently) our predictive '
+                'model while it is not boating season, but these model outputs '
+                'are not intended to be used to make decisions regarding '
+                'recreational activities along the Charles River.'
+            )
+        flash(msg)
 
 
 def stylize_model_output(df: pd.DataFrame) -> str:
@@ -90,10 +109,12 @@ def index() -> str:
     df = latest_model_outputs()
     homepage = parse_model_outputs(df)
     model_last_updated_time = df['time'].iloc[0]
+    boating_season = current_app.config['BOATING_SEASON']
 
     return render_template('index.html',
                            homepage=homepage,
-                           model_last_updated_time=model_last_updated_time)
+                           model_last_updated_time=model_last_updated_time,
+                           boating_season=boating_season)
 
 
 @bp.route('/about')
@@ -146,10 +167,12 @@ def flags() -> str:
     df = latest_model_outputs()
     boathouse_statuses = parse_model_outputs(df)
     model_last_updated_time = df['time'].iloc[0]
+    boating_season = current_app.config['BOATING_SEASON']
 
     return render_template('flags.html',
                            boathouse_statuses=boathouse_statuses,
-                           model_last_updated_time=model_last_updated_time)
+                           model_last_updated_time=model_last_updated_time,
+                           boating_season=boating_season)
 
 
 @bp.route('/api')

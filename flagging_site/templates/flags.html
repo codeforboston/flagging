@@ -27,28 +27,29 @@
         {% if messages %}
             <div class="flash">
                 {% for message in messages %}
-                    <div class="flash-message">{{ message }}</div>
+                    <div class="flash-message">{{ message | safe }}</div>
                 {% endfor %}
             </div>
         {% endif %}
     {% endwith %}
-    {% for reach, data in boathouse_statuses.items() %}
-        {% for boathouse in data['boathouses'] %}
-        <div class="flag-container">
-            {% if data['flag'] %}
-                <img class="flag" src="{{ url_for('static', filename='images/blue_flag.png') }}" />
-            {% else %}
-                <img class="flag" src="{{ url_for('static', filename='images/red_flag.png') }}" />
-            {% endif %}
-            <br />
-            {{ boathouse }}
-        </div>
+    {% if boating_season %}
+        {% for reach, data in boathouse_statuses.items() %}
+            {% for boathouse in data['boathouses'] %}
+            <div class="flag-container">
+                {% if data['flag'] %}
+                    <img class="flag" src="{{ url_for('static', filename='images/blue_flag.png') }}" />
+                {% else %}
+                    <img class="flag" src="{{ url_for('static', filename='images/red_flag.png') }}" />
+                {% endif %}
+                <br />
+                {{ boathouse }}
+            </div>
+            {% endfor %}
         {% endfor %}
-    {% endfor %}
-
-    <div class="last-updated">
-        ( Last updated: {{ model_last_updated_time }} )
-    </div>
+        <div class="last-updated">
+            ( Last updated: {{ model_last_updated_time }} )
+        </div>
+    {% endif %}
     <div class="info">
         <a href="{{ url_for('flagging.index', _external=True) }}" target="_blank">Click here for more information.</a>
     </div>

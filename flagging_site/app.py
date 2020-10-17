@@ -13,6 +13,7 @@ from typing import Dict
 from typing import Union
 
 from flask import Flask
+from flask import current_app
 from flask.json import JSONEncoder
 
 import py7zr
@@ -116,11 +117,14 @@ def create_app(config: Optional[Union[Config, str]] = None) -> Flask:
     def update_db_command():
         """Update the database with the latest live data."""
         from .data.database import update_database
-        updated = update_database()
-        click.echo('Updated the database.')
-        if not updated:
-            click.echo('Note: while updating database, the predictive model '
-                       'did not run.')
+        try:
+            update_database()
+            click.echo('Updated the database.')
+            updated = True
+        except Exception as e:
+            click.echo("Note: while updating database, something didn't "
+                       f'work: {e}')
+            updated = False
         return updated
 
     @app.cli.command('update-website')
@@ -128,8 +132,13 @@ def create_app(config: Optional[Union[Config, str]] = None) -> Flask:
     def update_website_command(ctx):
         """Updates the database, then Tweets a message."""
         updated = ctx.invoke(update_db_command)
-        # If the model updated, send tweet. Otherwise do nothing.
-        if updated:
+        # If the model updated and it's boating season, send a tweet.
+        # Otherwise, do nothing.
+        if (
+                updated
+                and current_app.config['BOATING_SEASON']
+                and current_app.config['SEND_TWEETS']
+        ):
             from .twitter import tweet_current_status
             msg = tweet_current_status()
             click.echo(f'Sent out tweet: {msg!r}')

@@ -53,6 +53,7 @@ def model_api(reaches: List[int], hours: int) -> dict:
     return {
         'model_version': MODEL_VERSION,
         'time_returned': pd.to_datetime('today'),
+        'is_boating_season': bool(current_app.config['BOATING_SEASON']),
         'model_outputs': [
             {
                 'predictions': df.loc[
