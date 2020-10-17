@@ -2,7 +2,6 @@ from typing import List
 
 import pandas as pd
 from flask import Blueprint
-from flask import render_template
 from flask import request
 from flask import current_app
 from flask import jsonify
@@ -14,12 +13,6 @@ from ..data.database import execute_sql
 from flasgger import swag_from
 
 bp = Blueprint('api', __name__, url_prefix='/api')
-
-
-@bp.route('/', methods=['GET'])
-def index() -> str:
-    """Landing page for the API."""
-    return render_template('api/index.html')
 
 
 def add_to_dict(models, df, reach) -> None:
@@ -60,6 +53,7 @@ def model_api(reaches: List[int], hours: int) -> dict:
     return {
         'model_version': MODEL_VERSION,
         'time_returned': pd.to_datetime('today'),
+        'is_boating_season': bool(current_app.config['BOATING_SEASON']),
         'model_outputs': [
             {
                 'predictions': df.loc[

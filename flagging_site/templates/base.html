@@ -39,14 +39,23 @@
     <div class="above-fold">
         <div class="page-header">
             {% block header %}
-            <img class="header-logo" src="{{ url_for('static', filename='images/CRWA_banner_main.jpg') }}" />
-            <header>{{ self.title() }}</header>
-            <nav>
-                <a href="{{ url_for('flagging.index') }}">Home</a>
-                &nbsp; | &nbsp; <a href="{{ url_for('flagging.about') }}">About</a>
-                &nbsp; | &nbsp; <a href="{{ url_for('flagging.output_model') }}">Detailed Outputs</a>
-                &nbsp; | &nbsp; <a href="{{ url_for('api.index') }}">API</a>
-            </nav>
+                <img class="header-logo" src="{{ url_for('static', filename='images/CRWA_banner_main.jpg') }}" />
+                <header>{{ self.title() }}</header>
+                <nav>
+                    <a href="{{ url_for('flagging.index') }}">Home</a>
+                    &nbsp; | &nbsp; <a href="{{ url_for('flagging.about') }}">About</a>
+                    &nbsp; | &nbsp; <a href="{{ url_for('flagging.output_model') }}">Detailed Outputs</a>
+                    &nbsp; | &nbsp; <a href="{{ url_for('flagging.api_index') }}">API</a>
+                </nav>
+                {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                        <div class="flash">
+                            {% for message in messages %}
+                                <div class="flash-message">{{ message | safe }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                {% endwith %}
             {% endblock %}
         </div>
         <section class="content">{% block content %}{% endblock %}</section>

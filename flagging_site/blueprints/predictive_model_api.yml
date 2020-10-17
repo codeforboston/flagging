@@ -17,7 +17,6 @@ parameters:
     description: Number of hours of data to return.
     in: query
     type: integer
-    enum: [1, 2, 3, 6, 12, 24, 36, 48]
     required: false
     default: 24
 responses:
@@ -34,6 +33,11 @@ responses:
         time_returned:
           description: The timestamp of when the model was run.
           type: string
+        is_boating_season:
+          description: A boolean reporting whether it is currently boating season or not. When it is not boating season,
+                       the model's outputs are not considered valid and actionable predictions as far as recreational
+                       activities along the Charles River are concerned.
+          type: boolean
         model_outputs:
           description: The most recent predictive model outputs
           type: array
@@ -51,21 +55,13 @@ responses:
                   properties:
                     time:
                       description: Timestamp for the model results.
-                      type: array
-                      items:
-                        type: string
+                      type: string
                     log-odds:
                       description: Log odds output of the model.
-                      type: array
-                      items:
-                        type: number
+                      type: number
                     probability:
                       description: Probability output of the model.
-                      type: array
-                      items:
-                        type: number
+                      type: number
                     safe:
                       description: Indication of whether or not the water is safe according to the model.
-                      type: array
-                      items:
-                        type: boolean
+                      type: boolean

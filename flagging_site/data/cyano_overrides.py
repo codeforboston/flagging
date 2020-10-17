@@ -10,7 +10,7 @@ from .database import Base
 from .database import execute_sql_from_file
 
 
-class CyanoOverrides(Base):
+class ManualOverrides(Base):
     __tablename__ = 'cyano_overrides'
     reach = Column(Integer, primary_key=True)
     start_time = Column(TIMESTAMP, primary_key=True)
@@ -18,7 +18,7 @@ class CyanoOverrides(Base):
     reason = Column(VARCHAR(255))
 
 
-class CyanoOverridesModelView(AdminModelView):
+class ManualOverridesModelView(AdminModelView):
     form_choices = {
         'reason': [
             ('cyanobacteria', 'Cyanobacteria'),
@@ -28,7 +28,7 @@ class CyanoOverridesModelView(AdminModelView):
     }
 
     def __init__(self, session):
-        super().__init__(CyanoOverrides, session)
+        super().__init__(ManualOverrides, session)
 
 
 def get_currently_overridden_reaches() -> Set[int]:

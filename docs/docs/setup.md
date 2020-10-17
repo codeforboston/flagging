@@ -19,7 +19,7 @@ Install all of the following programs onto your computer:
 **Recommended:**
 
 - A good text editor or IDE, such as [Atom.io](https://atom.io/) (which is lightweight and beginner friendly) or [PyCharm](https://www.jetbrains.com/pycharm/) (which is powerful but bulky and geared toward advanced users).
-- [Heroku CLI](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) _(required for remote deployment to Heroku.)_
+- [Heroku CLI](https://devcenter.heroku.com/articles/heroku-cli) _(required for remote deployment to Heroku.)_
 
 **Other:**
 
@@ -159,6 +159,9 @@ After you get everything set up, you should run the website at least once. The p
      * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
      * Restarting with stat
     ```
+
+???+ error
+    If you get an error that says something like "`Microsoft Visual C++ 14.0 or greater is required.`," you need to follow the link provided by the error message, download and install it, then reboot your computer.
 
 4. Point your browser of choice to the URL shown in the terminal output. If everything worked out, the website should be running on your local computer!
 
