@@ -58,7 +58,7 @@ def init_admin(app: Flask):
 
         # Database functions
         admin.add_view(DatabaseView(
-            name='Update Database', endpoint='db/updated', category='Database'
+            name='Update Database', endpoint='db/update', category='Database'
         ))
 
         admin.add_view(DownloadView(
