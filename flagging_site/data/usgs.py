@@ -12,13 +12,13 @@ from flask import abort
 from flask import current_app
 
 # Constants
-USGS_URL = 'https://waterservices.usgs.gov/nwis/iv/'
+USGS_URL = 'https://waterdata.usgs.gov/nwis/uv'
 
 USGS_STATIC_FILE_NAME = 'usgs.pickle'
 # ~ ~ ~ ~
 
 
-def get_live_usgs_data() -> pd.DataFrame:
+def get_live_usgs_data(days_ago: int = 5) -> pd.DataFrame:
     """This function runs through the whole process for retrieving data from
     usgs: first we perform the request, and then we parse the data.
 
@@ -31,24 +31,32 @@ def get_live_usgs_data() -> pd.DataFrame:
         )
         df = pd.read_pickle(fpath)
     else:
-        res = request_to_usgs()
+        res = request_to_usgs(days_ago=days_ago)
         df = parse_usgs_data(res)
     return df
 
 
-def request_to_usgs() -> requests.models.Response:
+def request_to_usgs(days_ago: int = 5) -> requests.models.Response:
     """Get a request from the USGS.
+
+
 
     Returns:
         Request Response containing the data from the request.
     """
 
+    todays_date = pd.Timestamp('today').date()
+    prior_date = todays_date - pd.Timedelta(f'{days_ago} days')
+
     payload = {
-        'format': 'json',
-        'sites': '01104500',
-        'period': 'P7D',
-        'parameterCd': '00060,00065',
-        'siteStatus': 'all'
+        'cb_00060': 'on',
+        'cb_00065': 'on',
+        'format': 'rdb',
+        'site_no': '01104500',
+        'period': {
+            'begin_date': str(todays_date),
+            'end_date': str(prior_date)
+        }
     }
 
     res = requests.get(USGS_URL, params=payload)
@@ -70,32 +78,29 @@ def parse_usgs_data(res) -> pd.DataFrame:
         Pandas DataFrame containing the usgs data.
     """
 
-    raw_data = res.json()
-
-    discharge_volume = raw_data['value']['timeSeries'][0]['values'][0]['value']
-    gage_height = raw_data['value']['timeSeries'][1]['values'][0]['value']
-
-    data_list = [
-        {
-            'time': vol_entry['dateTime'],
-            'stream_flow': float(vol_entry['value']),
-            'gage_height': float(height_entry['value'])
-        }
-        for vol_entry, height_entry
-        in zip(discharge_volume, gage_height)
+    raw_data = [
+        i.split('\t')
+        for i in res.text.split('\n')
+        if not i.startswith('#') and i != ''
     ]
 
-    df = pd.DataFrame(data_list)
-    try:
-        # Not time zone aware
-        df['time'] = (
-            pd.to_datetime(df['time'])  # Convert to Pandas datetime format
-            .dt.tz_localize('UTC')  # This is UTC; define it as such
-            .dt.tz_convert('US/Eastern')  # Take UTC time and convert to EST
-            .dt.tz_localize(None)  # Remove the timezone from the datetime
-        )
-    except TypeError:
-        # Now try if already timezone aware
-        df['time'] = pd.to_datetime(df['time']).dt.tz_localize(None)
+    # First row is column headers
+    # Second row is ????
+    # Third row downward is the data
+    df = pd.DataFrame(raw_data[2:], columns=raw_data[0])
+
+    df = df.rename(columns={
+        'datetime': 'time',
+        '66190_00060': 'stream_flow',
+        '66191_00065': 'gage_height'
+    })
+
+    # Filter columns
+    df = df[['time', 'stream_flow', 'gage_height']]
+
+    # Convert types
+    df['time'] = pd.to_datetime(df['time'])
+    df['stream_flow'] = df['stream_flow'].astype(float)
+    df['gage_height'] = df['gage_height'].astype(float)
 
     return df
