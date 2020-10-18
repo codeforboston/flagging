@@ -45,18 +45,12 @@ def request_to_usgs(days_ago: int = 5) -> requests.models.Response:
         Request Response containing the data from the request.
     """
 
-    todays_date = pd.Timestamp('today').date()
-    prior_date = todays_date - pd.Timedelta(f'{days_ago} days')
-
     payload = {
         'cb_00060': 'on',
         'cb_00065': 'on',
         'format': 'rdb',
         'site_no': '01104500',
-        'period': {
-            'begin_date': str(todays_date),
-            'end_date': str(prior_date)
-        }
+        'period': days_ago
     }
 
     res = requests.get(USGS_URL, params=payload)
