@@ -14,6 +14,7 @@ from typing import Union
 
 from flask import Flask
 from flask import current_app
+from flask import Markup
 from flask.json import JSONEncoder
 
 import py7zr
@@ -287,7 +288,6 @@ def update_config_from_vault(app: Flask) -> None:
 
 
 def add_social_svg_files_to_jinja(app: Flask):
-
     with open(os.path.join(app.static_folder, 'images', 'github.svg')) as f:
         GITHUB_SVG = f.read()
 
@@ -295,7 +295,7 @@ def add_social_svg_files_to_jinja(app: Flask):
         TWITTER_SVG = f.read()
 
     app.jinja_env.globals.update({
-        'GITHUB_SVG': GITHUB_SVG,
-        'TWITTER_SVG': TWITTER_SVG
+        'GITHUB_SVG': Markup(GITHUB_SVG),
+        'TWITTER_SVG': Markup(TWITTER_SVG)
     })
 
