@@ -74,7 +74,6 @@ class Config:
         db = self.POSTGRES_DBNAME
         return f'postgres://{user}:{password}@{host}:{port}/{db}'
 
-    SQLALCHEMY_ECHO: bool = True
     SQLALCHEMY_RECORD_QUERIES: bool = True
     SQLALCHEMY_TRACK_MODIFICATIONS: bool = False
 
@@ -95,6 +94,8 @@ class Config:
     """If True, the app instance will not fail to load just because the vault
     wasn't opened. Usually set alongside DEBUG mode.
     """
+
+    BOATING_SEASON: bool = strtobool(os.getenv('BOATING_SEASON') or 'true')
 
     VAULT_PASSWORD: str = os.getenv('VAULT_PASSWORD')
 
@@ -227,6 +228,7 @@ class DevelopmentConfig(Config):
     the vault hasn't been loaded but doesn't prevent the website from loading
     just because the vault is not open.
     """
+    SQLALCHEMY_ECHO: bool = True
     VAULT_OPTIONAL: bool = True
     DEBUG: bool = True
     TESTING: bool = True

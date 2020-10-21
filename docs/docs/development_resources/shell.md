@@ -78,8 +78,6 @@ hobolink_data = get_live_hobolink_data()
 hobolink_data.to_csv('path/where/to/save/my-CSV-file.csv')
 ```
 
-Downloading the data may be useful if you want to see 
-
 ## Example 2: Preview Tweet
 
 Let's say you want to preview a Tweet that would be sent out without actually sending it. The `compose_tweet()` function returns a string of this message:

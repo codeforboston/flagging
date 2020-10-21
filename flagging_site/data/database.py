@@ -125,10 +125,6 @@ def init_db():
         Base.metadata.create_all(db.engine)
 
 
-def database_is_empty():
-    execute_sql('SELECT * FROM asdf')
-
-
 def update_database():
     """This function basically controls all of our data refreshes. The
     following tables are updated in order:
@@ -206,3 +202,10 @@ def get_boathouse_metadata_dict():
     """
     boathouse_query = (Boathouses.query.all())
     return {'boathouses': boathouse_query}
+
+
+def get_latest_time():
+    """
+    Returns the latest time in the processed data
+    """
+    return execute_sql('SELECT MAX(time) FROM processed_data;').iloc[0]['max']
