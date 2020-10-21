@@ -78,9 +78,10 @@ def create_app(config: Optional[Union[Config, str]] = None) -> Flask:
     from .twitter import init_tweepy
     init_tweepy(app)
 
+    add_social_svg_files_to_jinja(app)
+
     class CustomJSONEncoder(JSONEncoder):
         """Add support for Decimal types"""
-
         def default(self, o):
             if isinstance(o, decimal.Decimal):
                 return float(o)
@@ -283,3 +284,19 @@ def update_config_from_vault(app: Flask) -> None:
             app.config['SECRET_KEY'] = os.urandom(16)
         else:
             raise RuntimeError(msg)
+
+
+def add_social_svg_files_to_jinja(app: Flask):
+
+    print('foo')
+    with open(os.path.join(app.static_folder, 'images', 'github.svg')) as f:
+        GITHUB_SVG = f.read()
+
+    with open(os.path.join(app.static_folder, 'images', 'twitter.svg')) as f:
+        TWITTER_SVG = f.read()
+
+    app.jinja_env.globals.update({
+        'GITHUB_SVG': GITHUB_SVG,
+        'TWITTER_SVG': TWITTER_SVG
+    })
+
