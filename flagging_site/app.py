@@ -288,7 +288,6 @@ def update_config_from_vault(app: Flask) -> None:
 
 def add_social_svg_files_to_jinja(app: Flask):
 
-    print('foo')
     with open(os.path.join(app.static_folder, 'images', 'github.svg')) as f:
         GITHUB_SVG = f.read()
 
