@@ -33,7 +33,40 @@ ul {
 }
 
 nav {
-  margin: 0.5em;
+  display: flex;
+  margin: 1.2em;
+  letter-spacing: 0.1em;
+  padding: 0.5em;
+  font-size: 0.9em;
+  flex-basis: auto;
+  max-width: 80%;
+}
+
+nav div {
+  flex: 1 1 auto;
+  margin: 1em 0 1em 0;
+  overflow-y: auto;
+}
+
+@media(max-width: 680px) {
+  nav {
+    margin: 0.3em;
+    flex-direction: column;
+    flex-wrap: wrap;
+  }
+
+  nav div {
+    text-align: left;
+    margin: 2px 0 2px 0;
+    flex: 1 0 auto;
+  }
+}
+
+
+nav a:hover {
+  -webkit-transition: all 0.25s;
+  transition: all 0.25s;
+  color: #27475e;
 }
 /***** End Element Styling *****/
 
@@ -56,74 +89,118 @@ nav {
 
 /***** Start Header Section *****/
 .page-header {
+  position: fixed; /* Set the navbar to fixed position */
+  top: 0px; /* Position the navbar at the top of the page */
+  display: block;
+  width: 100%;
+  max-width: 1260px;
   text-align: center;
   border-bottom: thin solid #dce9f2;
-  padding: 15px;
+  height: 100px;
   background: white;
+  overflow: hidden;
 }
 
-.page-header > header {
-  padding: 0.4em 0 0.4em 0;
-  text-align: center;
-  font-size: 1.5em;
+.page-header ::before {
+
 }
 
-.header-logo {
-  max-width: 100%;
+.page-header > .header-content {
+  max-width: 800px;
+  float: left;
 }
 
+.header-logo > img {
+  width: 20%;
+  height: 20%;
+  min-width: 260px;
+  float: left;
+  margin: 1.3em 2em 4em 3em;
+}
+
+.social-section {
+  float: right;
+  padding: 1.9em;
+}
+
+.social svg {
+  width: 2.1rem;
+  height: 2.1rem;
+  padding-left: 0.2em;
+  fill: #4f8fbd;
+}
+
+.social svg:hover {
+  -webkit-transition: all 0.25s;
+  transition: all 0.25s;
+  fill: #27475e;
+}
+
+/***** End Header Section *****/
+
+/***** Start Content Section *****/
 .flash {
   padding: 0.2em;
   width: 80%;
   margin: auto;
+  line-height: 20px;
 }
 
 .flash-message {
-  background-color: #ffff6f;
   padding: 0.8em;
   margin: 0.6em auto;
+  animation: fadeInAnimation ease 3s;
+  animation-iteration-count: 1;
+  animation-fill-mode: forwards;
 }
-/***** End Header Section *****/
+@keyframes fadeInAnimation {
+  0% {
+    background-color: #ffff6f;
+  }
+  100% {
+    background-color: #FFFFFF;
+  }
+}
 
-/***** Start Content Section *****/
-.content {
+.page-title {
+  margin-bottom: 1.3em;
+  font-size: 1.9em;
+}
+
+.body {
   background: white;
-  padding: 24px;
   flex-grow: 1;
+  margin-top: 80px;
+  padding: 1.9em;
 }
 
 @media(min-width: 1024px) {
-  .content {
+  .body {
     padding: 48px 10%;
   }
 }
 
-.content > header h1 {
-  flex: auto;
-  margin: 1rem 0 0.25rem 0;
-}
-
-.content:last-child {
+.body:last-child {
   margin-bottom: 0;
 }
 
-.content form {
+.body form {
   margin: 1em 0;
   display: flex;
   flex-direction: column;
 }
 
-.content label {
+.body label {
   font-weight: bold;
   margin-bottom: 0.5em;
 }
 
-.content input,
-.content textarea {
+.body input,
+.body textarea {
   margin-bottom: 1em;
 }
 
-.content textarea {
+.body textarea {
   min-height: 12em;
   resize: vertical;
 }
@@ -144,19 +221,6 @@ nav {
 
 .footer .footer-section:not(:first-child) {
   padding-top: 30px;
-}
-
-.footer .social {
-  display: inline-block;
-  width: 1.6rem;
-  height: 1.6rem;
-  text-align: center;
-}
-
-.footer .social img:hover {
-  -webkit-transition: all 0.25s;
-  transition: all 0.25s;
-  opacity: .5;
 }
 /***** End Footer *****/
 
