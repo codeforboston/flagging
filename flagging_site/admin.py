@@ -53,7 +53,7 @@ def init_admin(app: Flask):
 
     with app.app_context():
         # Register /admin sub-views
-        from .data.cyano_overrides import ManualOverridesModelView
+        from .data.manual_overrides import ManualOverridesModelView
         admin.add_view(ManualOverridesModelView(db.session))
 
         # Database functions
