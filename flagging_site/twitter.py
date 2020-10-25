@@ -54,18 +54,38 @@ def compose_tweet() -> str:
         .tz_convert('US/Eastern')
         .strftime('%I:%M:%S %p, %m/%d/%Y')
     )
-
-    if all(i for i in flags.values()):
+    unsafe_count = list(flags.values()).count(False)
+    if unsafe_count < 1:
         msg = (
             'Our predictive model is reporting all reaches are safe for '
             f'recreational activities as of {current_time}.'
         )
-    else:
-        unsafe = ', '.join([str(k) for k, v in flags.items() if v is False])
+    if unsafe_count == 1:
+        unsafe = ''.join([str(k) for k, v in flags.items() if v is False])
         msg = (
-            'Our predictive model is reporting that the following reaches are '
-            f'unsafe as of {current_time}: {unsafe}. http://crwa-flagging.herokuapp.com/'
+            f'The CRWA is reporting that reach {unsafe} is unsafe for recreational activities '
+            f'as of {current_time}. https://crwa-flagging.herokuapp.com/'
         )
+    if unsafe_count > 1:
+        unsafe = ''
+        unsafe_found = 0
+        for key in flags.keys():
+            if flags.get(key) is False:
+                unsafe += str(key)
+                unsafe_found += 1
+                if unsafe_found < unsafe_count - 1:
+                    unsafe += ', '
+                else:
+                    if unsafe_found == unsafe_count - 1:
+                        if unsafe_count > 2:
+                            unsafe += ', and '
+                        else:
+                            unsafe += ' and '
+        msg = (
+            f'The CRWA is reporting that reaches {unsafe} are unsafe for recreational activities as of {current_time}. '
+            f' https://crwa-flagging.herokuapp.com/'
+        )
+
     return msg
 
 
