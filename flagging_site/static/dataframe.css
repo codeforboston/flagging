@@ -2,12 +2,6 @@
 https://freefrontend.com/css-tables/
 */
 
-*{
-    box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-}
-
 .table-wrapper h2 {
     text-align: center;
 }
@@ -84,7 +78,6 @@ https://freefrontend.com/css-tables/
     }
     .dataframe tbody {
         width: auto;
-        position: relative;
         overflow-x: auto;
     }
     .dataframe td, .dataframe th {
