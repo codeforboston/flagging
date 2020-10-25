@@ -149,17 +149,7 @@ nav a:hover {
 .flash-message {
   padding: 0.8em;
   margin: 0.6em auto;
-  animation: fadeInAnimation ease 3s;
-  animation-iteration-count: 1;
-  animation-fill-mode: forwards;
-}
-@keyframes fadeInAnimation {
-  0% {
-    background-color: #ffff6f;
-  }
-  100% {
-    background-color: #FFFFFF;
-  }
+  background-color: #ffff6f;
 }
 
 .page-title {
