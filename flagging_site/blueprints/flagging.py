@@ -6,7 +6,7 @@ from flask import request
 from flask import current_app
 from flask import flash
 
-from ..data.cyano_overrides import get_currently_overridden_reaches
+from ..data.manual_overrides import get_currently_overridden_reaches
 from ..data.predictive_models import latest_model_outputs
 from ..data.database import get_boathouse_by_reach_dict
 from ..data.database import get_latest_time
