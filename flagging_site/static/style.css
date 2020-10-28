@@ -163,6 +163,16 @@ nav a:hover {
   padding: 0;
   border-top-width: 0;
 }
+/*
+ * Same styles as non-hidden but below .hidden definition,
+ * so it takes priority. (To see why, try reloading the page
+ * and pressing tab a few times.)
+ */
+.dropdown-menu:focus-within {
+  padding: 20px 0;
+  max-height: 300px; /* exclusively for transition */
+  border-top: thin solid #dce9f2;
+}
 
 .dropdown-menu > a {
   width: fit-content;
