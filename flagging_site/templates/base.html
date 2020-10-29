@@ -43,7 +43,9 @@
             {% block header %}
                 <div class="logo-and-links">
                     <div class="header-logo">
-                        <img src="{{ url_for('static', filename='images/crwa_logo.png') }}" />
+                        <a href="{{ url_for('flagging.index') }}">
+                            <img src="{{ url_for('static', filename='images/crwa_logo.png') }}" />
+                        </a>
                     </div>
                     <nav>
                         <a href="{{ url_for('flagging.index') }}">Home</a>
