@@ -293,9 +293,13 @@ def add_social_svg_files_to_jinja(app: Flask):
 
     with open(os.path.join(app.static_folder, 'images', 'twitter.svg')) as f:
         TWITTER_SVG = f.read()
+    
+    with open(os.path.join(app.static_folder, 'images', 'hamburger.svg')) as f:
+        HAMBURGER_SVG = f.read()
 
     app.jinja_env.globals.update({
         'GITHUB_SVG': Markup(GITHUB_SVG),
-        'TWITTER_SVG': Markup(TWITTER_SVG)
+        'TWITTER_SVG': Markup(TWITTER_SVG),
+        'HAMBURGER_SVG': Markup(HAMBURGER_SVG)
     })
 
