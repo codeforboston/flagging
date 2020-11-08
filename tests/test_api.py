@@ -8,19 +8,17 @@ import schemathesis
 @pytest.fixture
 def schema_fixture(app):
     schema = schemathesis.from_wsgi('/api/flagging_api.json', app)
-
-    # Skip the model input data endpoint for test purposes.
-    # We do not plan on maintaining this schema.
-    # The following line removes the model_input_data from the schema:
-    schema.raw_schema['paths'].pop('/api/v1/model_input_data', None)
-
     return schema
 
 
 schema = schemathesis.from_pytest_fixture('schema_fixture')
 
 
-@schema.parametrize()
+# Skip the model input data endpoint for test purposes.
+# We do not plan on maintaining this schema.
+# The input to `endpoint=` removes the model_input_data from the schema:
+
+@schema.parametrize(endpoint='^(?!/api/v1/model_input_data$).*$')
 def test_api(case):
     """Test the API against the OpenAPI specification."""
     response = case.call_wsgi()
