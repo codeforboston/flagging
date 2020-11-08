@@ -87,7 +87,7 @@ ul {
   padding: 15px;
 }
 
-.header-logo > img {
+.header-logo > a > img {
   width: 260px;
   min-width: 260px;
 }
@@ -101,11 +101,11 @@ nav {
   max-width: 80%;
 }
 
-nav > a {
+nav > .nav-link {
   display: flex;
   align-items: center;
 }
-nav > a:not(:first-child) {
+nav > .nav-link:not(:first-child) {
   margin-left: 25px;
 }
 
