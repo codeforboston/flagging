@@ -20,13 +20,16 @@ PYEXEC=$(get_python_exec)
 # Set up virtual environment in /venv
 $PYEXEC -m venv venv
 source venv/bin/activate
-$PYEXEC -m pip install -r requirements.txt
+$PYEXEC -m pip install $(cat requirements.txt | grep -v "psycopg2==")
 
 # Set up and run the Flask application
-export FLASK_APP=flagging_site
+export FLASK_APP=flagging_site:create_app
 export FLASK_ENV=development
-read -p "Offline mode? [y/n]: " offline_mode
-export OFFLINE_MODE=${offline_mode}
-read -p "Enter vault password: " vault_pw
-export VAULT_PASSWORD=${vault_pw}
+export DATABASE_URL=$(heroku config:get DATABASE_URL)
+
+read -p "Use mock data? [y/n]: " use_mock_data
+export USE_MOCK_DATA=${use_mock_data:-${USE_MOCK_DATA}}
+
+flask create-db
+flask init-db
 flask run

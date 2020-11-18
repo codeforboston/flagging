@@ -1,0 +1,67 @@
+JSON of the predictive model outputs
+---
+tags:
+  - Predictive Model API
+parameters:
+  - name: reach
+    description: The reach (or reaches) to return model results for.
+    in: query
+    type: array
+    collectionFormat: multi
+    required: false
+    default: [2, 3, 4, 5]
+    items:
+      type: string
+      enum: [2, 3, 4, 5]
+  - name: hours
+    description: Number of hours of data to return.
+    in: query
+    type: integer
+    required: false
+    default: 24
+responses:
+  200:
+    description: Dictionary-like json of the output model
+    schema:
+      id: predictive_models
+      type: object
+      properties:
+        version:
+          description: The model version. Each model version corresponds with its own unique set of coefficients and/or
+                       features. Typically this will be the year of the model.
+          type: string
+        time_returned:
+          description: The timestamp of when the model was run.
+          type: string
+        is_boating_season:
+          description: A boolean reporting whether it is currently boating season or not. When it is not boating season,
+                       the model's outputs are not considered valid and actionable predictions as far as recreational
+                       activities along the Charles River are concerned.
+          type: boolean
+        model_outputs:
+          description: The most recent predictive model outputs
+          type: array
+          items:
+            type: object
+            properties:
+              reach:
+                description: The reach that these model outputs correspond to.
+                type: integer
+              predictions:
+                description: Records of the predictive model outputs.
+                type: array
+                items:
+                  type: object
+                  properties:
+                    time:
+                      description: Timestamp for the model results.
+                      type: string
+                    log-odds:
+                      description: Log odds output of the model.
+                      type: number
+                    probability:
+                      description: Probability output of the model.
+                      type: number
+                    safe:
+                      description: Indication of whether or not the water is safe according to the model.
+                      type: boolean

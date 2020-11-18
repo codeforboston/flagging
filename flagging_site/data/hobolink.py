@@ -2,22 +2,17 @@
 This file handles connections to the HOBOlink API, including cleaning and
 formatting of the data that we receive from it.
 """
-# TODO:
-#  Pandas is inefficient. It should go to SQL, not to Pandas. I am currently
-#  using pandas because we do not have any cron jobs or any caching or SQL, but
-#  I think in future versions we should not be using Pandas at all.
+import os
 import io
 import requests
 import pandas as pd
 from flask import abort
-from .keys import get_keys
-from .keys import offline_mode
-from .keys import get_data_store_file_path
+from flask import current_app
 
 # Constants
 
 HOBOLINK_URL = 'http://webservice.hobolink.com/restv2/data/custom/file'
-EXPORT_NAME = 'code_for_boston_export'
+DEFAULT_HOBOLINK_EXPORT_NAME = 'code_for_boston_export_21d'
 # Each key is the original column name; the value is the renamed column.
 HOBOLINK_COLUMNS = {
     'Time, GMT-04:00': 'time',
@@ -33,11 +28,13 @@ HOBOLINK_COLUMNS = {
     'Temp': 'air_temp',
     # 'Batt, V, Charles River Weather Station': 'battery'
 }
-STATIC_FILE_NAME = 'hobolink.pickle'
+HOBOLINK_STATIC_FILE_NAME = 'hobolink.pickle'
 # ~ ~ ~ ~
 
 
-def get_live_hobolink_data(export_name: str = EXPORT_NAME) -> pd.DataFrame:
+def get_live_hobolink_data(
+        export_name: str = DEFAULT_HOBOLINK_EXPORT_NAME
+) -> pd.DataFrame:
     """This function runs through the whole process for retrieving data from
     HOBOlink: first we perform the request, and then we clean the data.
 
@@ -48,8 +45,11 @@ def get_live_hobolink_data(export_name: str = EXPORT_NAME) -> pd.DataFrame:
     Returns:
         Pandas Dataframe containing the cleaned-up Hobolink data.
     """
-    if offline_mode():
-        df = pd.read_pickle(get_data_store_file_path(STATIC_FILE_NAME))
+    if current_app.config['USE_MOCK_DATA']:
+        fpath = os.path.join(
+            current_app.config['DATA_STORE'], HOBOLINK_STATIC_FILE_NAME
+        )
+        df = pd.read_pickle(fpath)
     else:
         res = request_to_hobolink(export_name=export_name)
         df = parse_hobolink_data(res.text)
@@ -57,7 +57,7 @@ def get_live_hobolink_data(export_name: str = EXPORT_NAME) -> pd.DataFrame:
 
 
 def request_to_hobolink(
-        export_name: str = EXPORT_NAME,
+        export_name: str = DEFAULT_HOBOLINK_EXPORT_NAME,
 ) -> requests.models.Response:
     """
     Get a request from the Hobolink server.
@@ -71,7 +71,7 @@ def request_to_hobolink(
     """
     data = {
         'query': export_name,
-        'authentication': get_keys()['hobolink']
+        'authentication': current_app.config['HOBOLINK_AUTH']
     }
 
     res = requests.post(HOBOLINK_URL, json=data)
@@ -93,15 +93,16 @@ def parse_hobolink_data(res: str) -> pd.DataFrame:
     Returns:
         Pandas DataFrame containing the HOBOlink data.
     """
-    # TODO:
-    #  The first half of the output is a yaml-formatted text stream. Is there
-    #  anything useful in it? Can we store it and make use of it somehow?
     if isinstance(res, requests.models.Response):
         res = res.text
 
-    # Turn the text from the API response into a Pandas DataFrame.
+    # The first half of the text from the response is a yaml. The part below
+    # the yaml is the actual data. The following lines split the text and grab
+    # the csv:
     split_by = '------------'
     str_table = res[res.find(split_by) + len(split_by):]
+
+    # Turn the text from the API response into a Pandas DataFrame.
     df = pd.read_csv(io.StringIO(str_table), sep=',')
 
     # There is a weird issue in the HOBOlink data where it sometimes returns
@@ -133,6 +134,6 @@ def parse_hobolink_data(res: str) -> pd.DataFrame:
     df = df.loc[df['water_temp'].notna()]
 
     # Convert time column to Pandas datetime
-    df['time'] = pd.to_datetime(df['time'])
+    df['time'] = pd.to_datetime(df['time'], format='%m/%d/%y %H:%M:%S')
 
     return df

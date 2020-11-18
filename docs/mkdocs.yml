@@ -1,8 +1,64 @@
-site_name: Water MKDocs
+site_name: CRWA Flagging Website Documentation
+site_description: Guide on developing and deploying the flagging website
 nav:
-    - Home: index.md
-    - Background: background.md
-    - Deployment: deployment.md
-    - System: system.md
-    
-theme: readthedocs
+- Home: index.md
+- About: about.md
+- Setup: setup.md
+- Admin: admin.md
+- Cloud:
+    - Overview: cloud/index.md
+    - Heroku Deployment: cloud/heroku_deployment.md
+    - Twitter Bot: cloud/twitter_bot.md
+- Development:
+    - Overview: development/index.md
+    # - Config: development/config.md
+    - Data: development/data.md
+    - Predictive Models: development/predictive_models.md
+    # - Front-End: development/front-end.md
+- Development Resources:
+    - Overview: development_resources/index.md
+    - Learning Resources: development_resources/learning_resources.md
+    - Shell: development_resources/shell.md
+theme:
+  name: material
+  palette:
+    scheme: default
+    primary: teal
+    accent: cyan
+  icon:
+    logo: fontawesome/regular/flag
+  font:
+    text: Opens Sans
+    code: Roboto Mono
+repo_name: codeforboston/flagging
+repo_url: https://github.com/codeforboston/flagging
+edit_uri: ""
+plugins:
+  - macros
+markdown_extensions:
+- admonition
+- pymdownx.tabbed # https://facelessuser.github.io/pymdown-extensions/
+- pymdownx.keys
+- pymdownx.details
+- pymdownx.inlinehilite
+- pymdownx.magiclink:
+    repo_url_shorthand: true
+    user: squidfunk
+    repo: mkdocs-material
+- pymdownx.superfences:
+    custom_fences:
+    - name: mermaid
+      class: mermaid
+      format: !!python/name:pymdownx.superfences.fence_div_format
+- sane_lists
+extra:
+  flagging_website_url: https://crwa-flagging.herokuapp.com
+  social:
+  - icon: fontawesome/brands/github
+    link: https://github.com/codeforboston/flagging
+  - icon: fontawesome/brands/meetup
+    link: https://www.meetup.com/Code-for-Boston/
+  - icon: fontawesome/brands/twitter
+    link: https://twitter.com/codeforboston
+extra_javascript:
+- https://unpkg.com/mermaid@8.4.6/dist/mermaid.min.js

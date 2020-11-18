@@ -1,11 +1,25 @@
-from flagging_site.blueprints.api import model_api
-from flask import current_app
+"""This file tests that the schema of the API is valid. The schemas are defined
+in the YAML files, and they in turn define how the API is supposed to work.
+"""
+import pytest
+import schemathesis
 
 
-def test_max_hours(app):
-    """Test that the API never returns more than the max number of hours."""
-    with app.app_context():
-        max_hours = current_app.config['API_MAX_HOURS']
-        excess_hours = current_app.config['API_MAX_HOURS'] + 10
-        rows_returned = len(model_api(None, excess_hours)['models']['reach_2']['time'])
-        assert rows_returned == max_hours
+@pytest.fixture
+def schema_fixture(app):
+    schema = schemathesis.from_wsgi('/api/flagging_api.json', app)
+    return schema
+
+
+schema = schemathesis.from_pytest_fixture('schema_fixture')
+
+
+# Skip the model input data endpoint for test purposes.
+# We do not plan on maintaining this schema.
+# The input to `endpoint=` removes the model_input_data from the schema:
+
+@schema.parametrize(endpoint='^(?!/api/v1/model_input_data$).*$')
+def test_api(case):
+    """Test the API against the OpenAPI specification."""
+    response = case.call_wsgi()
+    case.validate_response(response)

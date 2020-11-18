@@ -2,12 +2,6 @@
 https://freefrontend.com/css-tables/
 */
 
-*{
-    box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-}
-
 .table-wrapper h2 {
     text-align: center;
 }
@@ -15,7 +9,8 @@ https://freefrontend.com/css-tables/
 /* Table Styles */
 
 .table-wrapper {
-    margin: 10px 70px 70px;
+    max-width: 90%;
+    margin: auto;
     box-shadow: 0px 35px 50px rgba( 0, 0, 0, 0.2 );
 }
 
@@ -60,18 +55,21 @@ https://freefrontend.com/css-tables/
 
 /* Responsive */
 
-@media (max-width: 767px) {
+@media (max-width: 680px) {
     .dataframe {
         display: block;
         width: 100%;
     }
-    .table-wrapper:before{
+    .table-wrapper: before{
         content: "Scroll horizontally >";
         display: block;
         text-align: right;
         font-size: 11px;
-        color: white;
         padding: 0 0 10px;
+    }
+    .table-wrapper {
+        width: 100%;
+        max-width: 100%;
     }
     .dataframe thead, .dataframe tbody, .dataframe thead th {
         display: block;
@@ -84,7 +82,6 @@ https://freefrontend.com/css-tables/
     }
     .dataframe tbody {
         width: auto;
-        position: relative;
         overflow-x: auto;
     }
     .dataframe td, .dataframe th {
@@ -94,14 +91,20 @@ https://freefrontend.com/css-tables/
         box-sizing: border-box;
         overflow-x: hidden;
         overflow-y: auto;
-        width: 160px;
         font-size: 13px;
         text-overflow: ellipsis;
+    }
+    .dataframe td {
+        width: 160px;
     }
     .dataframe thead th {
         text-align: left;
         border-bottom: 1px solid #f7f7f9;
     }
+    .dataframe th {
+        width: 120px;
+    }
+
     .dataframe tbody tr {
         display: table-cell;
     }

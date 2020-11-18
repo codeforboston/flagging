@@ -1,0 +1,38 @@
+{% extends "admin/base.html" %}
+{% block body %}
+    <h3>Database Downloads</h3>
+    <p>
+        The following tables are available for download directly from the database as CSV files:
+    </p>
+    <ul>
+        <li><a href="./csv/hobolink">HOBOlink</a></li>
+        <li><a href="./csv/usgs">USGS</a></li>
+        <li><a href="./csv/processed_data">Processed Data</a></li>
+        <li><a href="./csv/model_outputs">Model Outputs</a></li>
+        <li><a href="./csv/boathouses">Boathouses</a></li>
+    </ul>
+    <h3>Source Downloads</h3>
+    <p>
+        Due to free tier hosting limitations, we cannot store lots of data at a time in the database.
+    </p>
+    <p>
+        However, the data processing functions can be run directly and sent as a download without ever touching the
+        database. This allows for sending larger chunks of data at a time because it is not bound by limitations on the
+        number of rows we can store imposed by our hosting service.
+    </p>
+    <p>
+        The downsides to this approach are (1.) it takes a while, and (2.) it may consume a lot of bandwidth and CPU
+        time, so use it sparingly!
+    </p>
+    <p>
+        <b>Note:</b> Some of the earliest data in the "Processed Data" and "Model Outputs" tables will be missing or
+        distorted due to some data transformations that require looking backwards in time, e.g. rolling averages or time
+        since last significant rainfall. It is suggested that you discard the earliest month of data for each download.
+    </p>
+    <ul>
+        <li><a href="./csv/hobolink_source">HOBOlink</a></li>
+        <li><a href="./csv/usgs_source">USGS</a></li>
+        <li><a href="./csv/processed_data">Processed Data</a></li>
+        <li><a href="./csv/model_outputs">Model Outputs</a></li>
+    </ul>
+{% endblock %}

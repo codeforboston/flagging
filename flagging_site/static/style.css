@@ -1,79 +1,285 @@
+/***** Start Element Styling *****/
 html {
   font-family: sans-serif;
-  background: #dce9f2;
-  padding: 1rem;
 }
+
 body {
   max-width: 1260px;
   margin: 0 auto;
-  background: white;
+  background: #dce9f2;
 }
+
 h1, h2, h3, h4 {
   color: #27475e;
-  margin: 1rem 0;
 }
+
 a {
   color: #377ba8;
+  text-decoration: none;
 }
+
 hr {
   border: none;
-  border-top: 1px solid lightgray;
+  border-top: thin solid #dce9f2;
 }
+
 p {
   line-height: 25px;
 }
-nav h1 {
-  flex: auto;
-  margin: 0;
-}
-nav h1 a {
-  text-decoration: none;
-  padding: 0.25rem 0.5rem;
-}
-nav ul {
-  display: flex;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-nav ul li a,
-nav ul li span,
-header .action {
-  display: block;
-  padding: 0.5rem;
-}
+
 ul {
   line-height: 25px;
-}
-ul.home-boat-house {
   list-style-type: square;
-  padding-left: 15px;
-  padding-right: 15px;
+}
+/***** End Element Styling *****/
+
+/***** Start Common Classes *****/
+.above-fold {
+  /* Everything above the bottom of the screen */
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.centered {
+  text-align: center;
+}
+
+.non-breaking {
+  display: inline-block;
+}
+/***** End Common Classes *****/
+
+/***** Start Header Section *****/
+.page-header {
+  position: fixed; /* Set the navbar to fixed position */
+  top: 0px; /* Position the navbar at the top of the page */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 1260px;
+  text-align: center;
+  border-bottom: thin solid #dce9f2;
+  height: fit-content;
+  background: white;
+  z-index: 99;
+}
+
+.page-header > .header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-height: 100px;
+  padding: 0 20px;
+  box-sizing: border-box;
+}
+
+.logo-and-links {
+  display: flex;
+  align-items: center;
+}
+
+.header-logo {
+  width: min-content;
+  height: min-content;
+  padding: 15px;
+}
+
+.header-logo > a > img {
+  width: 260px;
+  min-width: 260px;
+}
+
+nav {
+  display: flex;
+  letter-spacing: 0.1em;
+  padding: 0.5em;
+  font-size: 0.9em;
+  flex-basis: auto;
+  max-width: 80%;
+}
+
+nav > .nav-link {
+  display: flex;
+  align-items: center;
+}
+nav > .nav-link:not(:first-child) {
+  margin-left: 25px;
+}
+
+@media(max-width: 680px) {
+  nav,
+  .social-section {
+    display: none;
+  }
+}
+
+nav a:hover {
+  -webkit-transition: all 0.25s;
+  transition: all 0.25s;
+  color: #27475e;
+}
+
+.social-section {
+  white-space: nowrap;
+  padding: 15px;
+}
+
+.social svg {
+  width: 2.1rem;
+  height: 2.1rem;
+  padding-left: 0.2em;
+  fill: #4f8fbd;
+}
+
+.social svg:hover {
+  -webkit-transition: all 0.25s;
+  transition: all 0.25s;
+  fill: #27475e;
+}
+
+.hamburger-button {
+  border: none;
+  background: transparent;
+  padding: 15px;
+}
+
+.dropdown-menu {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  padding: 20px 0;
+  border-top: thin solid #dce9f2;
+  box-shadow: 0 4px 10px -2px #dce9f2;
+  overflow: hidden;
+  
+  max-height: 300px; /* exclusively for transition */
+  transition: padding 0.3s, max-height 0.3s, border-top-width 0.3s;
+}
+.dropdown-menu.hidden {
+  max-height: 0px;
+  padding: 0;
+  border-top-width: 0;
+}
+/*
+ * Same styles as non-hidden but below .hidden definition,
+ * so it takes priority. (To see why, try reloading the page
+ * and pressing tab a few times.)
+ */
+.dropdown-menu:focus-within {
+  padding: 20px 0;
+  max-height: 300px; /* exclusively for transition */
+  border-top: thin solid #dce9f2;
+}
+
+.dropdown-menu > a {
+  width: fit-content;
+}
+.dropdown-menu > a:not(:first-child) {
+  margin-top: 15px;
+}
+
+@media(min-width: 681px) {
+  .hamburger-button,
+  .dropdown-menu {
+    display: none;
+  }
+}
+
+/***** End Header Section *****/
+
+/***** Start Content Section *****/
+.flash {
+  padding: 0.2em;
+  width: 80%;
+  margin: auto;
+  line-height: 20px;
+}
+
+.flash-message {
+  padding: 0.8em;
+  margin: 0.6em auto;
+  background-color: #ffff6f;
+}
+
+.page-title {
+  margin-bottom: 1.3em;
+  font-size: 1.9em;
+}
+
+.body {
+  background: white;
+  flex-grow: 1;
+  margin-top: 80px;
+  padding: 1.9em;
+}
+
+@media(min-width: 1024px) {
+  .body {
+    padding: 48px 10%;
+  }
+}
+
+.body:last-child {
+  margin-bottom: 0;
+}
+
+.body form {
+  margin: 1em 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.body label {
+  font-weight: bold;
+  margin-bottom: 0.5em;
+}
+
+.body input,
+.body textarea {
+  margin-bottom: 1em;
+}
+
+.body textarea {
+  min-height: 12em;
+  resize: vertical;
+}
+/***** End Content Section *****/
+
+/***** Start Footer Section *****/
+.footer {
+  text-align: center;
+  padding: 3em 1em 3em 1em;
+  font-size: 0.85em;
+  background: white;
+  border-top: thin solid #dce9f2;
+}
+
+.footer p {
+  line-height: normal;
+}
+
+.footer .footer-section:not(:first-child) {
+  padding-top: 30px;
+}
+/***** End Footer *****/
+
+/***** Start Home Page *****/
+.home-boat-house {
+  margin: 5px 0;
   text-align: left;
 }
-section.page-header {
-  text-align: center;
-  border-bottom: 1px solid lightgray;
-   padding-bottom: 0.7em;
+
+.home-reach {
+  border: 1px solid black;
+  border-collapse: collapse;
+  padding: 15px;
+  margin: 0 auto;            
 }
-.page-header > header {
-  padding: 0.4em 0 0.4em 0;
-  text-align: center;
-  font-size: 1.5em;
-}
-.content {
-  padding: 0 1rem 1rem;
-}
-.content > header h1 {
-  flex: auto;
-  margin: 1rem 0 0.25rem 0;
-}
-.flash {
-  margin: 1em 0;
-  padding: 1em;
-  background: #cae6f6;
-  border: 1px solid #377ba8;
-}
+
 .flag {
   width: 2rem;
   height: auto;
@@ -81,69 +287,49 @@ section.page-header {
   padding-left: 1rem;
   padding-right: 1rem;
 }
-.post > header {
-  display: flex;
-  align-items: flex-end;
-  font-size: 0.85em;
-}
-.post > header > div:first-of-type {
-  flex: auto;
-}
-.post > header h1 {
-  font-size: 1.5em;
-  margin-bottom: 0;
-}
-.post .about {
-  color: slategray;
-  font-style: italic;
-}
-.post .body {
-  white-space: pre-line;
-}
-.content:last-child {
-  margin-bottom: 0;
-}
-.content form {
-  margin: 1em 0;
-  display: flex;
-  flex-direction: column;
-}
-.content label {
-  font-weight: bold;
-  margin-bottom: 0.5em;
-}
-.content input,
-.content textarea {
-  margin-bottom: 1em;
-}
-.footer {
-  padding: 3em 1em 3em 1em;
-  font-size: 0.85em;
 
-}
-.footer > .footer-content {
-  width: 30em;
-  text-align: center;
+.twitter-tweet {
   margin: 0 auto;
 }
-.content textarea {
-  min-height: 12em;
-  resize: vertical;
+
+/***** End Home Page *****/
+
+/***** Start About Page *****/
+
+.shrink-youtube {
+  max-width: 645px;
+  margin: auto;
 }
 
-.home-centered{
-  text-align: center;
+.youtube-container {
+  position: relative;
+  padding-bottom: 56.25%;
+  height: 0;
+  overflow: hidden;
 }
-.home-reach{
-  border: 1px solid black;
-  border-collapse: collapse;
-  padding: 15px;
-  margin: 0 auto;            
+
+.youtube-container iframe,
+.youtube-container object,
+.youtube-container embed {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
 }
-input.danger {
-  color: #cc2f2e;
+
+/***** End About Page *****/
+
+/***** Start API Index Page *****/
+
+pre.prettyprint {
+  overflow-x: scroll;
+  overflow-y: hidden;
+  width: 90%;
+  margin: 2em auto;
+  border: none !important;
+  display: inline-block;
 }
-input[type="submit"] {
-  align-self: start;
-  min-width: 10em;
-}
+
+/***** End API Index Page *****/

@@ -5,50 +5,54 @@ gauge.
 Link  to the web interface (not the api) 
 https://waterdata.usgs.gov/nwis/uv?site_no=01104500
 """
+import os
 import pandas as pd
 import requests
 from flask import abort
-from .keys import offline_mode
-from .keys import get_data_store_file_path
+from flask import current_app
 
 # Constants
-USGS_URL = 'https://waterservices.usgs.gov/nwis/iv/'
+USGS_URL = 'https://waterdata.usgs.gov/nwis/uv'
 
-STATIC_FILE_NAME = 'usgs.pickle'
+USGS_STATIC_FILE_NAME = 'usgs.pickle'
 # ~ ~ ~ ~
 
 
-def get_live_usgs_data() -> pd.DataFrame:
-    """This function  runs through the whole process for retrieving data from
-    usgs: first we perform the request, and then we clean the data.
+def get_live_usgs_data(days_ago: int = 5) -> pd.DataFrame:
+    """This function runs through the whole process for retrieving data from
+    usgs: first we perform the request, and then we parse the data.
 
     Returns:
         Pandas Dataframe containing the usgs data.
     """
-    if offline_mode():
-        df = pd.read_pickle(get_data_store_file_path(STATIC_FILE_NAME))
+    if current_app.config['USE_MOCK_DATA']:
+        fpath = os.path.join(
+            current_app.config['DATA_STORE'], USGS_STATIC_FILE_NAME
+        )
+        df = pd.read_pickle(fpath)
     else:
-        res = request_to_usgs()
+        res = request_to_usgs(days_ago=days_ago)
         df = parse_usgs_data(res)
     return df
 
 
-def request_to_usgs() -> requests.models.Response:
-    """
-    Get a request from the USGS.
+def request_to_usgs(days_ago: int = 5) -> requests.models.Response:
+    """Get a request from the USGS.
+
+
 
     Returns:
         Request Response containing the data from the request.
     """
-    
+
     payload = {
-        'format': 'json',
-        'sites': '01104500',
-        'period': 'P7D',
-        'parameterCd': '00060,00065',
-        'siteStatus': 'all'
+        'cb_00060': 'on',
+        'cb_00065': 'on',
+        'format': 'rdb',
+        'site_no': '01104500',
+        'period': days_ago
     }
-    
+
     res = requests.get(USGS_URL, params=payload)
     if res.status_code // 100 in [4, 5]:
         error_msg = 'API request to the USGS endpoint failed with status code '\
@@ -68,32 +72,33 @@ def parse_usgs_data(res) -> pd.DataFrame:
         Pandas DataFrame containing the usgs data.
     """
 
-    raw_data = res.json()
-
-    discharge_volume = raw_data['value']['timeSeries'][0]['values'][0]['value']
-    gage_height = raw_data['value']['timeSeries'][1]['values'][0]['value']
-
-    data_list = [
-        {
-            'time': vol_entry['dateTime'],
-            'stream_flow': float(vol_entry['value']),
-            'gage_height': float(height_entry['value'])
-        }
-        for vol_entry, height_entry
-        in zip(discharge_volume, gage_height)
+    raw_data = [
+        i.split('\t')
+        for i in res.text.split('\n')
+        if not i.startswith('#') and i != ''
     ]
 
-    df = pd.DataFrame(data_list)
-    try:
-        # Not time zone aware
-        df['time'] = (
-            pd.to_datetime(df['time'])  # Convert to Pandas datetime format
-            .dt.tz_localize('UTC')  # This is UTC; define it as such
-            .dt.tz_convert('US/Eastern')  # Take the UTC time and convert to EST
-            .dt.tz_localize(None)  # Remove the timezone from the datetime
-        )
-    except TypeError:
-        # Now try if already timezone aware
-        df['time'] = pd.to_datetime(df['time']).dt.tz_localize(None)
+    # First row is column headers
+    # Second row is ????
+    # Third row downward is the data
+    df = pd.DataFrame(raw_data[2:], columns=raw_data[0])
+
+    df = df.rename(columns={
+        'datetime': 'time',
+        '66190_00060': 'stream_flow',
+        '66191_00065': 'gage_height'
+    })
+
+    # Filter columns
+    df = df[['time', 'stream_flow', 'gage_height']]
+
+    # Convert types
+    df['time'] = pd.to_datetime(df['time'])
+    # Note to self: ran this once in a test and it gave the following error:
+    # FAILED tests/test_data.py::test_usgs_data_is_recent - ValueError: could not convert string to float: ''
+    # Reran and it went away
+    # The error was here in this line casting `stream_flow` to a float:
+    df['stream_flow'] = df['stream_flow'].astype(float)
+    df['gage_height'] = df['gage_height'].astype(float)
 
     return df

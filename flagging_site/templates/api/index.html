@@ -1,11 +1,11 @@
 {% extends "base.html" %}
-{% block title %}API{% endblock %}
+{% block head %}
+    {{ super() }}
+    <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/lang-r.js"></script>
+{% endblock %}
+{% block title %}Public Flagging API{% endblock %}
 {% block content %}
-    <p>
-        <strong>Note: The v1 API is still tentative and under development at this time. It will be
-        finalized when this messsage is removed. The schemas may break in the meanwhile.</strong>
-    </p>
-    <h2>Public Flagging API</h2>
     <p>
         Pursuant to CRWA's mission to provide open access to ecological data to the greater Boston community and the
         world, the CRWA allows open access to its Public Flagging API, which provides JSON versions of the CRWA's data
@@ -16,13 +16,76 @@
         the data. Additional APIs may be added to the project as development progresses. This is a volunteer
         driven project and we appreciate developers' and researchers' input on what would be most useful.
     </p>
-    <p>
-        <a href="{{ url_for('flasgger.apidocs') }}" target="_blank">
-            Click here to view API documentation powered by Swagger.
-        </a>
+    <p style="text-align:center; font-weight:bold;">
+            <a href="{{ url_for('flasgger.apidocs') }}" target="_blank">
+                Click here to view our API and its documentation with Swagger.
+            </a>
     </p>
     <h2>Available Endpoints</h2>
     <ul>
-        <li><a href="{{ url_for('api.reachesapi') }}" target="_blank">Flagging Model Outputs</a></li>
+        <li><a href="{{ url_for('api.predictive_model_api') }}" target="_blank">Predictive Model Outputs</a></li>
+        <li><a href="{{ url_for('api.boathouses_api') }}" target="_blank">Boathouses</a></li>
+        <li><a href="{{ url_for('api.model_input_data_api') }}" target="_blank">Model Input Data</a></li>
     </ul>
+    <br />
+    <hr />
+    <br />
+    <h2>Sample Code For API Calls</h2>
+    <p>
+        Below we provide sample code so that you can download the data directly from the Public Flagging API.
+    </p>
+    <h3>Python Code Examples</h3>
+        <p>Note: Requires Pandas (<tt>pip install pandas</tt>) and Requests (<tt>pip install requests</tt>).</p>
+        <h4>Predictive Model Outputs API</h4>
+            <pre class="prettyprint lang-python">
+import pandas as pd
+import requests
+
+# Get data and parse returned JSON
+url = "{{ url_for('api.predictive_model_api', _external=True) }}"
+res = requests.get(url).json()
+records = [
+    {
+        "reach": reach["reach"],
+        **row
+    }
+    for reach in res["model_outputs"]
+    for row in reach["predictions"]
+]
+
+# Turn into Pandas DataFrame
+df = pd.DataFrame(records)
+print(df.head())</pre>
+        <h4>Boathouses API</h4>
+            <pre class="prettyprint lang-python">
+import pandas as pd
+import requests
+
+# Get data and parse returned JSON
+url = "{{ url_for('api.boathouses_api', _external=True) }}"
+res = requests.get(url).json()
+records = res["boathouses"]
+
+# Turn into Pandas DataFrame
+df = pd.DataFrame(records)
+print(df.head())</pre>
+    <h3>R (Tidyverse) Code Examples</h3>
+        <p>Note: Requires Tidyverse (<tt>install.packages("tidyverse")</tt>) and jsonlite (<tt>install.packages("jsonlite")</tt>).</p>
+        <h4>Predictive Model Outputs API</h4>
+                <pre class="prettyprint lang-r">
+library(jsonlite)
+library(tidyverse)
+
+url <- "{{ url_for('api.predictive_model_api', _external=True) }}"
+res <- fromJSON(url) %>% as_tibble
+df <- res$model_outputs %>% unnest(predictions)
+df</pre>
+        <h4>Boathouses API</h4>
+            <pre class="prettyprint lang-r">
+library(jsonlite)
+library(tidyverse)
+
+url <- "{{ url_for('api.boathouses_api', _external=True) }}"
+df <- fromJSON(url) %>% as_tibble
+df</pre>
 {% endblock %}

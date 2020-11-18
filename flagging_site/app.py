@@ -2,14 +2,30 @@
 This file handles the construction of the Flask application object.
 """
 import os
-from typing import Optional
-from flask import Flask, render_template, jsonify, request
+import click
+import time
+import json
+import decimal
 
-from .data.keys import get_keys
+import datetime
+from typing import Optional
+from typing import Dict
+from typing import Union
+
+from flask import Flask, render_template, jsonify, request
+from flask import current_app
+from flask import Markup
+from flask.json import JSONEncoder
+
+import py7zr
+from lzma import LZMAError
+from py7zr.exceptions import PasswordRequired
+
 from .config import Config
 from .config import get_config_from_env
 
-def create_app(config: Optional[Config] = None) -> Flask:
+
+def create_app(config: Optional[Union[Config, str]] = None) -> Flask:
     """Create and configure an instance of the Flask application. We use the
     `create_app` scheme over defining the `app` directly at the module level so
     the app isn't loaded immediately by importing the module.
@@ -20,13 +36,16 @@ def create_app(config: Optional[Config] = None) -> Flask:
     Returns:
         The fully configured Flask app instance.
     """
-    app = Flask(__name__, instance_relative_config=True)
+    app = Flask(__name__)
 
     # Get a config for the website. If one was not passed in the function, then
     # a config will be used depending on the `FLASK_ENV`.
-    if not config:
+    if config is None:
         # Determine the config based on the `FLASK_ENV`.
         config = get_config_from_env(app.env)
+    elif isinstance(config, str):
+        # If config is string, parse it as if it's an env.
+        config = get_config_from_env(config)
 
     app.config.from_object(config)
 
@@ -38,16 +57,20 @@ def create_app(config: Optional[Config] = None) -> Flask:
     # blueprints are imported is: If BLUEPRINTS is in the config, then import
     # only from that list. Otherwise, import everything that's inside of
     # `blueprints/__init__.py`.
-    from . import blueprints
-    register_blueprints_from_module(app, blueprints)
+    from .blueprints.api import bp as api_bp
+    app.register_blueprint(api_bp)
+
+    from .blueprints.flagging import bp as flagging_bp
+    app.register_blueprint(flagging_bp)
 
     # Add Swagger to the app. Swagger automates the API documentation and
     # provides an interface for users to query the API on the website.
-    add_swagger_plugin_to_app(app)
+    init_swagger(app)
 
     # Register the database commands
-    # from .data import db
-    # db.init_app(app)
+    from .data import db
+    db.init_app(app)
+
 
     # And we're all set! We can hand the app over to flask at this point.
 
@@ -67,40 +90,113 @@ def create_app(config: Optional[Config] = None) -> Flask:
         bp.logger.error('Server Error: %s', (error))
         return render_template('error.html', type = "500", msg = "Something went wrong.")
 
+    # Register admin
+    from .admin import init_admin
+    init_admin(app)
+
+    # Register Twitter bot
+    from .twitter import init_tweepy
+    init_tweepy(app)
+
+    add_social_svg_files_to_jinja(app)
+
+    class CustomJSONEncoder(JSONEncoder):
+        """Add support for Decimal types"""
+        def default(self, o):
+            if isinstance(o, decimal.Decimal):
+                return float(o)
+            elif isinstance(o, datetime.date):
+                return o.isoformat()
+            else:
+                return super().default(o)
+
+    app.json_encoder = CustomJSONEncoder
+
+    @app.before_request
+    def before_request():
+        from flask import g
+        g.request_start_time = time.time()
+        g.request_time = lambda: '%.3fs' % (time.time() - g.request_start_time)
+
+    @app.cli.command('create-db')
+    def create_db_command():
+        """Create database (after verifying that it isn't already there)."""
+        from .data.database import create_db
+        if create_db():
+            click.echo('The database was created.')
+        else:
+            click.echo('The database was already there.')
+
+    @app.cli.command('init-db')
+    def init_db_command():
+        """Clear existing data and create new tables."""
+        from .data.database import init_db
+        init_db()
+        click.echo('Initialized the database.')
+
+    @app.cli.command('update-db')
+    def update_db_command():
+        """Update the database with the latest live data."""
+        from .data.database import update_database
+        try:
+            update_database()
+            click.echo('Updated the database.')
+            updated = True
+        except Exception as e:
+            click.echo("Note: while updating database, something didn't "
+                       f'work: {e}')
+            updated = False
+        return updated
+
+    @app.cli.command('update-website')
+    @click.pass_context
+    def update_website_command(ctx):
+        """Updates the database, then Tweets a message."""
+        updated = ctx.invoke(update_db_command)
+        # If the model updated and it's boating season, send a tweet.
+        # Otherwise, do nothing.
+        if (
+                updated
+                and current_app.config['BOATING_SEASON']
+                and current_app.config['SEND_TWEETS']
+        ):
+            from .twitter import tweet_current_status
+            msg = tweet_current_status()
+            click.echo(f'Sent out tweet: {msg!r}')
+
+    # Make a few useful functions available in Flask shell without imports
+    @app.shell_context_processor
+    def make_shell_context():
+        import pandas as pd
+        import numpy as np
+        from flask import current_app
+        from .data import db
+        from .data.hobolink import get_live_hobolink_data
+        from .data.predictive_models import process_data
+        from .data.usgs import get_live_usgs_data
+        from .twitter import compose_tweet
+
+        return {
+            'pd': pd,
+            'np': np,
+            'app': current_app,
+            'db': db,
+            'get_live_hobolink_data': get_live_hobolink_data,
+            'get_live_usgs_data': get_live_usgs_data,
+            'process_data': process_data,
+            'compose_tweet': compose_tweet
+        }
+
+    # And we're all set! We can hand the app over to flask at this point.
     return app
 
 
-def update_config_from_vault(app: Flask) -> None:
-    """
-    This updates the state of the `app` to have the keys from the vault. The
-    vault also stores the "SECRET_KEY", which is a Flask builtin configuration
-    variable (i.e. Flask treats the "SECRET_KEY" as special). So we also
-    populate the "SECRET_KEY" in this step.
-
-    If we fail to load the vault in development mode, then the user is warned
-    that the vault was not loaded successfully. In production mode, failing to
-    load the vault raises a RuntimeError.
+def init_swagger(app: Flask):
+    """This function handles all the logic for adding Swagger automated
+    documentation to the application instance.
 
     Args:
         app: A Flask application instance.
-    """
-    try:
-        app.config['KEYS'] = get_keys()
-    except (RuntimeError, KeyError):
-        msg = 'Unable to load the vault; bad password provided.'
-        if app.env == 'production':
-            raise RuntimeError(msg)
-        else:
-            print(f'Warning: {msg}')
-            app.config['KEYS'] = None
-            app.config['SECRET_KEY'] = None
-    else:
-        app.config['SECRET_KEY'] = app.config['KEYS']['flask']['secret_key']
-
-
-def add_swagger_plugin_to_app(app: Flask):
-    """This function hnadles all the logic for adding Swagger automated
-    documentation to the application instance.
     """
     from flasgger import Swagger
     from flasgger import LazyString
@@ -110,11 +206,11 @@ def add_swagger_plugin_to_app(app: Flask):
         'headers': [],
         'specs': [
             {
-                'endpoint': 'reach_api',
-                'route': '/api/reach_api.json',
+                'endpoint': 'flagging_api',
+                'route': '/api/flagging_api.json',
                 'rule_filter': lambda rule: True,  # all in
                 'model_filter': lambda tag: True,  # all in
-            }
+            },
         ],
         'static_url_path': '/flasgger_static',
         # 'static_folder': '/static/flasgger',
@@ -128,33 +224,100 @@ def add_swagger_plugin_to_app(app: Flask):
                 "API for the Charles River Watershed Association's predictive "
                 'models, and the data used for those models.',
             'contact': {
-                'responsibleOrganization': 'Charles River Watershed Association',
-                'responsibleDeveloper': 'Code for Boston',
+                'x-responsibleOrganization': 'Charles River Watershed Association',
+                'x-responsibleDeveloper': 'Code for Boston',
             },
+            'version': '1.0',
         }
     }
     app.config['SWAGGER'] = {
         'uiversion': 3,
-        'favicon': LazyString(lambda: url_for('static', filename='favicon/favicon.ico'))
+        'favicon': LazyString(
+            lambda: url_for('static', filename='favicon/favicon.ico'))
     }
 
     Swagger(app, config=swagger_config, template=template)
 
 
-def register_blueprints_from_module(app: Flask, module: object) -> None:
-    """
-    This function looks within the submodules of a module for objects
-    specifically named `bp`. It then assumes those objects are blueprints, and
-    registers them to the app.
+def _load_secrets_from_vault(
+        password: str,
+        vault_file: str
+) -> Dict[str, Union[str, Dict[str, str]]]:
+    """This code loads the keys directly from the vault zip file.
+
+    The schema of the vault's `secrets.json` file looks like this:
+
+    >>> {
+    >>>     "SECRET_KEY": str,
+    >>>     "HOBOLINK_AUTH": {
+    >>>         "password": str,
+    >>>         "user": str,
+    >>>         "token": str
+    >>>     },
+    >>>     "TWITTER_AUTH": {
+    >>>         "api_key": str,
+    >>>         "api_key_secret": str,
+    >>>         "access_token": str,
+    >>>         "access_token_secret": str,
+    >>>         "bearer_token": str
+    >>>     }
+    >>> }
 
     Args:
-        app: (Flask) Flask instance to which we will register blueprints.
-        module: (object) A module that contains submodules which themselves
-                contain `bp` objects.
+        vault_password: (str) Password for opening up the `vault_file`.
+        vault_file: (str) File path of the zip file containing `keys.json`.
+
+    Returns:
+        Dict of credentials.
     """
-    if app.config.get('BLUEPRINTS'):
-        blueprint_list = app.config['BLUEPRINTS']
-    else:
-        blueprint_list = filter(lambda x: not x.startswith('_'), dir(module))
-    for submodule in blueprint_list:
-        app.register_blueprint(getattr(module, submodule).bp)
+    with py7zr.SevenZipFile(vault_file, mode='r', password=password) as f:
+        archive = f.readall()
+        d = json.load(archive['secrets.json'])
+    return d
+
+
+def update_config_from_vault(app: Flask) -> None:
+    """
+    This updates the state of the `app` to have the secrets from the vault. The
+    vault also stores the "SECRET_KEY", which is a Flask builtin configuration
+    variable (i.e. Flask treats the "SECRET_KEY" as special). So we also
+    populate the "SECRET_KEY" in this step.
+
+    If we fail to load the vault in development mode, then the user is warned
+    that the vault was not loaded successfully. In production mode, failing to
+    load the vault raises a RuntimeError.
+
+    Args:
+        app: A Flask application instance.
+    """
+    try:
+        secrets = _load_secrets_from_vault(
+            password=app.config['VAULT_PASSWORD'],
+            vault_file=app.config['VAULT_FILE']
+        )
+        # Add 'SECRET_KEY', 'HOBOLINK_AUTH', AND 'TWITTER_AUTH' to the config.
+        app.config.update(secrets)
+    except (LZMAError, PasswordRequired, KeyError):
+        msg = 'Unable to load the vault; bad password provided.'
+        if app.config.get('VAULT_OPTIONAL'):
+            print(f'Warning: {msg}')
+            app.config['SECRET_KEY'] = os.urandom(16)
+        else:
+            raise RuntimeError(msg)
+
+
+def add_social_svg_files_to_jinja(app: Flask):
+    with open(os.path.join(app.static_folder, 'images', 'github.svg')) as f:
+        GITHUB_SVG = f.read()
+
+    with open(os.path.join(app.static_folder, 'images', 'twitter.svg')) as f:
+        TWITTER_SVG = f.read()
+
+    with open(os.path.join(app.static_folder, 'images', 'hamburger.svg')) as f:
+        HAMBURGER_SVG = f.read()
+
+    app.jinja_env.globals.update({
+        'GITHUB_SVG': Markup(GITHUB_SVG),
+        'TWITTER_SVG': Markup(TWITTER_SVG),
+        'HAMBURGER_SVG': Markup(HAMBURGER_SVG)
+    })

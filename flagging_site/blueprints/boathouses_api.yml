@@ -1,0 +1,30 @@
+JSON of boathouse metadata
+---
+tags:
+  - Boathouse API
+responses:
+  200:
+    description: JSON records of the boathouses covered by the predictive model
+    schema:
+      id: boathouses
+      type: object
+      properties:
+        boathouses:
+          description: Records of the boathouses
+          type: array
+          items:
+            type: object
+            properties:
+              boathouse:
+                description: Name of the boathouse
+                type: string
+              latitude:
+                description: Latitude of boathouse's location
+                type: number
+              longitude:
+                description: Longitude of boathouse's location
+                type: number
+              reach:
+                description: Reach that the boathouse is associated with
+                type: integer
+                enum: [2, 3, 4, 5]
