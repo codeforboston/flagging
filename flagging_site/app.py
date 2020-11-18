@@ -3,12 +3,11 @@ This file handles the construction of the Flask application object.
 """
 import os
 from typing import Optional
-from flask import Flask
+from flask import Flask, render_template, jsonify, request
 
 from .data.keys import get_keys
 from .config import Config
 from .config import get_config_from_env
-
 
 def create_app(config: Optional[Config] = None) -> Flask:
     """Create and configure an instance of the Flask application. We use the
@@ -51,6 +50,23 @@ def create_app(config: Optional[Config] = None) -> Flask:
     # db.init_app(app)
 
     # And we're all set! We can hand the app over to flask at this point.
+
+    @app.errorhandler(404)
+    def page_not_found(e):
+        """ Return error 404 """
+        if request.path.startswith('/api/'):
+            # we return a json saying so
+            return jsonify(Message = "404 Error - Method Not Allowed")
+        else:
+            # if not, direct user to generic site-wide 404 page
+            return render_template('error.html', type = '404', msg = "This page doesn't exist!")
+
+    @app.errorhandler(500)
+    def internal_server_error(error):
+        """ Return error 500 """
+        bp.logger.error('Server Error: %s', (error))
+        return render_template('error.html', type = "500", msg = "Something went wrong.")
+
     return app
 
 
