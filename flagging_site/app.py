@@ -22,7 +22,7 @@ from py7zr.exceptions import PasswordRequired
 
 from .config import Config
 from .config import get_config_from_env
-
+from .data import live_website_options
 
 def create_app(config: Optional[Union[Config, str]] = None) -> Flask:
     """Create and configure an instance of the Flask application. We use the
@@ -136,7 +136,7 @@ def create_app(config: Optional[Union[Config, str]] = None) -> Flask:
         # Otherwise, do nothing.
         if (
                 updated
-                and current_app.config['BOATING_SEASON']
+                and live_website_options.is_boating_season()#current_app.config['BOATING_SEASON']
                 and current_app.config['SEND_TWEETS']
         ):
             from .twitter import tweet_current_status

@@ -56,6 +56,10 @@ def init_admin(app: Flask):
         from .data.cyano_overrides import ManualOverridesModelView
         admin.add_view(ManualOverridesModelView(db.session))
 
+        from .data.live_website_options import LiveWebsiteOptionsModelView
+        admin.add_view(LiveWebsiteOptionsModelView(db.session))
+
+
         # Database functions
         admin.add_view(DatabaseView(
             name='Update Database', endpoint='db/update', category='Database'

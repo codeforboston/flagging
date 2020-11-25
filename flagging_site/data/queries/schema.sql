@@ -45,4 +45,9 @@ CREATE TABLE IF NOT EXISTS cyano_overrides (
     reason          varchar(255)
 );
 
+DROP TABLE IF EXISTS live_website_opts;
+CREATE TABLE IF NOT EXISTS live_website_opts (
+    boating_season varchar(255)
+);
+
 COMMIT;

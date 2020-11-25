@@ -10,6 +10,7 @@ from ..data.cyano_overrides import get_currently_overridden_reaches
 from ..data.predictive_models import latest_model_outputs
 from ..data.database import get_boathouse_by_reach_dict
 from ..data.database import get_latest_time
+from ..data.live_website_options import is_boating_season
 
 bp = Blueprint('flagging', __name__)
 
@@ -32,7 +33,7 @@ def before_request():
 
     # ~~~
 
-    if not current_app.config['BOATING_SEASON']:
+    if not is_boating_season():
         msg = '<b>Note:</b> It is currently not boating season. '
         if request.path.startswith('/flags'):
             # If the path is the iframe...
@@ -109,7 +110,7 @@ def index() -> str:
     df = latest_model_outputs()
     homepage = parse_model_outputs(df)
     model_last_updated_time = df['time'].iloc[0]
-    boating_season = current_app.config['BOATING_SEASON']
+    boating_season = is_boating_season()#current_app.config['BOATING_SEASON']
 
     return render_template('index.html',
                            homepage=homepage,
@@ -167,7 +168,7 @@ def flags() -> str:
     df = latest_model_outputs()
     boathouse_statuses = parse_model_outputs(df)
     model_last_updated_time = df['time'].iloc[0]
-    boating_season = current_app.config['BOATING_SEASON']
+    boating_season = is_boating_season()#current_app.config['BOATING_SEASON']
 
     return render_template('flags.html',
                            boathouse_statuses=boathouse_statuses,

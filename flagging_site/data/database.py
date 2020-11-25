@@ -116,6 +116,9 @@ def init_db():
         # only needs to be populated once.
         execute_sql_from_file('define_boathouse.sql')
 
+        # The file for keeping track of if it's currently boating season
+        execute_sql_from_file('boating_season.sql')
+
         # The function that updates the database periodically is run for the
         # first time.
         update_database()
@@ -165,6 +168,9 @@ def update_database():
 
     return True
 
+@dataclass
+class LiveWebsiteOpts(db.Model):
+    boating_season: str = db.Column(db.String(255), primary_key=True, extend_existing=True)
 
 @dataclass
 class Boathouses(db.Model):
