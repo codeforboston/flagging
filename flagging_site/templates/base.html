@@ -41,21 +41,53 @@
         <div class="page-header">
             <div class="header-content">
             {% block header %}
-                <div class="header-logo"><img src="{{ url_for('static', filename='images/crwa_logo.png') }}" /></div>
-                <nav>
-                    <div><a href="{{ url_for('flagging.index') }}">Home</a></div>
-                    <div><a href="{{ url_for('flagging.about') }}">About</a></div>
-                    <div><a href="{{ url_for('flagging.output_model') }}">Detailed Outputs</a></div>
-                    <div><a href="{{ url_for('flagging.api_index') }}">API</a></div>
-                </nav>
+                <div class="logo-and-links">
+                    <div class="header-logo">
+                        <a href="{{ url_for('flagging.index') }}">
+                            <img src="{{ url_for('static', filename='images/crwa_logo.png') }}" />
+                        </a>
+                    </div>
+                    <nav>
+                        <a class="nav-link" href="{{ url_for('flagging.index') }}">Home</a>
+                        <a class="nav-link" href="{{ url_for('flagging.about') }}">About</a>
+                        <a class="nav-link" href="{{ url_for('flagging.output_model') }}">Detailed Outputs</a>
+                        <a class="nav-link" href="{{ url_for('flagging.api_index') }}">API</a>
+                    </nav>
+                </div>
+                <div class="social-section">
+                    <span class="social">
+                        <a href="https://twitter.com/crwaflagging">{{ TWITTER_SVG }}</a>
+                    </span>
+                    <span class="social">
+                        <a href="https://github.com/codeforboston/flagging">{{ GITHUB_SVG }}</a>
+                    </span>
+                </div>
+                <button class="hamburger-button" type="button" onclick="toggleDropdown()">
+                    {{ HAMBURGER_SVG }}
+                </button>
+                <script>
+                    function toggleDropdown() {
+                        // Add or remove "hidden" class from div
+                        const menu = document.getElementsByClassName("dropdown-menu")[0];
+                        menu.classList.toggle("hidden");
+                    }
+
+                    // Hide dropdown when screen is large
+                    const mediaQueryList = window.matchMedia("(min-width: 681px)"); // px here should be the same as in our CSS file media queries
+                    mediaQueryList.addListener(function(mediaQuery) {
+                        if (mediaQuery.matches) {
+                            // Screen is large so hide dropdown
+                            const menu = document.getElementsByClassName("dropdown-menu")[0];
+                            menu.classList.add("hidden");
+                        }
+                    })
+                </script>
             </div>
-            <div class="social-section">
-                <span class="social">
-                    <a href="https://twitter.com/crwaflagging">{{ TWITTER_SVG }}</a>
-                </span>
-                <span class="social">
-                    <a href="https://github.com/codeforboston/flagging">{{ GITHUB_SVG }}</a>
-                </span>
+            <div class="dropdown-menu hidden">
+                <a href="{{ url_for('flagging.index') }}">Home</a>
+                <a href="{{ url_for('flagging.about') }}">About</a>
+                <a href="{{ url_for('flagging.output_model') }}">Detailed Outputs</a>
+                <a href="{{ url_for('flagging.api_index') }}">API</a>
             </div>
         </div>
         <section class="body">
@@ -87,6 +119,12 @@
         </div>
         <div class="footer-section">
             <p>This website was built by <a href="https://www.codeforboston.org/" class="non-breaking" target="_blank">Code for Boston</a> in collaboration with <a href="https://www.crwa.org/" class="non-breaking">Charles River Watershed Association</a>.</p>
+            <span class="social">
+                <a href="https://twitter.com/crwaflagging">{{ TWITTER_SVG }}</a>
+            </span>
+            <span class="social">
+                <a href="https://github.com/codeforboston/flagging">{{ GITHUB_SVG }}</a>
+            </span>
         </div>
         {% endblock %}
     </section>

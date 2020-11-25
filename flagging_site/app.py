@@ -12,7 +12,7 @@ from typing import Optional
 from typing import Dict
 from typing import Union
 
-from flask import Flask
+from flask import Flask, render_template, jsonify, request
 from flask import current_app
 from flask import Markup
 from flask.json import JSONEncoder
@@ -70,6 +70,25 @@ def create_app(config: Optional[Union[Config, str]] = None) -> Flask:
     # Register the database commands
     from .data import db
     db.init_app(app)
+
+
+    # And we're all set! We can hand the app over to flask at this point.
+
+    @app.errorhandler(404)
+    def page_not_found(e):
+        """ Return error 404 """
+        if request.path.startswith('/api/'):
+            # we return a json saying so
+            return jsonify(Message = "404 Error - Method Not Allowed")
+        else:
+            # if not, direct user to generic site-wide 404 page
+            return render_template('error.html', type = '404', msg = "This page doesn't exist!")
+
+    @app.errorhandler(500)
+    def internal_server_error(error):
+        """ Return error 500 """
+        bp.logger.error('Server Error: %s', (error))
+        return render_template('error.html', type = "500", msg = "Something went wrong.")
 
     # Register admin
     from .admin import init_admin
@@ -294,8 +313,11 @@ def add_social_svg_files_to_jinja(app: Flask):
     with open(os.path.join(app.static_folder, 'images', 'twitter.svg')) as f:
         TWITTER_SVG = f.read()
 
+    with open(os.path.join(app.static_folder, 'images', 'hamburger.svg')) as f:
+        HAMBURGER_SVG = f.read()
+
     app.jinja_env.globals.update({
         'GITHUB_SVG': Markup(GITHUB_SVG),
-        'TWITTER_SVG': Markup(TWITTER_SVG)
+        'TWITTER_SVG': Markup(TWITTER_SVG),
+        'HAMBURGER_SVG': Markup(HAMBURGER_SVG)
     })
-
