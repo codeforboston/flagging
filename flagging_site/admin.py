@@ -1,13 +1,13 @@
+import re
 import io
 import pandas as pd
-import datetime
 
 from flask import Flask
-from flask import redirect
 from flask import request
 from flask import Response
 from flask import send_file
 from flask import abort
+from flask import url_for
 from flask_admin import Admin
 from flask_admin import BaseView
 from flask_admin import expose
@@ -19,20 +19,10 @@ from sqlalchemy.exc import ProgrammingError
 
 from .data import db
 
+
 admin = Admin(template_mode='bootstrap3')
 
 basic_auth = BasicAuth()
-
-
-# Taken from https://computableverse.com/blog/flask-admin-using-basicauth
-class AuthException(HTTPException):
-    def __init__(self, message):
-        """HTTP Forbidden error that prompts for login"""
-        super().__init__(message, Response(
-            'You could not be authenticated. Please refresh the page.',
-            status=401,
-            headers={'WWW-Authenticate': 'Basic realm="Login Required"'}
-        ))
 
 
 def init_admin(app: Flask):
@@ -48,8 +38,8 @@ def init_admin(app: Flask):
     @app.before_request
     def auth():
         """Authorize all paths that start with /admin/."""
-        if request.path.startswith('/admin/'):
-            validate_credentials()
+        if re.match('^/admin(?:$|/+)', request.path):
+            _validate_credentials()
 
     with app.app_context():
         # Register /admin sub-views
@@ -68,45 +58,21 @@ def init_admin(app: Flask):
         admin.add_view(LogoutView(name='Logout'))
 
 
-def validate_credentials() -> bool:
-    """
-    Protect admin pages with basic_auth.
-    If logged out and current page is /admin/, then ask for credentials.
-    Otherwise, raises HTTP 401 error and redirects user to /admin/ on the
-    frontend (redirecting with HTTP redirect causes user to always be
-    redirected to /admin/ even after logging in).
-
-    We redirect to /admin/ because our logout method only works if the path to
-    /logout is the same as the path to where we put in our credentials. So if
-    we put in credentials at /admin/cyanooverride, then we would need to logout
-    at /admin/cyanooverride/logout, which would be difficult to arrange. Instead,
-    we always redirect to /admin/ to put in credentials, and then logout at
-    /admin/logout.
+def _validate_credentials():
+    """Check if properly authenticated. If not, then return a 401 error. (The
+    401 error page will in turn prompt the user for a username and password.)
     """
     if not basic_auth.authenticate():
-        if request.path.startswith('/admin/'):
-            raise AuthException('Not authenticated. Refresh the page.')
-        else:
-            raise HTTPException(
-                'Attempted to visit admin page but not authenticated.',
-                Response(
-                    '''
-                    Not authenticated. Navigate to /admin/ to login.
-                    <script>window.location = "/admin/";</script>
-                    ''',
-                    status=401  # 'Forbidden' status
-                )
-            )
-    return True
+        abort(401)
 
 
 class AdminBaseView(BaseView):
     def is_accessible(self):
-        return validate_credentials()
+        return basic_auth.authenticate()
 
     def inaccessible_callback(self, name, **kwargs):
-        """Ask for credentials when access fails"""
-        return redirect(basic_auth.challenge())
+        """Ask for credentials when access fails."""
+        return _validate_credentials()
 
 
 # Adapted from https://computableverse.com/blog/flask-admin-using-basicauth
@@ -126,21 +92,9 @@ class AdminModelView(sqla.ModelView, AdminBaseView):
 class LogoutView(AdminBaseView):
     @expose('/')
     def index(self):
-        """
-        To log out of basic auth for admin pages,
-        we raise an HTTP 401 error (there isn't really a cleaner way)
-        and then redirect on the frontend to home.
-        """
-        raise HTTPException(
-            'Logged out.',
-            Response(
-                '''
-                Successfully logged out.
-                <script>window.location = "/";</script>
-                ''',
-                status=401
-            )
-        )
+        body = self.render('admin/logout.html')
+        status = 401
+        return body, status
 
 
 class DatabaseView(AdminBaseView):
@@ -154,29 +108,19 @@ class DatabaseView(AdminBaseView):
         designed to be available in the app during runtime, and is protected by
         BasicAuth so that only administrators can run it.
         """
-        # If auth passed, then update database.
         from .data.database import update_database
         update_database()
 
         # Notify the user that the update was successful, then redirect:
-        return '''<!DOCTYPE html>
-            <html>
-                <body>
-                    <script>
-                        setTimeout(function(){
-                            window.location.href = '/admin/';
-                        }, 3000);
-                    </script>
-                    <p>Databases updated. Redirecting in 3 seconds...</p>
-                </body>
-            </html>
-        '''
+        return self.render('admin/redirect.html',
+                           message='Database updated.',
+                           redirect_to=url_for('admin.index'))
 
 
 def _send_csv_attachment_of_dataframe(
         df: pd.DataFrame,
         file_name: str,
-        date_prefix: bool = False
+        date_prefix: bool = True
 ):
     strio = io.StringIO()
     df.to_csv(strio, index=False)
@@ -191,8 +135,8 @@ def _send_csv_attachment_of_dataframe(
     if date_prefix:
         todays_date = (
             pd.Timestamp('now', tz='UTC')
-                .tz_convert('US/Eastern')
-                .strftime('%Y_%m_%d')
+            .tz_convert('US/Eastern')
+            .strftime('%Y_%m_%d')
         )
         file_name = f'{todays_date}-{file_name}'
 
@@ -229,7 +173,6 @@ class DownloadView(AdminBaseView):
         # Be careful when parameterizing queries like how we do it below.
         # The reason it's OK in this case is because users don't touch it.
         # However it is dangerous to do this in some other contexts.
-        # We are doing it like this to avoid needing to utilize sessions.
         query = f'''SELECT * FROM {sql_table_name}'''
         try:
             df = execute_sql(query)
@@ -237,15 +180,14 @@ class DownloadView(AdminBaseView):
             raise HTTPException(
                 'Invalid SQL.',
                 Response(
-                    f'<b>Invalid SQL query:</b> <tt>{query}</tt>',
+                    f'<b>Invalid SQL query:</b> <samp>{query}</samp>',
                     status=500
                 )
             )
 
         return _send_csv_attachment_of_dataframe(
             df=df,
-            file_name=f'{sql_table_name}.csv',
-            date_prefix=True
+            file_name=f'{sql_table_name}.csv'
         )
 
     @expose('/csv/hobolink_source')
@@ -255,8 +197,7 @@ class DownloadView(AdminBaseView):
 
         return _send_csv_attachment_of_dataframe(
             df=df_hobolink,
-            file_name=f'hobolink_source.csv',
-            date_prefix=True
+            file_name='hobolink_source.csv'
         )
 
     @expose('/csv/usgs_source')
@@ -266,8 +207,7 @@ class DownloadView(AdminBaseView):
 
         return _send_csv_attachment_of_dataframe(
             df=df_usgs,
-            file_name=f'usgs_source.csv',
-            date_prefix=True
+            file_name='usgs_source.csv'
         )
 
     @expose('/csv/model_outputs')
@@ -283,8 +223,7 @@ class DownloadView(AdminBaseView):
 
         return _send_csv_attachment_of_dataframe(
             df=df,
-            file_name=f'model_outputs_source.csv',
-            date_prefix=True
+            file_name='model_outputs_source.csv'
         )
 
     @expose('/csv/model_outputs')
@@ -303,8 +242,5 @@ class DownloadView(AdminBaseView):
 
         return _send_csv_attachment_of_dataframe(
             df=model_outs,
-            file_name=f'model_outputs_source.csv',
-            date_prefix=True
+            file_name='model_outputs_source.csv'
         )
-
-
