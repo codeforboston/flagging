@@ -46,13 +46,21 @@ def init_admin(app: Flask):
         from .data.manual_overrides import ManualOverridesModelView
         admin.add_view(ManualOverridesModelView(db.session))
 
+        from .data.database import Boathouses
+
+        class BoathousesView(AdminModelView):
+            def __init__(self, session, **kwargs):
+                super().__init__(Boathouses, session, **kwargs)
+
+        admin.add_view(BoathousesView(db.session))
+
         # Database functions
         admin.add_view(DatabaseView(
-            name='Update Database', url='db/update', category='Database'
+            name='Update Database', url='db/update', category='Manage DB'
         ))
 
         admin.add_view(DownloadView(
-            name='Download', url='db/download', category='Database'
+            name='Download', url='db/download', category='Manage DB'
         ))
 
         admin.add_view(LogoutView(name='Logout'))
@@ -81,6 +89,8 @@ class AdminModelView(sqla.ModelView, AdminBaseView):
     Extension of SQLAlchemy ModelView that requires BasicAuth authentication,
     and shows all columns in the form (including primary keys).
     """
+    can_export = True
+    export_types = ['csv']
 
     def __init__(self, model, *args, **kwargs):
         # Show all columns in form
