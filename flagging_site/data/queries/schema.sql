@@ -20,14 +20,6 @@ CREATE TABLE IF NOT EXISTS hobolink (
     air_temp        decimal
 );
 
-DROP TABLE IF EXISTS boathouses;
-CREATE TABLE IF NOT EXISTS boathouses (
-    reach           int,
-    boathouse       varchar(255),
-    latitude        decimal,
-    longitude       decimal
-);
-
 DROP TABLE IF EXISTS model_outputs;
 CREATE TABLE IF NOT EXISTS model_outputs (
     reach           int,
@@ -36,18 +28,8 @@ CREATE TABLE IF NOT EXISTS model_outputs (
     probability     decimal,
     safe            boolean
 );
-
-DROP TABLE IF EXISTS cyano_overrides;
-CREATE TABLE IF NOT EXISTS cyano_overrides (
-    reach           int,
-    start_time      timestamp,
-    end_time        timestamp,
-    reason          varchar(255)
-);
-
-DROP TABLE IF EXISTS live_website_opts;
-CREATE TABLE IF NOT EXISTS live_website_opts (
-    boating_season varchar(255)
-);
-
+/* These tables are defined with SQLAlchemy. */
+DROP TABLE IF EXISTS boathouses;
+DROP TABLE IF EXISTS manual_overrides;
+DROP TABLE IF EXISTS live_website_options;
 COMMIT;
