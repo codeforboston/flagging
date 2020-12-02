@@ -1,9 +1,6 @@
 {% extends "base.html" %}
-
-{% block title %}Page Not Found{% endblock %}
+{% block title %}{{ title }}{% endblock %}
 {% block content %}
-    <!--- MAKE SURE TO MODIFY THIS SO THAT IT DISPLAYS THE TYPE OF ERROR ----->
-<h1>{{type}} Error: </h1>
-<h1>{{msg}}</h1>
-
+    <h2>{{ status_code }} Error:</h2>
+    <p>{{ msg }}</p>
 {% endblock %}

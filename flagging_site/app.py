@@ -12,7 +12,10 @@ from typing import Optional
 from typing import Dict
 from typing import Union
 
-from flask import Flask, render_template, jsonify, request
+from flask import Flask
+from flask import render_template
+from flask import jsonify
+from flask import request
 from flask import current_app
 from flask import Markup
 from flask.json import JSONEncoder
@@ -71,24 +74,40 @@ def create_app(config: Optional[Union[Config, str]] = None) -> Flask:
     from .data import db
     db.init_app(app)
 
-
-    # And we're all set! We can hand the app over to flask at this point.
+    @app.errorhandler(401)
+    def bad_auth(e):
+        """ Return error 401 """
+        body = render_template(
+            'error.html',
+            title='Invalid Authorization',
+            status_code=401,
+            msg='Bad username or password provided.'
+        )
+        status = 401
+        headers = {'WWW-Authenticate': 'Basic realm="Login Required"'}
+        return body, status, headers
 
     @app.errorhandler(404)
     def page_not_found(e):
         """ Return error 404 """
         if request.path.startswith('/api/'):
             # we return a json saying so
-            return jsonify(Message = "404 Error - Method Not Allowed")
+            body = jsonify(Message='404 Error - Method Not Allowed')
         else:
             # if not, direct user to generic site-wide 404 page
-            return render_template('error.html', type = '404', msg = "This page doesn't exist!")
+            body = render_template(
+                'error.html',
+                title='Page not found',
+                status_code=404,
+                msg="This page doesn't exist!"
+            )
+        return body, 404
 
     @app.errorhandler(500)
-    def internal_server_error(error):
+    def internal_server_error(e):
         """ Return error 500 """
-        bp.logger.error('Server Error: %s', (error))
-        return render_template('error.html', type = "500", msg = "Something went wrong.")
+        app.logger.error(f'Server Error: {e}')
+        return render_template('error.html', type=500, msg='Something went wrong.'), 500
 
     # Register admin
     from .admin import init_admin
@@ -101,7 +120,7 @@ def create_app(config: Optional[Union[Config, str]] = None) -> Flask:
     add_social_svg_files_to_jinja(app)
 
     class CustomJSONEncoder(JSONEncoder):
-        """Add support for Decimal types"""
+        """Add support for Decimal types and datetimes."""
         def default(self, o):
             if isinstance(o, decimal.Decimal):
                 return float(o)
@@ -307,17 +326,20 @@ def update_config_from_vault(app: Flask) -> None:
 
 
 def add_social_svg_files_to_jinja(app: Flask):
-    with open(os.path.join(app.static_folder, 'images', 'github.svg')) as f:
-        GITHUB_SVG = f.read()
+    """It's much more flexible to work with raw SVG markup in an HTML file,
+    rather than using an SVG file rendered as an image. (E.g. doing this allows
+    us to change the colors using CSS.) This function loads SVG markup into our
+    Jinja environment via reading from SVG files.
+    """
 
-    with open(os.path.join(app.static_folder, 'images', 'twitter.svg')) as f:
-        TWITTER_SVG = f.read()
-
-    with open(os.path.join(app.static_folder, 'images', 'hamburger.svg')) as f:
-        HAMBURGER_SVG = f.read()
+    def _load_svg(file_name: str):
+        """Load an svg file from `static/images/`."""
+        with open(os.path.join(app.static_folder, 'images', file_name)) as f:
+            s = f.read()
+        return Markup(s)
 
     app.jinja_env.globals.update({
-        'GITHUB_SVG': Markup(GITHUB_SVG),
-        'TWITTER_SVG': Markup(TWITTER_SVG),
-        'HAMBURGER_SVG': Markup(HAMBURGER_SVG)
+        'GITHUB_SVG': _load_svg('github.svg'),
+        'TWITTER_SVG': _load_svg('twitter.svg'),
+        'HAMBURGER_SVG': _load_svg('hamburger.svg')
     })

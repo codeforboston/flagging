@@ -1,0 +1,23 @@
+{% extends "admin/base.html" %}
+{% block head %}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+{% endblock %}
+{% block body %}
+    <script>
+        $(document).ready(function(){
+            $.ajax({
+               async: false,
+               type: "GET",
+               url: "/admin",
+               username: "logout"
+            })
+            .done(function(){
+            })
+            .fail(function(){
+                window.location.href = "{{ url_for('flagging.index') }}";
+            });
+        });
+    </script>
+        <p>Logged out.</p>
+        <p>Redirecting...</p>
+{% endblock %}
