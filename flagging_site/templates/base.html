@@ -16,6 +16,7 @@
     {% block head %}
     <meta charset="UTF-8">
     <title>{% block title %}{% endblock %} - CRWA Flagging Program</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta property="og:title" content="CRWA Flagging - {{ self.title() }}" />
     <meta property="og:type" content="website" />
     <meta property="og:image" content="{{ url_for('static', filename='images/og_preview.png', _external=True) }}">
@@ -38,15 +39,58 @@
 <body>
     <div class="above-fold">
         <div class="page-header">
+            <div class="header-content">
             {% block header %}
-                <img class="header-logo" src="{{ url_for('static', filename='images/CRWA_banner_main.jpg') }}" />
-                <header>{{ self.title() }}</header>
-                <nav>
-                    <a href="{{ url_for('flagging.index') }}">Home</a>
-                    &nbsp; | &nbsp; <a href="{{ url_for('flagging.about') }}">About</a>
-                    &nbsp; | &nbsp; <a href="{{ url_for('flagging.output_model') }}">Detailed Outputs</a>
-                    &nbsp; | &nbsp; <a href="{{ url_for('flagging.api_index') }}">API</a>
-                </nav>
+                <div class="logo-and-links">
+                    <div class="header-logo">
+                        <a href="{{ url_for('flagging.index') }}">
+                            <img src="{{ url_for('static', filename='images/crwa_logo.png') }}" />
+                        </a>
+                    </div>
+                    <nav>
+                        <a class="nav-link" href="{{ url_for('flagging.index') }}">Home</a>
+                        <a class="nav-link" href="{{ url_for('flagging.about') }}">About</a>
+                        <a class="nav-link" href="{{ url_for('flagging.output_model') }}">Detailed Outputs</a>
+                        <a class="nav-link" href="{{ url_for('flagging.api_index') }}">API</a>
+                    </nav>
+                </div>
+                <div class="social-section">
+                    <span class="social">
+                        <a href="https://twitter.com/crwaflagging">{{ TWITTER_SVG }}</a>
+                    </span>
+                    <span class="social">
+                        <a href="https://github.com/codeforboston/flagging">{{ GITHUB_SVG }}</a>
+                    </span>
+                </div>
+                <button class="hamburger-button" type="button" onclick="toggleDropdown()">
+                    {{ HAMBURGER_SVG }}
+                </button>
+                <script>
+                    function toggleDropdown() {
+                        // Add or remove "hidden" class from div
+                        const menu = document.getElementsByClassName("dropdown-menu")[0];
+                        menu.classList.toggle("hidden");
+                    }
+
+                    // Hide dropdown when screen is large
+                    const mediaQueryList = window.matchMedia("(min-width: 681px)"); // px here should be the same as in our CSS file media queries
+                    mediaQueryList.addListener(function(mediaQuery) {
+                        if (mediaQuery.matches) {
+                            // Screen is large so hide dropdown
+                            const menu = document.getElementsByClassName("dropdown-menu")[0];
+                            menu.classList.add("hidden");
+                        }
+                    })
+                </script>
+            </div>
+            <div class="dropdown-menu hidden">
+                <a href="{{ url_for('flagging.index') }}">Home</a>
+                <a href="{{ url_for('flagging.about') }}">About</a>
+                <a href="{{ url_for('flagging.output_model') }}">Detailed Outputs</a>
+                <a href="{{ url_for('flagging.api_index') }}">API</a>
+            </div>
+        </div>
+        <section class="body">
                 {% with messages = get_flashed_messages() %}
                     {% if messages %}
                         <div class="flash">
@@ -57,8 +101,11 @@
                     {% endif %}
                 {% endwith %}
             {% endblock %}
-        </div>
-        <section class="content">{% block content %}{% endblock %}</section>
+            <h1 class="page-title">{{ self.title() }}</h1>
+            <div class="content">
+                {% block content %}{% endblock %}
+            </div>
+        </section>
     </div>
     <section class="footer">
         {% block footer %}
@@ -72,17 +119,11 @@
         </div>
         <div class="footer-section">
             <p>This website was built by <a href="https://www.codeforboston.org/" class="non-breaking" target="_blank">Code for Boston</a> in collaboration with <a href="https://www.crwa.org/" class="non-breaking">Charles River Watershed Association</a>.</p>
-        </div>
-        <div class="footer-section">
             <span class="social">
-                <a href="https://twitter.com/crwaflagging">
-                    <img src="{{ url_for('static', filename='images/twitter.svg') }}" />
-                </a>
-            </span> &nbsp;
+                <a href="https://twitter.com/crwaflagging">{{ TWITTER_SVG }}</a>
+            </span>
             <span class="social">
-                <a href="https://github.com/codeforboston/flagging">
-                    <img src="{{ url_for('static', filename='images/github.svg') }}" />
-                </a>
+                <a href="https://github.com/codeforboston/flagging">{{ GITHUB_SVG }}</a>
             </span>
         </div>
         {% endblock %}
