@@ -15,8 +15,7 @@ from distutils.util import strtobool
 
 class LiveWebsiteOptions(db.Model):
     __tablename__ = 'live_website_options'
-    id = db.Column(INTEGER, primary_key=True)
-    boating_season = db.Column(db.String, default=True)
+    boating_season = db.Column(db.String, default=True, primary_key=True)
 
 class LiveWebsiteOptionsModelView(AdminModelView):
     can_create = False
