@@ -9,6 +9,7 @@ from ..data.predictive_models import latest_model_outputs
 from ..data.predictive_models import MODEL_VERSION
 from ..data.database import get_boathouse_metadata_dict
 from ..data.database import execute_sql
+from ..data.live_website_options import is_boating_season
 
 from flasgger import swag_from
 
@@ -53,7 +54,7 @@ def model_api(reaches: List[int], hours: int) -> dict:
     return {
         'model_version': MODEL_VERSION,
         'time_returned': pd.to_datetime('today'),
-        'is_boating_season': bool(current_app.config['BOATING_SEASON']),
+        'is_boating_season': bool(is_boating_season()),#current_app.config['BOATING_SEASON']),
         'model_outputs': [
             {
                 'predictions': df.loc[
