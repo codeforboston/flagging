@@ -20,7 +20,7 @@ PYEXEC=$(get_python_exec)
 # Set up virtual environment in /venv
 $PYEXEC -m venv venv
 source venv/bin/activate
-$PYEXEC -m pip install $(cat requirements.txt | grep -v "psycopg2==")
+$PYEXEC -m pip install -r requirements/dev_osx.txt
 
 # Set up and run the Flask application
 export FLASK_APP=flagging_site:create_app

@@ -1,0 +1,14 @@
+click
+flasgger
+Flask-Admin
+Flask-BasicAuth
+Flask-SQLAlchemy
+Flask
+gunicorn
+Jinja2
+pandas
+py7zr
+PyYAML
+requests
+SQLAlchemy
+tweepy
