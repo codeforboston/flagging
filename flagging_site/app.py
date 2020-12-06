@@ -191,8 +191,10 @@ def create_app(config: Optional[Union[Config, str]] = None) -> Flask:
         from flask import current_app
         from .data import db
         from .data.hobolink import get_live_hobolink_data
+        from .data.hobolink import request_to_hobolink
         from .data.predictive_models import process_data
         from .data.usgs import get_live_usgs_data
+        from .data.usgs import request_to_usgs
         from .twitter import compose_tweet
 
         return {
@@ -201,8 +203,10 @@ def create_app(config: Optional[Union[Config, str]] = None) -> Flask:
             'app': current_app,
             'db': db,
             'get_live_hobolink_data': get_live_hobolink_data,
+            'request_to_hobolink': request_to_hobolink,
             'get_live_usgs_data': get_live_usgs_data,
             'process_data': process_data,
+            'request_to_usgs': request_to_usgs,
             'compose_tweet': compose_tweet
         }
 
