@@ -5,6 +5,10 @@ from flask import Blueprint
 from flask import request
 from flask import current_app
 from flask import jsonify
+from flask import url_for
+from flask import Flask
+from flasgger import Swagger
+from flasgger import LazyString
 from ..data.predictive_models import latest_model_outputs
 from ..data.predictive_models import MODEL_VERSION
 from ..data.database import get_boathouse_metadata_dict
@@ -105,3 +109,48 @@ def model_input_data_api():
     return jsonify({
         'model_input_data': df.tail(n=hours).to_dict(orient='records')
     })
+
+
+def init_swagger(app: Flask):
+    """This function handles all the logic for adding Swagger automated
+    documentation to the application instance.
+
+    Args:
+        app: A Flask application instance.
+    """
+    swagger_config = {
+        'headers': [],
+        'specs': [
+            {
+                'endpoint': 'flagging_api',
+                'route': '/api/flagging_api.json',
+                'rule_filter': lambda rule: True,  # all in
+                'model_filter': lambda tag: True,  # all in
+            },
+        ],
+        'static_url_path': '/flasgger_static',
+        # 'static_folder': '/static/flasgger',
+        'swagger_ui': True,
+        'specs_route': '/api/docs'
+    }
+    template = {
+        'info': {
+            'title': 'CRWA Public Flagging API',
+            'description':
+                "API for the Charles River Watershed Association's predictive "
+                'models, and the data used for those models.',
+            'contact': {
+                'x-responsibleOrganization': 'Charles River Watershed Association',
+                'x-responsibleDeveloper': 'Code for Boston',
+            },
+            'version': '1.0',
+        }
+    }
+    app.config['SWAGGER'] = {
+        'uiversion': 3,
+        'favicon': LazyString(
+            lambda: url_for('static', filename='favicon/favicon.ico'))
+    }
+
+    Swagger(app, config=swagger_config, template=template)
+

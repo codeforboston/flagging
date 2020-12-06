@@ -14,6 +14,9 @@ from dataclasses import dataclass
 from typing import Optional
 
 import pandas as pd
+import psycopg2
+import psycopg2.errors
+import click
 from flask import current_app
 from flask_sqlalchemy import SQLAlchemy
 from flask_sqlalchemy import declarative_base
@@ -80,26 +83,18 @@ def create_db() -> bool:
         port=current_app.config['POSTGRES_PORT'],
         dbname='postgres'
     )
+    database = current_app.config['POSTGRES_DBNAME']
     cursor = conn.cursor()
 
-    # get a list of all databases:
-    cursor.execute('SELECT datname FROM pg_database;')
-
-    # create a list of all available database names:
-    db_list = cursor.fetchall()
-    db_list = [d[0] for d in db_list]
-
-    # if that database is already there, exit out of this function
-    if current_app.config['POSTGRES_DBNAME'] in db_list:
+    try:
+        cursor.execute('COMMIT;')
+        cursor.execute(f'CREATE DATABASE {database};')
+    except psycopg2.errors.lookup('42P04'):
+        click.echo(f'Database {database!r} already exist.')
         return False
-
-    # if the database isn't already there, proceed ...
-    # create the database
-    cursor.execute('COMMIT;')
-    cursor.execute('CREATE DATABASE ' + current_app.config['POSTGRES_DBNAME'])
-    cursor.execute('COMMIT;')
-
-    return True
+    else:
+        click.echo(f'Created database {database!r}.')
+        return True
 
 
 def init_db():
@@ -123,9 +118,8 @@ def init_db():
     # The file for keeping track of if it's currently boating season
     execute_sql_from_file('define_default_options.sql')
 
-    # The function that updates the database periodically is run for the
-    # first time.
-    update_database()
+    # The function that updates the database periodically should be run after
+    # this runs.
 
 
 def update_database():
@@ -165,8 +159,6 @@ def update_database():
     from .predictive_models import all_models
     model_outs = all_models(df)
     model_outs.to_sql('model_outputs', **options)
-
-    return True
 
 
 @dataclass
