@@ -88,7 +88,7 @@ def register_errorhandlers(app: Flask):
     """
 
     @app.errorhandler(401)
-    def bad_auth(e):
+    def unauthorized(e):
         """When a 401 error is triggered, we ask the user to log in using HTTP
         Basic-Auth. If they input bad credentials we send the error page.
         """
@@ -103,7 +103,7 @@ def register_errorhandlers(app: Flask):
         return body, status, headers
 
     @app.errorhandler(404)
-    def page_not_found(e):
+    def not_found(e):
         """ Return error 404 """
         if request.path.startswith('/api/'):
             # we return a json saying so
@@ -121,8 +121,14 @@ def register_errorhandlers(app: Flask):
     @app.errorhandler(500)
     def internal_server_error(e):
         """ Return error 500 """
-        app.logger.error(f'Server Error: {e}')
-        return render_template('error.html', type=500, msg='Something went wrong.'), 500
+        app.logger.error(e)
+        body = render_template(
+            'error.html',
+            title='Internal Server Error',
+            status_code=500,
+            msg='Something went wrong.'
+        )
+        return body, 500
 
 
 def register_jinja_env(app: Flask):
