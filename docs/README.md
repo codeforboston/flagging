@@ -19,12 +19,7 @@ All of these tools are added and configured inside `mkdocs.yml`. Note you need t
 If you have write permission to the upstream repository (i.e. you are a project manager), point your terminal to this directory and run the following:
 
 ```shell script
-python3 -m venv mkdocs_env
-source mkdocs_env/bin/activate
-pip install mkdocs pymdown-extensions mkdocs-material mkdocs-macros-plugin pygments
 mkdocs gh-deploy --remote-name upstream
-deactivate
-source ../venv/bin/activate
 ```
 
 If you do not have write permission to the upstream repository, you can do one of the following:

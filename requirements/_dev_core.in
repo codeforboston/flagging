@@ -1,0 +1,17 @@
+-r _core.in
+
+# Docs dependencies
+mkdocs
+pymdown-extensions
+mkdocs-material
+mkdocs-macros-plugin
+pygments
+
+# Testing related stuff
+pytest
+pytest-cov
+schemathesis
+
+# Misc. dev stuff
+pip-tools
+python-dotenv
