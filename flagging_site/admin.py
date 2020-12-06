@@ -9,19 +9,34 @@ from flask import send_file
 from flask import abort
 from flask import url_for
 from flask_admin import Admin
-from flask_admin import BaseView
+from flask_admin import BaseView as _BaseView
 from flask_admin import expose
 from flask_admin.contrib import sqla
 
-from flask_basicauth import BasicAuth
+from flask_basicauth import BasicAuth as _BasicAuth
 from werkzeug.exceptions import HTTPException
 from sqlalchemy.exc import ProgrammingError
 
 from .data import db
 
 
-admin = Admin(template_mode='bootstrap3')
+# ==============================================================================
+# Extensions
+# ==============================================================================
 
+class BasicAuth(_BasicAuth):
+    """Uses HTTP BasicAuth to authenticate the admin user."""
+
+    def get_login(self):
+        """Check if properly authenticated. If not, then return a 401 error.
+        The 401 error page will in turn prompt the user for a username and
+        password.
+        """
+        if not self.authenticate():
+            abort(401)
+
+
+admin = Admin(template_mode='bootstrap3')
 basic_auth = BasicAuth()
 
 
@@ -36,59 +51,46 @@ def init_admin(app: Flask):
     admin.init_app(app)
 
     @app.before_request
-    def auth():
+    def auth_protect_admin_pages():
         """Authorize all paths that start with /admin/."""
         if re.match('^/admin(?:$|/+)', request.path):
-            _validate_credentials()
+            basic_auth.get_login()
 
     with app.app_context():
         # Register /admin sub-views
         from .data.manual_overrides import ManualOverridesModelView
-        admin.add_view(ManualOverridesModelView(db.session))
-
+        from .data.manual_overrides import ManualOverrides
         from .data.database import Boathouses
 
-        class BoathousesView(AdminModelView):
-            def __init__(self, session, **kwargs):
-                super().__init__(Boathouses, session, **kwargs)
-
-        admin.add_view(BoathousesView(db.session))
-
-        # Database functions
-        admin.add_view(DatabaseView(
-            name='Update Database', url='db/update', category='Manage DB'
-        ))
-
-        admin.add_view(DownloadView(
-            name='Download', url='db/download', category='Manage DB'
-        ))
-
-        admin.add_view(LogoutView(name='Logout'))
+        admin.add_view(ModelView(Boathouses, db.session))
+        admin.add_view(ManualOverridesModelView(ManualOverrides, db.session))
+        admin.add_view(DatabaseView(name='Update Database', url='db/update',
+                                    category='Manage DB'))
+        admin.add_view(DownloadView(name='Download', url='db/download',
+                                    category='Manage DB'))
+        admin.add_view(LogoutView(name='Logout', url='logout'))
 
 
-def _validate_credentials():
-    """Check if properly authenticated. If not, then return a 401 error. (The
-    401 error page will in turn prompt the user for a username and password.)
+# ==============================================================================
+# Base classes
+# ==============================================================================
+
+
+class BaseView(_BaseView):
+    """All admin views should inherit from here. This base view adds required
+    authorization to everything on the admin panel.
     """
-    if not basic_auth.authenticate():
-        abort(401)
 
-
-class AdminBaseView(BaseView):
     def is_accessible(self):
         return basic_auth.authenticate()
 
     def inaccessible_callback(self, name, **kwargs):
         """Ask for credentials when access fails."""
-        return _validate_credentials()
+        return basic_auth.get_login()
 
 
-# Adapted from https://computableverse.com/blog/flask-admin-using-basicauth
-class AdminModelView(sqla.ModelView, AdminBaseView):
-    """
-    Extension of SQLAlchemy ModelView that requires BasicAuth authentication,
-    and shows all columns in the form (including primary keys).
-    """
+class ModelView(sqla.ModelView, BaseView):
+    """Base Admin view for SQLAlchemy models."""
     can_export = True
     export_types = ['csv']
 
@@ -99,7 +101,12 @@ class AdminModelView(sqla.ModelView, AdminBaseView):
         super().__init__(model, *args, **kwargs)
 
 
-class LogoutView(AdminBaseView):
+# ==============================================================================
+# Views
+# ==============================================================================
+
+
+class LogoutView(BaseView):
     @expose('/')
     def index(self):
         body = self.render('admin/logout.html')
@@ -107,7 +114,7 @@ class LogoutView(AdminBaseView):
         return body, status
 
 
-class DatabaseView(AdminBaseView):
+class DatabaseView(BaseView):
     @expose('/')
     def index(self):
         return self.render('admin/update.html')
@@ -158,7 +165,7 @@ def _send_csv_attachment_of_dataframe(
     )
 
 
-class DownloadView(AdminBaseView):
+class DownloadView(BaseView):
     TABLES = [
         'hobolink',
         'usgs',
