@@ -10,7 +10,6 @@ import re
 from flask.cli import load_dotenv
 from distutils.util import strtobool
 
-
 # Constants
 # ~~~~~~~~~
 
@@ -94,8 +93,6 @@ class Config:
     """If True, the app instance will not fail to load just because the vault
     wasn't opened. Usually set alongside DEBUG mode.
     """
-
-    BOATING_SEASON: bool = strtobool(os.getenv('BOATING_SEASON') or 'true')
 
     VAULT_PASSWORD: str = os.getenv('VAULT_PASSWORD')
 

@@ -52,9 +52,6 @@ def init_admin(app: Flask):
     Args:
         app: A Flask application instance.
     """
-    basic_auth.init_app(app)
-    admin.init_app(app)
-
     @app.before_request
     def auth_protect_admin_pages():
         """Authorize all paths that start with /admin/."""
@@ -62,13 +59,19 @@ def init_admin(app: Flask):
             basic_auth.get_login()
 
     with app.app_context():
+        basic_auth.init_app(app)
+        admin.init_app(app)
+
         # Register /admin sub-views
         from .data.manual_overrides import ManualOverridesModelView
         from .data.manual_overrides import ManualOverrides
         from .data.database import Boathouses
+        from .data.live_website_options import LiveWebsiteOptionsModelView
+        from .data.live_website_options import LiveWebsiteOptions
 
         admin.add_view(ModelView(Boathouses, db.session))
         admin.add_view(ManualOverridesModelView(ManualOverrides, db.session))
+        admin.add_view(LiveWebsiteOptionsModelView(LiveWebsiteOptions, db.session))
         admin.add_view(DatabaseView(name='Update Database', url='db/update',
                                     category='Manage DB'))
         admin.add_view(DownloadView(name='Download', url='db/download',
