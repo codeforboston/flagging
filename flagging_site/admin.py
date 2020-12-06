@@ -1,3 +1,4 @@
+"""This module defines the admin panel, plus authentication for it."""
 import re
 import io
 import pandas as pd
@@ -25,7 +26,11 @@ from .data import db
 # ==============================================================================
 
 class BasicAuth(_BasicAuth):
-    """Uses HTTP BasicAuth to authenticate the admin user."""
+    """Uses HTTP BasicAuth to authenticate the admin user. We subclass the
+    original object to add a convenient method, `get_login`, that handles both
+    authentication and logging in (in conjunction with our error handler for 401
+    responses.
+    """
 
     def get_login(self):
         """Check if properly authenticated. If not, then return a 401 error.
@@ -107,6 +112,8 @@ class ModelView(sqla.ModelView, BaseView):
 
 
 class LogoutView(BaseView):
+    """Returns a logout page that uses a jQuery trick to emulate a logout."""
+
     @expose('/')
     def index(self):
         body = self.render('admin/logout.html')
@@ -115,6 +122,8 @@ class LogoutView(BaseView):
 
 
 class DatabaseView(BaseView):
+    """Exposes an "update database" button to the user."""
+
     @expose('/')
     def index(self):
         return self.render('admin/update.html')
@@ -134,21 +143,32 @@ class DatabaseView(BaseView):
                            redirect_to=url_for('admin.index'))
 
 
-def _send_csv_attachment_of_dataframe(
+def send_csv_attachment_of_dataframe(
         df: pd.DataFrame,
         file_name: str,
         date_prefix: bool = True
-):
-    strio = io.StringIO()
-    df.to_csv(strio, index=False)
+) -> Response:
+    """Turn a Pandas DataFrame into a response object that sends a CSV
+    attachment. This is used to download some of our tables from the database
+    (especially useful for tables we don't have SQLAlchemy for), and also for
+    DataFrames we build live.
 
-    # Convert to bytes
-    bytesio = io.BytesIO()
-    bytesio.write(strio.getvalue().encode('utf-8'))
-    # seeking was necessary. Python 3.5.2, Flask 0.12.2
-    bytesio.seek(0)
-    strio.close()
+    I think there is a strong possibility that this function causes a memory
+    leak because it doesn't handle the byte stream in a great way. For our
+    extremely small and infrequent use case, this is fine. But do keep in mind
+    that this doesn't scale.
 
+    Args:
+        df: (pd.DataFrame) DataFrame to turn into a CSV.
+        file_name: (str) Name of csv file to send. Be sure to include the file
+                   extension here!
+        date_prefix: (bool) If true, add today's date.
+
+    Returns:
+        Flask Response object with an attachment of the CSV.
+    """
+
+    # Set the file name:
     if date_prefix:
         todays_date = (
             pd.Timestamp('now', tz='UTC')
@@ -156,6 +176,19 @@ def _send_csv_attachment_of_dataframe(
             .strftime('%Y_%m_%d')
         )
         file_name = f'{todays_date}-{file_name}'
+
+    # Flask can only return byte streams as file attachments.
+    # Ultimately we end up turning the CSV
+    bytesio = io.BytesIO()
+
+    # Write csv to stream, then encode it.
+    with io.StringIO() as strio:
+        df.to_csv(strio, index=False)
+        b = strio.getvalue().encode('utf-8')
+        bytesio.write(b)
+
+    # It's safest to set the stream position at the start
+    bytesio.seek(0)
 
     return send_file(
         bytesio,
@@ -166,6 +199,11 @@ def _send_csv_attachment_of_dataframe(
 
 
 class DownloadView(BaseView):
+    """This admin view renders a landing page for downloading tables either from
+    the Postgres Database or live from the external APIs. The lives downloads
+    are handy because they get around limitations of the Heroku free tier.
+    """
+
     TABLES = [
         'hobolink',
         'usgs',
@@ -202,7 +240,7 @@ class DownloadView(BaseView):
                 )
             )
 
-        return _send_csv_attachment_of_dataframe(
+        return send_csv_attachment_of_dataframe(
             df=df,
             file_name=f'{sql_table_name}.csv'
         )
@@ -212,7 +250,7 @@ class DownloadView(BaseView):
         from .data.hobolink import get_live_hobolink_data
         df_hobolink = get_live_hobolink_data('code_for_boston_export_90d')
 
-        return _send_csv_attachment_of_dataframe(
+        return send_csv_attachment_of_dataframe(
             df=df_hobolink,
             file_name='hobolink_source.csv'
         )
@@ -222,7 +260,7 @@ class DownloadView(BaseView):
         from .data.usgs import get_live_usgs_data
         df_usgs = get_live_usgs_data(days_ago=90)
 
-        return _send_csv_attachment_of_dataframe(
+        return send_csv_attachment_of_dataframe(
             df=df_usgs,
             file_name='usgs_source.csv'
         )
@@ -238,10 +276,8 @@ class DownloadView(BaseView):
         from .data.predictive_models import process_data
         df = process_data(df_hobolink=df_hobolink, df_usgs=df_usgs)
 
-        return _send_csv_attachment_of_dataframe(
-            df=df,
-            file_name='model_outputs_source.csv'
-        )
+        return send_csv_attachment_of_dataframe(
+            df=df, file_name='model_outputs_source.csv')
 
     @expose('/csv/model_outputs')
     def source_model_outputs(self):
@@ -257,7 +293,7 @@ class DownloadView(BaseView):
         from .data.predictive_models import all_models
         model_outs = all_models(df, rows=len(df))
 
-        return _send_csv_attachment_of_dataframe(
+        return send_csv_attachment_of_dataframe(
             df=model_outs,
             file_name='model_outputs_source.csv'
         )
