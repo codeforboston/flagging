@@ -214,6 +214,42 @@ def register_commands(app: Flask):
             msg = tweet_current_status()
             click.echo(f'Sent out tweet: {msg!r}')
 
+    @app.cli.command('gen-mock-data')
+    def generate_mock_data():
+        """Create or update mock data.
+
+        Mock data is stored in flagging_site/data/_store. Theese offline
+        versions of the data are there for three reasons:
+
+        1. Running demo/dev version of the site without credentials.
+        2. Running demo/dev version of the site if the HOBOlink API ever breaks.
+        3. For unit-testing some functionality of the website.
+
+        This data is used for when the actual website when the `USE_MOCK_DATA`
+        config variable is True. It is useful for dev, but it should never be
+        used in production.
+        """
+        current_app.config['USE_MOCK_DATA'] = False
+
+        def _format_path(fn: str) -> str:
+            return os.path.join(current_app.config['DATA_STORE'], fn)
+
+        from .data.usgs import get_live_usgs_data
+        from .data.usgs import USGS_STATIC_FILE_NAME
+        from .data.hobolink import get_live_hobolink_data
+        from .data.hobolink import HOBOLINK_STATIC_FILE_NAME
+
+        df_hobolink = get_live_hobolink_data()
+        df_usgs = get_live_usgs_data()
+
+        fname_hobolink = _format_path(HOBOLINK_STATIC_FILE_NAME)
+        df_hobolink.to_pickle(fname_hobolink)
+        click.echo(f'Wrote HOBOlink data to {fname_hobolink!r}')
+
+        fname_usgs = _format_path(USGS_STATIC_FILE_NAME)
+        df_usgs.to_pickle(fname_usgs)
+        click.echo(f'Wrote USGS data to {fname_hobolink!r}')
+
 
 def register_misc(app: Flask):
     """For things that don't neatly fit into the other "register" functions.

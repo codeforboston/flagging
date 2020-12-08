@@ -110,7 +110,7 @@ def index() -> str:
     df = latest_model_outputs()
     homepage = parse_model_outputs(df)
     model_last_updated_time = df['time'].iloc[0]
-    boating_season = is_boating_season()#current_app.config['BOATING_SEASON']
+    boating_season = is_boating_season()
 
     return render_template('index.html',
                            homepage=homepage,
@@ -123,7 +123,7 @@ def about() -> str:
     return render_template('about.html')
 
 
-@bp.route('/output_model', methods=['GET'])
+@bp.route('/output_model')
 def output_model() -> str:
     """
     Retrieves data from hobolink and usgs, processes that data, and then
@@ -168,7 +168,7 @@ def flags() -> str:
     df = latest_model_outputs()
     boathouse_statuses = parse_model_outputs(df)
     model_last_updated_time = df['time'].iloc[0]
-    boating_season = is_boating_season()#current_app.config['BOATING_SEASON']
+    boating_season = is_boating_season()
 
     return render_template('flags.html',
                            boathouse_statuses=boathouse_statuses,

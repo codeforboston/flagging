@@ -265,6 +265,6 @@ def get_config_from_env(env: str) -> Config:
     try:
         config = config_mapping[env]
     except KeyError:
-        raise KeyError('Bad config passed; the config must be production, '
-                       'development, or testing.')
+        raise KeyError('Bad config passed; the config must be in '
+                       f'{config_mapping.values()}')
     return config()

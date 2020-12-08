@@ -58,7 +58,7 @@ def model_api(reaches: List[int], hours: int) -> dict:
     return {
         'model_version': MODEL_VERSION,
         'time_returned': pd.to_datetime('today'),
-        'is_boating_season': bool(is_boating_season()),#current_app.config['BOATING_SEASON']),
+        'is_boating_season': is_boating_season(),
         'model_outputs': [
             {
                 'predictions': df.loc[
@@ -80,8 +80,8 @@ def model_api(reaches: List[int], hours: int) -> dict:
 @swag_from('predictive_model_api.yml')
 def predictive_model_api():
     """Returns JSON of the predictive model outputs."""
-    reaches = request.args.getlist('reach', type=int) or [2, 3, 4, 5]
-    hours = request.args.get('hours', type=int) or 24
+    reaches = request.args.getlist('reach', default=[2, 3, 4, 5], type=int)
+    hours = request.args.get('hours', default=24, type=int)
     return jsonify(model_api(reaches, hours))
 
 
@@ -100,7 +100,7 @@ def model_input_data_api():
     df = execute_sql('''SELECT * FROM processed_data ORDER BY time''')
 
     # Parse the hours
-    hours = request.args.get('hours', type=int) or 24
+    hours = request.args.get('hours', default=24, type=int)
     if hours > current_app.config['API_MAX_HOURS']:
         hours = current_app.config['API_MAX_HOURS']
     elif hours < 1:
@@ -153,4 +153,3 @@ def init_swagger(app: Flask):
     }
 
     Swagger(app, config=swagger_config, template=template)
-
