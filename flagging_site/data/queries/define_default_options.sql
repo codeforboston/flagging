@@ -1,4 +1,4 @@
 INSERT INTO live_website_options
-    (boating_season)
+    (boating_season, flagging_message)
 VALUES
-    ('false');
+    ('false', NULL);

@@ -6,7 +6,7 @@ from distutils.util import strtobool
 class LiveWebsiteOptions(db.Model):
     __tablename__ = 'live_website_options'
     boating_season = db.Column(db.String, default=True, primary_key=True)
-
+    flagging_message = db.Column(db.VARCHAR(32767), default=True)
 
 class LiveWebsiteOptionsModelView(ModelView):
     can_create = False
@@ -17,6 +17,13 @@ class LiveWebsiteOptionsModelView(ModelView):
             ('true', 'true'),
             ('false', 'false'),
         ]
+    }
+
+    form_widget_args = {
+        'description': {
+            'rows': 20,
+            'style': 'color: black'
+        }
     }
 
 
