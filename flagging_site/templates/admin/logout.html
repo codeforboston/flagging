@@ -1,8 +1,10 @@
 {% extends "admin/base.html" %}
-{% block head %}
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-{% endblock %}
 {% block body %}
+    <p>Logged out.</p>
+    <p>Redirecting...</p>
+{% endblock %}
+{% block tail %}
+    {{ super() }}
     <script>
         $(document).ready(function(){
             $.ajax({
@@ -18,6 +20,4 @@
             });
         });
     </script>
-    <p>Logged out.</p>
-    <p>Redirecting...</p>
 {% endblock %}

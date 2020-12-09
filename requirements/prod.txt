@@ -18,6 +18,7 @@ idna==2.10                # via requests
 itsdangerous==1.1.0       # via flask
 jinja2==2.11.2            # via -r requirements/_core.in, flask
 jsonschema==3.2.0         # via flasgger
+markdown==3.3.3           # via -r requirements/_core.in
 markupsafe==1.1.1         # via jinja2, wtforms
 mistune==0.8.4            # via flasgger
 numpy==1.19.4             # via pandas
