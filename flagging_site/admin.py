@@ -1,8 +1,9 @@
 """This module defines the admin panel, plus authentication for it."""
 import re
 import io
-import pandas as pd
+from typing import List
 
+import pandas as pd
 from flask import Flask
 from flask import request
 from flask import Response
@@ -64,14 +65,12 @@ def init_admin(app: Flask):
 
         # Register /admin sub-views
         from .data.manual_overrides import ManualOverridesModelView
-        from .data.manual_overrides import ManualOverrides
-        from .data.database import Boathouses
         from .data.live_website_options import LiveWebsiteOptionsModelView
-        from .data.live_website_options import LiveWebsiteOptions
+        from .data.database import Boathouses
 
         admin.add_view(ModelView(Boathouses, db.session))
-        admin.add_view(ManualOverridesModelView(ManualOverrides, db.session))
-        admin.add_view(LiveWebsiteOptionsModelView(LiveWebsiteOptions, db.session))
+        admin.add_view(ManualOverridesModelView(db.session))
+        admin.add_view(LiveWebsiteOptionsModelView(db.session))
         admin.add_view(DatabaseView(name='Update Database', url='db/update',
                                     category='Manage DB'))
         admin.add_view(DownloadView(name='Download', url='db/download',
@@ -102,11 +101,21 @@ class ModelView(sqla.ModelView, BaseView):
     can_export = True
     export_types = ['csv']
 
-    def __init__(self, model, *args, **kwargs):
-        # Show all columns in form
-        self.column_list = [c.key for c in model.__table__.columns]
+    def __init__(
+            self,
+            model,
+            session,
+            *args,
+            ignore_columns: List[str] = None,
+            **kwargs
+    ):
+        # Show all columns in form except any in `ignore_columns`
+        self.column_list = [
+            c.key for c in model.__table__.columns
+            if c.key not in (ignore_columns or [])
+        ]
         self.form_columns = self.column_list
-        super().__init__(model, *args, **kwargs)
+        super().__init__(model, session, *args, **kwargs)
 
 
 # ==============================================================================

@@ -10,7 +10,7 @@ from ..data.manual_overrides import get_currently_overridden_reaches
 from ..data.predictive_models import latest_model_outputs
 from ..data.database import get_boathouse_by_reach_dict
 from ..data.database import get_latest_time
-from ..data.live_website_options import is_boating_season
+from ..data.live_website_options import LiveWebsiteOptions
 
 bp = Blueprint('flagging', __name__)
 
@@ -33,7 +33,7 @@ def before_request():
 
     # ~~~
 
-    if not is_boating_season():
+    if not LiveWebsiteOptions.is_boating_season():
         msg = '<b>Note:</b> It is currently not boating season. '
         if request.path.startswith('/flags'):
             # If the path is the iframe...
@@ -108,12 +108,12 @@ def index() -> str:
     purpose of the website, and the latest outputs for the flagging model.
     """
     df = latest_model_outputs()
-    homepage = parse_model_outputs(df)
+    boathouse_statuses = parse_model_outputs(df)
     model_last_updated_time = df['time'].iloc[0]
-    boating_season = is_boating_season()
+    boating_season = LiveWebsiteOptions.is_boating_season()
 
     return render_template('index.html',
-                           homepage=homepage,
+                           boathouse_statuses=boathouse_statuses,
                            model_last_updated_time=model_last_updated_time,
                            boating_season=boating_season)
 
@@ -163,12 +163,10 @@ def output_model() -> str:
 
 @bp.route('/flags')
 def flags() -> str:
-    # TODO: Update to use combination of Boathouses and the predictive model
-    #  outputs
     df = latest_model_outputs()
     boathouse_statuses = parse_model_outputs(df)
     model_last_updated_time = df['time'].iloc[0]
-    boating_season = is_boating_season()
+    boating_season = LiveWebsiteOptions.is_boating_season()
 
     return render_template('flags.html',
                            boathouse_statuses=boathouse_statuses,

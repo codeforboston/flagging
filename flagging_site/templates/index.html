@@ -19,7 +19,7 @@
 {% if boating_season %}
 <h2>Water Quality Today</h2>
     <table class="home-reach">
-        {% for reach_no, reach in homepage.items() %}
+        {% for reach_no, reach in boathouse_statuses.items() %}
         <tr>
             <td class="home-reach">
                 <div><strong>Reach {{ reach_no }}</strong></div>
@@ -37,13 +37,9 @@
         </tr>
         {% endfor %}
     </table>
-    {% for key, value in homepage.items() %}
         <p class="centered">
-            {% if loop.last %}
             (Last updated: {{model_last_updated_time}})
-            {% endif %}
         </p>
-    {% endfor %}
 {% endif %}
 <h2>Stay Updated</h2>
 <p>

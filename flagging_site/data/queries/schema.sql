@@ -28,8 +28,11 @@ CREATE TABLE IF NOT EXISTS model_outputs (
     probability     decimal,
     safe            boolean
 );
+
 /* These tables are defined with SQLAlchemy. */
+
 DROP TABLE IF EXISTS boathouses;
 DROP TABLE IF EXISTS manual_overrides;
 DROP TABLE IF EXISTS live_website_options;
+
 COMMIT;
