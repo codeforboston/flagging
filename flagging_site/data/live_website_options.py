@@ -38,5 +38,5 @@ def get_flagging_message():
     if a.flagging_message is None:
         print("got none")
         return ""
-    print("got the message: " + a.flagging_message)
-    return a.flagging_message
+    print("got the message: " + ''.join(['<p>' + i + '</p>' for i in a.flagging_message.replace('\r','').split('\n\n')]))
+    return ''.join(['<p>' + i + '</p>' for i in a.flagging_message.replace('\r','').split('\n\n')])
