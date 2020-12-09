@@ -18,6 +18,7 @@
     </p>
 {% if boating_season %}
 <h2>Water Quality Today</h2>
+    {{ flagging_message }}
     <table class="home-reach">
         {% for reach_no, reach in homepage.items() %}
         <tr>
