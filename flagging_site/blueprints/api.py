@@ -58,7 +58,8 @@ def model_api(reaches: List[int], hours: int) -> dict:
     return {
         'model_version': MODEL_VERSION,
         'time_returned': pd.to_datetime('today'),
-        'is_boating_season': is_boating_season(),
+        # For some reason this casts to int when not wrapped in `bool()`:
+        'is_boating_season': bool(is_boating_season()),
         'model_outputs': [
             {
                 'predictions': df.loc[
@@ -80,7 +81,7 @@ def model_api(reaches: List[int], hours: int) -> dict:
 @swag_from('predictive_model_api.yml')
 def predictive_model_api():
     """Returns JSON of the predictive model outputs."""
-    reaches = request.args.getlist('reach', default=[2, 3, 4, 5], type=int)
+    reaches = request.args.getlist('reach', type=int) or [2, 3, 4, 5]
     hours = request.args.get('hours', default=24, type=int)
     return jsonify(model_api(reaches, hours))
 
