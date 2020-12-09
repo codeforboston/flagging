@@ -81,6 +81,8 @@ class Config:
     the rest of the code base.
     """
 
+    FLASK_ADMIN_SWATCH = 'lumen'
+
     # ==========================================================================
     # MISC. CUSTOM CONFIG OPTIONS
     #
