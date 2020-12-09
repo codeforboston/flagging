@@ -4,6 +4,7 @@ from sqlalchemy import Column
 from sqlalchemy import Integer
 from sqlalchemy import TIMESTAMP
 from sqlalchemy import VARCHAR
+from sqlalchemy.orm import Session
 
 from ..admin import ModelView
 from .database import Base
@@ -26,6 +27,9 @@ class ManualOverridesModelView(ModelView):
             ('other', 'Other'),
         ]
     }
+
+    def __init__(self, session: Session):
+        super().__init__(ManualOverrides, session)
 
 
 def get_currently_overridden_reaches() -> Set[int]:

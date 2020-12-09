@@ -6,9 +6,11 @@ Flask-SQLAlchemy
 Flask
 gunicorn
 Jinja2
+markdown
 pandas
 py7zr
 PyYAML
 requests
 SQLAlchemy
+tenacity
 tweepy

@@ -18,6 +18,7 @@ idna==2.10                # via requests
 itsdangerous==1.1.0       # via flask
 jinja2==2.11.2            # via -r requirements/_core.in, flask
 jsonschema==3.2.0         # via flasgger
+markdown==3.3.3           # via -r requirements/_core.in
 markupsafe==1.1.1         # via jinja2, wtforms
 mistune==0.8.4            # via flasgger
 numpy==1.19.4             # via pandas
@@ -33,8 +34,9 @@ pytz==2020.4              # via pandas
 pyyaml==5.3.1             # via -r requirements/_core.in, flasgger
 requests-oauthlib==1.3.0  # via tweepy
 requests[socks]==2.25.0   # via -r requirements/_core.in, requests-oauthlib, tweepy
-six==1.15.0               # via flasgger, jsonschema, python-dateutil, tweepy
+six==1.15.0               # via flasgger, jsonschema, python-dateutil, tenacity, tweepy
 sqlalchemy==1.3.20        # via -r requirements/_core.in, flask-sqlalchemy
+tenacity==6.2.0           # via -r requirements/_core.in
 texttable==1.6.3          # via py7zr
 tweepy==3.9.0             # via -r requirements/_core.in
 urllib3==1.26.2           # via requests
