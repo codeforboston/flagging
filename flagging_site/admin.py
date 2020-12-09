@@ -100,6 +100,8 @@ class ModelView(sqla.ModelView, BaseView):
     """Base Admin view for SQLAlchemy models."""
     can_export = True
     export_types = ['csv']
+    create_modal = True
+    edit_modal = True
 
     def __init__(
             self,

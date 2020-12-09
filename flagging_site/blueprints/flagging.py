@@ -12,6 +12,7 @@ from ..data.database import get_boathouse_by_reach_dict
 from ..data.database import get_latest_time
 from ..data.live_website_options import LiveWebsiteOptions
 
+
 bp = Blueprint('flagging', __name__)
 
 
@@ -111,11 +112,13 @@ def index() -> str:
     boathouse_statuses = parse_model_outputs(df)
     model_last_updated_time = df['time'].iloc[0]
     boating_season = LiveWebsiteOptions.is_boating_season()
+    flagging_message = LiveWebsiteOptions.get_flagging_message()
 
     return render_template('index.html',
                            boathouse_statuses=boathouse_statuses,
                            model_last_updated_time=model_last_updated_time,
-                           boating_season=boating_season)
+                           boating_season=boating_season,
+                           flagging_message=flagging_message)
 
 
 @bp.route('/about')
@@ -167,11 +170,13 @@ def flags() -> str:
     boathouse_statuses = parse_model_outputs(df)
     model_last_updated_time = df['time'].iloc[0]
     boating_season = LiveWebsiteOptions.is_boating_season()
+    flagging_message = LiveWebsiteOptions.get_flagging_message()
 
     return render_template('flags.html',
                            boathouse_statuses=boathouse_statuses,
                            model_last_updated_time=model_last_updated_time,
-                           boating_season=boating_season)
+                           boating_season=boating_season,
+                           flagging_message=flagging_message)
 
 
 @bp.route('/api')
