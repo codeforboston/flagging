@@ -8,6 +8,9 @@ import requests
 import pandas as pd
 from flask import abort
 from flask import current_app
+from tenacity import retry
+from tenacity import wait_fixed
+from tenacity import stop_after_attempt
 
 # Constants
 
@@ -32,6 +35,7 @@ HOBOLINK_STATIC_FILE_NAME = 'hobolink.pickle'
 # ~ ~ ~ ~
 
 
+@retry(wait=wait_fixed(1), stop=stop_after_attempt(3))
 def get_live_hobolink_data(
         export_name: str = DEFAULT_HOBOLINK_EXPORT_NAME
 ) -> pd.DataFrame:
@@ -78,8 +82,9 @@ def request_to_hobolink(
     # handle HOBOLINK errors by checking HTTP status code
     # status codes in 400's are client errors, in 500's are server errors
     if res.status_code // 100 in [4, 5]:
-        error_message = "link has failed with error # " + str(res.status_code)
-        return abort(res.status_code, error_message)
+        error_msg = 'API request to the HOBOlink endpoint failed with status ' \
+                    f'code {res.status_code}.'
+        abort(res.status_code, error_msg)
     return res
 
 
