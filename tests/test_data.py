@@ -12,7 +12,6 @@ from flagging_site.data.usgs import get_live_usgs_data
 STATIC_RESOURCES = os.path.join(os.path.dirname(__file__), 'static')
 
 
-@pytest.mark.skip
 def test_hobolink_data_is_recent(app):
     with app.app_context():
         df = get_live_hobolink_data()
@@ -33,7 +32,7 @@ def test_usgs_data_is_recent(app):
     ('input_data', 'expected_output_data'),
     [
         ('test_case_01_input.txt', 'test_case_01_output.feather'),
-        # ('test_case_02_input.txt', 'test_case_02_output.feather'),
+        ('test_case_02_input.txt', 'test_case_02_output.feather')
     ]
 )
 def test_hobolink_handles_erroneous_csv(

@@ -18,6 +18,7 @@ schema = schemathesis.from_pytest_fixture('schema_fixture')
 # We do not plan on maintaining this schema.
 # The input to `endpoint=` removes the model_input_data from the schema:
 
+@pytest.mark.filterwarnings("ignore:^.*'subtests' fixture.*$")
 @schema.parametrize(endpoint='^(?!/api/v1/model_input_data$).*$')
 def test_api(case):
     """Test the API against the OpenAPI specification."""

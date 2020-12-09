@@ -18,7 +18,7 @@ HOBOLINK_URL = 'http://webservice.hobolink.com/restv2/data/custom/file'
 DEFAULT_HOBOLINK_EXPORT_NAME = 'code_for_boston_export_21d'
 # Each key is the original column name; the value is the renamed column.
 HOBOLINK_COLUMNS = {
-    'Time, GMT-04:00': 'time',
+    'Time, GMT-': 'time',
     'Pressure': 'pressure',
     'PAR': 'par',
     'Rain': 'rain',
@@ -141,4 +141,4 @@ def parse_hobolink_data(res: str) -> pd.DataFrame:
     # Convert time column to Pandas datetime
     df['time'] = pd.to_datetime(df['time'], format='%m/%d/%y %H:%M:%S')
 
-    return df
+    return df.reset_index()

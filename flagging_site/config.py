@@ -71,7 +71,7 @@ class Config:
         host = self.POSTGRES_HOST
         port = self.POSTGRES_PORT
         db = self.POSTGRES_DBNAME
-        return f'postgres://{user}:{password}@{host}:{port}/{db}'
+        return f'postgresql://{user}:{password}@{host}:{port}/{db}'
 
     SQLALCHEMY_RECORD_QUERIES: bool = True
     SQLALCHEMY_TRACK_MODIFICATIONS: bool = False

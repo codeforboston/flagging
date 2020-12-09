@@ -1,3 +1,4 @@
+import warnings
 from typing import List
 
 import pandas as pd
@@ -7,15 +8,18 @@ from flask import current_app
 from flask import jsonify
 from flask import url_for
 from flask import Flask
-from flasgger import Swagger
-from flasgger import LazyString
+with warnings.catch_warnings():
+    warnings.simplefilter('ignore', category=DeprecationWarning)
+    from flasgger import Swagger
+    from flasgger import LazyString
+    from flasgger import swag_from
+
 from ..data.predictive_models import latest_model_outputs
 from ..data.predictive_models import MODEL_VERSION
 from ..data.database import get_boathouse_metadata_dict
 from ..data.database import execute_sql
 from ..data.live_website_options import LiveWebsiteOptions
 
-from flasgger import swag_from
 
 bp = Blueprint('api', __name__, url_prefix='/api')
 
