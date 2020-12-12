@@ -1,38 +1,50 @@
+"""This module defines the admin panel, plus authentication for it."""
+import re
 import io
-import pandas as pd
-import datetime
+from typing import List
 
+import pandas as pd
 from flask import Flask
-from flask import redirect
 from flask import request
 from flask import Response
 from flask import send_file
 from flask import abort
+from flask import url_for
 from flask_admin import Admin
-from flask_admin import BaseView
+from flask_admin import AdminIndexView
+from flask_admin import BaseView as _BaseView
 from flask_admin import expose
 from flask_admin.contrib import sqla
 
-from flask_basicauth import BasicAuth
+from flask_basicauth import BasicAuth as _BasicAuth
 from werkzeug.exceptions import HTTPException
 from sqlalchemy.exc import ProgrammingError
 
 from .data import db
 
+
+# ==============================================================================
+# Extensions
+# ==============================================================================
+
+class BasicAuth(_BasicAuth):
+    """Uses HTTP BasicAuth to authenticate the admin user. We subclass the
+    original object to add a convenient method, `get_login`, that handles both
+    authentication and logging in (in conjunction with our error handler for 401
+    responses.
+    """
+
+    def get_login(self):
+        """Check if properly authenticated. If not, then return a 401 error.
+        The 401 error page will in turn prompt the user for a username and
+        password.
+        """
+        if not self.authenticate():
+            abort(401)
+
+
 admin = Admin(template_mode='bootstrap3')
-
 basic_auth = BasicAuth()
-
-
-# Taken from https://computableverse.com/blog/flask-admin-using-basicauth
-class AuthException(HTTPException):
-    def __init__(self, message):
-        """HTTP Forbidden error that prompts for login"""
-        super().__init__(message, Response(
-            'You could not be authenticated. Please refresh the page.',
-            status=401,
-            headers={'WWW-Authenticate': 'Basic realm="Login Required"'}
-        ))
 
 
 def init_admin(app: Flask):
@@ -42,108 +54,91 @@ def init_admin(app: Flask):
     Args:
         app: A Flask application instance.
     """
-    basic_auth.init_app(app)
-    admin.init_app(app)
-
     @app.before_request
-    def auth():
+    def auth_protect_admin_pages():
         """Authorize all paths that start with /admin/."""
-        if request.path.startswith('/admin/'):
-            validate_credentials()
+        if re.match('^/admin(?:$|/+)', request.path):
+            basic_auth.get_login()
 
     with app.app_context():
+        basic_auth.init_app(app)
+        admin.init_app(app)
+
         # Register /admin sub-views
+        from .data.live_website_options import LiveWebsiteOptionsModelView
         from .data.manual_overrides import ManualOverridesModelView
+        from .data.database import Boathouses
+
+        admin.add_view(LiveWebsiteOptionsModelView(db.session))
+        admin.add_view(ModelView(Boathouses, db.session))
         admin.add_view(ManualOverridesModelView(db.session))
-
-        # Database functions
-        admin.add_view(DatabaseView(
-            name='Update Database', url='db/update', category='Database'
-        ))
-
-        admin.add_view(DownloadView(
-            name='Download', url='db/download', category='Database'
-        ))
-
-        admin.add_view(LogoutView(name='Logout'))
+        admin.add_view(DatabaseView(name='Update Database', url='db/update',
+                                    category='Manage DB'))
+        admin.add_view(DownloadView(name='Download', url='db/download',
+                                    category='Manage DB'))
+        admin.add_view(LogoutView(name='Logout', url='logout'))
 
 
-def validate_credentials() -> bool:
+# ==============================================================================
+# Base classes
+# ==============================================================================
+
+
+class BaseView(_BaseView):
+    """All admin views should inherit from here. This base view adds required
+    authorization to everything on the admin panel.
     """
-    Protect admin pages with basic_auth.
-    If logged out and current page is /admin/, then ask for credentials.
-    Otherwise, raises HTTP 401 error and redirects user to /admin/ on the
-    frontend (redirecting with HTTP redirect causes user to always be
-    redirected to /admin/ even after logging in).
 
-    We redirect to /admin/ because our logout method only works if the path to
-    /logout is the same as the path to where we put in our credentials. So if
-    we put in credentials at /admin/cyanooverride, then we would need to logout
-    at /admin/cyanooverride/logout, which would be difficult to arrange. Instead,
-    we always redirect to /admin/ to put in credentials, and then logout at
-    /admin/logout.
-    """
-    if not basic_auth.authenticate():
-        if request.path.startswith('/admin/'):
-            raise AuthException('Not authenticated. Refresh the page.')
-        else:
-            raise HTTPException(
-                'Attempted to visit admin page but not authenticated.',
-                Response(
-                    '''
-                    Not authenticated. Navigate to /admin/ to login.
-                    <script>window.location = "/admin/";</script>
-                    ''',
-                    status=401  # 'Forbidden' status
-                )
-            )
-    return True
-
-
-class AdminBaseView(BaseView):
     def is_accessible(self):
-        return validate_credentials()
+        return basic_auth.authenticate()
 
     def inaccessible_callback(self, name, **kwargs):
-        """Ask for credentials when access fails"""
-        return redirect(basic_auth.challenge())
+        """Ask for credentials when access fails."""
+        return basic_auth.get_login()
 
 
-# Adapted from https://computableverse.com/blog/flask-admin-using-basicauth
-class AdminModelView(sqla.ModelView, AdminBaseView):
-    """
-    Extension of SQLAlchemy ModelView that requires BasicAuth authentication,
-    and shows all columns in the form (including primary keys).
-    """
+class ModelView(sqla.ModelView, BaseView):
+    """Base Admin view for SQLAlchemy models."""
+    can_export = True
+    export_types = ['csv']
+    create_modal = True
+    edit_modal = True
 
-    def __init__(self, model, *args, **kwargs):
-        # Show all columns in form
-        self.column_list = [c.key for c in model.__table__.columns]
+    def __init__(
+            self,
+            model,
+            session,
+            *args,
+            ignore_columns: List[str] = None,
+            **kwargs
+    ):
+        # Show all columns in form except any in `ignore_columns`
+        self.column_list = [
+            c.key for c in model.__table__.columns
+            if c.key not in (ignore_columns or [])
+        ]
         self.form_columns = self.column_list
-        super().__init__(model, *args, **kwargs)
+        super().__init__(model, session, *args, **kwargs)
 
 
-class LogoutView(AdminBaseView):
+# ==============================================================================
+# Views
+# ==============================================================================
+
+
+class LogoutView(BaseView):
+    """Returns a logout page that uses a jQuery trick to emulate a logout."""
+
     @expose('/')
     def index(self):
-        """
-        To log out of basic auth for admin pages,
-        we raise an HTTP 401 error (there isn't really a cleaner way)
-        and then redirect on the frontend to home.
-        """
-        raise HTTPException(
-            'Logged out.',
-            Response(
-                '''
-                Successfully logged out.
-                <script>window.location = "/";</script>
-                ''',
-                status=401
-            )
-        )
+        body = self.render('admin/logout.html')
+        status = 401
+        return body, status
 
 
-class DatabaseView(AdminBaseView):
+class DatabaseView(BaseView):
+    """Exposes an "update database" button to the user."""
+
     @expose('/')
     def index(self):
         return self.render('admin/update.html')
@@ -154,47 +149,61 @@ class DatabaseView(AdminBaseView):
         designed to be available in the app during runtime, and is protected by
         BasicAuth so that only administrators can run it.
         """
-        # If auth passed, then update database.
         from .data.database import update_database
         update_database()
 
         # Notify the user that the update was successful, then redirect:
-        return '''<!DOCTYPE html>
-            <html>
-                <body>
-                    <script>
-                        setTimeout(function(){
-                            window.location.href = '/admin/';
-                        }, 3000);
-                    </script>
-                    <p>Databases updated. Redirecting in 3 seconds...</p>
-                </body>
-            </html>
-        '''
+        return self.render('admin/redirect.html',
+                           message='Database updated.',
+                           redirect_to=url_for('admin.index'))
 
 
-def _send_csv_attachment_of_dataframe(
+def send_csv_attachment_of_dataframe(
         df: pd.DataFrame,
         file_name: str,
-        date_prefix: bool = False
-):
-    strio = io.StringIO()
-    df.to_csv(strio, index=False)
+        date_prefix: bool = True
+) -> Response:
+    """Turn a Pandas DataFrame into a response object that sends a CSV
+    attachment. This is used to download some of our tables from the database
+    (especially useful for tables we don't have SQLAlchemy for), and also for
+    DataFrames we build live.
 
-    # Convert to bytes
-    bytesio = io.BytesIO()
-    bytesio.write(strio.getvalue().encode('utf-8'))
-    # seeking was necessary. Python 3.5.2, Flask 0.12.2
-    bytesio.seek(0)
-    strio.close()
+    I think there is a strong possibility that this function causes a memory
+    leak because it doesn't handle the byte stream in a great way. For our
+    extremely small and infrequent use case, this is fine. But do keep in mind
+    that this doesn't scale.
 
+    Args:
+        df: (pd.DataFrame) DataFrame to turn into a CSV.
+        file_name: (str) Name of csv file to send. Be sure to include the file
+                   extension here!
+        date_prefix: (bool) If true, add today's date.
+
+    Returns:
+        Flask Response object with an attachment of the CSV.
+    """
+
+    # Set the file name:
     if date_prefix:
         todays_date = (
             pd.Timestamp('now', tz='UTC')
-                .tz_convert('US/Eastern')
-                .strftime('%Y_%m_%d')
+            .tz_convert('US/Eastern')
+            .strftime('%Y_%m_%d')
         )
         file_name = f'{todays_date}-{file_name}'
+
+    # Flask can only return byte streams as file attachments.
+    # Ultimately we end up turning the CSV
+    bytesio = io.BytesIO()
+
+    # Write csv to stream, then encode it.
+    with io.StringIO() as strio:
+        df.to_csv(strio, index=False)
+        b = strio.getvalue().encode('utf-8')
+        bytesio.write(b)
+
+    # It's safest to set the stream position at the start
+    bytesio.seek(0)
 
     return send_file(
         bytesio,
@@ -204,7 +213,12 @@ def _send_csv_attachment_of_dataframe(
     )
 
 
-class DownloadView(AdminBaseView):
+class DownloadView(BaseView):
+    """This admin view renders a landing page for downloading tables either from
+    the Postgres Database or live from the external APIs. The lives downloads
+    are handy because they get around limitations of the Heroku free tier.
+    """
+
     TABLES = [
         'hobolink',
         'usgs',
@@ -229,7 +243,6 @@ class DownloadView(AdminBaseView):
         # Be careful when parameterizing queries like how we do it below.
         # The reason it's OK in this case is because users don't touch it.
         # However it is dangerous to do this in some other contexts.
-        # We are doing it like this to avoid needing to utilize sessions.
         query = f'''SELECT * FROM {sql_table_name}'''
         try:
             df = execute_sql(query)
@@ -237,15 +250,14 @@ class DownloadView(AdminBaseView):
             raise HTTPException(
                 'Invalid SQL.',
                 Response(
-                    f'<b>Invalid SQL query:</b> <tt>{query}</tt>',
+                    f'<b>Invalid SQL query:</b> <samp>{query}</samp>',
                     status=500
                 )
             )
 
-        return _send_csv_attachment_of_dataframe(
+        return send_csv_attachment_of_dataframe(
             df=df,
-            file_name=f'{sql_table_name}.csv',
-            date_prefix=True
+            file_name=f'{sql_table_name}.csv'
         )
 
     @expose('/csv/hobolink_source')
@@ -253,10 +265,9 @@ class DownloadView(AdminBaseView):
         from .data.hobolink import get_live_hobolink_data
         df_hobolink = get_live_hobolink_data('code_for_boston_export_90d')
 
-        return _send_csv_attachment_of_dataframe(
+        return send_csv_attachment_of_dataframe(
             df=df_hobolink,
-            file_name=f'hobolink_source.csv',
-            date_prefix=True
+            file_name='hobolink_source.csv'
         )
 
     @expose('/csv/usgs_source')
@@ -264,10 +275,9 @@ class DownloadView(AdminBaseView):
         from .data.usgs import get_live_usgs_data
         df_usgs = get_live_usgs_data(days_ago=90)
 
-        return _send_csv_attachment_of_dataframe(
+        return send_csv_attachment_of_dataframe(
             df=df_usgs,
-            file_name=f'usgs_source.csv',
-            date_prefix=True
+            file_name='usgs_source.csv'
         )
 
     @expose('/csv/model_outputs')
@@ -281,11 +291,8 @@ class DownloadView(AdminBaseView):
         from .data.predictive_models import process_data
         df = process_data(df_hobolink=df_hobolink, df_usgs=df_usgs)
 
-        return _send_csv_attachment_of_dataframe(
-            df=df,
-            file_name=f'model_outputs_source.csv',
-            date_prefix=True
-        )
+        return send_csv_attachment_of_dataframe(
+            df=df, file_name='model_outputs_source.csv')
 
     @expose('/csv/model_outputs')
     def source_model_outputs(self):
@@ -301,10 +308,7 @@ class DownloadView(AdminBaseView):
         from .data.predictive_models import all_models
         model_outs = all_models(df, rows=len(df))
 
-        return _send_csv_attachment_of_dataframe(
+        return send_csv_attachment_of_dataframe(
             df=model_outs,
-            file_name=f'model_outputs_source.csv',
-            date_prefix=True
+            file_name='model_outputs_source.csv'
         )
-
-

@@ -10,7 +10,6 @@ import re
 from flask.cli import load_dotenv
 from distutils.util import strtobool
 
-
 # Constants
 # ~~~~~~~~~
 
@@ -72,7 +71,7 @@ class Config:
         host = self.POSTGRES_HOST
         port = self.POSTGRES_PORT
         db = self.POSTGRES_DBNAME
-        return f'postgres://{user}:{password}@{host}:{port}/{db}'
+        return f'postgresql://{user}:{password}@{host}:{port}/{db}'
 
     SQLALCHEMY_RECORD_QUERIES: bool = True
     SQLALCHEMY_TRACK_MODIFICATIONS: bool = False
@@ -81,6 +80,8 @@ class Config:
     """Directory that contains various queries that are accessible throughout
     the rest of the code base.
     """
+
+    FLASK_ADMIN_SWATCH = 'lumen'
 
     # ==========================================================================
     # MISC. CUSTOM CONFIG OPTIONS
@@ -94,8 +95,6 @@ class Config:
     """If True, the app instance will not fail to load just because the vault
     wasn't opened. Usually set alongside DEBUG mode.
     """
-
-    BOATING_SEASON: bool = strtobool(os.getenv('BOATING_SEASON') or 'true')
 
     VAULT_PASSWORD: str = os.getenv('VAULT_PASSWORD')
 
@@ -268,6 +267,6 @@ def get_config_from_env(env: str) -> Config:
     try:
         config = config_mapping[env]
     except KeyError:
-        raise KeyError('Bad config passed; the config must be production, '
-                       'development, or testing.')
+        raise KeyError('Bad config passed; the config must be in '
+                       f'{config_mapping.values()}')
     return config()

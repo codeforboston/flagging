@@ -1,0 +1,13 @@
+{% extends "admin/base.html" %}
+{% set _seconds = seconds | default(2) %}
+{% block head %}
+    <script>
+    setTimeout(function(){
+        window.location.href = "{{ redirect_to }}";
+    }, {{ _seconds * 1000 }});
+    </script>
+{% endblock %}
+{% block body %}
+        <p>{{ message }}</p>
+        <p>Redirecting in {{ _seconds }} seconds...</p>
+{% endblock %}

@@ -10,6 +10,8 @@ from ..data.manual_overrides import get_currently_overridden_reaches
 from ..data.predictive_models import latest_model_outputs
 from ..data.database import get_boathouse_by_reach_dict
 from ..data.database import get_latest_time
+from ..data.live_website_options import LiveWebsiteOptions
+
 
 bp = Blueprint('flagging', __name__)
 
@@ -32,7 +34,7 @@ def before_request():
 
     # ~~~
 
-    if not current_app.config['BOATING_SEASON']:
+    if not LiveWebsiteOptions.is_boating_season():
         msg = '<b>Note:</b> It is currently not boating season. '
         if request.path.startswith('/flags'):
             # If the path is the iframe...
@@ -107,14 +109,16 @@ def index() -> str:
     purpose of the website, and the latest outputs for the flagging model.
     """
     df = latest_model_outputs()
-    homepage = parse_model_outputs(df)
+    boathouse_statuses = parse_model_outputs(df)
     model_last_updated_time = df['time'].iloc[0]
-    boating_season = current_app.config['BOATING_SEASON']
+    boating_season = LiveWebsiteOptions.is_boating_season()
+    flagging_message = LiveWebsiteOptions.get_flagging_message()
 
     return render_template('index.html',
-                           homepage=homepage,
+                           boathouse_statuses=boathouse_statuses,
                            model_last_updated_time=model_last_updated_time,
-                           boating_season=boating_season)
+                           boating_season=boating_season,
+                           flagging_message=flagging_message)
 
 
 @bp.route('/about')
@@ -122,7 +126,7 @@ def about() -> str:
     return render_template('about.html')
 
 
-@bp.route('/output_model', methods=['GET'])
+@bp.route('/output_model')
 def output_model() -> str:
     """
     Retrieves data from hobolink and usgs, processes that data, and then
@@ -162,17 +166,17 @@ def output_model() -> str:
 
 @bp.route('/flags')
 def flags() -> str:
-    # TODO: Update to use combination of Boathouses and the predictive model
-    #  outputs
     df = latest_model_outputs()
     boathouse_statuses = parse_model_outputs(df)
     model_last_updated_time = df['time'].iloc[0]
-    boating_season = current_app.config['BOATING_SEASON']
+    boating_season = LiveWebsiteOptions.is_boating_season()
+    flagging_message = LiveWebsiteOptions.get_flagging_message()
 
     return render_template('flags.html',
                            boathouse_statuses=boathouse_statuses,
                            model_last_updated_time=model_last_updated_time,
-                           boating_season=boating_season)
+                           boating_season=boating_season,
+                           flagging_message=flagging_message)
 
 
 @bp.route('/api')
