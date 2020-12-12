@@ -162,15 +162,21 @@ def register_commands(app: Flask):
     """
 
     @app.cli.command('create-db')
-    def create_db_command():
+    @click.option('--overwrite/--no-overwrite',
+                  default=False,
+                  is_flag=True,
+                  show_default=True,
+                  help='If true, overwrite the database if it exists.')
+    def create_db_command(overwrite: bool = False):
         """Create database (after verifying that it isn't already there)."""
         from .data.database import create_db
-        create_db()
+        create_db(overwrite=overwrite)
 
     @app.cli.command('init-db')
     @click.option('--pop/--no-pop',
                   default=True,
                   is_flag=True,
+                  show_default=True,
                   help='If true, then do a db update when initializing the db.')
     @click.pass_context
     def init_db_command(ctx: click.Context, pop: bool):

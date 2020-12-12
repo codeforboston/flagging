@@ -68,7 +68,7 @@ def execute_sql_from_file(file_name: str) -> Optional[pd.DataFrame]:
         return execute_sql(f.read().decode('utf8'))
 
 
-def create_db() -> bool:
+def create_db(overwrite: bool = False) -> bool:
     """If the database defined by `POSTGRES_DBNAME` doesn't exist, create it
     and return True, otherwise do nothing and return False. By default, the
     config variable `POSTGRES_DBNAME` is set to "flagging".
@@ -85,6 +85,14 @@ def create_db() -> bool:
     )
     database = current_app.config['POSTGRES_DBNAME']
     cursor = conn.cursor()
+
+    if overwrite:
+        cursor.execute("SELECT bool_or(datname = 'flagging') FROM pg_database;")
+        exists = cursor.fetchall()[0][0]
+        if exists:
+            cursor.execute('COMMIT;')
+            cursor.execute(f'DROP DATABASE {database};')
+            click.echo(f'Dropped database {database!r}.')
 
     try:
         cursor.execute('COMMIT;')
