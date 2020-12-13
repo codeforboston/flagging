@@ -187,7 +187,7 @@ class ProductionConfig(Config):
         # to be consistent with the `DATABASE_URL` below:
         postgres_url_schema = re.compile('''
             ^
-            postgres://
+            postgres(?:ql)?://
             ([^\s:@/]+) # Username
             :([^\s:@/]+) # Password
             @([^\s:@/]+) # Host
@@ -227,7 +227,7 @@ class DevelopmentConfig(Config):
     the vault hasn't been loaded but doesn't prevent the website from loading
     just because the vault is not open.
     """
-    SQLALCHEMY_ECHO: bool = True
+    SQLALCHEMY_ECHO: bool = strtobool(os.getenv('SQLALCHEMY_ECHO') or 'true')
     VAULT_OPTIONAL: bool = True
     DEBUG: bool = True
     TESTING: bool = True
