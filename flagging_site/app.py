@@ -162,15 +162,21 @@ def register_commands(app: Flask):
     """
 
     @app.cli.command('create-db')
-    def create_db_command():
+    @click.option('--overwrite/--no-overwrite',
+                  default=False,
+                  is_flag=True,
+                  show_default=True,
+                  help='If true, overwrite the database if it exists.')
+    def create_db_command(overwrite: bool = False):
         """Create database (after verifying that it isn't already there)."""
         from .data.database import create_db
-        create_db()
+        create_db(overwrite=overwrite)
 
     @app.cli.command('init-db')
     @click.option('--pop/--no-pop',
                   default=True,
                   is_flag=True,
+                  show_default=True,
                   help='If true, then do a db update when initializing the db.')
     @click.pass_context
     def init_db_command(ctx: click.Context, pop: bool):
@@ -179,35 +185,28 @@ def register_commands(app: Flask):
         init_db()
         click.echo('Initialized the database.')
         if pop:
-            # Update the database if `pop` is True
             ctx.invoke(update_db_command)
 
     @app.cli.command('update-db')
     def update_db_command():
         """Update the database with the latest live data."""
         from .data.database import update_database
-        try:
-            update_database()
-            click.echo('Updated the database.')
-            updated = True
-        except Exception as e:
-            click.echo("Note: while updating database, something didn't "
-                       f'work: {e}')
-            updated = False
-        return updated
+        update_database()
+        click.echo('Updated the database successfully.')
 
     @app.cli.command('update-website')
     @click.pass_context
     def update_website_command(ctx: click.Context):
         """Updates the database, then Tweets a message."""
-        from .data.live_website_options import is_boating_season
+        from .data.live_website_options import LiveWebsiteOptions
 
-        updated = ctx.invoke(update_db_command)
+        # Update the database
+        ctx.invoke(update_db_command)
+
         # If the model updated and it's boating season, send a tweet.
         # Otherwise, do nothing.
         if (
-                updated
-                and is_boating_season()
+                LiveWebsiteOptions.is_boating_season()
                 and current_app.config['SEND_TWEETS']
         ):
             from .twitter import tweet_current_status
