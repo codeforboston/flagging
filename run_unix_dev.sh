@@ -20,7 +20,7 @@ PYEXEC=$(get_python_exec)
 # Set up virtual environment in /venv
 $PYEXEC -m venv venv
 source venv/bin/activate
-$PYEXEC -m pip install $(cat requirements.txt | grep -v "psycopg2==")
+$PYEXEC -m pip install -r requirements/dev_osx.txt
 
 # Set up and run the Flask application
 export FLASK_APP=flagging_site:create_app
@@ -32,4 +32,4 @@ export USE_MOCK_DATA=${use_mock_data:-${USE_MOCK_DATA}}
 
 flask create-db
 flask init-db
-flask run
+flask run -p ${FLASK_PORT:-5000}

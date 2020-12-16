@@ -10,6 +10,9 @@ import pandas as pd
 import requests
 from flask import abort
 from flask import current_app
+from tenacity import retry
+from tenacity import wait_fixed
+from tenacity import stop_after_attempt
 
 # Constants
 USGS_URL = 'https://waterdata.usgs.gov/nwis/uv'
@@ -18,6 +21,7 @@ USGS_STATIC_FILE_NAME = 'usgs.pickle'
 # ~ ~ ~ ~
 
 
+@retry(wait=wait_fixed(1), stop=stop_after_attempt(3))
 def get_live_usgs_data(days_ago: int = 5) -> pd.DataFrame:
     """This function runs through the whole process for retrieving data from
     usgs: first we perform the request, and then we parse the data.
@@ -39,7 +43,8 @@ def get_live_usgs_data(days_ago: int = 5) -> pd.DataFrame:
 def request_to_usgs(days_ago: int = 5) -> requests.models.Response:
     """Get a request from the USGS.
 
-
+    Args:
+        days_ago: (int) Number of days of data to get.
 
     Returns:
         Request Response containing the data from the request.
@@ -55,8 +60,8 @@ def request_to_usgs(days_ago: int = 5) -> requests.models.Response:
 
     res = requests.get(USGS_URL, params=payload)
     if res.status_code // 100 in [4, 5]:
-        error_msg = 'API request to the USGS endpoint failed with status code '\
-                    + str(res.status_code)
+        error_msg = 'API request to the USGS endpoint failed with status ' \
+                    f'code {res.status_code}.'
         abort(res.status_code, error_msg)
     return res
 

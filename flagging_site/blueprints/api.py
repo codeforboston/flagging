@@ -1,3 +1,4 @@
+import warnings
 from typing import List
 
 import pandas as pd
@@ -5,12 +6,20 @@ from flask import Blueprint
 from flask import request
 from flask import current_app
 from flask import jsonify
+from flask import url_for
+from flask import Flask
+with warnings.catch_warnings():
+    warnings.simplefilter('ignore', category=DeprecationWarning)
+    from flasgger import Swagger
+    from flasgger import LazyString
+    from flasgger import swag_from
+
 from ..data.predictive_models import latest_model_outputs
 from ..data.predictive_models import MODEL_VERSION
 from ..data.database import get_boathouse_metadata_dict
 from ..data.database import execute_sql
+from ..data.live_website_options import LiveWebsiteOptions
 
-from flasgger import swag_from
 
 bp = Blueprint('api', __name__, url_prefix='/api')
 
@@ -53,7 +62,8 @@ def model_api(reaches: List[int], hours: int) -> dict:
     return {
         'model_version': MODEL_VERSION,
         'time_returned': pd.to_datetime('today'),
-        'is_boating_season': bool(current_app.config['BOATING_SEASON']),
+        # For some reason this casts to int when not wrapped in `bool()`:
+        'is_boating_season': LiveWebsiteOptions.is_boating_season(),
         'model_outputs': [
             {
                 'predictions': df.loc[
@@ -76,7 +86,7 @@ def model_api(reaches: List[int], hours: int) -> dict:
 def predictive_model_api():
     """Returns JSON of the predictive model outputs."""
     reaches = request.args.getlist('reach', type=int) or [2, 3, 4, 5]
-    hours = request.args.get('hours', type=int) or 24
+    hours = request.args.get('hours', default=24, type=int)
     return jsonify(model_api(reaches, hours))
 
 
@@ -95,7 +105,7 @@ def model_input_data_api():
     df = execute_sql('''SELECT * FROM processed_data ORDER BY time''')
 
     # Parse the hours
-    hours = request.args.get('hours', type=int) or 24
+    hours = request.args.get('hours', default=24, type=int)
     if hours > current_app.config['API_MAX_HOURS']:
         hours = current_app.config['API_MAX_HOURS']
     elif hours < 1:
@@ -104,3 +114,47 @@ def model_input_data_api():
     return jsonify({
         'model_input_data': df.tail(n=hours).to_dict(orient='records')
     })
+
+
+def init_swagger(app: Flask):
+    """This function handles all the logic for adding Swagger automated
+    documentation to the application instance.
+
+    Args:
+        app: A Flask application instance.
+    """
+    swagger_config = {
+        'headers': [],
+        'specs': [
+            {
+                'endpoint': 'flagging_api',
+                'route': '/api/flagging_api.json',
+                'rule_filter': lambda rule: True,  # all in
+                'model_filter': lambda tag: True,  # all in
+            },
+        ],
+        'static_url_path': '/flasgger_static',
+        # 'static_folder': '/static/flasgger',
+        'swagger_ui': True,
+        'specs_route': '/api/docs'
+    }
+    template = {
+        'info': {
+            'title': 'CRWA Public Flagging API',
+            'description':
+                "API for the Charles River Watershed Association's predictive "
+                'models, and the data used for those models.',
+            'contact': {
+                'x-responsibleOrganization': 'Charles River Watershed Association',
+                'x-responsibleDeveloper': 'Code for Boston',
+            },
+            'version': '1.0',
+        }
+    }
+    app.config['SWAGGER'] = {
+        'uiversion': 3,
+        'favicon': LazyString(
+            lambda: url_for('static', filename='favicon/favicon.ico'))
+    }
+
+    Swagger(app, config=swagger_config, template=template)

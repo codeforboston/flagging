@@ -8,6 +8,9 @@ import requests
 import pandas as pd
 from flask import abort
 from flask import current_app
+from tenacity import retry
+from tenacity import wait_fixed
+from tenacity import stop_after_attempt
 
 # Constants
 
@@ -15,7 +18,7 @@ HOBOLINK_URL = 'http://webservice.hobolink.com/restv2/data/custom/file'
 DEFAULT_HOBOLINK_EXPORT_NAME = 'code_for_boston_export_21d'
 # Each key is the original column name; the value is the renamed column.
 HOBOLINK_COLUMNS = {
-    'Time, GMT-04:00': 'time',
+    'Time, GMT-': 'time',
     'Pressure': 'pressure',
     'PAR': 'par',
     'Rain': 'rain',
@@ -32,6 +35,7 @@ HOBOLINK_STATIC_FILE_NAME = 'hobolink.pickle'
 # ~ ~ ~ ~
 
 
+@retry(wait=wait_fixed(1), stop=stop_after_attempt(3))
 def get_live_hobolink_data(
         export_name: str = DEFAULT_HOBOLINK_EXPORT_NAME
 ) -> pd.DataFrame:
@@ -78,8 +82,9 @@ def request_to_hobolink(
     # handle HOBOLINK errors by checking HTTP status code
     # status codes in 400's are client errors, in 500's are server errors
     if res.status_code // 100 in [4, 5]:
-        error_message = "link has failed with error # " + str(res.status_code)
-        return abort(res.status_code, error_message)
+        error_msg = 'API request to the HOBOlink endpoint failed with status ' \
+                    f'code {res.status_code}.'
+        abort(res.status_code, error_msg)
     return res
 
 
@@ -136,4 +141,4 @@ def parse_hobolink_data(res: str) -> pd.DataFrame:
     # Convert time column to Pandas datetime
     df['time'] = pd.to_datetime(df['time'], format='%m/%d/%y %H:%M:%S')
 
-    return df
+    return df.reset_index()

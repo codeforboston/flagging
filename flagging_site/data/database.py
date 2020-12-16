@@ -10,14 +10,18 @@ is passed in via `db.init_app(app)`, and the `db` object looks for the config
 variable `SQLALCHEMY_DATABASE_URI`.
 """
 import os
-import pandas as pd
+from dataclasses import dataclass
 from typing import Optional
+
+import pandas as pd
+import psycopg2
+import psycopg2.errors
+import click
 from flask import current_app
 from flask_sqlalchemy import SQLAlchemy
 from flask_sqlalchemy import declarative_base
 from sqlalchemy.exc import ResourceClosedError
 from psycopg2 import connect
-from dataclasses import dataclass
 
 db = SQLAlchemy()
 Base = declarative_base()
@@ -64,15 +68,13 @@ def execute_sql_from_file(file_name: str) -> Optional[pd.DataFrame]:
         return execute_sql(f.read().decode('utf8'))
 
 
-def create_db() -> bool:
+def create_db(overwrite: bool = False) -> bool:
     """If the database defined by `POSTGRES_DBNAME` doesn't exist, create it
     and return True, otherwise do nothing and return False. By default, the
     config variable `POSTGRES_DBNAME` is set to "flagging".
-
     Returns:
         bool for whether the database needed to be created.
     """
-
     # connect to postgres database, get cursor
     conn = connect(
         user=current_app.config['POSTGRES_USER'],
@@ -81,48 +83,51 @@ def create_db() -> bool:
         port=current_app.config['POSTGRES_PORT'],
         dbname='postgres'
     )
+    database = current_app.config['POSTGRES_DBNAME']
     cursor = conn.cursor()
 
-    # get a list of all databases:
-    cursor.execute('SELECT datname FROM pg_database;')
+    if overwrite:
+        cursor.execute("SELECT bool_or(datname = 'flagging') FROM pg_database;")
+        exists = cursor.fetchall()[0][0]
+        if exists:
+            cursor.execute('COMMIT;')
+            cursor.execute(f'DROP DATABASE {database};')
+            click.echo(f'Dropped database {database!r}.')
 
-    # create a list of all available database names:
-    db_list = cursor.fetchall()
-    db_list = [d[0] for d in db_list]
-
-    # if that database is already there, exit out of this function
-    if current_app.config['POSTGRES_DBNAME'] in db_list:
+    try:
+        cursor.execute('COMMIT;')
+        cursor.execute(f'CREATE DATABASE {database};')
+    except psycopg2.errors.lookup('42P04'):
+        click.echo(f'Database {database!r} already exist.')
         return False
-    # if the database isn't already there, proceed ...
-
-    # create the database
-    cursor.execute('COMMIT;')
-    cursor.execute('CREATE DATABASE ' + current_app.config['POSTGRES_DBNAME'])
-    cursor.execute('COMMIT;')
-
-    return True
+    else:
+        click.echo(f'Created database {database!r}.')
+        return True
 
 
 def init_db():
     """This data clears and then populates the database from scratch. You only
     need to run this function once per instance of the database.
     """
-    with current_app.app_context():
-        # This file drops the tables if they already exist, and then defines
-        # the tables. This is the only query that CREATES tables.
-        execute_sql_from_file('schema.sql')
 
-        # The boathouses table is populated. This table doesn't change, so it
-        # only needs to be populated once.
-        execute_sql_from_file('define_boathouse.sql')
+    # This file drops the tables if they already exist, and then defines
+    # the tables. This is the only query that CREATES tables.
+    execute_sql_from_file('schema.sql')
 
-        # The function that updates the database periodically is run for the
-        # first time.
-        update_database()
+    # The models available in Base are given corresponding tables if they
+    # do not already exist.
+    Base.metadata.create_all(db.engine)
+    db.create_all(app=current_app)
 
-        # The models available in Base are given corresponding tables if they
-        # do not already exist.
-        Base.metadata.create_all(db.engine)
+    # The boathouses table is populated. This table doesn't change, so it
+    # only needs to be populated once.
+    execute_sql_from_file('define_boathouse.sql')
+
+    # The file for keeping track of if it's currently boating season
+    execute_sql_from_file('define_default_options.sql')
+
+    # The function that updates the database periodically should be run after
+    # this runs.
 
 
 def update_database():
@@ -163,8 +168,6 @@ def update_database():
     model_outs = all_models(df)
     model_outs.to_sql('model_outputs', **options)
 
-    return True
-
 
 @dataclass
 class Boathouses(db.Model):
@@ -178,21 +181,18 @@ def get_boathouse_by_reach_dict():
     """
     Return a dict of boathouses, indexed by reach
     """
-    # return value is an outer dictionary with the reach number as the keys 
-    # and the a sub-dict as the values each sub-dict has the string 'boathouses' 
+    # return value is an outer dictionary with the reach number as the keys
+    # and the a sub-dict as the values each sub-dict has the string 'boathouses'
     # as the key, and an array of boathouse names as the value
     boathouse_dict = {}
-    
     # outer boathouse loop:  take one reach at a time
     for bh_out in Boathouses.query.distinct(Boathouses.reach):
         bh_list = []
-        # inner boathouse loop:  get all boathouse names within 
+        # inner boathouse loop:  get all boathouse names within
         # the reach (the reach that was selected by outer loop)
         for bh_in in Boathouses.query.filter(Boathouses.reach == bh_out.reach).all():
             bh_list.append(bh_in.boathouse)
-
         boathouse_dict[bh_out.reach] = {'boathouses': bh_list}
-
     return boathouse_dict
 
 

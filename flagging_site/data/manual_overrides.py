@@ -4,8 +4,9 @@ from sqlalchemy import Column
 from sqlalchemy import Integer
 from sqlalchemy import TIMESTAMP
 from sqlalchemy import VARCHAR
+from sqlalchemy.orm import Session
 
-from ..admin import AdminModelView
+from ..admin import ModelView
 from .database import Base
 from .database import execute_sql_from_file
 
@@ -18,7 +19,7 @@ class ManualOverrides(Base):
     reason = Column(VARCHAR(255))
 
 
-class ManualOverridesModelView(AdminModelView):
+class ManualOverridesModelView(ModelView):
     form_choices = {
         'reason': [
             ('cyanobacteria', 'Cyanobacteria'),
@@ -27,7 +28,7 @@ class ManualOverridesModelView(AdminModelView):
         ]
     }
 
-    def __init__(self, session):
+    def __init__(self, session: Session):
         super().__init__(ManualOverrides, session)
 
 

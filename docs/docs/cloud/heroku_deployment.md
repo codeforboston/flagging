@@ -196,3 +196,49 @@ git remote -v
 ```
 git push staging master
 ```
+
+## Updating the database schema
+
+We do not use Alembic or any other tools to handle database migrations. Our database is relatively simple and does not store information that cannot be trivially rewritten, so we can migrate to a new database schema by simply creating the new database locally and completely overwriting the database in production.
+
+Here are the steps to do that:
+
+1. Make your changes to the database schema.
+
+```shell
+flask create-db --overwrite
+flask init-db
+```
+
+2. Reset the database. You'll be asked if you're sure you want to reset, and go through that prompt.
+
+```shell
+heroku pg:reset -a crwa-flagging
+```
+
+3. Get a list of add-ons for the Heroku app. You'll need it for the final step.
+
+```shell
+heroku addons -a crwa-flagging
+```
+
+???+ success
+    You should see something like this:
+    
+    ```
+    Add-on                                        Plan       Price  State  
+    ────────────────────────────────────────────  ─────────  ─────  ───────
+    heroku-postgresql (postgresql-ukulele-12345)  hobby-dev  free   created
+     └─ as DATABASE
+    
+    scheduler (scheduler-banjo-67890)             standard   free   created
+     └─ as SCHEDULER
+    
+    The table above shows add-ons and the attachments to the current app (crwa-flagging) or other apps.
+    ```
+
+4. Take the add-on name for the DATABASE in parentheses (in the above case, `postgresql-ukulele-12345`) as the target for the Postgres push command:
+
+```shell
+heroku pg:push flagging postgresql-ukulele-12345 -a crwa-flagging
+```

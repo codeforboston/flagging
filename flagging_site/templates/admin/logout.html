@@ -1,0 +1,22 @@
+{% extends "admin/base.html" %}
+{% block body %}
+    <p>Logged out. Redirecting...</p>
+{% endblock %}
+{% block tail %}
+    {{ super() }}
+    <script>
+        $(document).ready(function(){
+            $.ajax({
+               async: false,
+               type: "GET",
+               url: "{{ url_for('admin.index') }}",
+               username: "logout"
+            })
+            .done(function(){
+            })
+            .fail(function(){
+                window.location.href = "{{ url_for('flagging.index') }}";
+            });
+        });
+    </script>
+{% endblock %}
