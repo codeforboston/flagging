@@ -7,6 +7,7 @@ VALUES
     (2,     'Northeastern''s Henderson Boathouse', 42.364135, 71.141571),
     (2,     'Paddle Boston at Herter Park',        42.369182, 71.131301),
     (3,     'Harvard''s Weld Boathouse',           42.369566, 71.122083),
+    (3,     'Cambridge Boat Club',                 42.372277, 71.133824),
     (4,     'Riverside Boat Club',                 42.358272, 71.115763),
     (5,     'Charles River Yacht Club',            42.360526, 71.084760),
     (5,     'Union Boat Club',                     42.357816, 71.073319),
