@@ -175,7 +175,8 @@ class Boathouses(db.Model):
     boathouse: str = db.Column(db.String(255), primary_key=True)
     latitude: float = db.Column(db.Numeric, unique=False)
     longitude: float = db.Column(db.Numeric, unique=False)
-
+    overridden: bool = db.Column(db.Boolean, unique=False)
+    reason: str = db.Column(db.String(255), unique=False)
 
 def get_boathouse_by_reach_dict():
     """

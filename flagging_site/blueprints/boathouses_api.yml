@@ -24,7 +24,13 @@ responses:
               longitude:
                 description: Longitude of boathouse's location
                 type: number
+              overridden:
+                description: Indicates if this boathouse is overridden
+                type: boolean
               reach:
                 description: Reach that the boathouse is associated with
                 type: integer
                 enum: [2, 3, 4, 5]
+              reason:
+                description: Name of this boathouse
+                type: string
