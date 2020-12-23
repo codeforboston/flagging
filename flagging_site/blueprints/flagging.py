@@ -9,6 +9,7 @@ from flask import flash
 from ..data.manual_overrides import get_currently_overridden_reaches
 from ..data.predictive_models import latest_model_outputs
 from ..data.database import get_boathouse_by_reach_dict
+from ..data.database import get_boathouse_list_by_reach_dict
 from ..data.database import get_latest_time
 from ..data.live_website_options import LiveWebsiteOptions
 
@@ -160,8 +161,8 @@ def output_model() -> str:
     for i in df['reach'].unique():
         if (reach == -1 or reach == i):
             reach_html_tables[i] = stylize_model_output(df.loc[df['reach'] == i])
-
-    return render_template('output_model.html', tables=reach_html_tables)
+    boathouses_by_reach = get_boathouse_list_by_reach_dict()
+    return render_template('output_model.html', tables=reach_html_tables, boathouses_by_reach=boathouses_by_reach)
 
 
 @bp.route('/flags')
