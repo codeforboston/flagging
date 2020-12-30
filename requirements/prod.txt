@@ -13,6 +13,7 @@ flask-admin==1.5.7        # via -r requirements/_core.in
 flask-basicauth==0.2.0    # via -r requirements/_core.in
 flask-sqlalchemy==2.4.4   # via -r requirements/_core.in
 flask==1.1.2              # via -r requirements/_core.in, flasgger, flask-admin, flask-basicauth, flask-sqlalchemy
+greenlet==0.4.17          # via meinheld
 gunicorn==20.0.4          # via -r requirements/_core.in
 idna==2.10                # via requests
 itsdangerous==1.1.0       # via flask
@@ -20,6 +21,7 @@ jinja2==2.11.2            # via -r requirements/_core.in, flask
 jsonschema==3.2.0         # via flasgger
 markdown==3.3.3           # via -r requirements/_core.in
 markupsafe==1.1.1         # via jinja2, wtforms
+meinheld==1.0.2           # via -r requirements/_core.in
 mistune==0.8.4            # via flasgger
 numpy==1.19.4             # via pandas
 oauthlib==3.1.0           # via requests-oauthlib

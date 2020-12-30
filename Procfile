@@ -5,4 +5,4 @@
 # https://devcenter.heroku.com/articles/procfile
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-web: gunicorn "flagging_site:create_app('production')"
+web: gunicorn --worker-class="egg:meinheld#gunicorn_worker" "flagging_site:create_app('production')"

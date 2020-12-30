@@ -43,10 +43,11 @@ heroku git:remote -a crwa-flagging
 heroku config:set VAULT_PASSWORD=vault_password_goes_here -a crwa-flagging
 ```
 
-4. You need to setup the `FLASK_ENV` environment variable. This is mainly used for the scheduler and other potential add-ons as a way to ensure that the production config is always being used.
+4. You need to setup the `FLASK_ENV` and `FLASK_APP` environment variables. These are mainly used for the scheduler and other potential add-ons.
 
 ```shell
 heroku config:set FLASK_ENV=production -a crwa-flagging
+heroku config:set FLASK_APP="flagging_site:create_app" -a crwa-flagging
 ```
 
 5. Add a `BASIC_AUTH_USERNAME` and `BASIC_AUTH_PASSWORD` for the admin panel. The username can be whatever you want; e.g. `admin` does the trick. The password should be hard to guess.
