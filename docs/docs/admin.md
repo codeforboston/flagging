@@ -17,9 +17,8 @@ You will be asked a username and password, which will be provided to you by the 
 ### Cyanobacteria Overrides
 
 There should be a link to this page in the admin navigation bar.
-On this page, one can add an override for a reach with a start time and end time,
-and if the current time is between those times then the reach will be marked as
-unsafe on the main website, regardless of the model data.
+On this page one can add an override for a boathouse.  All overridden boathouses 
+will be marked as unsafe on the website regardless of the model data.
 
 ## Update Database Manually
 
