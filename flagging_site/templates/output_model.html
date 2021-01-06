@@ -1,4 +1,6 @@
 {% extends "base.html" %}
+
+
 {% block head %}
     {{ super() }}
     <link rel="stylesheet" href="{{ url_for('static', filename='dataframe.css') }}" />
@@ -7,7 +9,19 @@
 {% block content %}
     {% for reach, tbl in tables.items() %}
         <div class="table-wrapper">
-            <h2>Predictive Model for Reach {{ reach }}</h2>
+            <style>
+
+
+            </style>
+            <!--div><h2>Predictive Model for Reach {{ reach }}
+                <div class="tooltip" title="{{ boathouses_by_reach.get(reach) }}">{{INFO_ICON}}</div>
+            </h2></div-->
+
+            <div><h2>Predictive Model for Reach {{ reach }}
+                <div class="tooltip">{{INFO_ICON}}
+                    <pre class="tooltiptext">{{ boathouses_by_reach.get(reach) }}</pre>
+                </div></h2>
+            </div>
             {{ tbl | safe }}
         </div>
     {% endfor %}
