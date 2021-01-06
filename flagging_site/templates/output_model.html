@@ -10,32 +10,18 @@
     {% for reach, tbl in tables.items() %}
         <div class="table-wrapper">
             <style>
-            .tooltip {
-              position: relative;
-              display: inline-block;
-            }
 
-            .tooltip .tooltiptext {
-              visibility: hidden;
-              width: 600px;
-              background-color: black;
-              color: #fff;
-              text-align: center;
-              padding: 5px 0;
-              border-radius: 6px;
 
-              position: absolute;
-              z-index: 1;
-              style: p;
-            }
-
-            .tooltip:hover .tooltiptext {
-              visibility: visible;
-            }
             </style>
-            <div><h2>Predictive Model for Reach {{ reach }}
+            <!--div><h2>Predictive Model for Reach {{ reach }}
                 <div class="tooltip" title="{{ boathouses_by_reach.get(reach) }}">{{INFO_ICON}}</div>
-            </h2></div>
+            </h2></div-->
+
+            <div><h2>Predictive Model for Reach {{ reach }}
+                <div class="tooltip">{{INFO_ICON}}
+                    <pre class="tooltiptext">{{ boathouses_by_reach.get(reach) }}</pre>
+                </div></h2>
+            </div>
             {{ tbl | safe }}
         </div>
     {% endfor %}

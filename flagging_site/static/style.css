@@ -332,4 +332,30 @@ pre.prettyprint {
   display: inline-block;
 }
 
+.tooltip {
+  position: relative;
+  display: inline-block;
+  font-style: normal;
+}
+
+.tooltip .tooltiptext {
+  visibility: hidden;
+  background-color: white;
+  top: 20%;
+  color: #000;
+  text-align: left;
+  padding: 5px 5px 5px;
+  border-radius: 6px;
+  font-family: "Calibri (Body)";
+  position: absolute;
+  z-index: 1;
+  font-style: normal;
+  font-size: 12px;
+}
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+  font-style: normal;
+}
+
 /***** End API Index Page *****/

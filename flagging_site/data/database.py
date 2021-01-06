@@ -198,8 +198,9 @@ def get_boathouse_by_reach_dict():
 def get_boathouse_list_by_reach_dict():
     boathouse_dict = {}
     for bh_out in Boathouses.query.distinct(Boathouses.reach):
-        bh_list = ""
+        bh_list = "Boathouses: \n"
         for bh_in in Boathouses.query.filter(Boathouses.reach == bh_out.reach).all():
+            bh_list += "- "
             bh_list += bh_in.boathouse
             bh_list += "\n"
         boathouse_dict[bh_out.reach] = bh_list
