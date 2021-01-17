@@ -210,3 +210,16 @@ def get_latest_time():
     Returns the latest time in the processed data
     """
     return execute_sql('SELECT MAX(time) FROM processed_data;').iloc[0]['max']
+
+
+def get_overridden_boathouses():
+    """
+    Returns a ?list? of overriden boathouses
+    """
+    ret_val = []
+    
+    for bh in Boathouses.query.filter(Boathouses.overridden == True):
+        ret_val.append(bh.boathouse)
+
+    return ret_val
+
