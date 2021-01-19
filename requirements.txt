@@ -1,7 +1,8 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # This file is used to deploy the website to Heroku
 #
-# See here for more info: https://devcenter.heroku.com/articles/python-pip
+# See here for more:
+# https://devcenter.heroku.com/articles/python-pip
 #
 # For dev dependencies on a local machine, use one of the following based on
 # your OS (instead of this file):
