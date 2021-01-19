@@ -100,22 +100,18 @@ git remote add upstream https://github.com/codeforboston/flagging.git
 git fetch upstream
 ```
 
-4. In your newly created `flagging` folder, create a blank text file called `.env`. This will be used to store Twitter credentials, HOBOlink credentials, and potentially Postgres credentials as well.
+4. In your newly created `flagging` folder, run the following:
 
-=== "Windows (CMD)"
-    ```shell
-    type nul >.env
-    ```
-
-=== "OSX (Bash)"
-    ```shell
-    touch .env
-    ```
+```shell
+echo "FLASK_ENV=development" >>.env
+```
 
 ???+ danger
     If you do any commits to the repo, _please make sure `.env` is properly gitignored!_ (`.flaskenv` does not need to be gitignored, only `.env`.) `.env` contains sensitive information.
 
-5. Add HOBOlink credentials to the `.env` file in this format. Run the following, replacing `replace_me` with the corresponding credentials. (`>>` means "append to the end of a file," so you can do one at a time and it won't overwrite anything).
+5. The previous step created a file called `.env` (pronounced "dot env"). This file will eventually contain our HOBOlink credentials, Twitter credentials, and potentially Postgres credentials as well.
+    
+    In this step, we will add HOBOlink credentials to the `.env` file. Run the following, replacing `replace_me` with the corresponding credentials. (`>>` means "append to the end of a file," so you can do one at a time and it won't overwrite anything).
 
 ```shell
 echo "HOBOLINK_USERNAME=replace_me" >>.env

@@ -7,7 +7,6 @@ this module, they won't refresh.
 """
 import os
 import re
-from flask.cli import load_dotenv
 from distutils.util import strtobool
 
 # Constants
@@ -16,13 +15,6 @@ from distutils.util import strtobool
 ROOT_DIR = os.path.abspath(os.path.dirname(__file__))
 QUERIES_DIR = os.path.join(ROOT_DIR, 'data', 'queries')
 DATA_STORE = os.path.join(ROOT_DIR, 'data', '_store')
-
-
-# Load dotenv
-# ~~~~~~~~~~~
-
-if os.getenv('FLASK_ENV') != 'production':
-    load_dotenv(os.path.join(ROOT_DIR, '..', '.env'))
 
 
 # Configs
@@ -44,7 +36,7 @@ class Config:
     # ==========================================================================
     DEBUG: bool = False
     TESTING: bool = False
-    SECRET_KEY: str = None
+    SECRET_KEY: str = os.getenv('SECRET_KEY') or os.urandom(32)
 
     # ==========================================================================
     # DATABASE CONFIG OPTIONS
@@ -163,7 +155,7 @@ class ProductionConfig(Config):
         #
         # In the rare event that they are needed in production, they are set
         # to be consistent with the `DATABASE_URL` below:
-        postgres_url_schema = re.compile('''
+        postgres_url_schema = re.compile(r'''
             ^
             postgres(?:ql)?://
             ([^\s:@/]+) # User

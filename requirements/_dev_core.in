@@ -14,5 +14,5 @@ schemathesis
 
 # Misc. dev stuff
 pip-tools
-python-dotenv
+c
 pyarrow  # for loading .feather file
