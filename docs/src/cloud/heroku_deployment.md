@@ -23,7 +23,7 @@ If you've never deployed the app from your computer, follow these instructions.
 1. If you have not already done so, follow the [setup guide](../setup). The following should now be true:
 
   - Your terminal is pointed to the root directory of the project `/flagging`.
-  - You should have a copy of the `VAULT_PASSWORD`.
+  - You should have the HOBOlink credentials ready in a `.env` file.
   - The Postgres database should be set up and up-to-date locally.
   - Your Heroku account needs to be "verified," which means it needs to have a valid credit card registered to it. Registering a credit card does not incur any charges on its own. See [here](https://devcenter.heroku.com/categories/billing) for Heroku's billing page for more information.
 
