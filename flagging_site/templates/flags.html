@@ -32,6 +32,7 @@
             </div>
         {% endif %}
     {% endwith %}
+
     {% if boating_season %}
         {% for boathouse, safe in flags.items() %}
         <div class="flag-container">
@@ -49,6 +50,7 @@
             ( Last updated: {{ model_last_updated_time }} )
         </div>
     {% endif %}
+
     <div class="info">
         <a href="{{ url_for('flagging.index', _external=True) }}" target="_blank">Click here for more information.</a>
     </div>

@@ -110,16 +110,26 @@ def index() -> str:
     purpose of the website, and the latest outputs for the flagging model.
     """
     df = latest_model_outputs()
-    # boathouse_statuses = parse_model_outputs(df)
+    flags = get_flags(df)
     model_last_updated_time = df['time'].iloc[0]
-    boating_season = LiveWebsiteOptions.is_boating_season()
-    flagging_message = LiveWebsiteOptions.get_flagging_message()
+    # boating_season = True
 
     return render_template('index.html',
-                           boathouse_statuses=boathouse_statuses,
-                           model_last_updated_time=model_last_updated_time,
-                           boating_season=boating_season,
-                           flagging_message=flagging_message)
+                           flags=flags,
+                           model_last_updated_time=model_last_updated_time)
+                        #    flagging_message=flagging_message)
+
+    # return render_template('index.html',
+    #                        flags=flags,
+    #                        model_last_updated_time=model_last_updated_time,
+    #                        boating_season=boating_season,
+    #                        flagging_message=flagging_message)
+
+    # return render_template('index.html',
+    #                        boathouse_statuses=boathouse_statuses,
+    #                        model_last_updated_time=model_last_updated_time,
+    #                        boating_season=boating_season,
+    #                        flagging_message=flagging_message)
 
 
 @bp.route('/about')
