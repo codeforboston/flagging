@@ -11,7 +11,6 @@ from flask import send_file
 from flask import abort
 from flask import url_for
 from flask_admin import Admin
-from flask_admin import AdminIndexView
 from flask_admin import BaseView as _BaseView
 from flask_admin import expose
 from flask_admin.contrib import sqla
