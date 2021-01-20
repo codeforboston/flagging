@@ -9,6 +9,7 @@ Jinja2
 markdown
 meinheld
 pandas
+python-dotenv
 PyYAML
 requests
 SQLAlchemy

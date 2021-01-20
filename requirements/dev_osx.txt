@@ -60,7 +60,7 @@ pytest-cov==2.10.1        # via -r requirements/_dev_core.in
 pytest-subtests==0.3.2    # via schemathesis
 pytest==6.1.2             # via -r requirements/_dev_core.in, pytest-cov, pytest-subtests, schemathesis
 python-dateutil==2.8.1    # via mkdocs-macros-plugin, pandas
-python-dotenv==0.15.0     # via -r requirements/_dev_core.in
+python-dotenv==0.15.0     # via -r requirements/_core.in
 pytz==2020.4              # via pandas
 pyyaml==5.3.1             # via -r requirements/_core.in, flasgger, mkdocs, mkdocs-macros-plugin, schemathesis
 regex==2020.11.13         # via nltk

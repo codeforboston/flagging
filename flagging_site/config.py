@@ -7,7 +7,9 @@ this module, they won't refresh.
 """
 import os
 import re
+from flask.cli import load_dotenv
 from distutils.util import strtobool
+
 
 # Constants
 # ~~~~~~~~~
@@ -15,6 +17,13 @@ from distutils.util import strtobool
 ROOT_DIR = os.path.abspath(os.path.dirname(__file__))
 QUERIES_DIR = os.path.join(ROOT_DIR, 'data', 'queries')
 DATA_STORE = os.path.join(ROOT_DIR, 'data', '_store')
+
+# Load dotenv
+# ~~~~~~~~~~~
+
+if os.getenv('FLASK_ENV') != 'production':
+    load_dotenv(os.path.join(ROOT_DIR, '..', '.env'))
+    load_dotenv(os.path.join(ROOT_DIR, '..', '.flaskenv'))
 
 
 # Configs

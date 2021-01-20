@@ -8,6 +8,7 @@ from flagging_site import create_app
 def app():
     """Create and configure a new app instance for each test."""
     app = create_app(config='testing')
+    print(app.config['HOBOLINK_AUTH'])
     yield app
 
 
