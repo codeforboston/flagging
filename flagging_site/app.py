@@ -140,7 +140,8 @@ def register_jinja_env(app: Flask):
     app.jinja_env.globals.update({
         'GITHUB_SVG': _load_svg('github.svg'),
         'TWITTER_SVG': _load_svg('twitter.svg'),
-        'HAMBURGER_SVG': _load_svg('hamburger.svg')
+        'HAMBURGER_SVG': _load_svg('hamburger.svg'),
+        'INFO_ICON': _load_svg('iconmonstr-info-6.svg')
     })
 
 
