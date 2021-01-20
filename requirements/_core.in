@@ -7,8 +7,9 @@ Flask
 gunicorn
 Jinja2
 markdown
+meinheld
 pandas
-py7zr
+python-dotenv
 PyYAML
 requests
 SQLAlchemy

@@ -23,7 +23,7 @@ If you've never deployed the app from your computer, follow these instructions.
 1. If you have not already done so, follow the [setup guide](../setup). The following should now be true:
 
   - Your terminal is pointed to the root directory of the project `/flagging`.
-  - You should have a copy of the `VAULT_PASSWORD`.
+  - You should have the HOBOlink credentials ready in a `.env` file.
   - The Postgres database should be set up and up-to-date locally.
   - Your Heroku account needs to be "verified," which means it needs to have a valid credit card registered to it. Registering a credit card does not incur any charges on its own. See [here](https://devcenter.heroku.com/categories/billing) for Heroku's billing page for more information.
 
@@ -43,10 +43,11 @@ heroku git:remote -a crwa-flagging
 heroku config:set VAULT_PASSWORD=vault_password_goes_here -a crwa-flagging
 ```
 
-4. You need to setup the `FLASK_ENV` environment variable. This is mainly used for the scheduler and other potential add-ons as a way to ensure that the production config is always being used.
+4. You need to setup the `FLASK_ENV` and `FLASK_APP` environment variables. These are mainly used for the scheduler and other potential add-ons.
 
 ```shell
 heroku config:set FLASK_ENV=production -a crwa-flagging
+heroku config:set FLASK_APP="flagging_site:create_app" -a crwa-flagging
 ```
 
 5. Add a `BASIC_AUTH_USERNAME` and `BASIC_AUTH_PASSWORD` for the admin panel. The username can be whatever you want; e.g. `admin` does the trick. The password should be hard to guess.
@@ -203,7 +204,7 @@ We do not use Alembic or any other tools to handle database migrations. Our data
 
 Here are the steps to do that:
 
-1. Make your changes to the database schema.
+1. Make your changes to the database schema, then initialize the database again.
 
 ```shell
 flask create-db --overwrite
@@ -216,29 +217,11 @@ flask init-db
 heroku pg:reset -a crwa-flagging
 ```
 
-3. Get a list of add-ons for the Heroku app. You'll need it for the final step.
+3. Now push the new database:
 
 ```shell
-heroku addons -a crwa-flagging
+heroku pg:push flagging DATABASE -a crwa-flagging
 ```
 
-???+ success
-    You should see something like this:
-    
-    ```
-    Add-on                                        Plan       Price  State  
-    ────────────────────────────────────────────  ─────────  ─────  ───────
-    heroku-postgresql (postgresql-ukulele-12345)  hobby-dev  free   created
-     └─ as DATABASE
-    
-    scheduler (scheduler-banjo-67890)             standard   free   created
-     └─ as SCHEDULER
-    
-    The table above shows add-ons and the attachments to the current app (crwa-flagging) or other apps.
-    ```
-
-4. Take the add-on name for the DATABASE in parentheses (in the above case, `postgresql-ukulele-12345`) as the target for the Postgres push command:
-
-```shell
-heroku pg:push flagging postgresql-ukulele-12345 -a crwa-flagging
-```
+???+ note
+    Unless there's an emergency, it's recommended you do something like this either late at night, or even better when it's no longer boating season.

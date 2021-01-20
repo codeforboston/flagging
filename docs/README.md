@@ -16,9 +16,10 @@ All of these tools are added and configured inside `mkdocs.yml`. Note you need t
 
 ### Deploying / Refreshing the Docs
 
-If you have write permission to the upstream repository (i.e. you are a project manager), point your terminal to this directory and run the following:
+If you have write permission to the upstream repository (i.e. you are a project manager), run the following:
 
 ```shell script
+cd docs
 mkdocs gh-deploy --remote-name upstream
 ```
 
