@@ -175,7 +175,8 @@ class Boathouses(db.Model):
     boathouse: str = db.Column(db.String(255), primary_key=True)
     latitude: float = db.Column(db.Numeric, unique=False)
     longitude: float = db.Column(db.Numeric, unique=False)
-
+    overridden: bool = db.Column(db.Boolean, unique=False)
+    reason: str = db.Column(db.String(255), unique=False)
 
 def get_boathouse_by_reach_dict():
     """
@@ -221,3 +222,16 @@ def get_latest_time():
     Returns the latest time in the processed data
     """
     return execute_sql('SELECT MAX(time) FROM processed_data;').iloc[0]['max']
+
+
+def get_overridden_boathouses():
+    """
+    Returns a ?list? of overriden boathouses
+    """
+    ret_val = []
+    
+    for bh in Boathouses.query.filter(Boathouses.overridden == True):
+        ret_val.append(bh.boathouse)
+
+    return ret_val
+
