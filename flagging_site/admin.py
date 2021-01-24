@@ -65,11 +65,11 @@ def init_admin(app: Flask):
 
         # Register /admin sub-views
         from .data.live_website_options import LiveWebsiteOptionsModelView
-        from .data.manual_overrides import ManualOverridesModelView
-        from .data.database import Boathouses
+        from .data.boathouses import ManualOverridesModelView
+        from .data.boathouses import Boathouse
 
         admin.add_view(LiveWebsiteOptionsModelView(db.session))
-        admin.add_view(ModelView(Boathouses, db.session))
+        admin.add_view(ModelView(Boathouse, db.session))
         admin.add_view(ManualOverridesModelView(db.session))
         admin.add_view(DatabaseView(name='Update Database', url='db/update',
                                     category='Manage DB'))

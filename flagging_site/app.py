@@ -14,6 +14,7 @@ from flask import jsonify
 from flask import request
 from flask import current_app
 from flask import Markup
+from flask.cli import with_appcontext
 
 
 def create_app(config: Optional[str] = None) -> Flask:
@@ -130,6 +131,7 @@ def register_jinja_env(app: Flask):
     change the colors using CSS.) This function loads SVG markup into our Jinja
     environment via reading from SVG files.
     """
+    import hashlib
 
     def _load_svg(file_name: str):
         """Load an svg file from `static/images/`."""
@@ -137,11 +139,24 @@ def register_jinja_env(app: Flask):
             s = f.read()
         return Markup(s)
 
+    def _md5_hash_file(file_name: str):
+        """Create a MD5 hash for the CSS files to add to the URLs. This helps
+        the browser to know whether you can use a cached version of the CSS
+        file, or if it's been updated and the cached version should *not* be
+        used. This method works in most browsers.
+        """
+        with open(os.path.join(app.static_folder, file_name)) as f:
+            val = hashlib.md5(f.read().encode('utf8')).hexdigest()
+        return val
+
     app.jinja_env.globals.update({
         'GITHUB_SVG': _load_svg('github.svg'),
         'TWITTER_SVG': _load_svg('twitter.svg'),
         'HAMBURGER_SVG': _load_svg('hamburger.svg'),
-        'INFO_ICON': _load_svg('iconmonstr-info-6.svg')
+        'INFO_ICON': _load_svg('iconmonstr-info-9.svg'),
+        'STYLE_CSS_MD5': _md5_hash_file('style.css'),
+        'FLAGS_CSS_MD5': _md5_hash_file('flags.css'),
+        'DATAFRAME_CSS_MD5': _md5_hash_file('dataframe.css')
     })
 
 
@@ -238,6 +253,29 @@ def register_commands(app: Flask):
         fname_usgs = _format_path(USGS_STATIC_FILE_NAME)
         df_usgs.to_pickle(fname_usgs)
         click.echo(f'Wrote USGS data to {fname_hobolink!r}')
+
+    @app.cli.command('pip-compile',
+                     context_settings=dict(
+                         ignore_unknown_options=True,
+                         allow_extra_args=True,
+                         help_option_names=[]))
+    @click.pass_context
+    @with_appcontext
+    def pip_compile(ctx: click.Context):
+        """Compile the .in files in /requirements.
+
+        This command is for development purposes only.
+        """
+        if current_app.env != 'development':
+            raise RuntimeError(
+                'You can only run this in the development environment. Make '
+                'sure you set up the environment correctly if you believe you '
+                'are in dev.'
+            )
+        import subprocess
+        subprocess.call(['pip-compile', 'requirements/dev_osx.in', *ctx.args])
+        subprocess.call(['pip-compile', 'requirements/dev_windows.in', *ctx.args])
+        subprocess.call(['pip-compile', 'requirements/prod.in', *ctx.args])
 
 
 def register_misc(app: Flask):

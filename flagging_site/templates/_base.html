@@ -31,7 +31,7 @@
     <meta name="description" content="CRWA program for monitoring the Charles River water quality.">
     <meta name="keywords" content="CRWA, Charles River, Flagging, Water Quality, E. Coli, Cyanobacteria">
     <meta name="author" content="Code for Boston">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css', v=STYLE_CSS_MD5) }}" />
     <link rel="icon" type="image/ico" href="{{ url_for('static', filename='favicon/favicon.ico') }}">
     {% endblock %}
 </head>
@@ -50,7 +50,7 @@
                     <nav>
                         <a class="nav-link" href="{{ url_for('flagging.index') }}">Home</a>
                         <a class="nav-link" href="{{ url_for('flagging.about') }}">About</a>
-                        <a class="nav-link" href="{{ url_for('flagging.output_model') }}">Detailed Outputs</a>
+                        <a class="nav-link" href="{{ url_for('flagging.model_outputs') }}">Model Outputs</a>
                         <a class="nav-link" href="{{ url_for('flagging.api_index') }}">API</a>
                     </nav>
                 </div>
@@ -86,7 +86,7 @@
             <div class="dropdown-menu hidden">
                 <a href="{{ url_for('flagging.index') }}">Home</a>
                 <a href="{{ url_for('flagging.about') }}">About</a>
-                <a href="{{ url_for('flagging.output_model') }}">Detailed Outputs</a>
+                <a href="{{ url_for('flagging.model_outputs') }}">Detailed Outputs</a>
                 <a href="{{ url_for('flagging.api_index') }}">API</a>
             </div>
         </div>
@@ -128,5 +128,6 @@
         </div>
         {% endblock %}
     </section>
+{% block tail %}{% endblock %}
 </body>
 </html>

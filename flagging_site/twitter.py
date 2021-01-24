@@ -60,13 +60,13 @@ def compose_tweet() -> str:
             'Our predictive model is reporting all reaches are safe for '
             f'recreational activities as of {current_time}.'
         )
-    if unsafe_count == 1:
+    elif unsafe_count == 1:
         unsafe = ''.join([str(k) for k, v in flags.items() if v is False])
         msg = (
             f'The CRWA is reporting that reach {unsafe} is unsafe for recreational activities '
             f'as of {current_time}. https://crwa-flagging.herokuapp.com/'
         )
-    if unsafe_count > 1:
+    else:
         unsafe = ''
         unsafe_found = 0
         for key in flags.keys():

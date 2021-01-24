@@ -16,21 +16,22 @@ responses:
             type: object
             properties:
               boathouse:
-                description: Name of the boathouse
+                description: Name of the boathouse.
                 type: string
-              latitude:
-                description: Latitude of boathouse's location
-                type: number
-              longitude:
-                description: Longitude of boathouse's location
-                type: number
-              overridden:
-                description: Indicates if this boathouse is overridden
-                type: boolean
               reach:
-                description: Reach that the boathouse is associated with
+                description: Reach that the boathouse is associated with.
                 type: integer
                 enum: [2, 3, 4, 5]
+              latitude:
+                description: Latitude of boathouse's location.
+                type: number
+              longitude:
+                description: Longitude of boathouse's location.
+                type: number
+              overridden:
+                description: Indicates if this boathouse's flag is manually overridden.
+                type: boolean
               reason:
-                description: Name of this boathouse
+                description: If overridden, we may provide a reason why.
                 type: string
+                x-nullable: true

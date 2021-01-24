@@ -16,7 +16,7 @@ with warnings.catch_warnings():
 
 from ..data.predictive_models import latest_model_outputs
 from ..data.predictive_models import MODEL_VERSION
-from ..data.database import get_boathouse_metadata_dict
+from ..data.boathouses import Boathouse
 from ..data.database import execute_sql
 from ..data.live_website_options import LiveWebsiteOptions
 
@@ -24,38 +24,13 @@ from ..data.live_website_options import LiveWebsiteOptions
 bp = Blueprint('api', __name__, url_prefix='/api')
 
 
-def add_to_dict(models, df, reach) -> None:
-    """
-    Iterates through dataframe from model output, adds to model dict where
-    key equals column name, value equals column values as list type
-
-    args:
-        models: dictionary
-        df: pd.DataFrame
-        reach:int
-
-    returns: None
-        """
-    # converts time column to type string because of conversion to json error
-    df['time'] = df['time'].astype(str)
-    models[f'reach_{reach}'] = df.to_dict(orient='list')
-
-
 def model_api(reaches: List[int], hours: int) -> dict:
     """
     Class method that retrieves data from hobolink and usgs and processes
     data, then creates json-like dictionary structure for model output.
 
-    returns: json-like dictionary
+    returns: dict
     """
-    # First step is to validate inputs
-
-    # `hours` must be an integer between 1 and `API_MAX_HOURS`. Default is 24
-    if hours > current_app.config['API_MAX_HOURS']:
-        hours = current_app.config['API_MAX_HOURS']
-    elif hours < 1:
-        hours = 1
-    # `reaches` must be a list of integers. Default is all the reaches.
 
     # get model output data from database
     df = latest_model_outputs(hours)
@@ -85,39 +60,46 @@ def model_api(reaches: List[int], hours: int) -> dict:
 @swag_from('predictive_model_api.yml')
 def predictive_model_api():
     """Returns JSON of the predictive model outputs."""
+    # Parse inputs
     reaches = request.args.getlist('reach', type=int) or [2, 3, 4, 5]
+    # Hours query parameter must be between 1 and API_MAX_HOURS.
     hours = request.args.get('hours', default=24, type=int)
-    return jsonify(model_api(reaches, hours))
+    hours = min(hours, current_app.config['API_MAX_HOURS'])
+    hours = max(hours, 1)
+
+    # Get data
+    data = model_api(reaches, hours)
+
+    return jsonify(data)
 
 
 @bp.route('/v1/boathouses')
 @swag_from('boathouses_api.yml')
 def boathouses_api():
     """Returns JSON of the boathouses."""
-    boathouse_metadata_dict = get_boathouse_metadata_dict()
-    return jsonify(boathouse_metadata_dict)
+    return jsonify(boathouses=Boathouse.all_boathouses_dict())
 
 
 @bp.route('/v1/model_input_data')
 @swag_from('model_input_data_api.yml')
 def model_input_data_api():
     """Returns records of the data used for the model."""
+    # Parse inputs
+    # Hours query parameter must be between 1 and API_MAX_HOURS.
+    hours = request.args.get('hours', default=24, type=int)
+    hours = min(hours, current_app.config['API_MAX_HOURS'])
+    hours = max(hours, 1)
+
     df = execute_sql('''SELECT * FROM processed_data ORDER BY time''')
 
-    # Parse the hours
-    hours = request.args.get('hours', default=24, type=int)
-    if hours > current_app.config['API_MAX_HOURS']:
-        hours = current_app.config['API_MAX_HOURS']
-    elif hours < 1:
-        hours = 1
+    model_input_data = df.tail(n=hours).to_dict(orient='records')
 
-    return jsonify({
-        'model_input_data': df.tail(n=hours).to_dict(orient='records')
-    })
+    return jsonify(model_input_data=model_input_data)
 
 
 def init_swagger(app: Flask):
-    """This function handles all the logic for adding Swagger automated
+    """
+    This function handles all the logic for adding Swagger automated
     documentation to the application instance.
 
     Args:
@@ -129,15 +111,15 @@ def init_swagger(app: Flask):
             {
                 'endpoint': 'flagging_api',
                 'route': '/api/flagging_api.json',
-                'rule_filter': lambda rule: True,  # all in
-                'model_filter': lambda tag: True,  # all in
+                'rule_filter': lambda rule: True,
+                'model_filter': lambda tag: True,
             },
         ],
         'static_url_path': '/flasgger_static',
-        # 'static_folder': '/static/flasgger',
         'swagger_ui': True,
         'specs_route': '/api/docs'
     }
+
     template = {
         'info': {
             'title': 'CRWA Public Flagging API',
@@ -151,6 +133,7 @@ def init_swagger(app: Flask):
             'version': '1.0',
         }
     }
+
     app.config['SWAGGER'] = {
         'uiversion': 3,
         'favicon': LazyString(

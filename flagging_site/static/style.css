@@ -1,12 +1,14 @@
 /***** Start Element Styling *****/
 html {
   font-family: sans-serif;
+  overflow-x: hidden;
 }
 
 body {
   max-width: 1260px;
   margin: 0 auto;
   background: #dce9f2;
+  overflow-x: hidden;
 }
 
 h1, h2, h3, h4 {
@@ -28,7 +30,7 @@ p {
 }
 
 ul {
-  line-height: 25px;
+  line-height: 1.7em;
   list-style-type: square;
 }
 /***** End Element Styling *****/
@@ -201,6 +203,7 @@ nav a:hover {
 
 .flash-message {
   padding: 0.8em;
+  border-radius: 8px;
   margin: 0.6em auto;
   background-color: #ffff6f;
 }
@@ -280,16 +283,15 @@ nav a:hover {
   margin: 0 auto;            
 }
 
-.flag {
-  width: 2rem;
-  height: auto;
-  padding-top: 1rem;
-  padding-left: 1rem;
-  padding-right: 1rem;
-}
-
 .twitter-tweet {
   margin: 0 auto;
+}
+
+.widget-container {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  margin: auto;
 }
 
 /***** End Home Page *****/
@@ -335,22 +337,42 @@ pre.prettyprint {
 .tooltip {
   position: relative;
   display: inline-block;
-  font-style: normal;
+}
+
+.tooltip svg {
+  width: 1.4em;
+  height: 1.4em;
+  padding-left: 0.8em;
+  fill: #7db553;
+}
+
+.tooltip svg:hover {
+  -webkit-transition: all 0.25s;
+  transition: all 0.25s;
+  fill: #3e5a29;
 }
 
 .tooltip .tooltiptext {
   visibility: hidden;
   background-color: white;
-  top: 20%;
-  color: #000;
+  width: 340px;
   text-align: left;
-  padding: 5px 5px 5px;
-  border-radius: 6px;
-  font-family: "Calibri (Body)";
+  padding: 14px;
+  margin: 0.5em 0em 0em;
+  border-radius: 10px;
   position: absolute;
   z-index: 1;
   font-style: normal;
-  font-size: 12px;
+  font-size: 16px;
+  box-shadow: 0px 15px 20px rgba( 0, 0, 0, 0.15 );
+  /* Animation */
+  opacity: 0;
+  transition: opacity 0.25s;
+  -webkit-transition: opacity 0.25s;
+}
+
+.tooltip:hover .tooltiptext {
+  opacity: 1;
 }
 
 .tooltip:hover .tooltiptext {
