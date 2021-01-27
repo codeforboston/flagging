@@ -17,7 +17,7 @@ flask-sqlalchemy==2.4.4   # via -r requirements/_core.in
 flask==1.1.2              # via -r requirements/_core.in, flasgger, flask-admin, flask-basicauth, flask-sqlalchemy
 future==0.18.2            # via lunr
 graphql-core==3.1.2       # via hypothesis-graphql
-gunicorn==20.0.4          # via -r requirements/_core.in
+gunicorn==19.10.0         # via -r requirements/_core.in
 hypothesis-graphql==0.3.2  # via schemathesis
 hypothesis-jsonschema==0.18.2  # via schemathesis
 hypothesis==5.41.5        # via hypothesis-graphql, hypothesis-jsonschema, schemathesis

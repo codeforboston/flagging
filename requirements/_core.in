@@ -4,7 +4,7 @@ Flask-Admin
 Flask-BasicAuth
 Flask-SQLAlchemy
 Flask
-gunicorn
+gunicorn<20
 Jinja2
 markdown
 pandas
