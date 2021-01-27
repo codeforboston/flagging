@@ -1,0 +1,21 @@
+{#
+    This is the flag widget. It is the HTML that renders the flags on the website.
+#}
+{% if boating_season %}
+    {{ flagging_message }}
+    {% for boathouse, safe in flags.items() %}
+    <div class="flag-container">
+        {% if safe %}
+            <img class="flag" src="{{ url_for('static', filename='images/blue_flag.png') }}" />
+        {% else %}
+            <img class="flag" src="{{ url_for('static', filename='images/red_flag.png') }}" />
+        {% endif %}
+        <br />
+        {{ boathouse }}
+    </div>
+
+    {% endfor %}
+    <div class="last-updated">
+        ( Last updated: {{ model_last_updated_time }} )
+    </div>
+{% endif %}

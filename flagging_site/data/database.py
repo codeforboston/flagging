@@ -174,7 +174,6 @@ def update_database():
     from .predictive_models import all_models
     model_outs = all_models(df)
     model_outs.to_sql('model_outputs', **options)
-
     print("clearing cache-update database")
     cache.clear()
 

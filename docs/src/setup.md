@@ -100,19 +100,26 @@ git remote add upstream https://github.com/codeforboston/flagging.git
 git fetch upstream
 ```
 
-4. In your newly created `flagging` folder, create a file called `.env` and add the vault password to it. (Replace `vault_password_here` with the actual vault password if you have it; otherwise just copy+paste and run the command as-is):
+4. In your newly created `flagging` folder, run the following:
 
 ```shell
-echo "VAULT_PASSWORD=vault_password_here" > .env
+echo "FLASK_ENV=development" >>.env
 ```
 
 ???+ danger
-    If you do any commits to the repo, _please make sure `.env` is properly gitignored!_ (`.flaskenv` does not need to be gitignored, only `.env`.) The vault password is sensitive information; it should not be shared with others and it should not be posted online publicly.
+    If you do any commits to the repo, _please make sure `.env` is properly gitignored!_ (`.flaskenv` does not need to be gitignored, only `.env`.) `.env` contains sensitive information.
+
+5. The previous step created a file called `.env` (pronounced "dot env"). This file will eventually contain our HOBOlink credentials, Twitter credentials, and potentially Postgres credentials as well.
+    
+    In this step, we will add HOBOlink credentials to the `.env` file. Run the following, replacing `replace_me` with the corresponding credentials. (`>>` means "append to the end of a file," so you can do one at a time and it won't overwrite anything).
+
+```shell
+echo "HOBOLINK_USERNAME=replace_me" >>.env
+echo "HOBOLINK_PASSWORD=replace_me" >>.env
+echo "HOBOLINK_TOKEN=replace_me" >>.env
+```
 
 ## Run the Website Locally
-
-???+ note
-    From here on in the documentation, each terminal command assumes your terminal's working directory is pointed toward the `flagging` directory.
 
 After you get everything set up, you should run the website at least once. The process of running the website installs the remaining dependencies, and sets up a virtual environment to work in.
 
@@ -132,20 +139,18 @@ After you get everything set up, you should run the website at least once. The p
     The script being run is doing the following, in order:
     
     1. Set up a "virtual environment" (basically an isolated folder inside your project directory that we install the Python packages into),
-    2. install the packages inside of `requirements.txt`; this can take a while during your first time.
+    2. install the packages inside of `requirements/dev.txt`; this can take a while during your first time.
     3. Set up some environment variables that Flask needs.
     4. Prompts the user to set some options for the deployment. (See step 2 below.)
     5. Set up the Postgres database and update it with data.
     6. Run the actual website.
 
 ???+ tip
-    If you are receiving any errors related to the Postgres database and you are certain that Postgres is running on your computer, you can modify the `POSTGRES_USERNAME` and `POSTGRES_PASSWORD` environment variables to connect to your local Postgres instance properly.
+    If you are receiving any errors related to the Postgres database and you are certain that Postgres is running on your computer, you can modify the `POSTGRES_USER` and `POSTGRES_PASSWORD` environment variables to connect to your local Postgres instance properly.
+    
+    You can also save these Postgres environment variables inside of your `.env` file, but **do not** save your system password (the password you use to login to your computer) in a plain text file. If you need to save a `POSTGRES_PASSWORD` in `.env`, make sure it's a unique password, e.g. an admin user `POSTGRES_USER=flagging` and a password you randomly generated for that user `POSTGRES_PASSWORD=my_random_password_here`.
 
 2. You will be prompted asking if you want to run the website with mock data. The `USE_MOCK_DATA` variable is a way to run the website with dummy data without accessing the credentials. It is useful for anyone who wants to run a demo of the website regardless of their affiliation with the CRWA or this project. It has also been useful for development purposes in the past for us.
-
-???+ tip
-    - If you have a working `VAULT_PASSWORD`, type ++n++ -> ++enter++. This runs the website as normal.
-    - If you do _not_ have the `VAULT_PASSWORD`, type ++y++ -> ++enter++ to turn on mock data.
 
 3. Now just wait for the database to start filling in and for the website to eventually run.
 

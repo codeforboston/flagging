@@ -3,13 +3,10 @@ This file handles the construction of the Flask application object.
 """
 import os
 import click
-import json
 import decimal
 
 import datetime
 from typing import Optional
-from typing import Dict
-from typing import Union
 
 from flask import Flask
 from flask import render_template
@@ -21,6 +18,7 @@ from flask_caching import Cache
 import py7zr
 from lzma import LZMAError
 from py7zr.exceptions import PasswordRequired
+from flask.cli import with_appcontext
 
 from .data.database import set_cache
 
@@ -45,10 +43,6 @@ def create_app(config: Optional[str] = None) -> Flask:
     from .config import get_config_from_env
     cfg = get_config_from_env(config or app.env)
     app.config.from_object(cfg)
-
-    # Use the stuff inside `vault.zip` file to update the app.
-    # Note: SOON TO BE DEPRECATED:
-    update_config_from_vault(app)
 
     with app.app_context():
         register_extensions(app)
@@ -146,6 +140,7 @@ def register_jinja_env(app: Flask):
     change the colors using CSS.) This function loads SVG markup into our Jinja
     environment via reading from SVG files.
     """
+    import hashlib
 
     def _load_svg(file_name: str):
         """Load an svg file from `static/images/`."""
@@ -153,11 +148,24 @@ def register_jinja_env(app: Flask):
             s = f.read()
         return Markup(s)
 
+    def _md5_hash_file(file_name: str):
+        """Create a MD5 hash for the CSS files to add to the URLs. This helps
+        the browser to know whether you can use a cached version of the CSS
+        file, or if it's been updated and the cached version should *not* be
+        used. This method works in most browsers.
+        """
+        with open(os.path.join(app.static_folder, file_name)) as f:
+            val = hashlib.md5(f.read().encode('utf8')).hexdigest()
+        return val
+
     app.jinja_env.globals.update({
         'GITHUB_SVG': _load_svg('github.svg'),
         'TWITTER_SVG': _load_svg('twitter.svg'),
         'HAMBURGER_SVG': _load_svg('hamburger.svg'),
-        'INFO_ICON': _load_svg('iconmonstr-info-6.svg')
+        'INFO_ICON': _load_svg('iconmonstr-info-9.svg'),
+        'STYLE_CSS_MD5': _md5_hash_file('style.css'),
+        'FLAGS_CSS_MD5': _md5_hash_file('flags.css'),
+        'DATAFRAME_CSS_MD5': _md5_hash_file('dataframe.css')
     })
 
 
@@ -255,6 +263,29 @@ def register_commands(app: Flask):
         df_usgs.to_pickle(fname_usgs)
         click.echo(f'Wrote USGS data to {fname_hobolink!r}')
 
+    @app.cli.command('pip-compile',
+                     context_settings=dict(
+                         ignore_unknown_options=True,
+                         allow_extra_args=True,
+                         help_option_names=[]))
+    @click.pass_context
+    @with_appcontext
+    def pip_compile(ctx: click.Context):
+        """Compile the .in files in /requirements.
+
+        This command is for development purposes only.
+        """
+        if current_app.env != 'development':
+            raise RuntimeError(
+                'You can only run this in the development environment. Make '
+                'sure you set up the environment correctly if you believe you '
+                'are in dev.'
+            )
+        import subprocess
+        subprocess.call(['pip-compile', 'requirements/dev_osx.in', *ctx.args])
+        subprocess.call(['pip-compile', 'requirements/dev_windows.in', *ctx.args])
+        subprocess.call(['pip-compile', 'requirements/prod.in', *ctx.args])
+
 
 def register_misc(app: Flask):
     """For things that don't neatly fit into the other "register" functions.
@@ -297,74 +328,3 @@ def register_misc(app: Flask):
         from .data.usgs import request_to_usgs
         from .twitter import compose_tweet
         return locals()
-
-
-# ==============================================================================
-# vvv-- will soon be deprecating this stuff.
-
-
-def _load_secrets_from_vault(
-        password: str,
-        vault_file: str
-) -> Dict[str, Union[str, Dict[str, str]]]:
-    """This code loads the keys directly from the vault zip file.
-
-    The schema of the vault's `secrets.json` file looks like this:
-
-    >>> {
-    >>>     "SECRET_KEY": str,
-    >>>     "HOBOLINK_AUTH": {
-    >>>         "password": str,
-    >>>         "user": str,
-    >>>         "token": str
-    >>>     },
-    >>>     "TWITTER_AUTH": {
-    >>>         "api_key": str,
-    >>>         "api_key_secret": str,
-    >>>         "access_token": str,
-    >>>         "access_token_secret": str,
-    >>>         "bearer_token": str
-    >>>     }
-    >>> }
-
-    Args:
-        vault_password: (str) Password for opening up the `vault_file`.
-        vault_file: (str) File path of the zip file containing `keys.json`.
-
-    Returns:
-        Dict of credentials.
-    """
-    with py7zr.SevenZipFile(vault_file, mode='r', password=password) as f:
-        archive = f.readall()
-        d = json.load(archive['secrets.json'])
-    return d
-
-
-def update_config_from_vault(app: Flask) -> None:
-    """
-    This updates the state of the `app` to have the secrets from the vault. The
-    vault also stores the "SECRET_KEY", which is a Flask builtin configuration
-    variable (i.e. Flask treats the "SECRET_KEY" as special). So we also
-    populate the "SECRET_KEY" in this step.
-
-    If we fail to load the vault in development mode, then the user is warned
-    that the vault was not loaded successfully. In production mode, failing to
-    load the vault raises a RuntimeError.
-
-    Args:
-        app: A Flask application instance.
-    """
-    try:
-        secrets = _load_secrets_from_vault(
-            password=app.config['VAULT_PASSWORD'],
-            vault_file=app.config['VAULT_FILE']
-        )
-        # Add 'SECRET_KEY', 'HOBOLINK_AUTH', AND 'TWITTER_AUTH' to the config.
-        app.config.update(secrets)
-    except (LZMAError, PasswordRequired, KeyError):
-        msg = 'Unable to load the vault; bad password provided.'
-        if app.config.get('VAULT_OPTIONAL'):
-            print(f'Warning: {msg}')
-            app.config['SECRET_KEY'] = os.urandom(16)
-        else:
-            raise RuntimeError(msg)

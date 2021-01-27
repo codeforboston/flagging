@@ -1,5 +1,9 @@
-{% extends "base.html" %}
+{% extends '_base.html' %}
 {% block title %}Flagging Program - Live Water Quality Alerts{% endblock %}
+{% block head %}
+    {{ super() }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='flags.css', v=FLAGS_CSS_MD5) }}" />
+{% endblock %}
 {% block content %}
 <h2>Overview</h2>
     <p>
@@ -16,32 +20,12 @@
         including rainfall and river flow. CRWA collects water samples weekly to verify the model forecasts. Cyanobacteria
         monitoring is conducted every 1-2 weeks.
     </p>
-{% if boating_season %}
+
 <h2>Water Quality Today</h2>
- {{ flagging_message | safe }}
-    <table class="home-reach">
-        {% for reach_no, reach in boathouse_statuses.items() %}
-        <tr>
-            <td class="home-reach">
-                <div><strong>Reach {{ reach_no }}</strong></div>
-                <ul class="home-boat-house">
-                    {% for boathouse in reach['boathouses'] %}
-                    <li> {{ boathouse }} </li>
-                    {% endfor %}
-                </ul>
-            </td>
-            {% if reach.flag %}
-            <td class="home-reach flag"><img class="flag" src="{{ url_for('static', filename='images/blue_flag.png') }}" /></td>
-            {% else %}
-            <td class="home-reach flag"><img class="flag" src="{{ url_for('static', filename='images/red_flag.png') }}" /></td>
-            {% endif %}
-        </tr>
-        {% endfor %}
-    </table>
-        <p class="centered">
-            (Last updated: {{model_last_updated_time}})
-        </p>
-{% endif %}
+<div class="widget-container">
+    {% include '_flag_widget.html' %}
+</div>
+
 <h2>Stay Updated</h2>
 <p>
     The best way to keep up with the CRWA flagging updates is to <a href="https://www.crwa.org/flagging-program.html">sign

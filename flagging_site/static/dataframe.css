@@ -10,8 +10,13 @@ https://freefrontend.com/css-tables/
 
 .table-wrapper {
     max-width: 90%;
-    margin: auto;
+    margin: 2em auto 4em auto;
     box-shadow: 0px 35px 50px rgba( 0, 0, 0, 0.2 );
+}
+
+.table-wrapper .table-header-wrapper {
+  text-align: center;
+  padding: 1em 0 1em 0;
 }
 
 .dataframe {

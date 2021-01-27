@@ -1,9 +1,14 @@
-# Note: This requirements.txt file is here for use by Heroku. See here for more
-# info: https://devcenter.heroku.com/articles/python-pip
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# This file is used to deploy the website to Heroku
 #
-# For dev dependencies, use one of the following based on your OS:
+# See here for more:
+# https://devcenter.heroku.com/articles/python-pip
 #
-# - requirements/dev_osx.txt
-# - requirements/dev_windows.txt
+# For dev dependencies on a local machine, use one of the following based on
+# your OS (instead of this file):
+#
+# - On Windows: pip install requirements/dev_windows.txt
+# - On OSX: pip install requirements/dev_osx.txt
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 -r ./requirements/prod.txt

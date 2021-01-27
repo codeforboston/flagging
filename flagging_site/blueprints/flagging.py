@@ -1,3 +1,5 @@
+from typing import Any
+from typing import Dict
 import pandas as pd
 
 from flask import Blueprint
@@ -6,11 +8,9 @@ from flask import request
 from flask import current_app
 from flask import flash
 
-from ..data.manual_overrides import get_currently_overridden_reaches
+from ..data.boathouses import Boathouse
 from ..data.predictive_models import latest_model_outputs
-from ..data.database import get_boathouse_by_reach_dict
-from ..data.database import get_boathouse_list_by_reach_dict
-from ..data.database import get_latest_time
+from ..data.boathouses import get_latest_time
 from ..data.live_website_options import LiveWebsiteOptions
 from ..data.database import cache
 
@@ -54,6 +54,55 @@ def before_request():
         flash(msg)
 
 
+def get_flags(df: pd.DataFrame = None) -> Dict[str, bool]:
+    """
+    Get a dict of boolean values indicating whether each boathouse is considered
+    safe. True means it is considered safe-- otherwise it is false.
+
+    Args:
+        df: (pd.DataFrame) Pandas Dataframe containing predictive model outputs.
+
+    Returns:
+        Dict of booleans.
+    """
+    # sql equivalent: SELECT * FROM boathouses ORDER BY boathouse
+    all_boathouses = (
+        Boathouse.query
+        .order_by(Boathouse.boathouse)
+        .all()
+    )
+
+    def _reach_is_safe(r: int) -> bool:
+        return df.loc[df['reach'] == r, 'safe'].iloc[0]
+
+    flag_statuses = {}
+
+    for row in all_boathouses:
+        # Check to see if the reach is safe AND the row has not been overridden.
+        # If both are true, then the boathouse gets a blue flag.
+        # Otherwise, give it a red flag.
+        flag_statuses[row.boathouse] = \
+             _reach_is_safe(row.reach) and (not row.overridden)
+
+    return flag_statuses
+
+
+def flag_widget_params() -> Dict[str, Any]:
+    """Creates the parameters for the flags widget.
+
+    Pass these parameters into a Jinja template like this:
+
+    >>> **flag_widget_params()
+    """
+    df = latest_model_outputs()
+    return dict(
+        flags=get_flags(df=df),
+        model_last_updated_time=df['time'].iloc[0],
+        boating_season=LiveWebsiteOptions.is_boating_season(),
+        flagging_message=LiveWebsiteOptions.get_flagging_message()
+    )
+
+
 def stylize_model_output(df: pd.DataFrame) -> str:
     """
     This function function stylizes the dataframe that we will output for our
@@ -61,7 +110,7 @@ def stylize_model_output(df: pd.DataFrame) -> str:
     returns the HTML of the table excluding the index.
 
     Args:
-        df: (pd.DataFrame) Pandas Dataframe containing model outputs.
+        df: (pd.DataFrame) Pandas Dataframe containing predictive model outputs.
 
     Returns:
         HTML table.
@@ -81,29 +130,6 @@ def stylize_model_output(df: pd.DataFrame) -> str:
     return df.to_html(index=False, escape=False)
 
 
-def parse_model_outputs(df: pd.DataFrame) -> dict:
-    df = df.set_index('reach')
-
-    overridden_reaches = get_currently_overridden_reaches()
-
-    flags = {
-        reach: val['safe'] and reach not in overridden_reaches
-        for reach, val
-        in df.to_dict(orient='index').items()
-    }
-
-    boathouse_statuses = get_boathouse_by_reach_dict()
-
-    # verify that the same reaches are in boathouse list and model outputs
-    if flags.keys() != boathouse_statuses.keys():
-        print('ERROR!  the reaches are\'t identical between boathouse list and model outputs!')
-
-    for flag_reach, flag_safe in flags.items():
-        boathouse_statuses[flag_reach]['flag'] = flag_safe
-
-    return boathouse_statuses
-
-
 @bp.route('/')
 @cache.cached(timeout=21600)
 def index() -> str:
@@ -111,17 +137,7 @@ def index() -> str:
     The home page of the website. This page contains a brief description of the
     purpose of the website, and the latest outputs for the flagging model.
     """
-    df = latest_model_outputs()
-    boathouse_statuses = parse_model_outputs(df)
-    model_last_updated_time = df['time'].iloc[0]
-    boating_season = LiveWebsiteOptions.is_boating_season()
-    flagging_message = LiveWebsiteOptions.get_flagging_message()
-
-    return render_template('index.html',
-                           boathouse_statuses=boathouse_statuses,
-                           model_last_updated_time=model_last_updated_time,
-                           boating_season=boating_season,
-                           flagging_message=flagging_message)
+    return render_template('index.html', **flag_widget_params())
 
 
 @bp.route('/about')
@@ -129,57 +145,33 @@ def about() -> str:
     return render_template('about.html')
 
 @cache.cached(timeout=21600)
-@bp.route('/output_model')
-def output_model() -> str:
+@bp.route('/model_outputs')
+def model_outputs() -> str:
     """
     Retrieves data from hobolink and usgs, processes that data, and then
     displays the data as a human-readable, stylized HTML table.
 
     Returns:
-        Rendering of the model outputs via the `output_model.html` template.
+        Rendering of the model outputs via the `model_outputs.html` template.
     """
+    df = latest_model_outputs(hours=24)
 
-    # Parse contents of the query string to get reach and hours parameters.
-    # Defaults are hours = 24, and reach = -1.
-    # When reach = -1, we utilize all reaches.
-    reach = request.args.get('reach', -1, type=int)
-    hours = request.args.get('hours', 24, type=int)
+    reach_html_tables = {
+        r: stylize_model_output(df.loc[df['reach'] == r])
+        for r
+        in df['reach'].unique()
+    }
 
-    # Look at no more than x_MAX_HOURS
-    hours = min(max(hours, 1), current_app.config['API_MAX_HOURS'])
+    boathouses_by_reach = Boathouse.boathouse_names_by_reach()
 
-    df = latest_model_outputs(hours)
-
-    # reach_html_tables is a dict where the index is the reach number
-    # and the values are HTML code for the table of data to display for
-    # that particular reach
-    reach_html_tables = {}
-
-    # loop through each reach in df
-    #    compare with reach to determine whether to display that reach
-    #       extract the subset from the df for that reach
-    #       then convert that df subset to HTML code
-    #       and then add that HTML subset to reach_html_tables
-    for i in df['reach'].unique():
-        if (reach == -1 or reach == i):
-            reach_html_tables[i] = stylize_model_output(df.loc[df['reach'] == i])
-    boathouses_by_reach = get_boathouse_list_by_reach_dict()
-    return render_template('output_model.html', tables=reach_html_tables, boathouses_by_reach=boathouses_by_reach)
+    return render_template('model_outputs.html',
+                           tables=reach_html_tables,
+                           boathouses_by_reach=boathouses_by_reach)
 
 
 @bp.route('/flags')
 def flags() -> str:
-    df = latest_model_outputs()
-    boathouse_statuses = parse_model_outputs(df)
-    model_last_updated_time = df['time'].iloc[0]
-    boating_season = LiveWebsiteOptions.is_boating_season()
-    flagging_message = LiveWebsiteOptions.get_flagging_message()
-
-    return render_template('flags.html',
-                           boathouse_statuses=boathouse_statuses,
-                           model_last_updated_time=model_last_updated_time,
-                           boating_season=boating_season,
-                           flagging_message=flagging_message)
+    return render_template('flags.html', **flag_widget_params())
 
 
 @bp.route('/api')
