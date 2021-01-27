@@ -17,10 +17,12 @@ from flask import jsonify
 from flask import request
 from flask import current_app
 from flask import Markup
-
+from flask_caching import Cache
 import py7zr
 from lzma import LZMAError
 from py7zr.exceptions import PasswordRequired
+
+from .data.database import set_cache
 
 
 def create_app(config: Optional[str] = None) -> Flask:
@@ -36,6 +38,9 @@ def create_app(config: Optional[str] = None) -> Flask:
         The fully configured Flask app instance.
     """
     app = Flask(__name__)
+    app.config['CACHE_TYPE'] = 'simple'
+
+    set_cache(Cache(app))
 
     from .config import get_config_from_env
     cfg = get_config_from_env(config or app.env)

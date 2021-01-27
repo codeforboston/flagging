@@ -22,10 +22,17 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_sqlalchemy import declarative_base
 from sqlalchemy.exc import ResourceClosedError
 from psycopg2 import connect
-
+from flask_caching import Cache
 db = SQLAlchemy()
 Base = declarative_base()
+cache = ''
 
+def get_cache():
+    return cache
+
+def set_cache(new_cache):
+    global cache
+    cache = new_cache
 
 def execute_sql(query: str) -> Optional[pd.DataFrame]:
     """Execute arbitrary SQL in the database. This works for both read and
@@ -168,6 +175,8 @@ def update_database():
     model_outs = all_models(df)
     model_outs.to_sql('model_outputs', **options)
 
+    print("clearing cache-update database")
+    cache.clear()
 
 @dataclass
 class Boathouses(db.Model):
