@@ -11,48 +11,38 @@ This overview page describes at a high-level what the website's infrastructure i
 
 ```mermaid
 classDiagram
+class Twitter Bot
+Twitter Bot : /twitter.py
+Heroku Task Scheduler ..> Twitter Bot
+Heroku Task Scheduler ..> PostgreSQL
 Heroku <.. gunicorn
 gunicorn <.. Flask : create_app()
 gunicorn : /../Procfile
 Heroku <.. PostgreSQL
 class Flask
 Flask : /app.py
-Flask : create_app()
-Flask : app = Flask(...)
-class Config
-Config : /config.py
-Config : config = get_config_from_env(...)
-class vault
-vault : /vault.7z
-vault : /app.py
-Config <.. vault : update_config_from_vault(app)
 class Swagger
 Swagger : /app.py
-Swagger : Swagger(app, ...)
 Flask <.. Swagger : init_swagger(app)
 Swagger ..> blueprints : wraps RESTful API
-Flask <.. Config : app.config.from_object(config)
 class SQLAlchemy
 SQLAlchemy : /data/database.py
-SQLAlchemy : db = SqlAlchemy()
 class Jinja2
 Jinja2 : /app.py
-Flask <.. Jinja2 : Built-in Flask
+Flask <.. Jinja2
 SQLAlchemy <.. PostgreSQL: Connected via psycopg2
 Flask <.. SQLAlchemy : db.init_app(app)
 class blueprints
 blueprints : blueprints/flagging.py
 blueprints : blueprints/api.py
-blueprints : app.register_blueprint(...)
 Flask <.. blueprints
 Jinja2 <.. blueprints : Renders HTML
 class Admin
 Admin : /admin.py
-Admin: admin = Admin(...)
 SQLAlchemy <.. Admin
 Flask <.. Admin : init_admin(app)
 class BasicAuth
 BasicAuth : /admin.py
-BasicAuth : auth = BasicAuth()
 BasicAuth ..> Admin
+Heroku .. Heroku Task Scheduler
 ```

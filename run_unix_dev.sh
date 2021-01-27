@@ -25,7 +25,7 @@ $PYEXEC -m pip install -r requirements/dev_osx.txt
 # Set up and run the Flask application
 export FLASK_APP=flagging_site:create_app
 export FLASK_ENV=development
-export DATABASE_URL=$(heroku config:get DATABASE_URL)
+# export DATABASE_URL=$(heroku config:get DATABASE_URL)
 
 read -p "Use mock data? [y/n]: " use_mock_data
 export USE_MOCK_DATA=${use_mock_data:-${USE_MOCK_DATA}}

@@ -1,0 +1,28 @@
+.flag-container {
+  display:inline-block;
+  vertical-align: top;
+  margin: 1em;
+  max-width: 140px;
+  width: 30%;
+  height: auto;
+  margin-bottom: 2em;
+  margin-right: 1em;
+  padding: 0.5em;
+}
+
+.flag-container img {
+  width: 138px;
+  height: auto;
+  background: #fff;
+}
+
+.last-updated {
+  text-align: center;
+  font-size: 16px;
+  margin-bottom: 0.3em;
+}
+
+.info {
+  text-align: center;
+  font-size: 16px;
+}
