@@ -7,7 +7,6 @@ Flask
 gunicorn
 Jinja2
 markdown
-meinheld
 pandas
 python-dotenv
 PyYAML

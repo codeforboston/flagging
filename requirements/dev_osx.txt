@@ -33,7 +33,7 @@ livereload==2.6.3         # via mkdocs
 lunr[languages]==0.5.8    # via mkdocs
 markdown==3.3.3           # via -r requirements/_core.in, mkdocs, mkdocs-material, pymdown-extensions
 markupsafe==1.1.1         # via jinja2, wtforms
-meinheld==1.0.2           # via -r requirements/_core.in
+meinheld==1.0.2           # via -r requirements/dev_osx.in
 mistune==0.8.4            # via flasgger
 mkdocs-macros-plugin==0.5.0  # via -r requirements/_dev_core.in
 mkdocs-macros-test==0.1.0  # via mkdocs-macros-plugin
