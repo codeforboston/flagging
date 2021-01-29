@@ -138,6 +138,35 @@ def index() -> str:
     return render_template('index.html', **flag_widget_params())
 
 
+@bp.route('/boathouses')
+def boathouses() -> str: 
+    all_boathouses_dict = Boathouse.all_boathouses_dict()
+
+    # Convert list of dicts to list of lists
+    #
+    # The parent list lists all boathouses.
+    # Each element of the parent list is a child list.
+    # The elements of the child list are:
+    #     element 0:  a decimal value showing the boathouse's latitude
+    #     element 1:  a decimal value showing the boathouse's longitude
+    #     element 2:  a string showing the boathouse name
+
+    #     Note that latitudes west of the Prime Meridian are positive 
+    #         (thus those east of the Prime Meridian are negative)
+    #     Longitudes north of the Equator are negative
+    #         (thus those south of the Equator are positive)
+    boathouses_list_of_lists = []
+    for boathouse in all_boathouses_dict:
+        boathouses_list_of_lists.append([
+            boathouse['latitude'],
+            boathouse['longitude'],
+            boathouse['boathouse']
+        ])
+
+    return render_template('boathouses.html',
+        boathouses_list_of_lists = boathouses_list_of_lists)
+
+
 @bp.route('/about')
 def about() -> str:
     return render_template('about.html')
