@@ -19,6 +19,8 @@ from flask_basicauth import BasicAuth as _BasicAuth
 from werkzeug.exceptions import HTTPException
 from sqlalchemy.exc import ProgrammingError
 
+
+
 from .data import db
 
 
@@ -60,6 +62,9 @@ def init_admin(app: Flask):
             basic_auth.get_login()
 
     with app.app_context():
+        from .data.database import cache
+        print("clearing cache-init admin")
+        cache.clear()
         basic_auth.init_app(app)
         admin.init_app(app)
 
@@ -131,6 +136,9 @@ class LogoutView(BaseView):
     def index(self):
         body = self.render('admin/logout.html')
         status = 401
+        from .data.database import cache
+        print("clearing cache index")
+        cache.clear()
         return body, status
 
 

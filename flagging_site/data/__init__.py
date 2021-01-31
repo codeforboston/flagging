@@ -5,5 +5,6 @@ processing, collection, and storage.
 from .database import db
 
 # SqlAlchemy database models
+db.metadata.clear()
 from .boathouses import Boathouse
 from .live_website_options import LiveWebsiteOptions

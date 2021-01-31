@@ -12,12 +12,13 @@ from ..data.boathouses import Boathouse
 from ..data.predictive_models import latest_model_outputs
 from ..data.boathouses import get_latest_time
 from ..data.live_website_options import LiveWebsiteOptions
-
+from ..data.database import cache
 
 bp = Blueprint('flagging', __name__)
 
 
 @bp.before_request
+@cache.cached(timeout=21600)
 def before_request():
     # Get the latest time shown in the database
     ltime = get_latest_time()
@@ -132,6 +133,7 @@ def stylize_model_output(df: pd.DataFrame) -> str:
 
 
 @bp.route('/')
+@cache.cached(timeout=21600)
 def index() -> str:
     """
     The home page of the website. This page contains a brief description of the
@@ -177,7 +179,7 @@ def boathouses() -> str:
 def about() -> str:
     return render_template('about.html')
 
-
+@cache.cached(timeout=21600)
 @bp.route('/model_outputs')
 def model_outputs() -> str:
     """
