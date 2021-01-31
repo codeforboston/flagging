@@ -10,7 +10,9 @@ from flask import Response
 from flask import send_file
 from flask import abort
 from flask import url_for
+from flask import redirect
 from flask_admin import Admin
+from flask_admin import AdminIndexView as _AdminIndexView
 from flask_admin import BaseView as _BaseView
 from flask_admin import expose
 from flask_admin.contrib import sqla
@@ -22,9 +24,11 @@ from sqlalchemy.exc import ProgrammingError
 from .data.database import db
 from .data.database import cache
 
+
 # ==============================================================================
 # Extensions
 # ==============================================================================
+
 
 class BasicAuth(_BasicAuth):
     """Uses HTTP BasicAuth to authenticate the admin user. We subclass the
@@ -40,10 +44,6 @@ class BasicAuth(_BasicAuth):
         """
         if not self.authenticate():
             abort(401)
-
-
-admin = Admin(template_mode='bootstrap3')
-basic_auth = BasicAuth()
 
 
 def init_admin(app: Flask):
@@ -120,8 +120,8 @@ class ModelView(sqla.ModelView, BaseView):
         super().__init__(model, session, *args, **kwargs)
 
     def after_model_change(self, *args, **kwargs):
-        cache.clear()
         super().after_model_change(*args, **kwargs)
+        cache.clear()
 
 # ==============================================================================
 # Views
@@ -315,3 +315,14 @@ class DownloadView(BaseView):
             df=model_outs,
             file_name='model_outputs_source.csv'
         )
+
+
+class AdminIndexView(BaseView, _AdminIndexView):
+    @expose('/reset-cache')
+    def reset_cache(self):
+        cache.clear()
+        return redirect('/admin')
+
+
+admin = Admin(template_mode='bootstrap3', index_view=AdminIndexView())
+basic_auth = BasicAuth()
