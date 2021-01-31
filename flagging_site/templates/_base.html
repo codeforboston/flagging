@@ -48,10 +48,7 @@
                         </a>
                     </div>
                     <nav>
-                        <a class="nav-link" href="{{ url_for('flagging.index') }}">Home</a>
-                        <a class="nav-link" href="{{ url_for('flagging.about') }}">About</a>
-                        <a class="nav-link" href="{{ url_for('flagging.model_outputs') }}">Model Outputs</a>
-                        <a class="nav-link" href="{{ url_for('flagging.api_index') }}">API</a>
+                        {% include '_nav.html' | indent(24) %}
                     </nav>
                 </div>
                 <div class="social-section">
@@ -84,11 +81,15 @@
                 </script>
             </div>
             <div class="dropdown-menu hidden">
+<<<<<<< HEAD
                 <a href="{{ url_for('flagging.index') }}">Home</a>
                 <a href="{{ url_for('flagging.about') }}">About</a>
                 <a href="{{ url_for('flagging.model_outputs') }}">Model Outputs</a>
                 <a href="{{ url_for('flagging.boathouses') }}">Boathouses</a>
                 <a href="{{ url_for('flagging.api_index') }}">API</a>
+=======
+                {% include '_nav.html' | indent(16) %}
+>>>>>>> ac286c3
             </div>
         </div>
         <section class="body">

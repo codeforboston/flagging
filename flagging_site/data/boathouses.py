@@ -36,7 +36,7 @@ class Boathouse(db.Model):
 
         You can think of this function as performing the following query:
 
-            SELECT reach, boathouse, latitude, longitude
+            SELECT reach, boathouse, latitude, longitude, overriden, reason
             FROM boathouses
             ORDER BY reach, boathouse
         """
@@ -103,14 +103,6 @@ class Boathouse(db.Model):
     @classmethod
     def get_flags(cls) -> Dict[str, bool]:
         return cls.query.all()
-
-
-def get_boathouse_metadata_dict():
-    """
-    Return a dictionary of boathouses' metadata
-    """
-    boathouse_query = (Boathouse.query.all())
-    return {'boathouses': boathouse_query}
 
 
 def get_latest_time():
