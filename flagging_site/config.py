@@ -82,6 +82,9 @@ class Config:
 
     FLASK_ADMIN_SWATCH = 'lumen'
 
+    CACHE_TYPE: str = 'simple'
+    CACHE_DEFAULT_TIMEOUT: int = 21600
+
     # ==========================================================================
     # MISC. CUSTOM CONFIG OPTIONS
     #
@@ -199,6 +202,7 @@ class DevelopmentConfig(Config):
     DEBUG: bool = True
     TESTING: bool = True
     USE_MOCK_DATA = strtobool(os.getenv('USE_MOCK_DATA') or 'false')
+    CACHE_DEFAULT_TIMEOUT: int = 1
 
 
 class TestingConfig(Config):

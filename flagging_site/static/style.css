@@ -65,7 +65,7 @@ ul {
   border-bottom: thin solid #dce9f2;
   height: fit-content;
   background: white;
-  z-index: 99;
+  z-index: 2000;
 }
 
 .page-header > .header-content {

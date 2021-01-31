@@ -58,7 +58,7 @@ def model_api(reaches: List[int], hours: int) -> dict:
 
 
 @bp.route('/v1/model')
-@cache.cached(timeout=21600, query_string=True)
+@cache.cached(query_string=True)
 @swag_from('predictive_model_api.yml')
 def predictive_model_api():
     """Returns JSON of the predictive model outputs."""
@@ -77,7 +77,7 @@ def predictive_model_api():
 
 
 @bp.route('/v1/boathouses')
-@cache.cached(timeout=21600)
+@cache.cached()
 @swag_from('boathouses_api.yml')
 def boathouses_api():
     """Returns JSON of the boathouses."""
@@ -85,7 +85,7 @@ def boathouses_api():
 
 
 @bp.route('/v1/model_input_data')
-@cache.cached(timeout=21600, query_string=True)
+@cache.cached(query_string=True)
 @swag_from('model_input_data_api.yml')
 def model_input_data_api():
     """Returns records of the data used for the model."""

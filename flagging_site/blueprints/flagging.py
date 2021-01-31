@@ -17,7 +17,7 @@ bp = Blueprint('flagging', __name__)
 
 
 @bp.before_request
-@cache.cached(timeout=21600)
+@cache.cached()
 def before_request():
     # Get the latest time shown in the database
     ltime = get_latest_time()
@@ -132,7 +132,7 @@ def stylize_model_output(df: pd.DataFrame) -> str:
 
 
 @bp.route('/')
-@cache.cached(timeout=21600)
+@cache.cached()
 def index() -> str:
     """
     The home page of the website. This page contains a brief description of the
@@ -142,7 +142,7 @@ def index() -> str:
 
 
 @bp.route('/boathouses')
-@cache.cached(timeout=21600)
+@cache.cached()
 def boathouses() -> str:
     all_boathouses_dict = Boathouse.all_boathouses_dict()
 
@@ -176,13 +176,13 @@ def boathouses() -> str:
 
 
 @bp.route('/about')
-@cache.cached(timeout=21600)
+@cache.cached()
 def about() -> str:
     return render_template('about.html')
 
 
-@cache.cached(timeout=21600)
 @bp.route('/model_outputs')
+@cache.cached()
 def model_outputs() -> str:
     """
     Retrieves data from hobolink and usgs, processes that data, and then
@@ -207,13 +207,13 @@ def model_outputs() -> str:
 
 
 @bp.route('/flags')
-@cache.cached(timeout=21600)
+@cache.cached()
 def flags() -> str:
     return render_template('flags.html', **flag_widget_params())
 
 
 @bp.route('/api')
-@cache.cached(timeout=21600)
+@cache.cached()
 def api_index() -> str:
     """Landing page for the API."""
     return render_template('api/index.html')
