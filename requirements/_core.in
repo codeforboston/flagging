@@ -2,12 +2,12 @@ click
 flasgger
 Flask-Admin
 Flask-BasicAuth
+Flask-Caching
 Flask-SQLAlchemy
 Flask
-gunicorn
+gunicorn<20
 Jinja2
 markdown
-meinheld
 pandas
 python-dotenv
 PyYAML

@@ -1,5 +1,9 @@
-{% extends "base.html" %}
+{% extends '_base.html' %}
 {% block title %}Flagging Program - Live Water Quality Alerts{% endblock %}
+{% block head %}
+    {{ super() }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='flags.css', v=FLAGS_CSS_MD5) }}" />
+{% endblock %}
 {% block content %}
 <h2>Overview</h2>
     <p>
@@ -18,21 +22,8 @@
     </p>
 
 <h2>Water Quality Today</h2>
-
-{% for boathouse, safe in flags.items() %}
-<div class="flag-container">
-    {% if safe %}
-        <img class="flag" src="{{ url_for('static', filename='images/blue_flag.png') }}" />
-    {% else %}
-        <img class="flag" src="{{ url_for('static', filename='images/red_flag.png') }}" />
-    {% endif %}
-    <br />
-    {{ boathouse }}
-</div>
-
-{% endfor %}
-<div class="last-updated">
-    ( Last updated: {{ model_last_updated_time }} )
+<div class="widget-container">
+    {% include '_flag_widget.html' %}
 </div>
 
 <h2>Stay Updated</h2>

@@ -19,8 +19,8 @@ from flask_basicauth import BasicAuth as _BasicAuth
 from werkzeug.exceptions import HTTPException
 from sqlalchemy.exc import ProgrammingError
 
-from .data import db
-
+from .data.database import db
+from .data.database import cache
 
 # ==============================================================================
 # Extensions
@@ -65,11 +65,11 @@ def init_admin(app: Flask):
 
         # Register /admin sub-views
         from .data.live_website_options import LiveWebsiteOptionsModelView
-        from .data.manual_overrides import ManualOverridesModelView
-        from .data.database import Boathouses
+        from .data.boathouses import ManualOverridesModelView
+        from .data.boathouses import Boathouse
 
         admin.add_view(LiveWebsiteOptionsModelView(db.session))
-        admin.add_view(ModelView(Boathouses, db.session))
+        admin.add_view(ModelView(Boathouse, db.session))
         admin.add_view(ManualOverridesModelView(db.session))
         admin.add_view(DatabaseView(name='Update Database', url='db/update',
                                     category='Manage DB'))
@@ -119,6 +119,9 @@ class ModelView(sqla.ModelView, BaseView):
         self.form_columns = self.column_list
         super().__init__(model, session, *args, **kwargs)
 
+    def after_model_change(self, *args, **kwargs):
+        cache.clear()
+        super().after_model_change(*args, **kwargs)
 
 # ==============================================================================
 # Views
@@ -132,6 +135,7 @@ class LogoutView(BaseView):
     def index(self):
         body = self.render('admin/logout.html')
         status = 401
+        cache.clear()
         return body, status
 
 

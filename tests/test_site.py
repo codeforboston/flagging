@@ -6,7 +6,7 @@ import pytest
     [
         ('/', 200),
         ('/about', 200),
-        ('/output_model', 200),
+        ('/model_outputs', 200),
         ('/flags', 200),
         ('/api', 200),
         ('/api/docs', 200),
