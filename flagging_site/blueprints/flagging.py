@@ -5,7 +5,6 @@ import pandas as pd
 from flask import Blueprint
 from flask import render_template
 from flask import request
-from flask import current_app
 from flask import flash
 
 from ..data.boathouses import Boathouse
@@ -143,7 +142,8 @@ def index() -> str:
 
 
 @bp.route('/boathouses')
-def boathouses() -> str: 
+@cache.cached(timeout=21600)
+def boathouses() -> str:
     all_boathouses_dict = Boathouse.all_boathouses_dict()
 
     # Convert list of dicts to list of lists
@@ -176,8 +176,10 @@ def boathouses() -> str:
 
 
 @bp.route('/about')
+@cache.cached(timeout=21600)
 def about() -> str:
     return render_template('about.html')
+
 
 @cache.cached(timeout=21600)
 @bp.route('/model_outputs')
@@ -205,11 +207,13 @@ def model_outputs() -> str:
 
 
 @bp.route('/flags')
+@cache.cached(timeout=21600)
 def flags() -> str:
     return render_template('flags.html', **flag_widget_params())
 
 
 @bp.route('/api')
+@cache.cached(timeout=21600)
 def api_index() -> str:
     """Landing page for the API."""
     return render_template('api/index.html')

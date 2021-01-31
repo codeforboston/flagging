@@ -15,12 +15,7 @@ from flask import request
 from flask import current_app
 from flask import Markup
 from flask_caching import Cache
-import py7zr
-from lzma import LZMAError
-from py7zr.exceptions import PasswordRequired
 from flask.cli import with_appcontext
-
-from .data.database import set_cache
 
 
 def create_app(config: Optional[str] = None) -> Flask:
@@ -37,8 +32,6 @@ def create_app(config: Optional[str] = None) -> Flask:
     """
     app = Flask(__name__)
     app.config['CACHE_TYPE'] = 'simple'
-
-    set_cache(Cache(app))
 
     from .config import get_config_from_env
     cfg = get_config_from_env(config or app.env)
@@ -57,8 +50,9 @@ def create_app(config: Optional[str] = None) -> Flask:
 
 def register_extensions(app: Flask):
     """Register all extensions for the app."""
-    from .data import db
+    from .data import db, cache
     db.init_app(app)
+    cache.init_app(app)
 
     from .admin import init_admin
     init_admin(app)

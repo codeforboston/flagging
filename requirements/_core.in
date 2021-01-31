@@ -2,6 +2,7 @@ click
 flasgger
 Flask-Admin
 Flask-BasicAuth
+Flask-Caching
 Flask-SQLAlchemy
 Flask
 gunicorn<20

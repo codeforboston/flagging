@@ -10,7 +10,6 @@ is passed in via `db.init_app(app)`, and the `db` object looks for the config
 variable `SQLALCHEMY_DATABASE_URI`.
 """
 import os
-from dataclasses import dataclass
 from typing import Optional
 
 import pandas as pd
@@ -19,20 +18,14 @@ import psycopg2.errors
 import click
 from flask import current_app
 from flask_sqlalchemy import SQLAlchemy
-from flask_sqlalchemy import declarative_base
 from sqlalchemy.exc import ResourceClosedError
 from psycopg2 import connect
 from flask_caching import Cache
+
+
 db = SQLAlchemy()
-Base = declarative_base()
-cache = ''
+cache = Cache()
 
-def get_cache():
-    return cache
-
-def set_cache(new_cache):
-    global cache
-    cache = new_cache
 
 def execute_sql(query: str) -> Optional[pd.DataFrame]:
     """Execute arbitrary SQL in the database. This works for both read and
@@ -123,7 +116,6 @@ def init_db():
 
     # The models available in Base are given corresponding tables if they
     # do not already exist.
-    Base.metadata.create_all(db.engine)
     db.create_all(app=current_app)
 
     # The boathouses table is populated. This table doesn't change, so it
@@ -155,77 +147,29 @@ def update_database():
         'if_exists': 'replace'
     }
 
-    # Populate the `usgs` table.
-    from .usgs import get_live_usgs_data
-    df_usgs = get_live_usgs_data()
-    df_usgs.to_sql('usgs', **options)
+    try:
+        # Populate the `usgs` table.
+        from .usgs import get_live_usgs_data
+        df_usgs = get_live_usgs_data()
+        df_usgs.to_sql('usgs', **options)
 
-    # Populate the `hobolink` table.
-    from .hobolink import get_live_hobolink_data
-    df_hobolink = get_live_hobolink_data()
-    df_hobolink.to_sql('hobolink', **options)
+        # Populate the `hobolink` table.
+        from .hobolink import get_live_hobolink_data
+        df_hobolink = get_live_hobolink_data()
+        df_hobolink.to_sql('hobolink', **options)
 
-    # Populate the `processed_data` table.
-    from .predictive_models import process_data
-    df = process_data(df_hobolink=df_hobolink, df_usgs=df_usgs)
-    df.to_sql('processed_data', **options)
+        # Populate the `processed_data` table.
+        from .predictive_models import process_data
+        df = process_data(df_hobolink=df_hobolink, df_usgs=df_usgs)
+        df.to_sql('processed_data', **options)
 
-    # Populate the `model_outputs` table.
-    from .predictive_models import all_models
-    model_outs = all_models(df)
-    model_outs.to_sql('model_outputs', **options)
-    print("clearing cache-update database")
-    cache.clear()
+        # Populate the `model_outputs` table.
+        from .predictive_models import all_models
+        model_outs = all_models(df)
+        model_outs.to_sql('model_outputs', **options)
 
-@dataclass
-class Boathouses(db.Model):
-    reach: int = db.Column(db.Integer, unique=False)
-    boathouse: str = db.Column(db.String(255), primary_key=True)
-    latitude: float = db.Column(db.Numeric, unique=False)
-    longitude: float = db.Column(db.Numeric, unique=False)
-
-
-def get_boathouse_by_reach_dict():
-    """
-    Return a dict of boathouses, indexed by reach
-    """
-    # return value is an outer dictionary with the reach number as the keys
-    # and the a sub-dict as the values each sub-dict has the string 'boathouses'
-    # as the key, and an array of boathouse names as the value
-    boathouse_dict = {}
-    # outer boathouse loop:  take one reach at a time
-    for bh_out in Boathouses.query.distinct(Boathouses.reach):
-        bh_list = []
-        # inner boathouse loop:  get all boathouse names within
-        # the reach (the reach that was selected by outer loop)
-        for bh_in in Boathouses.query.filter(Boathouses.reach == bh_out.reach).all():
-            bh_list.append(bh_in.boathouse)
-        boathouse_dict[bh_out.reach] = {'boathouses': bh_list}
-    return boathouse_dict
-
-def get_boathouse_list_by_reach_dict():
-    boathouse_dict = {}
-    for bh_out in Boathouses.query.distinct(Boathouses.reach):
-        bh_list = "Boathouses: \n"
-        for bh_in in Boathouses.query.filter(Boathouses.reach == bh_out.reach).all():
-            bh_list += "- "
-            bh_list += bh_in.boathouse
-            bh_list += "\n"
-        boathouse_dict[bh_out.reach] = bh_list
-        print(bh_list)
-    return boathouse_dict
-
-
-def get_boathouse_metadata_dict():
-    """
-    Return a dictionary of boathouses' metadata
-    """
-    boathouse_query = (Boathouses.query.all())
-    return {'boathouses': boathouse_query}
-
-
-def get_latest_time():
-    """
-    Returns the latest time in the processed data
-    """
-    return execute_sql('SELECT MAX(time) FROM processed_data;').iloc[0]['max']
+    finally:
+        # Clear the cache every time this function runs.
+        # the try -> finally makes sure this always runs, even if an error
+        # occurs somewhere when updating.
+        cache.clear()
