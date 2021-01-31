@@ -119,7 +119,6 @@ class ModelView(sqla.ModelView, BaseView):
         self.form_columns = self.column_list
         super().__init__(model, session, *args, **kwargs)
 
-
 # ==============================================================================
 # Views
 # ==============================================================================

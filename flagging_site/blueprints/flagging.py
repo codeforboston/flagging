@@ -64,6 +64,8 @@ def get_flags(df: pd.DataFrame = None) -> Dict[str, bool]:
     Returns:
         Dict of booleans.
     """
+    if df is None:
+        df = latest_model_outputs()
     # sql equivalent: SELECT * FROM boathouses ORDER BY boathouse
     all_boathouses = (
         Boathouse.query
@@ -155,16 +157,20 @@ def boathouses() -> str:
     #         (thus those east of the Prime Meridian are negative)
     #     Longitudes north of the Equator are negative
     #         (thus those south of the Equator are positive)
+    flag_statuses = get_flags()
+
     boathouses_list_of_lists = []
     for boathouse in all_boathouses_dict:
+        bh_name = boathouse['boathouse']
         boathouses_list_of_lists.append([
             boathouse['latitude'],
             boathouse['longitude'],
-            boathouse['boathouse']
+            bh_name,
+            'blueFlag' if flag_statuses[bh_name] else 'redFlag'
         ])
 
     return render_template('boathouses.html',
-        boathouses_list_of_lists = boathouses_list_of_lists)
+                           boathouses_list_of_lists=boathouses_list_of_lists)
 
 
 @bp.route('/about')

@@ -1,18 +1,18 @@
 {% extends '_base.html' %}
-{% block title %}Map of Boathouses{% endblock %}
-{% block content %}
-<head>
-	<title>Quick Start - Leaflet</title>
-	<meta charset="utf-8" />
+{% block head %}
+	{{ super() }}
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link rel="shortcut icon" type="image/x-icon" href="docs/images/favicon.ico" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin=""/>
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>
-</head>
-<body>
+{% endblock %}
+{% block title %}Map of Boathouses{% endblock %}
+{% block content %}
 	<!-- NOTE! the developer intends to replace the pushpins with flags -->
-	<p>Below is a map showing the Charles River boathouses, where each boathouse is a pushpin.  Clicking on any boathouse will trigger displaying the name of the boathouse.</p>
-	<div id="mapid" style="width: 600px; height: 400px;"></div>
+	<p>
+		Below is a map showing the Charles River boathouses, where each boathouse is a pushpin.  Clicking on any
+		boathouse will trigger displaying the name of the boathouse.
+	</p>
+	<div id="mapid" style="max-width: 600px; height: 400px; margin: auto;"></div>
 	<script>
 		var mymap = L.map('mapid').setView([42.36, -71.12], 12);
 
@@ -25,17 +25,32 @@
 			zoomOffset: -1
 		}).addTo(mymap);
 
-		var boathouses_list_of_lists_js = {{boathouses_list_of_lists | tojson}};
+		var blueFlag = new L.Icon({
+		  iconUrl: '/static/images/blue_flag.png',
+		  iconSize: [25, 41],
+		  iconAnchor: [12, 41],
+		  popupAnchor: [1, -34],
+		  shadowSize: [41, 41]
+		});
+
+		var redFlag = new L.Icon({
+		  iconUrl: '/static/images/red_flag.png',
+		  iconSize: [25, 41],
+		  iconAnchor: [12, 41],
+		  popupAnchor: [1, -34],
+		  shadowSize: [41, 41]
+		});
+
+
+		var boathouses_list_of_lists_js = {{ boathouses_list_of_lists | tojson }};
 		// loop through all boathouses
 		boathouses_list_of_lists_js.forEach(display_boathouse);
 
 		var marker = null
 		function display_boathouse(value, index, array) {
-			marker = L.marker([value[0], value[1]]).addTo(mymap);
+			marker = L.marker([value[0], value[1]], {icon: this[value[3]]}).addTo(mymap);
 			boathouse_display_name = "<b>" + value[2] + "</b>"
 			marker.bindPopup(boathouse_display_name).openPopup();
 		}
 	</script>
-</body>
-
 {% endblock %}
