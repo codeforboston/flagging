@@ -58,12 +58,13 @@ def model_api(reaches: List[int], hours: int) -> dict:
 
 
 @bp.route('/v1/model')
-@cache.cached(timeout=21600)
+@cache.cached(timeout=21600, query_string=True)
 @swag_from('predictive_model_api.yml')
 def predictive_model_api():
     """Returns JSON of the predictive model outputs."""
-    # Parse inputs
+    # Get the reaches from the query parameters.
     reaches = request.args.getlist('reach', type=int) or [2, 3, 4, 5]
+
     # Hours query parameter must be between 1 and API_MAX_HOURS.
     hours = request.args.get('hours', default=24, type=int)
     hours = min(hours, current_app.config['API_MAX_HOURS'])
@@ -84,7 +85,7 @@ def boathouses_api():
 
 
 @bp.route('/v1/model_input_data')
-@cache.cached(timeout=21600)
+@cache.cached(timeout=21600, query_string=True)
 @swag_from('model_input_data_api.yml')
 def model_input_data_api():
     """Returns records of the data used for the model."""
