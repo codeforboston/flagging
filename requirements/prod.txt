@@ -28,6 +28,7 @@ numpy==1.19.4             # via pandas
 oauthlib==3.1.0           # via requests-oauthlib
 pandas==1.1.4             # via -r requirements/_core.in
 psycopg2==2.8.6           # via -r requirements/prod.in
+pylibmc==1.6.1            # via -r requirements/prod.in
 pyrsistent==0.17.3        # via jsonschema
 pysocks==1.7.1            # via requests
 python-dateutil==2.8.1    # via pandas

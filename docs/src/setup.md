@@ -20,6 +20,7 @@ Install all of the following programs onto your computer:
 
 - A good text editor or IDE, such as [Atom.io](https://atom.io/) (which is lightweight and beginner friendly) or [PyCharm](https://www.jetbrains.com/pycharm/) (which is powerful but bulky and geared toward advanced users).
 - [Heroku CLI](https://devcenter.heroku.com/articles/heroku-cli) _(required for remote deployment to Heroku.)_
+- _(OSX only) Lunchy: `brew install lunchy`. This makes it easier to run data services from the command line.
 
 **Other:**
 
@@ -64,17 +65,19 @@ Install all of the following programs onto your computer:
         
         (Via the Services panel) As long as the service is "manual" and not automatic, it will not load at startup.
         
-    === "OSX (Bash)"        
+    === "OSX (Bash)"
+        First, install Lunchy via `brew install lunchy`. Then your off and on commands are:
+        
         **Turn Postgres on:**
         
         ```shell
-        pg_ctl -D /usr/local/var/postgres start
+        lunchy start postgres
         ```
         
         **Turn Postgres off:**
-
+        
         ```shell
-        pg_ctl -D /usr/local/var/postgres stop
+        lunchy stop postgres
         ```
         
         **Keep Postgres from running at startup:**
