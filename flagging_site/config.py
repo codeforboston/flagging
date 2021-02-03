@@ -82,8 +82,9 @@ class Config:
 
     FLASK_ADMIN_SWATCH = 'lumen'
 
-    CACHE_TYPE: str = 'memcached'
+    CACHE_TYPE: str = 'redis'
     CACHE_DEFAULT_TIMEOUT: int = 21600
+    CACHE_REDIS_URL: str = os.getenv('REDIS_URL')
 
     # ==========================================================================
     # MISC. CUSTOM CONFIG OPTIONS
