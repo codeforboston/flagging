@@ -82,8 +82,8 @@ class Config:
 
     FLASK_ADMIN_SWATCH = 'lumen'
 
-    CACHE_TYPE: str = 'memcached'
     CACHE_DEFAULT_TIMEOUT: int = 21600
+    CACHE_TYPE: str = os.getenv('CACHE_TYPE', 'simple')
 
     # ==========================================================================
     # MISC. CUSTOM CONFIG OPTIONS
@@ -142,6 +142,8 @@ class ProductionConfig(Config):
     is the `flagging` part, so that's the only blueprint we import.
     """
     SEND_TWEETS = strtobool(os.getenv('SEND_TWEETS') or 'true')
+    CACHE_TYPE: str = 'redis'
+    CACHE_REDIS_URL: str = os.getenv('REDIS_URL')
 
     def __init__(self):
         """Initializing the production config allows us to ensure the existence
@@ -203,7 +205,6 @@ class DevelopmentConfig(Config):
     TESTING: bool = True
     USE_MOCK_DATA = strtobool(os.getenv('USE_MOCK_DATA') or 'false')
     CACHE_DEFAULT_TIMEOUT: int = 1
-    CACHE_TYPE: str = os.getenv('CACHE_TYPE', 'simple')
 
 
 class TestingConfig(Config):
