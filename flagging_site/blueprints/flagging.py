@@ -168,7 +168,7 @@ def boathouses() -> str:
             boathouse['latitude'],
             boathouse['longitude'],
             bh_name,
-            'blueFlag' if flag_statuses[bh_name] else 'redFlag'
+            'blueFlagIcon' if flag_statuses[bh_name] else 'redFlagIcon'
         ])
 
     return render_template('boathouses.html',
