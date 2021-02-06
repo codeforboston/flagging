@@ -154,7 +154,8 @@ def boathouses() -> str:
     #     element 0:  a decimal value showing the boathouse's latitude
     #     element 1:  a decimal value showing the boathouse's longitude
     #     element 2:  a string showing the boathouse name
-
+    #     element 3:  the icon for the flag for that boathouse
+    #
     #     Note that latitudes west of the Prime Meridian are positive 
     #         (thus those east of the Prime Meridian are negative)
     #     Longitudes north of the Equator are negative
