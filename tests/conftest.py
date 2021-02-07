@@ -5,7 +5,6 @@ from flagging_site import create_app
 from flagging_site.data.database import cache as _cache
 
 from flagging_site.data.database import create_db
-from flagging_site.data.database import delete_db
 from flagging_site.data.database import init_db
 from flagging_site.data.database import update_db
 
