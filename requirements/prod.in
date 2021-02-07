@@ -1,3 +1,4 @@
 -r _core.in
 psycopg2
 meinheld
+redis

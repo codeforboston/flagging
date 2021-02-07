@@ -1,5 +1,7 @@
 import pytest
 
+from flagging_site.data import Boathouse
+
 
 @pytest.mark.parametrize(
     ('page', 'result'),
@@ -26,3 +28,58 @@ def test_pages(client, page, result):
     still a good stop-gap.
     """
     assert client.get(page).status_code == result
+
+
+def test_override_on_home_page(client, db_session, cache):
+    """Test to see that manual overrides show up properly on the home page. This
+    test assumes that the flag for "Union Boat Club" starts off as blue and not
+    overridden.
+
+    This function also tests that the caching works. Basically, updating the
+    database model by itself does not update the home page. It is also necessary
+    for the cache to be cleared.
+    """
+
+    def _get_flag_count():
+        res = client.get('/').data
+        return {
+            'blue': res.count(b'blue_flag.png'),
+            'red': res.count(b'red_flag.png')
+        }
+
+    # First let's get the home page.
+    flags1 = _get_flag_count()
+
+    # Let's clear the cache and get the home page again.
+    # Nothing should have changed because the database was not updated.
+
+    cache.clear()
+    flags2 = _get_flag_count()
+
+    assert flags2['red'] == flags1['red']
+    assert flags2['blue'] == flags1['blue']
+
+    # Now update the entry in the database.
+
+    db_session \
+        .query(Boathouse) \
+        .filter(Boathouse.boathouse == 'Union Boat Club') \
+        .update({"overridden": True})
+    db_session.commit()
+
+    # Without clearing the cache, the page should be the exact same, even
+    # though we updated the database on the backend.
+
+    flags3 = _get_flag_count()
+
+    assert flags3['red'] == flags1['red']
+    assert flags3['blue'] == flags1['blue']
+
+    # Now let's clear the cache. At long last, now the page should change
+    # because both the model updated and the cache cleared.
+
+    cache.clear()
+    flags4 = _get_flag_count()
+
+    assert flags4['red'] == flags1['red'] + 1
+    assert flags4['blue'] == flags1['blue'] - 1

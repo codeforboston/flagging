@@ -12,16 +12,17 @@ from flagging_site.data.usgs import get_live_usgs_data
 STATIC_RESOURCES = os.path.join(os.path.dirname(__file__), 'static')
 
 
-def test_hobolink_data_is_recent(app):
-    with app.app_context():
+@pytest.mark.auth_required
+def test_hobolink_data_is_recent(live_app):
+    with live_app.app_context():
         df = get_live_hobolink_data()
         last_timestamp = df['time'].iloc[-1]
         time_difference = (pd.to_datetime('today') - last_timestamp)
         assert time_difference < pd.Timedelta(hours=2)
 
 
-def test_usgs_data_is_recent(app):
-    with app.app_context():
+def test_usgs_data_is_recent(live_app):
+    with live_app.app_context():
         df = get_live_usgs_data()
         last_timestamp = df['time'].iloc[-1]
         time_difference = (pd.to_datetime('today') - last_timestamp)
@@ -38,7 +39,7 @@ def test_usgs_data_is_recent(app):
 def test_hobolink_handles_erroneous_csv(
         input_data,
         expected_output_data,
-        app,
+        live_app,
         monkeypatch
 ):
     """
@@ -62,5 +63,5 @@ def test_hobolink_handles_erroneous_csv(
         lambda export_name: MockHobolinkResponse()
     )
 
-    with app.app_context():
+    with live_app.app_context():
         assert get_live_hobolink_data().equals(expected_dataframe)
