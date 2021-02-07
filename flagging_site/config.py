@@ -35,6 +35,7 @@ class Config:
     """
     def __repr__(self):
         return f'{self.__class__.__name__}()'
+
     # ==========================================================================
     # FLASK BUILTIN CONFIG OPTIONS
     #
@@ -43,15 +44,17 @@ class Config:
     #
     # See here for more: https://flask.palletsprojects.com/en/1.1.x/config/
     # ==========================================================================
+
     DEBUG: bool = False
     TESTING: bool = False
-    SECRET_KEY: str = os.getenv('SECRET_KEY') or os.urandom(32)
+    SECRET_KEY: str = os.getenv('SECRET_KEY', os.urandom(32))
 
     # ==========================================================================
     # DATABASE CONFIG OPTIONS
     # ==========================================================================
+
     POSTGRES_USER: str = os.getenv('POSTGRES_USER', os.getenv('USER', 'postgres'))
-    POSTGRES_PASSWORD: str = os.getenv('POSTGRES_PASSWORD')
+    POSTGRES_PASSWORD: str = os.getenv('POSTGRES_PASSWORD', '')
     POSTGRES_HOST: str = os.getenv('POSTGRES_HOST', 'localhost')
     POSTGRES_PORT: str = os.getenv('POSTGRES_PORT', '5432')
     POSTGRES_DBNAME: str = os.getenv('POSTGRES_DBNAME', 'flagging')
@@ -60,29 +63,45 @@ class Config:
     def SQLALCHEMY_DATABASE_URI(self) -> str:
         """
         Returns the URI for the Postgres database.
-
         Example:
             >>> Config().SQLALCHEMY_DATABASE_URI
             'postgres://postgres:password_here@localhost:5432/flagging'
         """
-        user = self.POSTGRES_USER
-        password = self.POSTGRES_PASSWORD
-        host = self.POSTGRES_HOST
-        port = self.POSTGRES_PORT
-        db = self.POSTGRES_DBNAME
-        return f'postgresql://{user}:{password}@{host}:{port}/{db}'
-
-    SQLALCHEMY_RECORD_QUERIES: bool = True
-    SQLALCHEMY_TRACK_MODIFICATIONS: bool = False
+        if 'DATABASE_URL' in os.environ:
+            return os.getenv('DATABASE_URL')
+        else:
+            user = self.POSTGRES_USER
+            password = self.POSTGRES_PASSWORD
+            host = self.POSTGRES_HOST
+            port = self.POSTGRES_PORT
+            db = self.POSTGRES_DBNAME
+            return f'postgresql://{user}:{password}@{host}:{port}/{db}'
 
     QUERIES_DIR: str = QUERIES_DIR
     """Directory that contains various queries that are accessible throughout
     the rest of the code base.
     """
 
+    # Flask-SQLAlchemy
+    # https://flask-sqlalchemy.palletsprojects.com/en/2.x/config/
+    SQLALCHEMY_TRACK_MODIFICATIONS: bool = False
+
+    # ==========================================================================
+    # CONFIG OPTIONS FROM OTHER EXTENSIONS
+    # ==========================================================================
+
+    # Flask-Admin
+    # https://flask-admin.readthedocs.io/en/latest/
     FLASK_ADMIN_SWATCH = 'lumen'
 
-    CACHE_DEFAULT_TIMEOUT: int = 21600
+    # Flask-BasicAuth
+    # https://flask-basicauth.readthedocs.io/en/latest/
+    BASIC_AUTH_USERNAME: str = os.getenv('BASIC_AUTH_USERNAME', 'admin')
+    BASIC_AUTH_PASSWORD: str = os.getenv('BASIC_AUTH_PASSWORD', 'password')
+
+    # Flask-Caching
+    # https://flask-caching.readthedocs.io/en/latest/
+    CACHE_DEFAULT_TIMEOUT: int = 60 * 60 * 7
     CACHE_TYPE: str = os.getenv('CACHE_TYPE', 'simple')
 
     # ==========================================================================
@@ -92,6 +111,7 @@ class Config:
     # custom code does. These are also used  to handle the behavior of the
     # website.
     # ==========================================================================
+
     HOBOLINK_AUTH: dict = {
        'user': os.getenv('HOBOLINK_USERNAME'),
        'password': os.getenv('HOBOLINK_PASSWORD'),
@@ -120,20 +140,27 @@ class Config:
     when doing requests.
     """
 
-    API_MAX_HOURS: int = 48
-    """The maximum number of hours of data that the API will return. We are not
-    trying to be stingy about our data, we just want this in order to avoid any
-    odd behaviors if the user requests more data than exists.
+    API_MAX_HOURS: int = 24 * 7
+    """The maximum number of hours of data that the API will return. We need
+    this to avoid any odd behaviors if the user requests more data than exists.
     """
 
-    SEND_TWEETS: bool = strtobool(os.getenv('SEND_TWEETS') or 'false')
+    STORAGE_HOURS: int = 24 * 7
+    """Each hour of data takes 15 rows of data:
+     
+    - 6 for HOBOlink
+    - 4 for USGS
+    - 1 for processed data
+    - 4 for models
+    
+    Heroku free tier has a 10,000 total row limit across all tables, so we
+    """
+
+    SEND_TWEETS: bool = strtobool(os.getenv('SEND_TWEETS', 'false'))
     """If True, the website behaves normally. If False, any time the app would
     send a Tweet, it does not do so. It is useful to turn this off when
     developing to test Twitter messages.
     """
-
-    BASIC_AUTH_USERNAME: str = os.getenv('BASIC_AUTH_USERNAME', 'admin')
-    BASIC_AUTH_PASSWORD: str = os.getenv('BASIC_AUTH_PASSWORD', 'password')
 
 
 class ProductionConfig(Config):
@@ -141,7 +168,7 @@ class ProductionConfig(Config):
     internet. Currently the only part of the website that's pretty fleshed out
     is the `flagging` part, so that's the only blueprint we import.
     """
-    SEND_TWEETS = strtobool(os.getenv('SEND_TWEETS') or 'true')
+    SEND_TWEETS: bool = strtobool(os.getenv('SEND_TWEETS', 'true'))
     CACHE_TYPE: str = 'redis'
     CACHE_REDIS_URL: str = os.getenv('REDIS_URL')
 
@@ -162,34 +189,6 @@ class ProductionConfig(Config):
             print(msg)
             raise
 
-        # Production does things in reverse: Instead of defining the database
-        # using the POSTGRES_* environment variables, the database is set with
-        # the `DATABASE_URL` (provided automatically by Postgres), and the
-        # POSTGRES_* variables are not used.
-        #
-        # In the rare event that they are needed in production, they are set
-        # to be consistent with the `DATABASE_URL` below:
-        postgres_url_schema = re.compile(r'''
-            ^
-            postgres(?:ql)?://
-            ([^\s:@/]+) # User
-            :([^\s:@/]+) # Password
-            @([^\s:@/]+) # Host
-            :([^\s:@/]+) # Port
-            /([^\s:@/]*?) # Database
-            $
-        ''', re.VERBOSE)
-        matches = re.search(postgres_url_schema, self.SQLALCHEMY_DATABASE_URI)
-        self.POSTGRES_USER = matches.group(1)
-        self.POSTGRES_PASSWORD = matches.group(2)
-        self.POSTGRES_HOST = matches.group(3)
-        self.POSTGRES_PORT = matches.group(4)
-        self.POSTGRES_DBNAME = matches.group(5)
-
-    @property
-    def SQLALCHEMY_DATABASE_URI(self) -> str:
-        return os.getenv('DATABASE_URL')
-
 
 class DevelopmentConfig(Config):
     """The Development Config is used for running the website on your own
@@ -200,11 +199,11 @@ class DevelopmentConfig(Config):
     for unhandled exceptions) and Flask's testing mode (which turns off the
     app instance's builtin exception handling).
     """
-    SQLALCHEMY_ECHO: bool = strtobool(os.getenv('SQLALCHEMY_ECHO') or 'false')
     DEBUG: bool = True
     TESTING: bool = True
-    USE_MOCK_DATA = strtobool(os.getenv('USE_MOCK_DATA') or 'false')
-    CACHE_DEFAULT_TIMEOUT: int = 1
+    USE_MOCK_DATA = strtobool(os.getenv('USE_MOCK_DATA', 'false'))
+    CACHE_DEFAULT_TIMEOUT: int = 60
+    SQLALCHEMY_ECHO: bool = strtobool(os.getenv('SQLALCHEMY_ECHO', 'false'))
 
 
 class TestingConfig(Config):
@@ -213,6 +212,9 @@ class TestingConfig(Config):
     """
     SEND_TWEETS: bool = False
     TESTING: bool = True
+    CACHE_TYPE: str = 'simple'
+    USE_MOCK_DATA: bool = True
+    POSTGRES_DBNAME: str = os.getenv('POSTGRES_DBNAME', 'flagging') + '_test'
 
 
 def get_config_from_env(env: str) -> Config:
@@ -239,6 +241,8 @@ def get_config_from_env(env: str) -> Config:
     try:
         config = config_mapping[env]
     except KeyError:
-        raise KeyError('Bad config passed; the config must be in '
-                       f'{config_mapping.values()}')
-    return config()
+        valid_confs = config_mapping.values()
+        print(f'Bad config passed; the config must be in {valid_confs}')
+        raise
+    else:
+        return config()

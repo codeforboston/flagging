@@ -7,6 +7,7 @@ import decimal
 
 import datetime
 from typing import Optional
+from functools import wraps
 
 from flask import Flask
 from flask import render_template
@@ -14,8 +15,6 @@ from flask import jsonify
 from flask import request
 from flask import current_app
 from flask import Markup
-from flask_caching import Cache
-from flask.cli import with_appcontext
 
 
 def create_app(config: Optional[str] = None) -> Flask:
@@ -169,14 +168,31 @@ def register_commands(app: Flask):
     line.
     """
 
+    def dev_only(func: callable) -> callable:
+        """Decorator that ensures a command only runs in the development
+        environment. Commands tagged with this will raise an error when you run
+        them in production.
+        """
+        @wraps(func)
+        def _wrap(*args, **kwargs):
+            if current_app.env != 'development':
+                raise RuntimeError(
+                    'You can only run this in the development environment. '
+                    'Make sure you set up the environment correctly if you '
+                    'believe you are in dev.'
+                )
+            return func(*args, **kwargs)
+        return _wrap
+
     @app.cli.command('create-db')
     @click.option('--overwrite/--no-overwrite',
                   default=False,
                   is_flag=True,
                   show_default=True,
                   help='If true, overwrite the database if it exists.')
+    @dev_only
     def create_db_command(overwrite: bool = False):
-        """Create database (after verifying that it isn't already there)."""
+        """Create the database."""
         from .data.database import create_db
         create_db(overwrite=overwrite)
 
@@ -195,11 +211,26 @@ def register_commands(app: Flask):
         if pop:
             ctx.invoke(update_db_command)
 
+    @app.cli.command('delete-db')
+    @click.option('--test-db', '-t',
+                  default=False,
+                  is_flag=True,
+                  help='Deletes the database "flagging_test".')
+    @dev_only
+    def delete_db_command(test_db: bool):
+        """Delete the database."""
+        from .data.database import delete_db
+        if test_db:
+            dbname = 'flagging_test'
+        else:
+            dbname = current_app.config['POSTGRES_DBNAME']
+        delete_db(dbname=dbname)
+
     @app.cli.command('update-db')
     def update_db_command():
         """Update the database with the latest live data."""
-        from .data.database import update_database
-        update_database()
+        from .data.database import update_db
+        update_db()
         click.echo('Updated the database successfully.')
 
     @app.cli.command('update-website')
@@ -222,6 +253,7 @@ def register_commands(app: Flask):
             click.echo(f'Sent out tweet: {msg!r}')
 
     @app.cli.command('gen-mock-data')
+    @dev_only
     def generate_mock_data():
         """Create or update mock data.
 
@@ -263,18 +295,12 @@ def register_commands(app: Flask):
                          allow_extra_args=True,
                          help_option_names=[]))
     @click.pass_context
-    @with_appcontext
+    @dev_only
     def pip_compile(ctx: click.Context):
         """Compile the .in files in /requirements.
 
         This command is for development purposes only.
         """
-        if current_app.env != 'development':
-            raise RuntimeError(
-                'You can only run this in the development environment. Make '
-                'sure you set up the environment correctly if you believe you '
-                'are in dev.'
-            )
         import subprocess
         subprocess.call(['pip-compile', 'requirements/dev_osx.in', *ctx.args])
         subprocess.call(['pip-compile', 'requirements/dev_windows.in', *ctx.args])

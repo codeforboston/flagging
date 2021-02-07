@@ -85,20 +85,20 @@ def create_db(overwrite: bool = False) -> bool:
     )
     database = current_app.config['POSTGRES_DBNAME']
     cursor = conn.cursor()
+    cursor.execute('ROLLBACK')
 
     if overwrite:
         cursor.execute("SELECT bool_or(datname = 'flagging') FROM pg_database;")
         exists = cursor.fetchall()[0][0]
         if exists:
-            cursor.execute('COMMIT;')
             cursor.execute(f'DROP DATABASE {database};')
             click.echo(f'Dropped database {database!r}.')
 
     try:
-        cursor.execute('COMMIT;')
         cursor.execute(f'CREATE DATABASE {database};')
     except psycopg2.errors.lookup('42P04'):
-        click.echo(f'Database {database!r} already exist.')
+        click.echo(f'Database {database!r} already exists.')
+        cursor.execute('ROLLBACK')
         return False
     else:
         click.echo(f'Created database {database!r}.')
@@ -129,7 +129,7 @@ def init_db():
     # this runs.
 
 
-def update_database():
+def update_db():
     """This function basically controls all of our data refreshes. The
     following tables are updated in order:
 
@@ -147,20 +147,23 @@ def update_database():
         'if_exists': 'replace'
     }
 
+    hours = current_app.config['STORAGE_HOURS']
+
     try:
         # Populate the `usgs` table.
         from .usgs import get_live_usgs_data
         df_usgs = get_live_usgs_data()
-        df_usgs.to_sql('usgs', **options)
+        df_usgs.tail(hours * 4).to_sql('usgs', **options)
 
         # Populate the `hobolink` table.
         from .hobolink import get_live_hobolink_data
         df_hobolink = get_live_hobolink_data()
-        df_hobolink.to_sql('hobolink', **options)
+        df_hobolink.tail(hours * 6).to_sql('hobolink', **options)
 
         # Populate the `processed_data` table.
         from .predictive_models import process_data
         df = process_data(df_hobolink=df_hobolink, df_usgs=df_usgs)
+        df = df.tail(hours)
         df.to_sql('processed_data', **options)
 
         # Populate the `model_outputs` table.
@@ -173,3 +176,33 @@ def update_database():
         # the try -> finally makes sure this always runs, even if an error
         # occurs somewhere when updating.
         cache.clear()
+
+
+def delete_db(dbname: str = None):
+    """Delete the database."""
+    conn = connect(
+        user=current_app.config['POSTGRES_USER'],
+        password=current_app.config['POSTGRES_PASSWORD'],
+        host=current_app.config['POSTGRES_HOST'],
+        port=current_app.config['POSTGRES_PORT'],
+        dbname='postgres'
+    )
+
+    database = dbname or current_app.config['POSTGRES_DBNAME']
+    cursor = conn.cursor()
+    cursor.execute('ROLLBACK')
+
+    # Don't validate name for `flagging_test`.
+    if database != 'flagging_test':
+        # Make sure we want to do this.
+        click.echo(f'Are you sure you want to delete database {database!r}?')
+        click.echo(f"Type in the database name '" +
+                   click.style(database, fg='red') + "' to confirm")
+        confirmation = click.prompt('Database name')
+        if database != confirmation:
+            click.echo(f'The input does not match. '
+                       'The database will not be deleted.')
+            return None
+
+    cursor.execute(f'DROP DATABASE {database};')
+    click.echo(f'Database {database!r} was deleted.')

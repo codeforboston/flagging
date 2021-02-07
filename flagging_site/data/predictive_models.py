@@ -134,7 +134,7 @@ def process_data(
     return df
 
 
-def reach_2_model(df: pd.DataFrame, rows: int = 48) -> pd.DataFrame:
+def reach_2_model(df: pd.DataFrame, rows: int = None) -> pd.DataFrame:
     """Model params:
     a- rainfall sum 0-24 hrs
     d- Days since last rain
@@ -148,7 +148,10 @@ def reach_2_model(df: pd.DataFrame, rows: int = 48) -> pd.DataFrame:
     Returns:
         Outputs for model as a dataframe.
     """
-    df = df.tail(n=rows).copy()
+    if rows is None:
+        df = df.copy()
+    else:
+        df = df.tail(n=rows).copy()
 
     df['log_odds'] = (
         0.6233
@@ -164,7 +167,7 @@ def reach_2_model(df: pd.DataFrame, rows: int = 48) -> pd.DataFrame:
     return df[['reach', 'time', 'log_odds', 'probability', 'safe']]
 
 
-def reach_3_model(df: pd.DataFrame, rows: int = 48) -> pd.DataFrame:
+def reach_3_model(df: pd.DataFrame, rows: int = None) -> pd.DataFrame:
     """
     a- rainfall sum 0-24 hrs
     b- rainfall sum 24-48 hr
@@ -178,7 +181,10 @@ def reach_3_model(df: pd.DataFrame, rows: int = 48) -> pd.DataFrame:
     Returns:
         Outputs for model as a dataframe.
     """
-    df = df.tail(n=rows).copy()
+    if rows is None:
+        df = df.copy()
+    else:
+        df = df.tail(n=rows).copy()
 
     df['log_odds'] = (
         0.5157
@@ -194,7 +200,7 @@ def reach_3_model(df: pd.DataFrame, rows: int = 48) -> pd.DataFrame:
     return df[['reach', 'time', 'log_odds', 'probability', 'safe']]
 
 
-def reach_4_model(df: pd.DataFrame, rows: int = 48) -> pd.DataFrame:
+def reach_4_model(df: pd.DataFrame, rows: int = None) -> pd.DataFrame:
     """
     a- rainfall sum 0-24 hrs
     b- rainfall sum 24-48 hr
@@ -209,7 +215,10 @@ def reach_4_model(df: pd.DataFrame, rows: int = 48) -> pd.DataFrame:
     Returns:
         Outputs for model as a dataframe.
     """
-    df = df.tail(n=rows).copy()
+    if rows is None:
+        df = df.copy()
+    else:
+        df = df.tail(n=rows).copy()
 
     df['log_odds'] = (
         0.5791
@@ -226,7 +235,7 @@ def reach_4_model(df: pd.DataFrame, rows: int = 48) -> pd.DataFrame:
     return df[['reach', 'time', 'log_odds', 'probability', 'safe']]
 
 
-def reach_5_model(df: pd.DataFrame, rows: int = 48) -> pd.DataFrame:
+def reach_5_model(df: pd.DataFrame, rows: int = None) -> pd.DataFrame:
     """
     c- rainfall sum 0-48 hr
     d- Days since last rain
@@ -240,7 +249,10 @@ def reach_5_model(df: pd.DataFrame, rows: int = 48) -> pd.DataFrame:
     Returns:
         Outputs for model as a dataframe.
     """
-    df = df.tail(n=rows).copy()
+    if rows is None:
+        df = df.copy()
+    else:
+        df = df.tail(n=rows).copy()
 
     df['log_odds'] = (
         0.3333
