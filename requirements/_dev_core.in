@@ -10,6 +10,7 @@ pygments
 # Testing related stuff
 pytest
 pytest-cov
+pytest-flask-sqlalchemy
 schemathesis
 
 # Misc. dev stuff

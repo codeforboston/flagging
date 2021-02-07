@@ -22,7 +22,7 @@ USGS_STATIC_FILE_NAME = 'usgs.pickle'
 
 
 @retry(wait=wait_fixed(1), stop=stop_after_attempt(3))
-def get_live_usgs_data(days_ago: int = 5) -> pd.DataFrame:
+def get_live_usgs_data(days_ago: int = 14) -> pd.DataFrame:
     """This function runs through the whole process for retrieving data from
     usgs: first we perform the request, and then we parse the data.
 
@@ -40,7 +40,7 @@ def get_live_usgs_data(days_ago: int = 5) -> pd.DataFrame:
     return df
 
 
-def request_to_usgs(days_ago: int = 5) -> requests.models.Response:
+def request_to_usgs(days_ago: int = 14) -> requests.models.Response:
     """Get a request from the USGS.
 
     Args:

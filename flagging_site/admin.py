@@ -152,8 +152,8 @@ class DatabaseView(BaseView):
         designed to be available in the app during runtime, and is protected by
         BasicAuth so that only administrators can run it.
         """
-        from .data.database import update_database
-        update_database()
+        from .data.database import update_db
+        update_db()
 
         # Notify the user that the update was successful, then redirect:
         return self.render('admin/redirect.html',
