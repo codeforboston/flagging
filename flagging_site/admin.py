@@ -14,13 +14,9 @@ from flask_admin import Admin
 from flask_admin import BaseView as _BaseView
 from flask_admin import expose
 from flask_admin.contrib import sqla
-
 from flask_basicauth import BasicAuth as _BasicAuth
 from werkzeug.exceptions import HTTPException
 from sqlalchemy.exc import ProgrammingError
-
-
-
 from .data import db
 
 
@@ -74,7 +70,7 @@ def init_admin(app: Flask):
         from .data.boathouses import Boathouse
 
         admin.add_view(LiveWebsiteOptionsModelView(db.session))
-        admin.add_view(ModelView(Boathouse, db.session))
+        admin.add_view(BoathouseView(Boathouse, db.session))
         admin.add_view(ManualOverridesModelView(db.session))
         admin.add_view(DatabaseView(name='Update Database', url='db/update',
                                     category='Manage DB'))
@@ -107,7 +103,7 @@ class ModelView(sqla.ModelView, BaseView):
     export_types = ['csv']
     create_modal = True
     edit_modal = True
-
+    #column_filters = 'reach'
     def __init__(
             self,
             model,
@@ -124,6 +120,13 @@ class ModelView(sqla.ModelView, BaseView):
         self.form_columns = self.column_list
         super().__init__(model, session, *args, **kwargs)
 
+    def after_model_change(self, *args, **kwargs):
+        from .data.database import cache
+        print("clearing cache-admin after model change")
+        cache.clear()
+
+class BoathouseView(ModelView):
+    column_filters = ("reach",)
 
 # ==============================================================================
 # Views

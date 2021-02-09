@@ -14,7 +14,6 @@ from .database import execute_sql
 
 class Boathouse(db.Model):
     __tablename__ = 'boathouses'
-
     boathouse = db.Column(db.String(255), primary_key=True)
     reach = db.Column(db.Integer, unique=False)
     latitude = db.Column(db.Numeric, unique=False)
