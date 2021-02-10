@@ -10,15 +10,20 @@ from flask import Response
 from flask import send_file
 from flask import abort
 from flask import url_for
+from flask import redirect
 from flask_admin import Admin
 from flask_admin import BaseView as _BaseView
 from flask_admin import expose
 from flask_admin.contrib import sqla
 from flask_basicauth import BasicAuth as _BasicAuth
 from werkzeug.exceptions import HTTPException
+from flask_admin.actions import action
 from sqlalchemy.exc import ProgrammingError
-from .data import db
-
+from flask_admin.contrib.sqla import form, filters as sqla_filters, tools
+from sqlalchemy.orm import Session
+from .data import Boathouse
+from .data.database import db
+from sqlalchemy import text
 
 # ==============================================================================
 # Extensions
@@ -66,7 +71,7 @@ def init_admin(app: Flask):
 
         # Register /admin sub-views
         from .data.live_website_options import LiveWebsiteOptionsModelView
-        from .data.boathouses import ManualOverridesModelView
+        #from .data.boathouses import ManualOverridesModelView
         from .data.boathouses import Boathouse
 
         admin.add_view(LiveWebsiteOptionsModelView(db.session))
@@ -126,12 +131,42 @@ class ModelView(sqla.ModelView, BaseView):
         cache.clear()
 
 class BoathouseView(ModelView):
+
     column_filters = ("reach",)
+
+
+    @action('Override', 'Override Selected', 'Are you sure you want to override the selected locations?')
+    def action_override_selected(self, ids):
+        from .data import db, Boathouse
+        query = tools.get_query_for_ids(self.get_query(), self.model, ids)
+        #print("query:")
+        #print(query)
+        for c in query.all():
+            #print(c)
+            #print(text(c.boathouse) + ","+ str(c.overridden))
+            db.session.query(Boathouse).filter(Boathouse.boathouse == text(c.boathouse)).update({"overridden": True})
+            db.session.commit()
+        return redirect(self.url)
 
 # ==============================================================================
 # Views
 # ==============================================================================
+class ManualOverridesModelView(ModelView):
+    form_choices = {
+        'reason': [
+            ('cyanobacteria', 'Cyanobacteria'),
+            ('sewage', 'Sewage'),
+            ('other', 'Other'),
+        ]
+    }
 
+    def __init__(self, session: Session):
+        super().__init__(
+            Boathouse,
+            session,
+            endpoint='manual_overrides',
+            name='Boathouses (including Manual Overrides)'
+        )
 
 class LogoutView(BaseView):
     """Returns a logout page that uses a jQuery trick to emulate a logout."""
