@@ -125,7 +125,7 @@ class Config:
         'access_token_secret': os.getenv('TWITTER_ACCESS_TOKEN_SECRET')
     }
 
-    USE_MOCK_DATA: bool = strtobool(os.getenv('USE_MOCK_DATA', 'false'))
+    USE_MOCK_DATA: bool = False
     """This is useful for front-end development for 2 reasons: First, you don't
     need credentials to develop the front-end of the website. Second, it means
     that the data loads faster and avoids any possible issues.
@@ -212,6 +212,11 @@ class TestingConfig(Config):
     POSTGRES_DBNAME: str = os.getenv('POSTGRES_DBNAME', 'flagging') + '_test'
 
 
+class DemoConfig(ProductionConfig):
+    """Config for the Heroku one-click deploy demo mode."""
+    USE_MOCK_DATA: bool = True
+
+
 def get_config_from_env(env: str) -> Config:
     """This function takes a string variable, looks at what that string variable
     is, and returns an instance of a Config class corresponding to that string
@@ -232,6 +237,7 @@ def get_config_from_env(env: str) -> Config:
         'production': ProductionConfig,
         'development': DevelopmentConfig,
         'testing': TestingConfig,
+        'demo': DemoConfig
     }
     try:
         config = config_mapping[env]

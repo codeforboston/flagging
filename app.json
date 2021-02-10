@@ -25,14 +25,13 @@
       "value": "admin",
       "description": "Credentials for the admin panel."
     },
-    "FLASK_ENV": { "value":  "production" },
+    "FLASK_ENV": {
+      "value":  "production",
+      "description": "Set to 'demo' to run the demo version of the website."
+    },
     "HOBOLINK_PASSWORD": { "required": false },
     "HOBOLINK_TOKEN": { "required": false },
     "HOBOLINK_USERNAME": { "required": false },
-    "USE_MOCK_DATA": {
-      "required": false,
-      "description": "Set to 'true' to demo the website without requiring valid HOBOlink credentials. Leave this blank for true production."
-    },
     "TWITTER_API_KEY": { "required": false },
     "TWITTER_API_KEY_SECRET": { "required": false },
     "TWITTER_ACCESS_TOKEN": { "required": false },

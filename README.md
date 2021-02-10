@@ -18,9 +18,11 @@ This code base is built in Python 3.7+ and utilizes the Flask library heavily. T
 
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
 
-**For true production / the CRWA:** Make sure `USE_MOCK_DATA` is set to `false`, then fill out all the Twitter and HOBOlink credentials.
+**For demo mode deployment:** Set the `FLASK_ENV` variable to `demo` to run a version of this website in production using the demo data. Leave all the Twitter and HOBOlink credentials fields blank.
 
-**For demo purposes / general public:** Set `USE_MOCK_DATA` to `true` to run a version of this website in production using demo data.
+**For full CRWA production deployment:** See the docs.
+
+Note: Depending on how actively maintained this repo is, you may need to update `runtime.txt` by the time you read this. See [here](https://devcenter.heroku.com/articles/python-support#supported-runtimes) for supported Python runtimes.
 
 ## Credits
 
