@@ -306,6 +306,23 @@ def register_commands(app: Flask):
         subprocess.call(['pip-compile', 'requirements/dev_windows.in', *ctx.args])
         subprocess.call(['pip-compile', 'requirements/prod.in', *ctx.args])
 
+    @app.cli.command('clear-cache')
+    def clear_cache():
+        """Clear the cache.
+
+        Used in the production environment after every release. (Basically, if
+        the code base changes, that might indicate the cache will be outdated).
+        We do this instead of clearing the cache during `create_app()` because
+        often when the app is spinning up, the previous cache is still valid and
+        we'd still like to use that cache.
+
+        See for more:
+
+        https://devcenter.heroku.com/articles/release-phase
+        """
+        from .data import cache
+        cache.clear()
+
 
 def register_misc(app: Flask):
     """For things that don't neatly fit into the other "register" functions.

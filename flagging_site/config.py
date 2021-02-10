@@ -125,12 +125,8 @@ class Config:
         'access_token_secret': os.getenv('TWITTER_ACCESS_TOKEN_SECRET')
     }
 
-    USE_MOCK_DATA: bool = False
-    """If Offline Mode is turned on, the data used when performing requests will
-    be a static pickled version of the data instead of actively pulled from HTTP
-    requests.
-    
-    This is useful for front-end development for two reasons: First, you don't
+    USE_MOCK_DATA: bool = strtobool(os.getenv('USE_MOCK_DATA', 'false'))
+    """This is useful for front-end development for 2 reasons: First, you don't
     need credentials to develop the front-end of the website. Second, it means
     that the data loads faster and avoids any possible issues.
     """
@@ -201,7 +197,6 @@ class DevelopmentConfig(Config):
     """
     DEBUG: bool = True
     TESTING: bool = True
-    USE_MOCK_DATA = strtobool(os.getenv('USE_MOCK_DATA', 'false'))
     CACHE_DEFAULT_TIMEOUT: int = 60
     SQLALCHEMY_ECHO: bool = strtobool(os.getenv('SQLALCHEMY_ECHO', 'false'))
 
