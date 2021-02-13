@@ -37,17 +37,19 @@ def compose_tweet() -> str:
     """
     from .data.predictive_models import latest_model_outputs
     # from .data.manual_overrides import get_currently_overridden_reaches
+    from .blueprints.flagging import get_flags
 
     df = latest_model_outputs()
     df = df.set_index('reach')
 
-    overridden_reaches = get_currently_overridden_reaches()
+    # overridden_reaches = get_currently_overridden_reaches()
+    flags = get_flags()
 
-    flags = {
-        reach: val['safe'] and reach not in overridden_reaches
-        for reach, val
-        in df.to_dict(orient='index').items()
-    }
+    # flags = {
+    #     reach: val['safe'] and reach not in overridden_reaches
+    #     for reach, val
+    #     in df.to_dict(orient='index').items()
+    # }
 
     current_time = (
         pd.Timestamp('now', tz='UTC')
@@ -55,34 +57,41 @@ def compose_tweet() -> str:
         .strftime('%I:%M:%S %p, %m/%d/%Y')
     )
     unsafe_count = list(flags.values()).count(False)
+    tot_count = len(flags)
     if unsafe_count < 1:
         msg = (
-            'Our predictive model is reporting all reaches are safe for '
+            'Our predictive model is reporting all boathouses are safe for '
             f'recreational activities as of {current_time}.'
         )
-    elif unsafe_count == 1:
-        unsafe = ''.join([str(k) for k, v in flags.items() if v is False])
+    elif unsafe_count == tot_count:
+        # unsafe = ''.join([str(k) for k, v in flags.items() if v is False])
         msg = (
-            f'The CRWA is reporting that reach {unsafe} is unsafe for recreational activities '
+            f'The CRWA is reporting that all boathouses are unsafe for recreational activities '
             f'as of {current_time}. https://crwa-flagging.herokuapp.com/'
         )
     else:
-        unsafe = ''
-        unsafe_found = 0
-        for key in flags.keys():
-            if flags.get(key) is False:
-                unsafe += str(key)
-                unsafe_found += 1
-                if unsafe_found < unsafe_count - 1:
-                    unsafe += ', '
-                else:
-                    if unsafe_found == unsafe_count - 1:
-                        if unsafe_count > 2:
-                            unsafe += ', and '
-                        else:
-                            unsafe += ' and '
+        # unsafe = ''
+        # unsafe_found = 0
+        # for key in flags.keys():
+        #     if flags.get(key) is False:
+        #         unsafe += str(key)
+        #         unsafe_found += 1
+        #         if unsafe_found < unsafe_count - 1:
+        #             unsafe += ', '
+        #         else:
+        #             if unsafe_found == unsafe_count - 1:
+        #                 if unsafe_count > 2:
+        #                     unsafe += ', and '
+        #                 else:
+        #                     unsafe += ' and '
+        # msg = (
+        #     f'The CRWA is reporting that reaches {unsafe} are unsafe for recreational activities as of {current_time}. '
+        #     f' https://crwa-flagging.herokuapp.com/'
+        # )
+
         msg = (
-            f'The CRWA is reporting that reaches {unsafe} are unsafe for recreational activities as of {current_time}. '
+            f'The CRWA is reporting that some boathouses are unsafe and other boathouses are safe for '
+            f'recreational activities as of {current_time}. Review our site for more details.'
             f' https://crwa-flagging.herokuapp.com/'
         )
 
