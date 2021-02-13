@@ -1,0 +1,43 @@
+name: CRWA Flagging Website
+
+on:
+  - push
+  - pull_request
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:12-alpine
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: flagging-test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Set up Python 3.7
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.7
+    - name: Psycopg2 Linux dependencies
+      run: sudo apt-get install python-dev libpq-dev
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install -r requirements/dev_osx.txt
+    - name: Run unit-tests
+      run: python -m pytest -vv -m "not auth_required" ./tests
+      env:
+        POSTGRES_USER: postgres
+        POSTGRES_PASSWORD: postgres

@@ -69,9 +69,9 @@ def execute_sql_from_file(file_name: str) -> Optional[pd.DataFrame]:
 
 
 def create_db(overwrite: bool = False) -> bool:
-    """If the database defined by `POSTGRES_DBNAME` doesn't exist, create it
-    and return True, otherwise do nothing and return False. By default, the
-    config variable `POSTGRES_DBNAME` is set to "flagging".
+    """If the database defined by `POSTGRES_DB` doesn't exist, create it and
+    return True, otherwise do nothing and return False. By default, the
+    config variable `POSTGRES_DB` is set to "flagging".
     Returns:
         bool for whether the database needed to be created.
     """
@@ -83,7 +83,7 @@ def create_db(overwrite: bool = False) -> bool:
         port=current_app.config['POSTGRES_PORT'],
         dbname='postgres'
     )
-    database = current_app.config['POSTGRES_DBNAME']
+    database = current_app.config['POSTGRES_DB']
     cursor = conn.cursor()
     cursor.execute('ROLLBACK')
 
@@ -188,7 +188,7 @@ def delete_db(dbname: str = None):
         dbname='postgres'
     )
 
-    database = dbname or current_app.config['POSTGRES_DBNAME']
+    database = dbname or current_app.config['POSTGRES_DB']
     cursor = conn.cursor()
     cursor.execute('ROLLBACK')
 

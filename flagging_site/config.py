@@ -6,7 +6,6 @@ this module is loaded, meaning if you change the env variables _after_ you load
 this module, they won't refresh.
 """
 import os
-import re
 from flask.cli import load_dotenv
 from distutils.util import strtobool
 
@@ -54,10 +53,10 @@ class Config:
     # ==========================================================================
 
     POSTGRES_USER: str = os.getenv('POSTGRES_USER', os.getenv('USER', 'postgres'))
-    POSTGRES_PASSWORD: str = os.getenv('POSTGRES_PASSWORD', '')
+    POSTGRES_PASSWORD: str = os.getenv('POSTGRES_PASSWORD', 'postgres')
     POSTGRES_HOST: str = os.getenv('POSTGRES_HOST', 'localhost')
     POSTGRES_PORT: str = os.getenv('POSTGRES_PORT', '5432')
-    POSTGRES_DBNAME: str = os.getenv('POSTGRES_DBNAME', 'flagging')
+    POSTGRES_DB: str = os.getenv('POSTGRES_DB', 'flagging')
 
     @property
     def SQLALCHEMY_DATABASE_URI(self) -> str:
@@ -74,7 +73,7 @@ class Config:
             password = self.POSTGRES_PASSWORD
             host = self.POSTGRES_HOST
             port = self.POSTGRES_PORT
-            db = self.POSTGRES_DBNAME
+            db = self.POSTGRES_DB
             return f'postgresql://{user}:{password}@{host}:{port}/{db}'
 
     QUERIES_DIR: str = QUERIES_DIR
@@ -158,6 +157,8 @@ class Config:
     developing to test Twitter messages.
     """
 
+    DEFAULT_WIDGET_VERSION: int = 1
+
 
 class ProductionConfig(Config):
     """The Production Config is used for deployment of the website to the
@@ -209,7 +210,7 @@ class TestingConfig(Config):
     TESTING: bool = True
     CACHE_TYPE: str = 'simple'
     USE_MOCK_DATA: bool = True
-    POSTGRES_DBNAME: str = os.getenv('POSTGRES_DBNAME', 'flagging') + '_test'
+    POSTGRES_DB: str = os.getenv('POSTGRES_DB', 'flagging') + '_test'
 
 
 class DemoConfig(ProductionConfig):
