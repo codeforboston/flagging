@@ -2,9 +2,9 @@
 {% block title %}Boathouses{% endblock %}
 {% block head %}
 	{{ super() }}
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin=""/>
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>
+ 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 {% endblock %}
 {% block content %}
 	<!-- NOTE! the developer intends to replace the pushpins with flags -->
@@ -14,7 +14,8 @@
 	</p>
 	<div id="boathouse_map" style="max-width: 600px; height: 400px; margin: auto;"></div>
 	<script>
-		var mymap = L.map('boathouse_map').setView([42.36, -71.12], 12,);
+
+		var flagMap = L.map('boathouse_map').setView([42.36, -71.12], 12,);
 
 		L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
 			maxZoom: 18,
@@ -23,7 +24,7 @@
 			id: 'mapbox/streets-v11',
 			tileSize: 512,
 			zoomOffset: -1
-		}).addTo(mymap);
+		}).addTo(flagMap);
 
 		var FlagIcon = L.Icon.extend({
 			options: {
@@ -35,18 +36,32 @@
 				popupAnchor: [0, -34]
 			}
 		});
-		var blueFlagIcon = new FlagIcon({iconUrl: '/static/images/blue_flag.png'}),
-			redFlagIcon = new FlagIcon({iconUrl: '/static/images/red_flag.png'});
-	
-		var boathouses_list_of_lists_js = {{ boathouses_list_of_lists | tojson }};
-		// loop through all boathouses
-		boathouses_list_of_lists_js.forEach(display_boathouse);
+
+		var blueFlagIcon = new FlagIcon({iconUrl: '/static/images/blue_flag.png'});
+		var redFlagIcon = new FlagIcon({iconUrl: '/static/images/red_flag.png'});
 
 		var marker = null
-		function display_boathouse(value, index, array) {
-			marker = L.marker([value[0], value[1]], {icon: this[value[3]]}).addTo(mymap);
-			boathouse_display_name = "<b>" + value[2] + "</b>"
-			marker.bindPopup(boathouse_display_name).openPopup();
+
+		function displayBoathouse(boathouse, index) {
+			marker = L.marker([
+				    boathouse['latitude'],
+				    boathouse['longitude']
+				], {
+					icon: boathouse['overridden'] ? redFlagIcon : blueFlagIcon
+				}
+			).addTo(flagMap);
+			marker.bindPopup("<b>" + boathouse['boathouse'] + "</b>");
 		}
+
+		// Call the JSON from the Boathouses API,
+		// then map the response to the function that displays boathouses.
+
+		$.getJSON(
+			'{{ url_for('api.boathouses_api') }}',
+			function(data){
+				data['boathouses'].forEach(displayBoathouse)
+			}
+		);
+
 	</script>
 {% endblock %}

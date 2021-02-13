@@ -3,6 +3,7 @@ from typing import Dict
 import pandas as pd
 
 from flask import Blueprint
+from flask import current_app
 from flask import render_template
 from flask import request
 from flask import flash
@@ -17,8 +18,8 @@ bp = Blueprint('flagging', __name__)
 
 
 @bp.before_request
+@cache.cached()  # <-- needs to be here. some issues occur if you exclude it.
 def before_request():
-    print(request.path)
     # Get the latest time shown in the database
     ltime = get_latest_time()
 
@@ -29,28 +30,22 @@ def before_request():
     diff = ttime - ltime
 
     # If more than 48 hours, flash message.
-    if diff >= pd.Timedelta(48, 'hr'):
-        flash('<b>Note:</b> The database has not updated in at least 48 '
-              'hours. The information displayed on this page may be outdated.')
-
-    # ~~~
+    if current_app.env == 'demo':
+        flash(
+            'This website is currently in demo mode.'
+        )
+    elif diff >= pd.Timedelta(48, 'hr'):
+        flash(
+            '<b>Note:</b> The database has not updated in at least 48 hours. '
+            'The information displayed on this page may be outdated.'
+        )
 
     if not LiveWebsiteOptions.is_boating_season():
-        msg = '<b>Note:</b> It is currently not boating season. '
-        if request.path.startswith('/flags'):
-            # If the path is the iframe...
-            msg += (
-                'We do not display flags when it is not boating season. We '
-                'hope to see you again this spring!'
-            )
-        else:
-            msg += (
-                'We may update our database and (consequently) our predictive '
-                'model while it is not boating season, but these model outputs '
-                'are not intended to be used to make decisions regarding '
-                'recreational activities along the Charles River.'
-            )
-        flash(msg)
+        flash(
+            '<b>Note:</b> It is currently not boating season. We do not '
+            'display flags when it is not boating season. We hope to see you '
+            'again this spring!'
+        )
 
 
 def get_flags(df: pd.DataFrame = None) -> Dict[str, bool]:
