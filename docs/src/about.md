@@ -6,7 +6,7 @@ Of the many services that the CRWA provides to the greater Boston community, one
 
 See the website's [about page]({{ flagging_website_url }}/about) for more about the website functionality and how it relates to the flagging program's objectives.
 
-See the [development resources overview](development/history) for more information on how this project started and how we came to make the design decisions that you see here today.
+See the [development resources overview](../development/history) for more information on how this project started and how we came to make the design decisions that you see here today.
 
 ## Code for Boston
 
