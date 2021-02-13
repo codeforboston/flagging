@@ -12,7 +12,7 @@ nav:
 - Admin: admin.md
 - Cloud:
     - Overview: cloud/index.md
-    - Heroku Deployment: cloud/heroku_deployment.md
+    - Heroku Deployment: cloud/manual_heroku_deployment.md
     - Twitter Bot: cloud/twitter_bot.md
 - Development:
     - Overview: development/index.md

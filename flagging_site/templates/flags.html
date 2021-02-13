@@ -28,7 +28,7 @@
         {% endif %}
     {% endwith %}
 
-    {% include '_flag_widget.html' %}
+    {% include get_widget_filename(version=version) %}
 
     <div class="info">
         <a href="{{ url_for('flagging.index', _external=True) }}" target="_blank">Click here for more information.</a>

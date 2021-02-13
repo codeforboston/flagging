@@ -151,6 +151,15 @@ def register_jinja_env(app: Flask):
             val = hashlib.md5(f.read().encode('utf8')).hexdigest()
         return val
 
+    def get_widget_filename(version: int = None):
+        """Function that gets stuck inside the Jinja env to get the proper file
+        for the widget.
+        """
+        if version is None:
+            version = current_app.config['DEFAULT_WIDGET_VERSION']
+        v = str(version).zfill(2)
+        return f'_flag_widget_v{v}.html'
+
     app.jinja_env.globals.update({
         'GITHUB_SVG': _load_svg('github.svg'),
         'TWITTER_SVG': _load_svg('twitter.svg'),
@@ -158,7 +167,8 @@ def register_jinja_env(app: Flask):
         'INFO_ICON': _load_svg('iconmonstr-info-9.svg'),
         'STYLE_CSS_MD5': _md5_hash_file('style.css'),
         'FLAGS_CSS_MD5': _md5_hash_file('flags.css'),
-        'DATAFRAME_CSS_MD5': _md5_hash_file('dataframe.css')
+        'DATAFRAME_CSS_MD5': _md5_hash_file('dataframe.css'),
+        'get_widget_filename': get_widget_filename
     })
 
 
@@ -223,7 +233,7 @@ def register_commands(app: Flask):
         if test_db:
             dbname = 'flagging_test'
         else:
-            dbname = current_app.config['POSTGRES_DBNAME']
+            dbname = current_app.config['POSTGRES_DB']
         delete_db(dbname=dbname)
 
     @app.cli.command('update-db')
@@ -305,6 +315,23 @@ def register_commands(app: Flask):
         subprocess.call(['pip-compile', 'requirements/dev_osx.in', *ctx.args])
         subprocess.call(['pip-compile', 'requirements/dev_windows.in', *ctx.args])
         subprocess.call(['pip-compile', 'requirements/prod.in', *ctx.args])
+
+    @app.cli.command('clear-cache')
+    def clear_cache():
+        """Clear the cache.
+
+        Used in the production environment after every release. (Basically, if
+        the code base changes, that might indicate the cache will be outdated).
+        We do this instead of clearing the cache during `create_app()` because
+        often when the app is spinning up, the previous cache is still valid and
+        we'd still like to use that cache.
+
+        See for more:
+
+        https://devcenter.heroku.com/articles/release-phase
+        """
+        from .data import cache
+        cache.clear()
 
 
 def register_misc(app: Flask):

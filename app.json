@@ -1,0 +1,42 @@
+{
+  "name": "CRWA Flagging Website",
+  "description": "Web server for the Charles River Watershed Association's E. coli prediction service.",
+  "buildpacks": [
+    { "url": "heroku/python" }
+  ],
+  "scripts": { "postdeploy": "flask init-db" },
+  "addons": [
+    "scheduler",
+    {
+      "plan": "heroku-postgresql:hobby-dev",
+      "as": "DATABASE"
+    },
+    {
+      "plan": "heroku-redis:hobby-dev",
+      "as": "REDIS",
+      "options": { "maxmemory_policy": "volatile-lru" }
+    }
+  ],
+  "env": {
+    "BASIC_AUTH_PASSWORD": {
+      "description": "Credentials for the admin panel."
+    },
+    "BASIC_AUTH_USERNAME": {
+      "value": "admin",
+      "description": "Credentials for the admin panel."
+    },
+    "FLASK_ENV": {
+      "value":  "production",
+      "description": "Set to 'demo' to run the demo version of the website."
+    },
+    "HOBOLINK_PASSWORD": { "required": false },
+    "HOBOLINK_TOKEN": { "required": false },
+    "HOBOLINK_USERNAME": { "required": false },
+    "TWITTER_API_KEY": { "required": false },
+    "TWITTER_API_KEY_SECRET": { "required": false },
+    "TWITTER_ACCESS_TOKEN": { "required": false },
+    "TWITTER_ACCESS_TOKEN_SECRET": { "required": false },
+    "SECRET_KEY": { "generator": "secret" },
+    "SEND_TWEETS": { "value": "true" }
+  }
+}

@@ -4,9 +4,9 @@ This documentation provides developers and maintainers information about the CRW
 
 ## For Website Administrators
 
-If the website is already deployed and you want to implement a manual override, you do not need to follow the setup guide. All you need to do is read the [admin guide](admin).
+Read the [admin guide](../admin).
 
-## Connecting to Weebly
+## Connecting the Widget
 
 The outputs of the model can be exported as an iFrame, which allows the flagging website's live data to be viewed on a statically rendered web page (such as those hosted by Weebly).
 
@@ -20,9 +20,17 @@ To export the model outputs using an iFrame, use the following HTML:
 
 ## For Developers
 
-Start by following the [setup guide](setup). Once you have the website setup locally, you now have access to the following:
+To locally deploy the website and start coding, follow the [setup guide](setup).
 
-- Deploy the website to Heroku (guide [here](deployment))
+Once you have the website setup locally, you now have access to the following:
+
+- Deploy the website to Heroku (guide [here](../deployment))
 - Manually run commands and download data through the [shell](shell).
 - Make changes to the predictive model, including revising its coefficients. (Guide is currently WIP)
 - (Advanced) Make other changes to the website.
+
+## To Deploy
+
+The website can be one-click deployed to Heroku [from the repo]{{ config.repo_url }}.
+
+There will still be some additional configuration you should do after one-click deployment. Click [here](cloud) for more.

@@ -6,6 +6,8 @@
 
 ## Overview
 
+![](https://github.com/codeforboston/flagging/workflows/main.yaml/badge.svg)
+
 This is the code base for the [Charles River Watershed Association's](https://crwa.org/) ("CRWA") flagging website. The flagging website hosts an interface for the CRWA's staff to monitor the outputs of a predictive model that determines whether it is reasonably safe to swim or boat in the Charles River.
 
 This code base is built in Python 3.7+ and utilizes the Flask library heavily. The website can be run locally in development mode, and it can be deployed to Heroku using Gunicorn.
@@ -13,6 +15,16 @@ This code base is built in Python 3.7+ and utilizes the Flask library heavily. T
 ## For Developers and Maintainers
 
 **[Read our documentation here.](https://codeforboston.github.io/flagging/)** Our documentation contains information on everything related to the website, including [first time setup](https://codeforboston.github.io/flagging/setup/).
+
+## Deploy to Heroku
+
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
+
+**For demo mode deployment:** Set the `FLASK_ENV` variable to `demo` to run a version of this website in production using the demo data. Leave all the Twitter and HOBOlink credentials fields blank.
+
+**For full CRWA production deployment:** See the docs.
+
+Note: Depending on how actively maintained this repo is, you may need to update `runtime.txt` by the time you read this. See [here](https://devcenter.heroku.com/articles/python-support#supported-runtimes) for supported Python runtimes.
 
 ## Credits
 

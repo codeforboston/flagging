@@ -1,5 +1,4 @@
 import os
-import pickle
 
 import pytest
 import pandas as pd
@@ -12,20 +11,30 @@ from flagging_site.data.usgs import get_live_usgs_data
 STATIC_RESOURCES = os.path.join(os.path.dirname(__file__), 'static')
 
 
+@pytest.fixture
+def now():
+    """Returns current time in EST."""
+    return (
+        pd.to_datetime('now', utc=True)
+        .tz_convert('US/Eastern')
+        .tz_localize(None)
+    )
+
+
 @pytest.mark.auth_required
-def test_hobolink_data_is_recent(live_app):
+def test_hobolink_data_is_recent(live_app, now):
     with live_app.app_context():
         df = get_live_hobolink_data()
         last_timestamp = df['time'].iloc[-1]
-        time_difference = (pd.to_datetime('today') - last_timestamp)
+        time_difference = now - last_timestamp
         assert time_difference < pd.Timedelta(hours=2)
 
 
-def test_usgs_data_is_recent(live_app):
+def test_usgs_data_is_recent(live_app, now):
     with live_app.app_context():
         df = get_live_usgs_data()
         last_timestamp = df['time'].iloc[-1]
-        time_difference = (pd.to_datetime('today') - last_timestamp)
+        time_difference = now - last_timestamp
         assert time_difference < pd.Timedelta(hours=2)
 
 

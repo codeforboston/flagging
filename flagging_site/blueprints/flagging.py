@@ -17,8 +17,8 @@ bp = Blueprint('flagging', __name__)
 
 
 @bp.before_request
-@cache.cached()
 def before_request():
+    print(request.path)
     # Get the latest time shown in the database
     ltime = get_latest_time()
 
@@ -88,7 +88,7 @@ def get_flags(df: pd.DataFrame = None) -> Dict[str, bool]:
     return flag_statuses
 
 
-def flag_widget_params() -> Dict[str, Any]:
+def flag_widget_params(version: int = None) -> Dict[str, Any]:
     """Creates the parameters for the flags widget.
 
     Pass these parameters into a Jinja template like this:
@@ -207,10 +207,13 @@ def model_outputs() -> str:
                            boathouses_by_reach=boathouses_by_reach)
 
 
-@bp.route('/flags')
+@bp.route('/flags', strict_slashes=False)
+@bp.route('/flags/<int:version>')
 @cache.cached()
-def flags() -> str:
-    return render_template('flags.html', **flag_widget_params())
+def flags(version: int = None) -> str:
+    return render_template('flags.html',
+                           **flag_widget_params(),
+                           version=version)
 
 
 @bp.route('/api')

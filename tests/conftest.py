@@ -1,4 +1,3 @@
-import os
 import pytest
 
 from flagging_site import create_app
@@ -56,6 +55,3 @@ def _db(app):
     """
     from flagging_site.data.database import db
     yield db
-
-
-

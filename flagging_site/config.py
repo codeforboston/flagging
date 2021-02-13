@@ -6,7 +6,6 @@ this module is loaded, meaning if you change the env variables _after_ you load
 this module, they won't refresh.
 """
 import os
-import re
 from flask.cli import load_dotenv
 from distutils.util import strtobool
 
@@ -54,10 +53,10 @@ class Config:
     # ==========================================================================
 
     POSTGRES_USER: str = os.getenv('POSTGRES_USER', os.getenv('USER', 'postgres'))
-    POSTGRES_PASSWORD: str = os.getenv('POSTGRES_PASSWORD', '')
+    POSTGRES_PASSWORD: str = os.getenv('POSTGRES_PASSWORD', 'postgres')
     POSTGRES_HOST: str = os.getenv('POSTGRES_HOST', 'localhost')
     POSTGRES_PORT: str = os.getenv('POSTGRES_PORT', '5432')
-    POSTGRES_DBNAME: str = os.getenv('POSTGRES_DBNAME', 'flagging')
+    POSTGRES_DB: str = os.getenv('POSTGRES_DB', 'flagging')
 
     @property
     def SQLALCHEMY_DATABASE_URI(self) -> str:
@@ -74,7 +73,7 @@ class Config:
             password = self.POSTGRES_PASSWORD
             host = self.POSTGRES_HOST
             port = self.POSTGRES_PORT
-            db = self.POSTGRES_DBNAME
+            db = self.POSTGRES_DB
             return f'postgresql://{user}:{password}@{host}:{port}/{db}'
 
     QUERIES_DIR: str = QUERIES_DIR
@@ -126,11 +125,7 @@ class Config:
     }
 
     USE_MOCK_DATA: bool = False
-    """If Offline Mode is turned on, the data used when performing requests will
-    be a static pickled version of the data instead of actively pulled from HTTP
-    requests.
-    
-    This is useful for front-end development for two reasons: First, you don't
+    """This is useful for front-end development for 2 reasons: First, you don't
     need credentials to develop the front-end of the website. Second, it means
     that the data loads faster and avoids any possible issues.
     """
@@ -161,6 +156,8 @@ class Config:
     send a Tweet, it does not do so. It is useful to turn this off when
     developing to test Twitter messages.
     """
+
+    DEFAULT_WIDGET_VERSION: int = 1
 
 
 class ProductionConfig(Config):
@@ -201,7 +198,6 @@ class DevelopmentConfig(Config):
     """
     DEBUG: bool = True
     TESTING: bool = True
-    USE_MOCK_DATA = strtobool(os.getenv('USE_MOCK_DATA', 'false'))
     CACHE_DEFAULT_TIMEOUT: int = 60
     SQLALCHEMY_ECHO: bool = strtobool(os.getenv('SQLALCHEMY_ECHO', 'false'))
 
@@ -214,7 +210,12 @@ class TestingConfig(Config):
     TESTING: bool = True
     CACHE_TYPE: str = 'simple'
     USE_MOCK_DATA: bool = True
-    POSTGRES_DBNAME: str = os.getenv('POSTGRES_DBNAME', 'flagging') + '_test'
+    POSTGRES_DB: str = os.getenv('POSTGRES_DB', 'flagging') + '_test'
+
+
+class DemoConfig(ProductionConfig):
+    """Config for the Heroku one-click deploy demo mode."""
+    USE_MOCK_DATA: bool = True
 
 
 def get_config_from_env(env: str) -> Config:
@@ -237,6 +238,7 @@ def get_config_from_env(env: str) -> Config:
         'production': ProductionConfig,
         'development': DevelopmentConfig,
         'testing': TestingConfig,
+        'demo': DemoConfig
     }
     try:
         config = config_mapping[env]
