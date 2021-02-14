@@ -2,18 +2,23 @@ from typing import Any
 from typing import Dict
 from typing import List
 
+from flask import redirect
+from flask_admin.actions import action
+from flask_admin.contrib.sqla import tools
+
 from sqlalchemy import func
-
 from sqlalchemy.dialects.postgresql import aggregate_order_by
+from sqlalchemy.orm import Session
 
-
+from ..admin import ModelView
 from .database import db
 from .database import execute_sql
 
 
 class Boathouse(db.Model):
     __tablename__ = 'boathouses'
-    boathouse = db.Column(db.String(255), primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    boathouse = db.Column(db.String(255))
     reach = db.Column(db.Integer, unique=False)
     latitude = db.Column(db.Numeric, unique=False)
     longitude = db.Column(db.Numeric, unique=False)
@@ -122,4 +127,63 @@ def get_overridden_boathouses():
     return ret_val
 
 
+class _BaseBoathouseView(ModelView):
+    column_filters = ('reach',)
+    column_default_sort = [('reach', False), ('boathouse', False)]
 
+
+class BoathouseModelView(_BaseBoathouseView):
+    def __init__(self, session: Session):
+        super().__init__(
+            Boathouse,
+            session,
+            ignore_columns=['id', 'overridden', 'reach', 'reason'],
+            endpoint='boathouses',
+            name='Boathouses'
+        )
+
+
+class ManualOverridesModelView(_BaseBoathouseView):
+    can_delete = False
+    can_create = False
+
+    form_choices = {
+        'reason': [
+            ('cyanobacteria', 'Cyanobacteria'),
+            ('sewage', 'Sewage'),
+            ('other', 'Other'),
+        ]
+    }
+
+    def __init__(self, session: Session):
+        super().__init__(
+            Boathouse,
+            session,
+            endpoint='manual_overrides',
+            ignore_columns=['id', 'latitude', 'longitude'],
+            name='Manual Overrides'
+        )
+        self.form_columns = ['overridden', 'reason']
+
+    def _flip_all_overrides(self, ids, change_flags_to: bool):
+        query = tools.get_query_for_ids(self.get_query(), self.model, ids)
+        query.update({'overridden': change_flags_to}, synchronize_session='fetch')
+        db.session.commit()
+        return redirect(self.url)
+
+    @action('Override',
+            'Override Selected',
+            'Are you sure you want to override the selected locations?')
+    def action_override_selected(self, ids):
+        return self._flip_all_overrides(ids, change_flags_to=True)
+
+    @action('Remove Override',
+            'Remove Override for Selected',
+            'Are you sure you want to remove the override the selected locations?')
+    def action_remove_override_selected(self, ids):
+        return self._flip_all_overrides(ids, change_flags_to=False)
+
+    def on_form_prefill(self, form, *args, **kwargs):
+        form.boathouse.render_kw = {'readonly': True}
+        form.reach.render_kw = {'readonly': True}
+        super().on_form_prefill(form, *args, **kwargs)
