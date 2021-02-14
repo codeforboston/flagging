@@ -3,18 +3,16 @@ from typing import Dict
 from typing import List
 
 from sqlalchemy import func
-from sqlalchemy.orm import Session
+
 from sqlalchemy.dialects.postgresql import aggregate_order_by
 
-from ..admin import ModelView
+
 from .database import db
 from .database import execute_sql
-# from .predictive_models import
 
 
 class Boathouse(db.Model):
     __tablename__ = 'boathouses'
-
     boathouse = db.Column(db.String(255), primary_key=True)
     reach = db.Column(db.Integer, unique=False)
     latitude = db.Column(db.Numeric, unique=False)
@@ -124,20 +122,4 @@ def get_overridden_boathouses():
     return ret_val
 
 
-class ManualOverridesModelView(ModelView):
-    
-    form_choices = {
-        'reason': [
-            ('cyanobacteria', 'Cyanobacteria'),
-            ('sewage', 'Sewage'),
-            ('other', 'Other'),
-        ]
-    }
 
-    def __init__(self, session: Session):
-        super().__init__(
-            Boathouse,
-            session,
-            endpoint='manual_overrides',
-            name='Boathouses (including Manual Overrides)'
-        )
