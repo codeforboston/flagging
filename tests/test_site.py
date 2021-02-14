@@ -1,10 +1,12 @@
+from base64 import b64encode
+
 import pytest
 
 from flagging_site.data import Boathouse
 
 
 @pytest.mark.parametrize(
-    ('page', 'result'),
+    ('page', 'expected_status_code'),
     [
         ('/', 200),
         ('/about', 200),
@@ -18,7 +20,7 @@ from flagging_site.data import Boathouse
         ('/api/v1/model_input_data', 200),
     ]
 )
-def test_pages(client, page, result):
+def test_pages(client, page, expected_status_code):
     """Test that pages render without errors. This test is very broad; the
     purpose of this test is to capture any errors that would cause a routing
     function to fail, such as a 404 HTTP error or a 500 HTTP error.
@@ -27,7 +29,39 @@ def test_pages(client, page, result):
     render without any status code errors but still render incorrectly), it is
     still a good stop-gap.
     """
-    assert client.get(page).status_code == result
+    assert client.get(page).status_code == expected_status_code
+
+
+@pytest.mark.parametrize(
+    ('page', 'auth', 'expected_status_code'),
+    [
+        ('/admin/', None, 401),
+        ('/admin/', 'bad:credentials', 401),
+
+        ('/admin/boathouses/', None, 401),
+        ('/admin/boathouses/', 'bad:credentials', 401),
+
+        ('/admin/livewebsiteoptions/', None, 401),
+        ('/admin/livewebsiteoptions/', 'bad:credentials', 401),
+
+        ('/admin/', 'admin:password', 200),
+        ('/admin/livewebsiteoptions/', 'admin:password', 302),
+        ('/admin/manual_overrides/', 'admin:password', 200),
+        ('/admin/boathouses/', 'admin:password', 200),
+        ('/admin/db/update/', 'admin:password', 200),
+        ('/admin/db/download/', 'admin:password', 200)
+    ]
+)
+def test_admin_pages(client, page, auth, expected_status_code):
+    if auth is not None:
+        auth_encoded = b64encode(auth.encode()).decode('utf-8')
+        headers = {'Authorization': f'Basic {auth_encoded}'}
+    else:
+        headers = {}
+
+    status_code = client.get(page, headers=headers).status_code
+
+    assert status_code == expected_status_code
 
 
 def test_override_on_home_page(client, db_session, cache):
