@@ -51,7 +51,13 @@ class Boathouse(db.Model):
             )
             .all()
         )
-        return [i.to_dict() for i in res]
+        data = []
+        for i in res:
+            # remove the "id" field.
+            bh = i.to_dict()
+            bh.pop('id')
+            data.append(bh)
+        return data
 
     @classmethod
     def boathouse_names_by_reach(cls) -> Dict[int, List[str]]:
@@ -103,9 +109,9 @@ class Boathouse(db.Model):
         )
         return [i.boathouse for i in res]
 
-    @classmethod
-    def get_flags(cls) -> Dict[str, bool]:
-        return cls.query.all()
+    # @classmethod
+    # def get_flags(cls) -> Dict[str, bool]:
+    #     return cls.query.all()
 
 
 def get_latest_time():
@@ -128,6 +134,8 @@ def get_overridden_boathouses():
 
 
 class _BaseBoathouseView(ModelView):
+    # <span class="fa fa-circle-o glyphicon glyphicon-minus-sign icon-minus-sign"></span>
+    list_template = 'admin/list_boathouses.html'
     column_filters = ('reach',)
     column_default_sort = [('reach', False), ('boathouse', False)]
 
