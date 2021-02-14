@@ -12,14 +12,13 @@ nav:
 - Admin: admin.md
 - Cloud:
     - Overview: cloud/index.md
-    - Heroku Deployment: cloud/manual_heroku_deployment.md
+    # - Manual Deployment: cloud/manual_heroku_deployment.md
     - Twitter Bot: cloud/twitter_bot.md
 - Development:
     - Overview: development/index.md
-    # - Config: development/config.md
     - Data: development/data.md
     - Predictive Models: development/predictive_models.md
-    # - Front-End: development/front-end.md
+    - Front-End: development/frontend.md
 - Development Resources:
     - Overview: development_resources/index.md
     - Learning Resources: development_resources/learning_resources.md
@@ -28,7 +27,7 @@ theme:
   name: material
   palette:
     scheme: default
-    primary: teal
+    primary: black
     accent: cyan
   icon:
     logo: fontawesome/regular/flag

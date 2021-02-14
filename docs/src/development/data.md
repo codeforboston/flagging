@@ -16,7 +16,7 @@ Here is a "TLDR" of the data engineering for this website:
 
 #### Locally (Development)
 
-Make sure you follow the [setup guide](setup) for local development.
+Make sure you follow the [setup guide](../setup) for local development.
 
 When you run `run_unix_dev.sh` (OSX) or `run_windows_dev.bat`, it will run these commands for you:
 
@@ -126,7 +126,7 @@ As you can see from the above, the HOBOlink API is a bit finicky for whatever re
 
 ### Combining data and predicting
 
-Information on preprocessing for prediction, and the predictive models themselves, are covered [here](development).
+Information on preprocessing for prediction, and the predictive models themselves, are covered [here](./predictive_models).
 
 ## Data and the website
 
@@ -146,4 +146,4 @@ The `db` object does a lot for us. We use it in two main ways:
 
 ### API and Front-end
 
-The `Boathouse` and `LiveWebsiteOptions` objects interface with both the front-end code and the REST API in various ways. See the code base for more. For more information on the front-end, see [here](frontend).
+The `Boathouse` and `LiveWebsiteOptions` objects interface with both the front-end code and the REST API in various ways. See the code base for more. For more information on the front-end, see [here](./frontend).
