@@ -2,29 +2,6 @@
 This file contains all the logic for modeling. The model takes data from the SQL
 backend, do some calculations on that data, and then output model results.
 
-
-Variables:
-
-a) rainfall sum 0-24 hrs
-b)rainfall sum 24-48 hr
-c)rainfall sum 0-48 hr
-d)Days since last rain
-e)Flow avg 0-24 hr
-f)PAR avg 24 hr
-
-
-Equations:
-
-Reach 2:    0.3531*a  -  0.0362*d  -  0.000312*f  + 0.6233
-Reach 3:    0.267*a + 0.1681*b - 0.02855*d  + 0.5157
-Reach 4:    0.30276*a + 0.1611*b - 0.02267*d - 0.000427*f  +0.5791
-Reach 5:    0.1091*c  -  0.01355*d + 0.000342*e  +0.3333
-
-These output model numbers such that EXP(model) / (1+EXP(model)) yields percent
-probability of flag and =<65% is a flag. EXP means raise e to the power of model
-number.
-
-
 Useful links:
 
 - Hobolink documentation:
@@ -141,7 +118,8 @@ def reach_2_model(df: pd.DataFrame, rows: int = None) -> pd.DataFrame:
     a- rainfall sum 0-24 hrs
     d- Days since last rain
     f- PAR avg 24 hr
-    0.3531*a  -  0.0362*d  -  0.000312*f  + 0.6233
+
+    Logistic model: 0.3531*a - 0.0362*d - 0.000312*f + 0.6233
 
     Args:
         df: Input data from `process_data()`
@@ -174,7 +152,8 @@ def reach_3_model(df: pd.DataFrame, rows: int = None) -> pd.DataFrame:
     a- rainfall sum 0-24 hrs
     b- rainfall sum 24-48 hr
     d- Days since last rain
-    0.267*a + 0.1681*b - 0.02855*d  + 0.5157
+
+    Logistic model: 0.267*a + 0.1681*b - 0.02855*d + 0.5157
 
     Args:
         df: (pd.DataFrame) Input data from `process_data()`
@@ -208,7 +187,7 @@ def reach_4_model(df: pd.DataFrame, rows: int = None) -> pd.DataFrame:
     b- rainfall sum 24-48 hr
     d- Days since last rain
     f- PAR avg 24 hr
-    0.30276*a + 0.1611*b - 0.02267*d - 0.000427*f  +0.5791
+    Logistic model: 0.30276*a + 0.1611*b - 0.02267*d - 0.000427*f + 0.5791
 
     Args:
         df: (pd.DataFrame) Input data from `process_data()`
@@ -242,7 +221,7 @@ def reach_5_model(df: pd.DataFrame, rows: int = None) -> pd.DataFrame:
     c- rainfall sum 0-48 hr
     d- Days since last rain
     e- Flow avg 0-24 hr
-    0.1091*c  -  0.01355*d + 0.000342*e  +0.3333
+    Logistic model: 0.1091*c - 0.01355*d + 0.000342*e + 0.3333
 
     Args:
         df: (pd.DataFrame) Input data from `process_data()`
