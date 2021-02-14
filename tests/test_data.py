@@ -1,12 +1,14 @@
 import os
+from functools import wraps
 
 import pytest
 import pandas as pd
 
 from flagging_site.data import hobolink
+from flagging_site.data import Boathouse
 from flagging_site.data.hobolink import get_live_hobolink_data
 from flagging_site.data.usgs import get_live_usgs_data
-
+from flagging_site.twitter import compose_tweet
 
 STATIC_RESOURCES = os.path.join(os.path.dirname(__file__), 'static')
 
@@ -74,3 +76,44 @@ def test_hobolink_handles_erroneous_csv(
 
     with live_app.app_context():
         assert get_live_hobolink_data().equals(expected_dataframe)
+
+
+def tweets_parametrization(func: callable):
+    """This decorator creates two new fixtures: overrides and expected_text.
+    It performs the work of overriding a number of flags equivalent to the
+    `overriddes` amount before the decorated text receives the db_session.
+    """
+    @pytest.mark.parametrize(
+        ('overrides', 'expected_text'),
+        [
+            (0, 'all boathouses are safe as of'),
+            (2, 'some boathouses are unsafe as of'),
+            (999, 'all boathouses are unsafe as of'),
+        ]
+    )
+    @wraps(func)
+    def _wrap(overrides, expected_text, db_session, *args, **kwargs):
+        db_session \
+            .query(Boathouse) \
+            .filter(Boathouse.id <= overrides) \
+            .update({"overridden": True})
+        db_session.commit()
+        func(overrides, expected_text, db_session, *args, **kwargs)
+
+    return _wrap
+
+
+@tweets_parametrization
+def test_tweet(overrides, expected_text, db_session):
+    """Make sure it contains the text"""
+    tweet = compose_tweet()
+    assert expected_text in tweet
+
+
+@tweets_parametrization
+def test_tweet_chars(overrides, expected_text, db_session):
+    """Tweets can have up to 280 characters (URLs are special and always count
+    as 23 chars), but we want to be safe anyway, so we'll limit to 240 chars.
+    """
+    tweet = compose_tweet()
+    assert len(tweet) < 240
