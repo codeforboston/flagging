@@ -6,7 +6,7 @@
 
 ## Overview
 
-![](https://github.com/codeforboston/flagging/workflows/main.yaml/badge.svg)
+![](https://github.com/codeforboston/flagging/workflows/tests/badge.svg)
 
 This is the code base for the [Charles River Watershed Association's](https://crwa.org/) ("CRWA") flagging website. The flagging website hosts an interface for the CRWA's staff to monitor the outputs of a predictive model that determines whether it is reasonably safe to swim or boat in the Charles River.
 
