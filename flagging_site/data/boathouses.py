@@ -129,6 +129,7 @@ def get_overridden_boathouses():
 
 class _BaseBoathouseView(ModelView):
     column_filters = ('reach',)
+    column_default_sort = [('reach', False), ('boathouse', False)]
 
 
 class BoathouseModelView(_BaseBoathouseView):
@@ -136,7 +137,7 @@ class BoathouseModelView(_BaseBoathouseView):
         super().__init__(
             Boathouse,
             session,
-            ignore_columns=['id', 'overridden', 'reach'],
+            ignore_columns=['id', 'overridden', 'reach', 'reason'],
             endpoint='boathouses',
             name='Boathouses'
         )
