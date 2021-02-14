@@ -46,7 +46,7 @@ The feature transformations the CRWA uses depends on the year of the model, so b
 
 Each model function defined in `models.py` is formatted like this:
 
-1. Take the last few rows of the input dataframe (I discuss what the input dataframe is later on this page). Each row is an hour of data on the condition of the Charles River and its surrounding environment, so for example, taking the last 24 rows is equivalent to taking the last 24 hours of data.
+1. (Optional) Take only up to `rows` number of rows from the input dataframe (I discuss what the input dataframe is later on this page). Each row is an hour of data on the condition of the Charles River and its surrounding environment, so for example, setting `rows=24` is equivalent to taking the last 24 hours of data.
 2. Predict the probability of the water being unsafe using a logistic regression fit, with the coefficients in the log odds form (so the dot product of the parameters and the data returns a predicted log odds of the target variable).
 3. To get the probability of a log odds, we run it through a logistic function (`sigmoid()`, defined at the top of `models.py`).
 4. We check whether the function is above or below the target threshold for safety, defined by `SAFETY_THRESHOLD`.
@@ -55,12 +55,13 @@ Each model function defined in `models.py` is formatted like this:
 Here is an example function. It should be pretty easy to track the steps outlined above with the code below.
 
 ```python
-def reach_3_model(df: pd.DataFrame, rows: int = 48) -> pd.DataFrame:
+def reach_3_model(df: pd.DataFrame, rows: int = None) -> pd.DataFrame:
     """
     a- rainfall sum 0-24 hrs
     b- rainfall sum 24-48 hr
     d- Days since last rain
-    0.267*a + 0.1681*b - 0.02855*d  + 0.5157
+    
+    Logistic model: 0.267*a + 0.1681*b - 0.02855*d + 0.5157
 
     Args:
         df: (pd.DataFrame) Input data from `process_data()`
@@ -69,7 +70,10 @@ def reach_3_model(df: pd.DataFrame, rows: int = 48) -> pd.DataFrame:
     Returns:
         Outputs for model as a dataframe.
     """
-    df = df.tail(n=rows).copy()
+    if rows is None:
+        df = df.copy()
+    else:
+        df = df.tail(n=rows).copy()
 
     df['log_odds'] = (
         0.5157
@@ -77,11 +81,11 @@ def reach_3_model(df: pd.DataFrame, rows: int = 48) -> pd.DataFrame:
         + 0.1681 * df['rain_24_to_48h_sum']
         - 0.02855 * df['days_since_sig_rain']
     )
-    
+
     df['probability'] = sigmoid(df['log_odds'])
     df['safe'] = df['probability'] <= SAFETY_THRESHOLD
     df['reach'] = 3
-    
+
     return df[['reach', 'time', 'log_odds', 'probability', 'safe']]
 ```
 
@@ -98,7 +102,7 @@ def reach_3_model(df: pd.DataFrame, rows: int = 48) -> pd.DataFrame:
     If you want to do anything more complicated, such as adding a new source of information to the model, that is outside the scope of this document. To accomplish that, you'll need to do more sleuthing into the code to really understand it.
 
 ???+ note
-    Making any changes covered in this section is relatively easy, but you'll still need to actually deploy the changes to Heroku if you want them to be on the live site. Read the [deployment guide](../../deployment) for more.
+    Making any changes covered in this section is relatively easy, but you'll still need to actually deploy the changes to Heroku if you want them to be on the live site. Read the [deployment guide](../deployment) for more.
 
 ### Model coefficients
 
