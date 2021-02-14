@@ -27,7 +27,7 @@ theme:
   name: material
   palette:
     scheme: default
-    primary: white
+    primary: black
     accent: cyan
   icon:
     logo: fontawesome/regular/flag
