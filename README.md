@@ -6,11 +6,11 @@
 
 ## Overview
 
-![](https://github.com/codeforboston/flagging/workflows/main.yaml/badge.svg)
-
 This is the code base for the [Charles River Watershed Association's](https://crwa.org/) ("CRWA") flagging website. The flagging website hosts an interface for the CRWA's staff to monitor the outputs of a predictive model that determines whether it is reasonably safe to swim or boat in the Charles River.
 
 This code base is built in Python 3.7+ and utilizes the Flask library heavily. The website can be run locally in development mode, and it can be deployed to Heroku using Gunicorn.
+
+[![](../../workflows/tests/badge.svg)](../../actions)
 
 ## For Developers and Maintainers
 
