@@ -174,6 +174,7 @@ class ProductionConfig(Config):
     internet. Currently the only part of the website that's pretty fleshed out
     is the `flagging` part, so that's the only blueprint we import.
     """
+    PREFERRED_URL_SCHEME: str = 'https'
     SEND_TWEETS: bool = strtobool(os.getenv('SEND_TWEETS', 'true'))
     CACHE_TYPE: str = 'redis'
     CACHE_REDIS_URL: str = os.getenv('REDIS_URL')
