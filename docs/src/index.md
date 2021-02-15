@@ -20,17 +20,17 @@ To export the model outputs using an iFrame, use the following HTML:
 
 ## For Developers
 
-To locally deploy the website and start coding, follow the [setup guide](setup).
+To locally deploy the website and start coding, follow the [setup guide](../setup).
 
 Once you have the website setup locally, you now have access to the following:
 
 - Deploy the website to Heroku (guide [here](../deployment))
-- Manually run commands and download data through the [shell](shell).
+- Manually run commands and download data through the `flask shell`.
 - Make changes to the predictive model, including revising its coefficients. (Guide is currently WIP)
 - (Advanced) Make other changes to the website.
 
 ## To Deploy
 
-The website can be one-click deployed to Heroku [from the repo]{{ config.repo_url }}.
+The website can be one-click deployed to Heroku [from the repo]({{ config.repo_url }}).
 
-There will still be some additional configuration you should do after one-click deployment. Click [here](cloud) for more.
+There will still be some additional configuration you should do after one-click deployment. Click [here](../cloud) for more.

@@ -1,8 +1,10 @@
+from textwrap import dedent
 import pandas as pd
 import tweepy
 from flask import Flask
-from flask import current_app
 
+from .data.predictive_models import latest_model_outputs
+from .blueprints.flagging import get_flags
 
 tweepy_api = tweepy.API()
 
@@ -35,56 +37,31 @@ def compose_tweet() -> str:
         Message intended to be tweeted that conveys the status of the Charles
         River.
     """
-    from .data.predictive_models import latest_model_outputs
-    # from .data.manual_overrides import get_currently_overridden_reaches
 
-    df = latest_model_outputs()
-    df = df.set_index('reach')
-
-    overridden_reaches = get_currently_overridden_reaches()
-
-    flags = {
-        reach: val['safe'] and reach not in overridden_reaches
-        for reach, val
-        in df.to_dict(orient='index').items()
-    }
+    flags = get_flags()
 
     current_time = (
         pd.Timestamp('now', tz='UTC')
         .tz_convert('US/Eastern')
         .strftime('%I:%M:%S %p, %m/%d/%Y')
     )
-    unsafe_count = list(flags.values()).count(False)
-    if unsafe_count < 1:
-        msg = (
-            'Our predictive model is reporting all reaches are safe for '
-            f'recreational activities as of {current_time}.'
-        )
-    elif unsafe_count == 1:
-        unsafe = ''.join([str(k) for k, v in flags.items() if v is False])
-        msg = (
-            f'The CRWA is reporting that reach {unsafe} is unsafe for recreational activities '
-            f'as of {current_time}. https://crwa-flagging.herokuapp.com/'
-        )
-    else:
-        unsafe = ''
-        unsafe_found = 0
-        for key in flags.keys():
-            if flags.get(key) is False:
-                unsafe += str(key)
-                unsafe_found += 1
-                if unsafe_found < unsafe_count - 1:
-                    unsafe += ', '
-                else:
-                    if unsafe_found == unsafe_count - 1:
-                        if unsafe_count > 2:
-                            unsafe += ', and '
-                        else:
-                            unsafe += ' and '
-        msg = (
-            f'The CRWA is reporting that reaches {unsafe} are unsafe for recreational activities as of {current_time}. '
-            f' https://crwa-flagging.herokuapp.com/'
-        )
+    unsafe_count = len([k for k, v in get_flags().items() if v is False])
+    total_count = len(flags)
+
+    base_msg = (
+        'The CRWA is reporting that {some_or_all} boathouses are {safe_or_unsafe}'
+        ' as of {current_time}.{text_if_not_safe}'
+    )
+
+    text_if_not_safe = \
+        'Review our site for more details. https://crwa-flagging.herokuapp.com/'
+
+    msg = base_msg.format(
+        some_or_all='some' if total_count > unsafe_count > 0 else 'all',
+        safe_or_unsafe='unsafe' if unsafe_count > 0 else 'safe',
+        current_time=current_time,
+        text_if_not_safe=text_if_not_safe if unsafe_count > 0 else ''
+    )
 
     return msg
 

@@ -1,12 +1,10 @@
 # Remote Deployment
 
 ???+ warning
-    This guide is outdated now that one-click deployment is available!
-    
-    Note that this guide is missing the Redis caching setup, and may miss other things as we build out.
+    **This guide is outdated now that one-click deployment is available!**
 
-???+ note
-    This guide is an instruction manual on how to deploy the flagging website to the internet via Heroku. If you just want to run the website locally, you do not need Heroku.
+???+ warning
+    This guide is missing the Redis caching setup, and may miss other things as we build out.
 
 The following tools are required to deploy the website:
 

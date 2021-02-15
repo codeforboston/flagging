@@ -32,7 +32,7 @@ def before_request():
     # If more than 48 hours, flash message.
     if current_app.env == 'demo':
         flash(
-            'This website is currently in demo mode.'
+            'This website is currently in demo mode. It is not using live data.'
         )
     elif diff >= pd.Timedelta(48, 'hr'):
         flash(
@@ -44,7 +44,7 @@ def before_request():
         flash(
             '<b>Note:</b> It is currently not boating season. We do not '
             'display flags when it is not boating season. We hope to see you '
-            'again this spring!'
+            'again in the near future!'
         )
 
 
@@ -139,36 +139,7 @@ def index() -> str:
 @bp.route('/boathouses')
 @cache.cached()
 def boathouses() -> str:
-    all_boathouses_dict = Boathouse.all_boathouses_dict()
-
-    # Convert list of dicts to list of lists
-    #
-    # The parent list lists all boathouses.
-    # Each element of the parent list is a child list.
-    # The elements of the child list are:
-    #     element 0:  a decimal value showing the boathouse's latitude
-    #     element 1:  a decimal value showing the boathouse's longitude
-    #     element 2:  a string showing the boathouse name
-    #     element 3:  the icon for the flag for that boathouse
-    #
-    #     Note that latitudes west of the Prime Meridian are positive 
-    #         (thus those east of the Prime Meridian are negative)
-    #     Longitudes north of the Equator are negative
-    #         (thus those south of the Equator are positive)
-    flag_statuses = get_flags()
-
-    boathouses_list_of_lists = []
-    for boathouse in all_boathouses_dict:
-        bh_name = boathouse['boathouse']
-        boathouses_list_of_lists.append([
-            boathouse['latitude'],
-            boathouse['longitude'],
-            bh_name,
-            'blueFlagIcon' if flag_statuses[bh_name] else 'redFlagIcon'
-        ])
-
-    return render_template('boathouses.html',
-                           boathouses_list_of_lists=boathouses_list_of_lists)
+    return render_template('boathouses.html')
 
 
 @bp.route('/about')

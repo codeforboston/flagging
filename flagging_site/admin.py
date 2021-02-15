@@ -4,6 +4,7 @@ import io
 from typing import List
 
 import pandas as pd
+
 from flask import Flask
 from flask import request
 from flask import Response
@@ -11,6 +12,7 @@ from flask import send_file
 from flask import abort
 from flask import url_for
 from flask import redirect
+
 from flask_admin import Admin
 from flask_admin import AdminIndexView as _AdminIndexView
 from flask_admin import BaseView as _BaseView
@@ -21,8 +23,9 @@ from flask_basicauth import BasicAuth as _BasicAuth
 from werkzeug.exceptions import HTTPException
 from sqlalchemy.exc import ProgrammingError
 
-from .data.database import db
-from .data.database import cache
+from .data import db
+from .data import cache
+from .data.database import execute_sql
 
 
 # ==============================================================================
@@ -66,11 +69,11 @@ def init_admin(app: Flask):
         # Register /admin sub-views
         from .data.live_website_options import LiveWebsiteOptionsModelView
         from .data.boathouses import ManualOverridesModelView
-        from .data.boathouses import Boathouse
+        from .data.boathouses import BoathouseModelView
 
         admin.add_view(LiveWebsiteOptionsModelView(db.session))
-        admin.add_view(ModelView(Boathouse, db.session))
         admin.add_view(ManualOverridesModelView(db.session))
+        admin.add_view(BoathouseModelView(db.session))
         admin.add_view(DatabaseView(name='Update Database', url='db/update',
                                     category='Manage DB'))
         admin.add_view(DownloadView(name='Download', url='db/download',
@@ -123,10 +126,10 @@ class ModelView(sqla.ModelView, BaseView):
         super().after_model_change(*args, **kwargs)
         cache.clear()
 
+
 # ==============================================================================
 # Views
 # ==============================================================================
-
 
 class LogoutView(BaseView):
     """Returns a logout page that uses a jQuery trick to emulate a logout."""
@@ -241,7 +244,6 @@ class DownloadView(BaseView):
         if sql_table_name not in self.TABLES:
             raise abort(404)
 
-        from .data.database import execute_sql
         # WARNING:
         # Be careful when parameterizing queries like how we do it below.
         # The reason it's OK in this case is because users don't touch it.
