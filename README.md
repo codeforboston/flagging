@@ -20,7 +20,7 @@ This code base is built in Python 3.7+ and utilizes the Flask library heavily. T
 
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
 
-**For demo mode deployment:** Set the `FLASK_ENV` variable to `demo` to run a version of this website in production using the demo data. Leave all the Twitter and HOBOlink credentials fields blank.
+**For demo mode deployment:** Set the `FLASK_ENV` variable to `demo` to run a version of this website in production using the demo data. Leave all the credentials fields blank.
 
 **For full CRWA production deployment:** See the docs.
 

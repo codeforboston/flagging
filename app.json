@@ -32,6 +32,7 @@
     "HOBOLINK_PASSWORD": { "required": false },
     "HOBOLINK_TOKEN": { "required": false },
     "HOBOLINK_USERNAME": { "required": false },
+    "MAPBOX_ACCESS_TOKEN": { "required": false },
     "TWITTER_API_KEY": { "required": false },
     "TWITTER_API_KEY_SECRET": { "required": false },
     "TWITTER_ACCESS_TOKEN": { "required": false },
