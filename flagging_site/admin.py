@@ -21,6 +21,8 @@ from flask_admin.contrib import sqla
 
 from flask_basicauth import BasicAuth as _BasicAuth
 from werkzeug.exceptions import HTTPException
+from werkzeug.middleware.proxy_fix import ProxyFix
+
 from sqlalchemy.exc import ProgrammingError
 
 from .data import db
@@ -56,6 +58,10 @@ def init_admin(app: Flask):
     Args:
         app: A Flask application instance.
     """
+    # Fix an issue with some flask-admin stuff redirecting to "http". Because
+    # we use HTTP BasicAuth, the http scheme is bad during authorized sessions.
+    app.wsgi_app = ProxyFix(app.wsgi_app)
+
     @app.before_request
     def auth_protect_admin_pages():
         """Authorize all paths that start with /admin/."""
