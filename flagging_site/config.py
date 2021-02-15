@@ -159,6 +159,15 @@ class Config:
 
     DEFAULT_WIDGET_VERSION: int = 1
 
+    MAPBOX_ACCESS_TOKEN: str = os.getenv(
+        'MAPBOX_ACCESS_TOKEN',
+        # This is a token that's floating around the web in a lot of quickstart
+        # examples for LeafletJS, and seems to work. ¯\_(ツ)_/¯
+        #
+        # You should not use it ideally, but as a default for very quick runs
+        # and demos, it should be OK.
+        'pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw')
+
 
 class ProductionConfig(Config):
     """The Production Config is used for deployment of the website to the

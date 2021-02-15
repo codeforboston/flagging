@@ -15,6 +15,7 @@ from flask import jsonify
 from flask import request
 from flask import current_app
 from flask import Markup
+from flask import send_file
 
 
 def create_app(config: Optional[str] = None) -> Flask:
@@ -72,6 +73,10 @@ def register_blueprints(app: Flask):
 
     from .blueprints.flagging import bp as flagging_bp
     app.register_blueprint(flagging_bp)
+
+    @app.route('/favicon.ico')
+    def favicon():
+        return send_file('static/favicon/favicon.ico')
 
 
 def register_errorhandlers(app: Flask):
@@ -161,14 +166,20 @@ def register_jinja_env(app: Flask):
         return f'_flag_widget_v{v}.html'
 
     app.jinja_env.globals.update({
+        # SVG files
         'GITHUB_SVG': _load_svg('github.svg'),
         'TWITTER_SVG': _load_svg('twitter.svg'),
         'HAMBURGER_SVG': _load_svg('hamburger.svg'),
         'INFO_ICON': _load_svg('iconmonstr-info-9.svg'),
+
+        # MD5 hashes
         'STYLE_CSS_MD5': _md5_hash_file('style.css'),
         'FLAGS_CSS_MD5': _md5_hash_file('flags.css'),
         'DATAFRAME_CSS_MD5': _md5_hash_file('dataframe.css'),
-        'get_widget_filename': get_widget_filename
+
+        # Other stuff
+        'get_widget_filename': get_widget_filename,
+        'MAPBOX_ACCESS_TOKEN': app.config['MAPBOX_ACCESS_TOKEN']
     })
 
 
