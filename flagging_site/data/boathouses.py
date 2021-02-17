@@ -63,7 +63,7 @@ class Boathouse(db.Model):
             # remove the "id" field.
             bh = i.to_dict()
             bh['safe'] = \
-                _reach_is_safe(bh['reach']) and (not bh['overridden'])
+                bool(_reach_is_safe(bh['reach']) and (not bh['overridden']))
             bh.pop('id')
             return_data.append(bh)
         return return_data
