@@ -31,6 +31,9 @@ responses:
               overridden:
                 description: Indicates if this boathouse's flag is manually overridden.
                 type: boolean
+              safe:
+                description: Indicates the boathouses's final flag.
+                type: boolean
               reason:
                 description: If overridden, we may provide a reason why.
                 type: string
