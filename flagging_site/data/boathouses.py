@@ -13,6 +13,7 @@ from sqlalchemy.orm import Session
 from ..admin import ModelView
 from .database import db
 from .database import execute_sql
+from .predictive_models import latest_model_outputs
 
 
 class Boathouse(db.Model):
@@ -51,13 +52,21 @@ class Boathouse(db.Model):
             )
             .all()
         )
-        data = []
+
+        df = latest_model_outputs()
+
+        def _reach_is_safe(r: int) -> bool:
+            return df.loc[df['reach'] == r, 'safe'].iloc[0]
+
+        return_data = []
         for i in res:
             # remove the "id" field.
             bh = i.to_dict()
+            bh['safe'] = \
+                _reach_is_safe(bh['reach']) and (not bh['overridden'])
             bh.pop('id')
-            data.append(bh)
-        return data
+            return_data.append(bh)
+        return return_data
 
     @classmethod
     def boathouse_names_by_reach(cls) -> Dict[int, List[str]]:

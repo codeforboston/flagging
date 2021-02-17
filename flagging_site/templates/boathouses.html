@@ -48,7 +48,7 @@
                     boathouse['latitude'],
                     boathouse['longitude']
                 ], {
-                    icon: boathouse['overridden'] ? redFlagIcon : blueFlagIcon
+                    icon: boathouse['safe'] ? blueFlagIcon : redFlagIcon
                 }
             ).addTo(flagMap);
             marker.bindPopup("<b>" + boathouse['boathouse'] + "</b>");
