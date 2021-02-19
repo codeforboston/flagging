@@ -102,44 +102,9 @@ class Boathouse(db.Model):
         return {i[0]: i[1] for i in res}
 
     @classmethod
-    def overridden_boathouses(cls):
-        """This code is basically performing the following SQL:
-
-            SELECT boathouse
-            FROM boathouses
-            WHERE overridden
-            ORDER BY boathouse
-        """
-        res = (
-            cls.query
-            .filter(cls.overridden)
-            .order_by(cls.boathouse)
-            .all()
-        )
-        return [i.boathouse for i in res]
-
-    # @classmethod
-    # def get_flags(cls) -> Dict[str, bool]:
-    #     return cls.query.all()
-
-
-def get_latest_time():
-    """
-    Returns the latest time in the processed data
-    """
-    return execute_sql('SELECT MAX(time) FROM processed_data;').iloc[0]['max']
-
-
-def get_overridden_boathouses():
-    """
-    Returns a ?list? of overriden boathouses
-    """
-    ret_val = []
-
-    for bh in Boathouse.query.filter(Boathouse.overridden == True):
-        ret_val.append(bh.boathouse)
-
-    return ret_val
+    def all_flags(cls) -> Dict[str, bool]:
+        data = cls.all_boathouses_dict()
+        return {bh['boathouse']: bh['safe'] for bh in data}
 
 
 class _BaseBoathouseView(ModelView):
@@ -189,14 +154,14 @@ class ManualOverridesModelView(_BaseBoathouseView):
         return redirect(self.url)
 
     @action('Override',
-            'Override Selected',
+            'Override',
             'Are you sure you want to override the selected locations?')
     def action_override_selected(self, ids):
         return self._flip_all_overrides(ids, change_flags_to=True)
 
     @action('Remove Override',
-            'Remove Override for Selected',
-            'Are you sure you want to remove the override the selected locations?')
+            'Remove Override',
+            'Are you sure you want to remove the override for the selected locations?')
     def action_remove_override_selected(self, ids):
         return self._flip_all_overrides(ids, change_flags_to=False)
 

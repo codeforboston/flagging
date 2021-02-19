@@ -178,6 +178,14 @@ def update_db():
         cache.clear()
 
 
+def get_current_time() -> pd.Timestamp:
+    return (
+        pd.Timestamp('now', tz='UTC')
+        .tz_convert('US/Eastern')
+        .tz_localize(None)
+    )
+
+
 def delete_db(dbname: str = None):
     """Delete the database."""
     conn = connect(

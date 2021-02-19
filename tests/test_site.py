@@ -5,12 +5,21 @@ import pytest
 from flagging_site.data import Boathouse
 
 
+def auth_to_header(auth: str) -> dict:
+    if auth is not None:
+        auth_encoded = b64encode(auth.encode()).decode('utf-8')
+        headers = {'Authorization': f'Basic {auth_encoded}'}
+    else:
+        headers = {}
+    return headers
+
+
 @pytest.mark.parametrize(
     ('page', 'expected_status_code'),
     [
         ('/', 200),
         ('/about', 200),
-        ('/model_outputs', 200),
+        ('/model', 200),
         ('/flags', 200),
         ('/api', 200),
         ('/api/docs', 200),
@@ -49,19 +58,48 @@ def test_pages(client, page, expected_status_code):
         ('/admin/manual_overrides/', 'admin:password', 200),
         ('/admin/boathouses/', 'admin:password', 200),
         ('/admin/db/update/', 'admin:password', 200),
-        ('/admin/db/download/', 'admin:password', 200)
+        ('/admin/db/download/', 'admin:password', 200),
     ]
 )
 def test_admin_pages(client, page, auth, expected_status_code):
-    if auth is not None:
-        auth_encoded = b64encode(auth.encode()).decode('utf-8')
-        headers = {'Authorization': f'Basic {auth_encoded}'}
+    headers = auth_to_header(auth)
+    res = client.get(page, headers=headers)
+
+    assert res.status_code == expected_status_code
+
+
+@pytest.mark.parametrize(
+    ('page', 'auth', 'expected_status_code'),
+    [
+        # Valid
+        ('/admin/db/download/csv/hobolink', 'admin:password', 200),
+        ('/admin/db/download/csv/usgs', 'admin:password', 200),
+        ('/admin/db/download/csv/processed_data', 'admin:password', 200),
+        ('/admin/db/download/csv/model_outputs', 'admin:password', 200),
+        ('/admin/db/download/csv/boathouses', 'admin:password', 200),
+        ('/admin/db/download/csv/hobolink_source', 'admin:password', 200),
+        ('/admin/db/download/csv/usgs_source', 'admin:password', 200),
+        ('/admin/db/download/csv/processed_data_source', 'admin:password', 200),
+        ('/admin/db/download/csv/model_outputs_source', 'admin:password', 200),
+
+        # Errors
+        ('/admin/db/download/csv/arbitrary_table', 'admin:password', 404),
+        ('/admin/db/download/csv/boathouses', 'bad:credentials', 401),
+        ('/admin/db/download/csv/hobolink_source', None, 401),
+    ]
+)
+def test_admin_downloads(client, page, auth, expected_status_code):
+    headers = auth_to_header(auth)
+    res = client.get(page, headers=headers)
+
+    assert res.status_code == expected_status_code
+
+    if res.status_code >= 400:
+        assert res.mimetype == 'text/html'
     else:
-        headers = {}
-
-    status_code = client.get(page, headers=headers).status_code
-
-    assert status_code == expected_status_code
+        assert res.mimetype == 'text/csv'
+        # make sure it's returning *something*
+        assert res.data.count(b'\n') >= 5
 
 
 def test_override_on_home_page(client, db_session, cache):
