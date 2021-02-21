@@ -35,7 +35,7 @@ jobs:
         python -m pip install --upgrade pip
         python -m pip install -r requirements/dev_osx.txt
     - name: Run tests
-      run: python -m pytest -vv -m "not auth_required" ./tests
+      run: python -m pytest -vv -m "not auth_required and not check_grammar" ./tests
       env:
         POSTGRES_USER: postgres
         POSTGRES_PASSWORD: postgres

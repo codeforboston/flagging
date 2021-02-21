@@ -1,11 +1,13 @@
+import warnings
 from unittest.mock import patch
 from functools import wraps
-from flagging_site.data import Boathouse
-from flagging_site.twitter import compose_tweet
 
+import requests
 import pytest
 
+from flagging_site.data import Boathouse
 from flagging_site.data import database
+from flagging_site.twitter import compose_tweet
 
 
 @pytest.fixture
@@ -75,3 +77,26 @@ def test_tweet_chars(overrides, expected_text, db_session):
     """
     tweet = compose_tweet()
     assert len(tweet) < 240
+
+
+@pytest.mark.check_grammar
+@tweets_parametrization
+def test_tweet_grammar(overrides, expected_text, db_session):
+    """Uses LanguageTool's public API to see if there are any grammatical errors
+    in the tweet messages. Grammatical errors may be caused by faulty logic when
+    constructing the message.
+    """
+    res = requests.post(
+        'https://api.languagetool.org/v2/check',
+        params={'language': 'en-US', 'text': compose_tweet()}
+    )
+
+    if res.status_code >= 400:
+        warnings.warn(f'Error via languagetool.org: {res.text}')
+    else:
+        matches = res.json()['matches']
+
+        # There will be one message in the 'matches', which is there because
+        # LanguageTool doesn't know that "CRWA" is a valid word. Otherwise
+        # there should be no issues.
+        assert len(matches) <= 1, "There may be a grammatical error."
