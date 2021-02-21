@@ -381,7 +381,6 @@ def register_misc(app: Flask):
         """
         import pandas as pd
         import numpy as np
-
         from flask import current_app as app
         from flask.testing import FlaskClient
         from .data import db

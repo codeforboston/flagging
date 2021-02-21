@@ -216,10 +216,11 @@ class TestingConfig(Config):
     """The Testing Config is used for unit-testing and integration-testing the
     website.
     """
-    SEND_TWEETS: bool = False
+    SEND_TWEETS: bool = True  # Won't actually send tweets.
     TESTING: bool = True
     CACHE_TYPE: str = 'simple'
     USE_MOCK_DATA: bool = True
+    TWITTER_AUTH: dict = {k: None for k in Config.TWITTER_AUTH}
     POSTGRES_DB: str = os.getenv('POSTGRES_DB', 'flagging') + '_test'
 
 
