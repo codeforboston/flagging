@@ -34,6 +34,7 @@ def test_no_tweet_off_season(app, db_session, cli_runner,
     # So "update-website" should send a tweet.
     res = cli_runner.invoke(app.cli, ['update-website'])
     assert res.exit_code == 0
+    assert mock_update_db.call_count == 1
     assert mock_send_tweet.call_count == 1
 
     # Now set boating_season to false.
@@ -47,7 +48,8 @@ def test_no_tweet_off_season(app, db_session, cli_runner,
     # The call count should not have gone up since the previous assert.
     res = cli_runner.invoke(app.cli, ['update-website'])
     assert res.exit_code == 0
-    assert mock_send_tweet.call_count - 1 == 0
+    assert mock_update_db.call_count == 2
+    assert mock_send_tweet.call_count == 1
 
 
 def test_shell_runs(app):
