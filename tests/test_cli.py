@@ -99,4 +99,8 @@ def test_tweet_grammar(overrides, expected_text, db_session):
         # There will be one message in the 'matches', which is there because
         # LanguageTool doesn't know that "CRWA" is a valid word. Otherwise
         # there should be no issues.
-        assert len(matches) <= 1, "There may be a grammatical error."
+        assert len(matches) <= 1, (
+            'There may be a grammatical error in this tweet:\n'
+            f'{compose_tweet()!r}.\nIf you think this is a false positive, run '
+            'pytest with the option -m "not check_grammar" to skip this test.'
+        )
