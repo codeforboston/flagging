@@ -6,6 +6,7 @@ import requests
 import pytest
 
 from flagging_site.data import Boathouse
+from flagging_site.data import LiveWebsiteOptions
 from flagging_site.data import database
 from flagging_site.twitter import compose_tweet
 
@@ -25,10 +26,28 @@ def test_update_runs(cmd, app, cli_runner, mock_update_db, mock_send_tweet):
 
     if cmd == 'update-db':
         assert mock_send_tweet.call_count == 0
-    elif cmd == 'update-website':
-        assert mock_send_tweet.call_count == 1
-    else:
-        assert False
+
+
+def test_no_tweet_off_season(app, db_session, cli_runner,
+                             mock_update_db, mock_send_tweet):
+    # Default database state (i.e. during testing) is boating_season is true.
+    # So "update-website" should send a tweet.
+    res = cli_runner.invoke(app.cli, ['update-website'])
+    assert res.exit_code == 0
+    assert mock_send_tweet.call_count == 1
+
+    # Now set boating_season to false.
+    db_session \
+        .query(LiveWebsiteOptions) \
+        .filter(LiveWebsiteOptions.id == 1) \
+        .update({'boating_season': False})
+    db_session.commit()
+
+    # No tweets should go out when it's not boating season.
+    # The call count should not have gone up since the previous assert.
+    res = cli_runner.invoke(app.cli, ['update-website'])
+    assert res.exit_code == 0
+    assert mock_send_tweet.call_count - 1 == 0
 
 
 def test_shell_runs(app):
@@ -56,7 +75,7 @@ def tweets_parametrization(func: callable):
         db_session \
             .query(Boathouse) \
             .filter(Boathouse.id <= overrides) \
-            .update({"overridden": True})
+            .update({'overridden': True})
         db_session.commit()
         func(overrides, expected_text, db_session, *args, **kwargs)
 
