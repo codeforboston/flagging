@@ -100,18 +100,19 @@ nav {
   padding: 0.5em;
   font-size: 0.9em;
   flex-basis: auto;
-  max-width: 80%;
+  max-width: 100%;
 }
 
 nav > .nav-link {
   display: flex;
   align-items: center;
+  width: auto;
 }
 nav > .nav-link:not(:first-child) {
   margin-left: 25px;
 }
 
-@media(max-width: 680px) {
+@media(max-width: 780px) {
   nav,
   .social-section {
     display: none;
@@ -184,7 +185,7 @@ nav a:hover {
   margin-top: 15px;
 }
 
-@media(min-width: 681px) {
+@media(min-width: 781px) {
   .hamburger-button,
   .dropdown-menu {
     display: none;

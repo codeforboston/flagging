@@ -1,10 +1,9 @@
-from textwrap import dedent
-import pandas as pd
 import tweepy
 from flask import Flask
+from flask import current_app
 
-from .data.predictive_models import latest_model_outputs
-from .blueprints.flagging import get_flags
+from .data.boathouses import Boathouse
+from .data.database import get_current_time
 
 tweepy_api = tweepy.API()
 
@@ -38,14 +37,10 @@ def compose_tweet() -> str:
         River.
     """
 
-    flags = get_flags()
+    flags = Boathouse.all_flags()
+    current_time = get_current_time().strftime('%I:%M:%S %p, %m/%d/%Y')
 
-    current_time = (
-        pd.Timestamp('now', tz='UTC')
-        .tz_convert('US/Eastern')
-        .strftime('%I:%M:%S %p, %m/%d/%Y')
-    )
-    unsafe_count = len([k for k, v in get_flags().items() if v is False])
+    unsafe_count = len([k for k, v in flags.items() if v is False])
     total_count = len(flags)
 
     base_msg = (
@@ -54,7 +49,7 @@ def compose_tweet() -> str:
     )
 
     text_if_not_safe = \
-        'Review our site for more details. https://crwa-flagging.herokuapp.com/'
+        ' Review our site for more details. https://crwa-flagging.herokuapp.com/'
 
     msg = base_msg.format(
         some_or_all='some' if total_count > unsafe_count > 0 else 'all',

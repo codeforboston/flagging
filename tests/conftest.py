@@ -1,8 +1,10 @@
 import pytest
 
-from flagging_site import create_app
-from flagging_site.data.database import cache as _cache
+from unittest.mock import patch
 
+from flagging_site import create_app
+from flagging_site.twitter import tweepy_api
+from flagging_site.data.database import cache as _cache
 from flagging_site.data.database import create_db
 from flagging_site.data.database import init_db
 from flagging_site.data.database import update_db
@@ -55,3 +57,14 @@ def _db(app):
     """
     from flagging_site.data.database import db
     yield db
+
+
+@pytest.fixture
+def cli_runner(app):
+    return app.test_cli_runner()
+
+
+@pytest.fixture(autouse=True)
+def mock_send_tweet():
+    with patch.object(tweepy_api, 'update_status') as mocked_func:
+        yield mocked_func

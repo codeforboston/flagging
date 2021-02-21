@@ -1,7 +1,8 @@
 import warnings
+from typing import Any
+from typing import Dict
 from typing import List
 
-import pandas as pd
 from flask import Blueprint
 from flask import request
 from flask import current_app
@@ -19,6 +20,7 @@ from ..data.predictive_models import MODEL_VERSION
 from ..data.boathouses import Boathouse
 from ..data.database import execute_sql
 from ..data.database import cache
+from ..data.database import get_current_time
 from ..data.live_website_options import LiveWebsiteOptions
 
 
@@ -35,16 +37,23 @@ def model_api(reaches: List[int], hours: int) -> dict:
 
     # get model output data from database
     df = latest_model_outputs(hours)
+
+    def _slice_df_by_reach(r: int) -> Dict[str, Any]:
+        return (
+            df
+            .loc[df['reach'] == r, :]
+            .drop(columns=['reach'])
+            .to_dict(orient='records')
+        )
+
     return {
         'model_version': MODEL_VERSION,
-        'time_returned': pd.to_datetime('today'),
+        'time_returned': get_current_time(),
         # For some reason this casts to int when not wrapped in `bool()`:
         'is_boating_season': LiveWebsiteOptions.is_boating_season(),
         'model_outputs': [
             {
-                'predictions': df.loc[
-                    df['reach'] == int(reach), :
-                ].drop(columns=['reach']).to_dict(orient='records'),
+                'predictions': _slice_df_by_reach(reach),
                 'reach': reach
             }
             for reach in reaches

@@ -68,6 +68,8 @@ def register_blueprints(app: Flask):
     """Register the "blueprints." Blueprints are basically like mini web apps
     that can be joined to the main web app.
     """
+    app.url_map.strict_slashes = False
+
     from .blueprints.api import bp as api_bp
     app.register_blueprint(api_bp)
 
@@ -190,19 +192,21 @@ def register_commands(app: Flask):
     """
 
     def dev_only(func: callable) -> callable:
-        """Decorator that ensures a command only runs in the development
+        """Decorator that ensures a function only runs in the development
         environment. Commands tagged with this will raise an error when you run
         them in production.
         """
+
         @wraps(func)
         def _wrap(*args, **kwargs):
-            if current_app.env != 'development':
+            if current_app.env not in ['development', 'testing']:
                 raise RuntimeError(
                     'You can only run this in the development environment. '
                     'Make sure you set up the environment correctly if you '
                     'believe you are in dev.'
                 )
             return func(*args, **kwargs)
+
         return _wrap
 
     @app.cli.command('create-db')
@@ -378,6 +382,7 @@ def register_misc(app: Flask):
         import pandas as pd
         import numpy as np
         from flask import current_app as app
+        from flask.testing import FlaskClient
         from .data import db
         from .data.hobolink import get_live_hobolink_data
         from .data.hobolink import request_to_hobolink
@@ -385,4 +390,26 @@ def register_misc(app: Flask):
         from .data.usgs import get_live_usgs_data
         from .data.usgs import request_to_usgs
         from .twitter import compose_tweet
+
+        def get_auth():
+            from base64 import b64encode
+            user = app.config['BASIC_AUTH_USERNAME']
+            pw = app.config['BASIC_AUTH_PASSWORD']
+            auth = f'{user}:{pw}'
+            auth_encoded = b64encode(auth.encode()).decode('utf-8')
+            return {'Authorization': f'Basic {auth_encoded}'}
+
+        class _AuthorizedClient(FlaskClient):
+
+            def __init__(self, *args, **kwargs):
+                self._auth = get_auth()
+                super().__init__(*args, **kwargs)
+
+            def open(self, *args, **kwargs):
+                kwargs.setdefault('headers', self._auth)
+                return super().open(*args, **kwargs)
+
+        app.test_client_class = _AuthorizedClient
+        client = app.test_client()
+
         return locals()

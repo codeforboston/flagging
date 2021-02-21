@@ -12,7 +12,6 @@ https://www.mass.gov/files/documents/2016/08/tz/36wqara.pdf
 """
 import numpy as np
 import pandas as pd
-from .database import cache
 from .database import execute_sql
 
 MODEL_VERSION = '2020'
@@ -286,7 +285,6 @@ def latest_model_outputs(hours: int = 1) -> pd.DataFrame:
     return df
 
 
-@cache.cached(key_prefix='db_utils')
-def get_latest_time():
-    """Returns the latest timestamp in model outputs.."""
+def get_latest_prediction_time():
+    """Returns the latest timestamp in model outputs."""
     return execute_sql('SELECT MAX(time) FROM model_outputs;').iloc[0]['max']
