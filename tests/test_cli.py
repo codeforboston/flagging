@@ -6,7 +6,6 @@ from flagging_site.twitter import compose_tweet
 import pytest
 
 from flagging_site.data import database
-from flagging_site.twitter import tweepy_api
 
 
 @pytest.fixture

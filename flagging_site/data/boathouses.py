@@ -12,7 +12,6 @@ from sqlalchemy.orm import Session
 
 from ..admin import ModelView
 from .database import db
-from .database import execute_sql
 from .predictive_models import latest_model_outputs
 
 
