@@ -12,6 +12,7 @@ from sqlalchemy.orm import Session
 
 from ..admin import ModelView
 from .database import db
+from .database import cache
 from .predictive_models import latest_model_outputs
 
 
@@ -150,6 +151,7 @@ class ManualOverridesModelView(_BaseBoathouseView):
         query = tools.get_query_for_ids(self.get_query(), self.model, ids)
         query.update({'overridden': change_flags_to}, synchronize_session='fetch')
         db.session.commit()
+        cache.clear()
         return redirect(self.url)
 
     @action('Override',
