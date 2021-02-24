@@ -19,7 +19,7 @@ flask==1.1.2              # via -r requirements/_core.in, flasgger, flask-admin,
 future==0.18.2            # via lunr
 graphql-core==3.1.2       # via hypothesis-graphql
 greenlet==0.4.17          # via meinheld
-gunicorn==19.10.0         # via -r requirements/_core.in
+gunicorn==20.0.4          # via -r requirements/_core.in
 hypothesis-graphql==0.3.2  # via schemathesis
 hypothesis-jsonschema==0.18.2  # via schemathesis
 hypothesis==5.41.5        # via hypothesis-graphql, hypothesis-jsonschema, schemathesis
