@@ -33,7 +33,6 @@ def create_app(config: Optional[str] = None) -> Flask:
         The fully configured Flask app instance.
     """
     app = Flask(__name__)
-    app.config['CACHE_TYPE'] = 'simple'
 
     from .config import get_config_from_env
     cfg = get_config_from_env(config or app.env)
