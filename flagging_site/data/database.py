@@ -131,8 +131,15 @@ def init_db():
     execute_sql_from_file('define_default_options.sql')
 
     # Create a database trigger
-    from .boathouses import Boathouse
-
+    #
+    # Eventually this can cause problems because of the Heroku free tier row
+    # limit of 10,000. The rest of the database takes up just above ~2,500 rows.
+    # The table "override_history" takes a while to fil,l but eventually it can
+    # fill, if this website sticks around in prod for a while.
+    #
+    # TODO:
+    #   Solve the aforementioned problem in an elegant way? Right now there is
+    #   no solution for this other than to flush it after a couple years...
     execute_sql(dedent('''\
         CREATE OR REPLACE FUNCTION record_override_change()
             RETURNS trigger AS $$
