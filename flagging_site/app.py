@@ -17,6 +17,8 @@ from flask import current_app
 from flask import Markup
 from flask import send_file
 
+from werkzeug.middleware.proxy_fix import ProxyFix
+
 
 def create_app(config: Optional[str] = None) -> Flask:
     """Create and configure an instance of the Flask application. We use the
@@ -44,6 +46,11 @@ def create_app(config: Optional[str] = None) -> Flask:
         register_jinja_env(app)
         register_commands(app)
         register_misc(app)
+
+    # Fix an issue with some flask-admin stuff redirecting to "http". Because
+    # we use HTTP BasicAuth, the http scheme is bad during authorized sessions.
+    # (This issue is specifically caused by Meinheld.)
+    app.wsgi_app = ProxyFix(app.wsgi_app)
 
     return app
 
