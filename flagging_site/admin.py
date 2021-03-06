@@ -241,7 +241,8 @@ class DownloadView(BaseView):
         'usgs',
         'processed_data',
         'model_outputs',
-        'boathouses'
+        'boathouses',
+        'override_history'
     ]
 
     @expose('/')

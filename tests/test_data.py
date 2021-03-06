@@ -4,8 +4,11 @@ import pytest
 import pandas as pd
 
 from flagging_site.data import hobolink
+from flagging_site.data import Boathouse
+
 from flagging_site.data.hobolink import get_live_hobolink_data
 from flagging_site.data.usgs import get_live_usgs_data
+
 
 STATIC_RESOURCES = os.path.join(os.path.dirname(__file__), 'static')
 
@@ -73,3 +76,22 @@ def test_hobolink_handles_erroneous_csv(
 
     with live_app.app_context():
         assert get_live_hobolink_data().equals(expected_dataframe)
+
+
+def test_boathouse_trigger(db_session):
+    """Make sure we're recording the overrides."""
+
+    def number_of_rows(r):
+        return len([i for i in r])
+
+    before = db_session.execute('''SELECT * FROM override_history;''')
+
+    db_session \
+        .query(Boathouse) \
+        .filter(Boathouse.boathouse == 'Union Boat Club') \
+        .update({"overridden": True})
+    db_session.commit()
+
+    after = db_session.execute('''SELECT * FROM override_history;''')
+
+    assert number_of_rows(after) == number_of_rows(before) + 1

@@ -43,5 +43,4 @@ class LiveWebsiteOptionsModelView(ModelView):
 
     @expose('/')
     def index(self):
-        # TODO: Get it to render `admin/model/edit.html` with form=self.form and id=1.
         return redirect(self.url + '/edit/?id=1')

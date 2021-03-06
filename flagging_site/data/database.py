@@ -10,16 +10,21 @@ is passed in via `db.init_app(app)`, and the `db` object looks for the config
 variable `SQLALCHEMY_DATABASE_URI`.
 """
 import os
+from textwrap import dedent
 from typing import Optional
 
 import pandas as pd
 import psycopg2
 import psycopg2.errors
+from psycopg2 import connect
 import click
 from flask import current_app
+
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import event
+from sqlalchemy import DDL
 from sqlalchemy.exc import ResourceClosedError
-from psycopg2 import connect
+
 from flask_caching import Cache
 
 
@@ -124,6 +129,36 @@ def init_db():
 
     # The file for keeping track of if it's currently boating season
     execute_sql_from_file('define_default_options.sql')
+
+    # Create a database trigger
+    from .boathouses import Boathouse
+
+    execute_sql(dedent('''\
+        CREATE OR REPLACE FUNCTION record_override_change()
+            RETURNS trigger AS $$
+                BEGIN
+                    INSERT INTO override_history(
+                        time,
+                        boathouse,
+                        overridden,
+                        reason
+                    )
+                    VALUES(
+                        now() AT TIME ZONE 'EST',
+                        NEW.boathouse,
+                        NEW.overridden,
+                        NEW.reason
+                    );
+                    RETURN NULL;
+                END; $$
+            LANGUAGE 'plpgsql'
+        ;
+
+        CREATE TRIGGER record_manual_overrides
+            AFTER UPDATE OF overridden, reason ON boathouses
+            FOR EACH ROW
+            EXECUTE PROCEDURE record_override_change()
+        ;'''))
 
     # The function that updates the database periodically should be run after
     # this runs.

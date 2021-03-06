@@ -384,6 +384,7 @@ def register_misc(app: Flask):
         from flask import current_app as app
         from flask.testing import FlaskClient
         from .data import db
+        from .data.database import execute_sql
         from .data.hobolink import get_live_hobolink_data
         from .data.hobolink import request_to_hobolink
         from .data.predictive_models import process_data
