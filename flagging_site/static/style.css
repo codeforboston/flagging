@@ -62,7 +62,7 @@ ul {
   width: 100%;
   max-width: 1260px;
   text-align: center;
-  border-bottom: thin solid #dce9f2;
+  border-bottom: 0 solid #dce9f2;
   height: fit-content;
   background: white;
   z-index: 2000;

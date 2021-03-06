@@ -2,7 +2,12 @@
     Based on code by @yeyezizhi:
     https://gist.github.com/yeyezizhi/046fa6e86c1cb3452e90c2dafcdb4915
 
-   The editor.md tool is a bit overkill; we <just></just> want to support extremely basic markdown, so we use SimpleMDE.
+    The editor.md tool is a bit overkill; we just want to support extremely
+    basic markdown, so we use SimpleMDE.
+
+    This page is designed for the live options interface. We remove the
+    "navlinks" (i.e. replace it with an empty block) because there is nothing to
+    navigate (live options is just one row in the db).
 #}
 {% extends 'admin/model/edit.html' %}
 {% block body %}
