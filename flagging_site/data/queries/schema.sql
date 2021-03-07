@@ -1,12 +1,12 @@
 DROP TABLE IF EXISTS usgs;
-CREATE TABLE IF NOT EXISTS usgs (
+CREATE TABLE usgs (
     time            timestamp,
     stream_flow     decimal,
     gage_height     decimal
 );
 
 DROP TABLE IF EXISTS hobolink;
-CREATE TABLE IF NOT EXISTS hobolink (
+CREATE TABLE hobolink (
     time            timestamp,
     pressure        decimal,
     par             decimal, -- photosynthetically active radiation
@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS hobolink (
 );
 
 DROP TABLE IF EXISTS model_outputs;
-CREATE TABLE IF NOT EXISTS model_outputs (
+CREATE TABLE model_outputs (
     reach           int,
     time            timestamp,
     log_odds        decimal,
@@ -29,10 +29,19 @@ CREATE TABLE IF NOT EXISTS model_outputs (
     safe            boolean
 );
 
+/* We don't want to ever drop this table because it may contain important
+   information that can't be recalculated. */
+CREATE TABLE IF NOT EXISTS override_history (
+    time            timestamp,
+    boathouse       text,
+    overridden      boolean,
+    reason          text
+);
+
+
 /* These tables are defined with SQLAlchemy. */
 
 DROP TABLE IF EXISTS boathouses;
-DROP TABLE IF EXISTS manual_overrides;
 DROP TABLE IF EXISTS live_website_options;
 
 COMMIT;

@@ -10,16 +10,21 @@ is passed in via `db.init_app(app)`, and the `db` object looks for the config
 variable `SQLALCHEMY_DATABASE_URI`.
 """
 import os
+from textwrap import dedent
 from typing import Optional
 
 import pandas as pd
 import psycopg2
 import psycopg2.errors
+from psycopg2 import connect
 import click
 from flask import current_app
+
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import event
+from sqlalchemy import DDL
 from sqlalchemy.exc import ResourceClosedError
-from psycopg2 import connect
+
 from flask_caching import Cache
 
 
@@ -124,6 +129,43 @@ def init_db():
 
     # The file for keeping track of if it's currently boating season
     execute_sql_from_file('define_default_options.sql')
+
+    # Create a database trigger
+    #
+    # Eventually this can cause problems because of the Heroku free tier row
+    # limit of 10,000. The rest of the database takes up just above ~2,500 rows.
+    # The table "override_history" takes a while to fil,l but eventually it can
+    # fill, if this website sticks around in prod for a while.
+    #
+    # TODO:
+    #   Solve the aforementioned problem in an elegant way? Right now there is
+    #   no solution for this other than to flush it after a couple years...
+    execute_sql(dedent('''\
+        CREATE OR REPLACE FUNCTION record_override_change()
+            RETURNS trigger AS $$
+                BEGIN
+                    INSERT INTO override_history(
+                        time,
+                        boathouse,
+                        overridden,
+                        reason
+                    )
+                    VALUES(
+                        now() AT TIME ZONE 'EST',
+                        NEW.boathouse,
+                        NEW.overridden,
+                        NEW.reason
+                    );
+                    RETURN NULL;
+                END; $$
+            LANGUAGE 'plpgsql'
+        ;
+
+        CREATE TRIGGER record_manual_overrides
+            AFTER UPDATE OF overridden, reason ON boathouses
+            FOR EACH ROW
+            EXECUTE PROCEDURE record_override_change()
+        ;'''))
 
     # The function that updates the database periodically should be run after
     # this runs.

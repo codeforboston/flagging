@@ -77,6 +77,7 @@ def test_admin_pages(client, page, auth, expected_status_code):
         ('/admin/db/download/csv/processed_data', 'admin:password', 200),
         ('/admin/db/download/csv/model_outputs', 'admin:password', 200),
         ('/admin/db/download/csv/boathouses', 'admin:password', 200),
+        ('/admin/db/download/csv/override_history', 'admin:password', 200),
         ('/admin/db/download/csv/hobolink_source', 'admin:password', 200),
         ('/admin/db/download/csv/usgs_source', 'admin:password', 200),
         ('/admin/db/download/csv/processed_data_source', 'admin:password', 200),
@@ -99,7 +100,8 @@ def test_admin_downloads(client, page, auth, expected_status_code):
     else:
         assert res.mimetype == 'text/csv'
         # make sure it's returning *something*
-        assert res.data.count(b'\n') >= 5
+        if 'override_history' not in page:
+            assert res.data.count(b'\n') >= 5
 
 
 def test_override_on_home_page(client, db_session, cache):

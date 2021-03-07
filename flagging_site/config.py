@@ -148,7 +148,8 @@ class Config:
     - 1 for processed data
     - 4 for models
     
-    Heroku free tier has a 10,000 total row limit across all tables, so we
+    Heroku free tier has a 10,000 total row limit across all tables, so we want
+    to be well within that limit to the extent we can assure it.
     """
 
     SEND_TWEETS: bool = strtobool(os.getenv('SEND_TWEETS', 'false'))
@@ -209,6 +210,7 @@ class DevelopmentConfig(Config):
     DEBUG: bool = True
     TESTING: bool = True
     CACHE_DEFAULT_TIMEOUT: int = 60
+    USE_MOCK_DATA: bool = strtobool(os.getenv('USE_MOCK_DATA', 'false'))
     SQLALCHEMY_ECHO: bool = strtobool(os.getenv('SQLALCHEMY_ECHO', 'false'))
 
 

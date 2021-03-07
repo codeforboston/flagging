@@ -17,6 +17,8 @@ from flask import current_app
 from flask import Markup
 from flask import send_file
 
+from werkzeug.middleware.proxy_fix import ProxyFix
+
 
 def create_app(config: Optional[str] = None) -> Flask:
     """Create and configure an instance of the Flask application. We use the
@@ -31,7 +33,6 @@ def create_app(config: Optional[str] = None) -> Flask:
         The fully configured Flask app instance.
     """
     app = Flask(__name__)
-    app.config['CACHE_TYPE'] = 'simple'
 
     from .config import get_config_from_env
     cfg = get_config_from_env(config or app.env)
@@ -44,6 +45,11 @@ def create_app(config: Optional[str] = None) -> Flask:
         register_jinja_env(app)
         register_commands(app)
         register_misc(app)
+
+    # Fix an issue with some flask-admin stuff redirecting to "http". Because
+    # we use HTTP BasicAuth, the http scheme is bad during authorized sessions.
+    # (This issue is specifically caused by Meinheld.)
+    app.wsgi_app = ProxyFix(app.wsgi_app)
 
     return app
 
@@ -384,6 +390,7 @@ def register_misc(app: Flask):
         from flask import current_app as app
         from flask.testing import FlaskClient
         from .data import db
+        from .data.database import execute_sql
         from .data.hobolink import get_live_hobolink_data
         from .data.hobolink import request_to_hobolink
         from .data.predictive_models import process_data
