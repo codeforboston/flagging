@@ -37,7 +37,7 @@ def test_manual_override(client, db_session, cache):
 
     def _get_yacht_club():
         res = client.get('/api/v1/boathouses').json
-        f = lambda x: x['boathouse'] == 'Newton Yacht Club'
+        f = lambda x: x['boathouse'] == 'Newton Yacht Club'  # noqa
         yacht_club = list(filter(f, res['boathouses']))[0]
         return yacht_club
 

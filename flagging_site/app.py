@@ -385,18 +385,18 @@ def register_misc(app: Flask):
         the need to manually declare an import. This is just a convenience for
         using the Flask shell.
         """
-        import pandas as pd
-        import numpy as np
-        from flask import current_app as app
-        from flask.testing import FlaskClient
-        from .data import db
-        from .data.database import execute_sql
-        from .data.hobolink import get_live_hobolink_data
-        from .data.hobolink import request_to_hobolink
-        from .data.predictive_models import process_data
-        from .data.usgs import get_live_usgs_data
-        from .data.usgs import request_to_usgs
-        from .twitter import compose_tweet
+        import pandas as pd  # noqa: F401
+        import numpy as np  # noqa: F401
+        from flask import current_app as app  # noqa: F401
+        from flask.testing import FlaskClient  # noqa: F401
+        from .data import db  # noqa: F401
+        from .data.database import execute_sql  # noqa: F401
+        from .data.hobolink import get_live_hobolink_data  # noqa: F401
+        from .data.hobolink import request_to_hobolink  # noqa: F401
+        from .data.predictive_models import process_data  # noqa: F401
+        from .data.usgs import get_live_usgs_data  # noqa: F401
+        from .data.usgs import request_to_usgs  # noqa: F401
+        from .twitter import compose_tweet  # noqa: F401
 
         def get_auth():
             from base64 import b64encode

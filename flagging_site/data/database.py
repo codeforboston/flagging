@@ -21,8 +21,6 @@ import click
 from flask import current_app
 
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import event
-from sqlalchemy import DDL
 from sqlalchemy.exc import ResourceClosedError
 
 from flask_caching import Cache
@@ -246,11 +244,11 @@ def delete_db(dbname: str = None):
     if database != 'flagging_test':
         # Make sure we want to do this.
         click.echo(f'Are you sure you want to delete database {database!r}?')
-        click.echo(f"Type in the database name '" +
+        click.echo("Type in the database name '" +
                    click.style(database, fg='red') + "' to confirm")
         confirmation = click.prompt('Database name')
         if database != confirmation:
-            click.echo(f'The input does not match. '
+            click.echo('The input does not match. '
                        'The database will not be deleted.')
             return None
 

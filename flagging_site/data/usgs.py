@@ -2,7 +2,7 @@
 This file handles connections to the USGS API to retrieve data from the Waltham
 gauge.
 
-Link  to the web interface (not the api) 
+Link to the web interface (not the api)
 https://waterdata.usgs.gov/nwis/uv?site_no=01104500
 """
 import os
@@ -100,7 +100,7 @@ def parse_usgs_data(res) -> pd.DataFrame:
     # Convert types
     df['time'] = pd.to_datetime(df['time'])
     # Note to self: ran this once in a test and it gave the following error:
-    # FAILED tests/test_data.py::test_usgs_data_is_recent - ValueError: could not convert string to float: ''
+    # >>> ValueError: could not convert string to float: ''
     # Reran and it went away
     # The error was here in this line casting `stream_flow` to a float:
     df['stream_flow'] = df['stream_flow'].astype(float)
