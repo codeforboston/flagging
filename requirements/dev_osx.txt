@@ -10,6 +10,7 @@ chardet==3.0.4            # via requests
 click==7.1.2              # via -r requirements/_core.in, flask, mkdocs, nltk, pip-tools, schemathesis
 coverage==5.3             # via pytest-cov
 curlify==2.2.1            # via schemathesis
+flake8==3.8.4             # via -r requirements/_dev_core.in
 flasgger==0.9.5           # via -r requirements/_core.in
 flask-admin==1.5.7        # via -r requirements/_core.in
 flask-basicauth==0.2.0    # via -r requirements/_core.in
@@ -34,6 +35,7 @@ livereload==2.6.3         # via mkdocs
 lunr[languages]==0.5.8    # via mkdocs
 markdown==3.3.3           # via -r requirements/_core.in, mkdocs, mkdocs-material, pymdown-extensions
 markupsafe==1.1.1         # via jinja2, wtforms
+mccabe==0.6.1             # via flake8
 meinheld==1.0.2           # via -r requirements/dev_osx.in
 mistune==0.8.4            # via flasgger
 mkdocs-macros-plugin==0.5.0  # via -r requirements/_dev_core.in
@@ -52,6 +54,8 @@ pluggy==0.13.1            # via pytest
 psycopg2-binary==2.8.6    # via -r requirements/dev_osx.in
 py==1.9.0                 # via pytest
 pyarrow==2.0.0            # via -r requirements/_dev_core.in
+pycodestyle==2.6.0        # via flake8
+pyflakes==2.2.0           # via flake8
 pygments==2.7.2           # via -r requirements/_dev_core.in, mkdocs-material
 pymdown-extensions==8.0.1  # via -r requirements/_dev_core.in, mkdocs-material
 pyparsing==2.4.7          # via packaging

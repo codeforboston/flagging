@@ -1,3 +1,4 @@
+# flake8: noqa: E501
 """
 This file contains all the logic for modeling. The model takes data from the SQL
 backend, do some calculations on that data, and then output model results.

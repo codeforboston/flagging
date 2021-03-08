@@ -108,7 +108,6 @@ class Boathouse(db.Model):
 
 
 class _BaseBoathouseView(ModelView):
-    # <span class="fa fa-circle-o glyphicon glyphicon-minus-sign icon-minus-sign"></span>
     list_template = 'admin/list_boathouses.html'
     column_filters = ('reach',)
     column_default_sort = [('reach', False), ('boathouse', False)]
@@ -149,7 +148,8 @@ class ManualOverridesModelView(_BaseBoathouseView):
 
     def _flip_all_overrides(self, ids, change_flags_to: bool):
         query = tools.get_query_for_ids(self.get_query(), self.model, ids)
-        query.update({'overridden': change_flags_to}, synchronize_session='fetch')
+        query.update({'overridden': change_flags_to},
+                     synchronize_session='fetch')
         db.session.commit()
         cache.clear()
         return redirect(self.url)

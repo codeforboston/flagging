@@ -52,7 +52,8 @@ class Config:
     # DATABASE CONFIG OPTIONS
     # ==========================================================================
 
-    POSTGRES_USER: str = os.getenv('POSTGRES_USER', os.getenv('USER', 'postgres'))
+    POSTGRES_USER: str = os.getenv('POSTGRES_USER',
+                                   os.getenv('USER', 'postgres'))
     POSTGRES_PASSWORD: str = os.getenv('POSTGRES_PASSWORD', 'postgres')
     POSTGRES_HOST: str = os.getenv('POSTGRES_HOST', 'localhost')
     POSTGRES_PORT: str = os.getenv('POSTGRES_PORT', '5432')
@@ -142,12 +143,12 @@ class Config:
 
     STORAGE_HOURS: int = 24 * 7
     """Each hour of data takes 15 rows of data:
-     
+
     - 6 for HOBOlink
     - 4 for USGS
     - 1 for processed data
     - 4 for models
-    
+
     Heroku free tier has a 10,000 total row limit across all tables, so we want
     to be well within that limit to the extent we can assure it.
     """
@@ -167,7 +168,7 @@ class Config:
         #
         # You should not use it ideally, but as a default for very quick runs
         # and demos, it should be OK.
-        'pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw')
+        'pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw')  # noqa
 
 
 class ProductionConfig(Config):
