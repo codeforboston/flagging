@@ -336,6 +336,7 @@ def register_commands(app: Flask):
         subprocess.call(['pip-compile', 'requirements/dev_osx.in', *ctx.args])
         subprocess.call(['pip-compile', 'requirements/dev_windows.in', *ctx.args])
         subprocess.call(['pip-compile', 'requirements/prod.in', *ctx.args])
+        subprocess.call(['pip-compile', 'requirements/_docs.in', *ctx.args])
 
     @app.cli.command('clear-cache')
     def clear_cache():
