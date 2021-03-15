@@ -1,11 +1,7 @@
 -r _core.in
 
 # Docs dependencies
-mkdocs
-pymdown-extensions
-mkdocs-material
-mkdocs-macros-plugin
-pygments
+-r _docs.in
 
 # Testing related stuff
 pytest
