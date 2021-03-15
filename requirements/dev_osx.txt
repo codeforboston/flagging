@@ -38,11 +38,11 @@ markupsafe==1.1.1         # via jinja2, wtforms
 mccabe==0.6.1             # via flake8
 meinheld==1.0.2           # via -r requirements/dev_osx.in
 mistune==0.8.4            # via flasgger
-mkdocs-macros-plugin==0.5.0  # via -r requirements/_dev_core.in
+mkdocs-macros-plugin==0.5.0  # via -r requirements/_docs.in
 mkdocs-macros-test==0.1.0  # via mkdocs-macros-plugin
 mkdocs-material-extensions==1.0.1  # via mkdocs-material
-mkdocs-material==6.1.6    # via -r requirements/_dev_core.in, mkdocs-macros-plugin, mkdocs-material-extensions
-mkdocs==1.1.2             # via -r requirements/_dev_core.in, mkdocs-macros-plugin, mkdocs-material
+mkdocs-material==6.1.6    # via -r requirements/_docs.in, mkdocs-macros-plugin, mkdocs-material-extensions
+mkdocs==1.1.2             # via -r requirements/_docs.in, mkdocs-macros-plugin, mkdocs-material
 multidict==5.1.0          # via yarl
 nltk==3.5                 # via lunr
 numpy==1.19.4             # via pandas, pyarrow
@@ -56,8 +56,8 @@ py==1.9.0                 # via pytest
 pyarrow==2.0.0            # via -r requirements/_dev_core.in
 pycodestyle==2.6.0        # via flake8
 pyflakes==2.2.0           # via flake8
-pygments==2.7.2           # via -r requirements/_dev_core.in, mkdocs-material
-pymdown-extensions==8.0.1  # via -r requirements/_dev_core.in, mkdocs-material
+pygments==2.7.2           # via -r requirements/_docs.in, mkdocs-material
+pymdown-extensions==8.0.1  # via -r requirements/_docs.in, mkdocs-material
 pyparsing==2.4.7          # via packaging
 pyrsistent==0.17.3        # via jsonschema
 pysocks==1.7.1            # via requests
