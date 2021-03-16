@@ -1,4 +1,4 @@
-name: tests
+name: Run unit-tests
 
 on:
 - push
@@ -31,6 +31,7 @@ jobs:
         python-version: 3.7
     - name: Install dependencies
       run: |
+        sudo apt-get update
         sudo apt-get install python-dev libpq-dev
         python -m pip install --upgrade pip
         python -m pip install -r requirements/dev_osx.txt
