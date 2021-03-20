@@ -40,7 +40,7 @@ idna==2.10
     # via requests
 itsdangerous==1.1.0
     # via flask
-jinja2==2.11.2
+jinja2==2.11.3
     # via
     #   -r _core.in
     #   flask
