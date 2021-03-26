@@ -74,7 +74,7 @@ python-dotenv==0.15.0
     # via -r _core.in
 pytz==2020.4
     # via pandas
-pyyaml==5.3.1
+pyyaml==5.4
     # via
     #   -r _core.in
     #   flasgger
