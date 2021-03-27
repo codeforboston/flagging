@@ -2,67 +2,22 @@
 {% block title %}Boathouses{% endblock %}
 {% block head %}
     {{ super() }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='flags.css', v=FLAGS_CSS_MD5) }}" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin=""/>
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>
-     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 {% endblock %}
 {% block content %}
-    <!-- NOTE! the developer intends to replace the pushpins with flags -->
+    <h2>Flags</h2>
+    <div class="widget-container">
+    {% include get_widget_filename(version=1) %}
+    </div>
+    <h2>Map</h2>
     <p>
         Below is a map showing the Charles River boathouses with their current flag statuses. Clicking on a flag will
         show the name of the boathouse.
     </p>
-    <div id="boathouse_map" style="max-width: 600px; height: 400px; margin: auto;"></div>
-    <script>
-
-        var flagMap = L.map('boathouse_map').setView([42.36, -71.12], 12);
-
-        L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={{ MAPBOX_ACCESS_TOKEN }}', {
-            maxZoom: 18,
-            attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, ' +
-                'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-            id: 'mapbox/streets-v11',
-            tileSize: 512,
-            zoomOffset: -1
-        }).addTo(flagMap);
-
-        var FlagIcon = L.Icon.extend({
-            options: {
-                shadowUrl: '/static/images/shadow_flag.png',
-                iconSize: [50, 50],
-                shadowSize: [50, 50],
-                iconAnchor: [11,44],
-                shadowAnchor: [9, 33],
-                popupAnchor: [0, -34]
-            }
-        });
-
-        var blueFlagIcon = new FlagIcon({iconUrl: '/static/images/blue_flag.png'});
-        var redFlagIcon = new FlagIcon({iconUrl: '/static/images/red_flag.png'});
-
-        var marker;
-
-        function displayBoathouse(boathouse, index) {
-
-            marker = L.marker([
-                    boathouse['latitude'],
-                    boathouse['longitude']
-                ], {
-                    icon: boathouse['safe'] ? blueFlagIcon : redFlagIcon
-                }
-            ).addTo(flagMap);
-            marker.bindPopup("<b>" + boathouse['boathouse'] + "</b>");
-        }
-
-        // Call the JSON from the Boathouses API,
-        // then map the response to the function that displays boathouses.
-
-        $.getJSON(
-            '{{ url_for('api.boathouses_api') }}',
-            function(data){
-                data['boathouses'].forEach(displayBoathouse)
-            }
-        );
-
-    </script>
+    <div class="widget-container">
+    {% include get_widget_filename(version=2) %}
+    </div>
 {% endblock %}

@@ -115,7 +115,7 @@ def test_override_on_home_page(client, db_session, cache):
     """
 
     def _get_flag_count():
-        res = client.get('/').data
+        res = client.get('/boathouses').data
         return {
             'blue': res.count(b'blue_flag.png'),
             'red': res.count(b'red_flag.png')
