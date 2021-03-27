@@ -14,22 +14,4 @@ There are a lot of extensions included in this documentation in addition to Mate
 
 All of these tools are added and configured inside `mkdocs.yml`. Note you need to pip install them for them to work when you deploy; see deployment script below.
 
-### Deploying / Refreshing the Docs
-
-If you have write permission to the upstream repository (i.e. you are a project manager), run the following:
-
-```shell script
-cd docs
-mkdocs gh-deploy --remote-name upstream
-```
-
-If you do not have write permission to the upstream repository, you can do one of the following:
- 
- 1. (Preferred) Ask a project manager to refresh the pages after you've made changes to the docs.
- 2. Run `mkdocs gh-deploy` on your own fork, and then do a pull request to `codeforboston:gh-pages`:
- 
-```shell script
-mkdocs gh-deploy
-git checkout gh-pages
-git push origin gh-pages
-```
+Docs are deployed automatically via Github Actions after every merge to the main branch.
