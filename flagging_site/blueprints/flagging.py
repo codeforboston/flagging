@@ -48,7 +48,7 @@ def before_request():
         )
 
 
-def flag_widget_params() -> Dict[str, Any]:
+def flag_widget_params(force_display: bool = False) -> Dict[str, Any]:
     """Creates the parameters for the flags widget.
 
     Pass these parameters into a Jinja template like this:
@@ -58,7 +58,7 @@ def flag_widget_params() -> Dict[str, Any]:
     return dict(
         flags=Boathouse.all_flags(),
         model_last_updated_time=get_latest_prediction_time(),
-        boating_season=LiveWebsiteOptions.is_boating_season(),
+        boating_season=force_display or LiveWebsiteOptions.is_boating_season(),
         flagging_message=LiveWebsiteOptions.get_flagging_message()
     )
 
@@ -103,7 +103,7 @@ def index() -> str:
 @bp.route('/boathouses')
 @cache.cached()
 def boathouses() -> str:
-    return render_template('boathouses.html', **flag_widget_params())
+    return render_template('boathouses.html', **flag_widget_params(force_display=True))
 
 
 @bp.route('/about')
