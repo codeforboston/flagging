@@ -103,7 +103,7 @@ def index() -> str:
 @bp.route('/boathouses')
 @cache.cached()
 def boathouses() -> str:
-    return render_template('boathouses.html')
+    return render_template('boathouses.html', **flag_widget_params())
 
 
 @bp.route('/about')
@@ -142,7 +142,6 @@ def model_outputs() -> str:
 @bp.route('/flags/<int:version>')
 @cache.cached()
 def flags(version: int = None) -> str:
-    print('version', version)
     return render_template('flags.html',
                            **flag_widget_params(),
                            version=version)
