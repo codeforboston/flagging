@@ -53,7 +53,7 @@ pymdown-extensions==8.1.1
     #   mkdocs-material
 python-dateutil==2.8.1
     # via mkdocs-macros-plugin
-pyyaml==5.4.1
+pyyaml==5.4
     # via
     #   mkdocs
     #   mkdocs-macros-plugin
