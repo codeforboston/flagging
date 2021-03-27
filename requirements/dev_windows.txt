@@ -4,89 +4,256 @@
 #
 #    pip-compile requirements/dev_windows.in
 #
-attrs==20.3.0             # via hypothesis, jsonschema, pytest, schemathesis
-certifi==2020.12.5        # via requests
-chardet==3.0.4            # via requests
-click==7.1.2              # via -r requirements/_core.in, flask, mkdocs, nltk, pip-tools, schemathesis
-colorama==0.4.4           # via -r requirements/dev_windows.in
-coverage==5.3             # via pytest-cov
-curlify==2.2.1            # via schemathesis
-flake8==3.8.4             # via -r requirements/_dev_core.in
-flasgger==0.9.5           # via -r requirements/_core.in
-flask-admin==1.5.7        # via -r requirements/_core.in
-flask-basicauth==0.2.0    # via -r requirements/_core.in
-flask-caching==1.9.0      # via -r requirements/_core.in
-flask-sqlalchemy==2.4.4   # via -r requirements/_core.in, pytest-flask-sqlalchemy
-flask==1.1.2              # via -r requirements/_core.in, flasgger, flask-admin, flask-basicauth, flask-caching, flask-sqlalchemy
-future==0.18.2            # via lunr
-graphql-core==3.1.2       # via hypothesis-graphql
-gunicorn==20.0.4          # via -r requirements/_core.in
-hypothesis-graphql==0.3.2  # via schemathesis
-hypothesis-jsonschema==0.18.2  # via schemathesis
-hypothesis==5.41.5        # via hypothesis-graphql, hypothesis-jsonschema, schemathesis
-idna==2.10                # via requests, yarl
-iniconfig==1.1.1          # via pytest
-itsdangerous==1.1.0       # via flask
-jinja2==2.11.2            # via -r requirements/_core.in, flask, mkdocs, mkdocs-macros-plugin
-joblib==0.17.0            # via nltk
-jsonschema==3.2.0         # via flasgger, hypothesis-jsonschema, schemathesis
-junit-xml==1.9            # via schemathesis
-livereload==2.6.3         # via mkdocs
-lunr[languages]==0.5.8    # via mkdocs
-markdown==3.3.3           # via -r requirements/_core.in, mkdocs, mkdocs-material, pymdown-extensions
-markupsafe==1.1.1         # via jinja2, wtforms
-mccabe==0.6.1             # via flake8
-mistune==0.8.4            # via flasgger
-mkdocs-macros-plugin==0.5.0  # via -r requirements/_docs.in
-mkdocs-macros-test==0.1.0  # via mkdocs-macros-plugin
-mkdocs-material-extensions==1.0.1  # via mkdocs-material
-mkdocs-material==6.1.6    # via -r requirements/_docs.in, mkdocs-macros-plugin, mkdocs-material-extensions
-mkdocs==1.1.2             # via -r requirements/_docs.in, mkdocs-macros-plugin, mkdocs-material
-multidict==5.1.0          # via yarl
-nltk==3.5                 # via lunr
-numpy==1.19.4             # via pandas, pyarrow
-oauthlib==3.1.0           # via requests-oauthlib
-packaging==20.7           # via pytest, pytest-flask-sqlalchemy
-pandas==1.1.4             # via -r requirements/_core.in
-pip-tools==5.4.0          # via -r requirements/_dev_core.in
-pluggy==0.13.1            # via pytest
-psycopg2==2.8.6           # via -r requirements/dev_windows.in
-py==1.9.0                 # via pytest
-pyarrow==2.0.0            # via -r requirements/_dev_core.in
-pycodestyle==2.6.0        # via flake8
-pyflakes==2.2.0           # via flake8
-pygments==2.7.2           # via -r requirements/_docs.in, mkdocs-material
-pymdown-extensions==8.0.1  # via -r requirements/_docs.in, mkdocs-material
-pyparsing==2.4.7          # via packaging
-pyrsistent==0.17.3        # via jsonschema
-pysocks==1.7.1            # via requests
-pytest-cov==2.10.1        # via -r requirements/_dev_core.in
-pytest-flask-sqlalchemy==1.0.2  # via -r requirements/_dev_core.in
-pytest-mock==3.5.1        # via pytest-flask-sqlalchemy
-pytest-subtests==0.3.2    # via schemathesis
-pytest==6.1.2             # via -r requirements/_dev_core.in, pytest-cov, pytest-flask-sqlalchemy, pytest-mock, pytest-subtests, schemathesis
-python-dateutil==2.8.1    # via mkdocs-macros-plugin, pandas
-python-dotenv==0.15.0     # via -r requirements/_core.in
-pytz==2020.4              # via pandas
-pyyaml==5.3.1             # via -r requirements/_core.in, flasgger, mkdocs, mkdocs-macros-plugin, schemathesis
-regex==2020.11.13         # via nltk
-requests-oauthlib==1.3.0  # via tweepy
-requests[socks]==2.25.0   # via -r requirements/_core.in, curlify, requests-oauthlib, schemathesis, tweepy
-schemathesis==2.8.4       # via -r requirements/_dev_core.in
-six==1.15.0               # via flasgger, jsonschema, junit-xml, livereload, lunr, pip-tools, python-dateutil, tenacity, tweepy
-sortedcontainers==2.3.0   # via hypothesis
-sqlalchemy==1.3.20        # via -r requirements/_core.in, flask-sqlalchemy, pytest-flask-sqlalchemy
-starlette==0.13.8         # via schemathesis
-tenacity==6.2.0           # via -r requirements/_core.in
-termcolor==1.1.0          # via mkdocs-macros-plugin
-toml==0.10.2              # via pytest
-tornado==6.1              # via livereload, mkdocs
-tqdm==4.54.1              # via nltk
-tweepy==3.9.0             # via -r requirements/_core.in
-urllib3==1.26.2           # via requests
-werkzeug==1.0.1           # via flask, schemathesis
-wtforms==2.3.3            # via flask-admin
-yarl==1.6.3               # via schemathesis
+attrs==20.3.0
+    # via
+    #   hypothesis
+    #   jsonschema
+    #   pytest
+    #   schemathesis
+certifi==2020.12.5
+    # via requests
+chardet==3.0.4
+    # via requests
+click==7.1.2
+    # via
+    #   -r _core.in
+    #   flask
+    #   mkdocs
+    #   nltk
+    #   pip-tools
+    #   schemathesis
+colorama==0.4.4
+    # via -r dev_windows.in
+coverage==5.3
+    # via pytest-cov
+curlify==2.2.1
+    # via schemathesis
+flake8==3.8.4
+    # via -r _dev_core.in
+flasgger==0.9.5
+    # via -r _core.in
+flask-admin==1.5.7
+    # via -r _core.in
+flask-basicauth==0.2.0
+    # via -r _core.in
+flask-caching==1.9.0
+    # via -r _core.in
+flask-sqlalchemy==2.4.4
+    # via
+    #   -r _core.in
+    #   pytest-flask-sqlalchemy
+flask==1.1.2
+    # via
+    #   -r _core.in
+    #   flasgger
+    #   flask-admin
+    #   flask-basicauth
+    #   flask-caching
+    #   flask-sqlalchemy
+future==0.18.2
+    # via lunr
+graphql-core==3.1.2
+    # via hypothesis-graphql
+gunicorn==20.0.4
+    # via -r _core.in
+hypothesis-graphql==0.3.2
+    # via schemathesis
+hypothesis-jsonschema==0.18.2
+    # via schemathesis
+hypothesis==5.41.5
+    # via
+    #   hypothesis-graphql
+    #   hypothesis-jsonschema
+    #   schemathesis
+idna==2.10
+    # via
+    #   requests
+    #   yarl
+iniconfig==1.1.1
+    # via pytest
+itsdangerous==1.1.0
+    # via flask
+jinja2==2.11.3
+    # via
+    #   -r _core.in
+    #   flask
+    #   mkdocs
+    #   mkdocs-macros-plugin
+joblib==0.17.0
+    # via nltk
+jsonschema==3.2.0
+    # via
+    #   flasgger
+    #   hypothesis-jsonschema
+    #   schemathesis
+junit-xml==1.9
+    # via schemathesis
+livereload==2.6.3
+    # via mkdocs
+lunr[languages]==0.5.8
+    # via mkdocs
+markdown==3.3.3
+    # via
+    #   -r _core.in
+    #   mkdocs
+    #   mkdocs-material
+    #   pymdown-extensions
+markupsafe==1.1.1
+    # via
+    #   jinja2
+    #   wtforms
+mccabe==0.6.1
+    # via flake8
+mistune==0.8.4
+    # via flasgger
+mkdocs-macros-plugin==0.5.0
+    # via -r _docs.in
+mkdocs-macros-test==0.1.0
+    # via mkdocs-macros-plugin
+mkdocs-material-extensions==1.0.1
+    # via mkdocs-material
+mkdocs-material==6.1.6
+    # via
+    #   -r _docs.in
+    #   mkdocs-macros-plugin
+    #   mkdocs-material-extensions
+mkdocs==1.1.2
+    # via
+    #   -r _docs.in
+    #   mkdocs-macros-plugin
+    #   mkdocs-material
+multidict==5.1.0
+    # via yarl
+nltk==3.5
+    # via lunr
+numpy==1.19.4
+    # via
+    #   pandas
+    #   pyarrow
+oauthlib==3.1.0
+    # via requests-oauthlib
+packaging==20.7
+    # via
+    #   pytest
+    #   pytest-flask-sqlalchemy
+pandas==1.1.4
+    # via -r _core.in
+pip-tools==5.4.0
+    # via -r _dev_core.in
+pluggy==0.13.1
+    # via pytest
+psycopg2==2.8.6
+    # via -r dev_windows.in
+py==1.9.0
+    # via pytest
+pyarrow==2.0.0
+    # via -r _dev_core.in
+pycodestyle==2.6.0
+    # via flake8
+pyflakes==2.2.0
+    # via flake8
+pygments==2.7.2
+    # via
+    #   -r _docs.in
+    #   mkdocs-material
+pymdown-extensions==8.0.1
+    # via
+    #   -r _docs.in
+    #   mkdocs-material
+pyparsing==2.4.7
+    # via packaging
+pyrsistent==0.17.3
+    # via jsonschema
+pysocks==1.7.1
+    # via requests
+pytest-cov==2.10.1
+    # via -r _dev_core.in
+pytest-flask-sqlalchemy==1.0.2
+    # via -r _dev_core.in
+pytest-mock==3.5.1
+    # via pytest-flask-sqlalchemy
+pytest-subtests==0.3.2
+    # via schemathesis
+pytest==6.1.2
+    # via
+    #   -r _dev_core.in
+    #   pytest-cov
+    #   pytest-flask-sqlalchemy
+    #   pytest-mock
+    #   pytest-subtests
+    #   schemathesis
+python-dateutil==2.8.1
+    # via
+    #   mkdocs-macros-plugin
+    #   pandas
+python-dotenv==0.15.0
+    # via -r _core.in
+pytz==2020.4
+    # via pandas
+pyyaml==5.4
+    # via
+    #   -r _core.in
+    #   flasgger
+    #   mkdocs
+    #   mkdocs-macros-plugin
+    #   schemathesis
+regex==2020.11.13
+    # via nltk
+requests-oauthlib==1.3.0
+    # via tweepy
+requests[socks]==2.25.0
+    # via
+    #   -r _core.in
+    #   curlify
+    #   requests-oauthlib
+    #   schemathesis
+    #   tweepy
+schemathesis==2.8.4
+    # via -r _dev_core.in
+six==1.15.0
+    # via
+    #   flasgger
+    #   jsonschema
+    #   junit-xml
+    #   livereload
+    #   lunr
+    #   pip-tools
+    #   python-dateutil
+    #   tenacity
+    #   tweepy
+sortedcontainers==2.3.0
+    # via hypothesis
+sqlalchemy==1.3.20
+    # via
+    #   -r _core.in
+    #   flask-sqlalchemy
+    #   pytest-flask-sqlalchemy
+starlette==0.13.8
+    # via schemathesis
+tenacity==6.2.0
+    # via -r _core.in
+termcolor==1.1.0
+    # via mkdocs-macros-plugin
+toml==0.10.2
+    # via pytest
+tornado==6.1
+    # via
+    #   livereload
+    #   mkdocs
+tqdm==4.54.1
+    # via nltk
+tweepy==3.9.0
+    # via -r _core.in
+urllib3==1.26.3
+    # via requests
+werkzeug==1.0.1
+    # via
+    #   flask
+    #   schemathesis
+wtforms==2.3.3
+    # via flask-admin
+yarl==1.6.3
+    # via schemathesis
 
 # The following packages are considered to be unsafe in a requirements file:
 # pip
