@@ -37,9 +37,6 @@ db = SQLAlchemy()
 cache = Cache()
 
 
-_cfg = get_config_from_env(os.getenv('FLASK_ENV', 'production'))
-
-
 def init_celery(app: Flask):
     celery_app.conf.update(
         broker_url=app.config['BROKER_URL'],

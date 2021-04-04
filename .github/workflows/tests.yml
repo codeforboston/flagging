@@ -40,7 +40,7 @@ jobs:
         python -m pip install --upgrade pip
         python -m pip install -r requirements/dev_osx.txt
     - name: Run Celery worker
-      run: flask celery --app "flagging_site.data:celery_app" worker
+      run: flask celery worker --detach
       env:
         FLASK_ENV: testing
     - name: Run tests
