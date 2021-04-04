@@ -32,4 +32,5 @@ export USE_MOCK_DATA=${use_mock_data:-${USE_MOCK_DATA}}
 
 flask create-db
 flask init-db
+flask clear-cache
 flask run -p ${FLASK_PORT:-5000}
