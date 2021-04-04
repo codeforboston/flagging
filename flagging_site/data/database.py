@@ -45,15 +45,15 @@ def init_celery(app: Flask):
         broker_url=app.config['BROKER_URL'],
         result_backend=app.config['CELERY_RESULT_BACKEND']
     )
-    #
-    # class WithAppContextTask(Task):
-    #     abstract = True
-    #
-    #     def __call__(self, *args, **kwargs):
-    #         with app.app_context():
-    #             return super().__call__(*args, **kwargs)
-    #
-    # celery_app.Task = WithAppContextTask
+
+    class WithAppContextTask(Task):
+        abstract = True
+
+        def __call__(self, *args, **kwargs):
+            with app.app_context():
+                return super().__call__(*args, **kwargs)
+
+    celery_app.Task = WithAppContextTask
 
 
 def execute_sql(query: str) -> Optional[pd.DataFrame]:
@@ -193,10 +193,12 @@ def update_db():
 
         json_usgs = usgs_task.wait()
         df_usgs = pd.DataFrame.from_dict(json_usgs)
+        df_usgs['time'] = pd.to_datetime(df_usgs['time'])
         df_usgs.tail(hours * 4).to_sql('usgs', **options)
 
         json_hobolink = hobolink_task.wait()
         df_hobolink = pd.DataFrame.from_dict(json_hobolink)
+        df_hobolink['time'] = pd.to_datetime(df_hobolink['time'])
         df_hobolink.tail(hours * 6).to_sql('hobolink', **options)
 
         # Populate the `processed_data` table.
