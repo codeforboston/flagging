@@ -183,19 +183,12 @@ def update_db():
     try:
         # Populate the `usgs` table.
         from .usgs import get_live_usgs_data
-        from .hobolink import get_live_hobolink_data
-
-        hobolink_task = get_live_hobolink_data.delay()
-        usgs_task = get_live_usgs_data.delay()
-
-        json_usgs = usgs_task.wait()
-        df_usgs = pd.DataFrame.from_dict(json_usgs)
-        df_usgs['time'] = pd.to_datetime(df_usgs['time'])
+        df_usgs = get_live_usgs_data()
         df_usgs.tail(hours * 4).to_sql('usgs', **options)
 
-        json_hobolink = hobolink_task.wait()
-        df_hobolink = pd.DataFrame.from_dict(json_hobolink)
-        df_hobolink['time'] = pd.to_datetime(df_hobolink['time'])
+        # Populate the `hobolink` table.
+        from .hobolink import get_live_hobolink_data
+        df_hobolink = get_live_hobolink_data()
         df_hobolink.tail(hours * 6).to_sql('hobolink', **options)
 
         # Populate the `processed_data` table.

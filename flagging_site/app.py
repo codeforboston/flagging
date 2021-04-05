@@ -363,7 +363,6 @@ def register_commands(app: Flask):
         cache.clear()
 
     from celery.bin.celery import celery as celery_cmd
-    celery_cmd.callback = with_appcontext(celery_cmd.callback)
     app.cli.add_command(celery_cmd)
 
 

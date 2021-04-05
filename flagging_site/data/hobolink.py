@@ -38,10 +38,14 @@ HOBOLINK_STATIC_FILE_NAME = 'hobolink.pickle'
 
 
 @celery_app.task
+def live_hobolink_task(export_name: str = DEFAULT_HOBOLINK_EXPORT_NAME) -> dict:
+    return get_live_hobolink_data(export_name=export_name).to_dict(orient='records')
+
+
 @retry(reraise=True, wait=wait_fixed(1), stop=stop_after_attempt(3))
 def get_live_hobolink_data(
         export_name: str = DEFAULT_HOBOLINK_EXPORT_NAME
-) -> dict:
+) -> pd.DataFrame:
     """This function runs through the whole process for retrieving data from
     HOBOlink: first we perform the request, and then we clean the data.
 
@@ -60,7 +64,7 @@ def get_live_hobolink_data(
     else:
         res = request_to_hobolink(export_name=export_name)
         df = parse_hobolink_data(res.text)
-    return df.to_dict(orient='records')
+    return df
 
 
 def request_to_hobolink(

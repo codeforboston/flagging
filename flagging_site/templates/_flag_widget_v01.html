@@ -6,9 +6,9 @@
     {% for boathouse, safe in flags.items() %}
     <div class="flag-container">
         {% if safe %}
-            <img class="flag" src="{{ url_for('static', filename='images/blue_flag.png') }}" />
+            <img class="flag" src="{{ url_for('static', filename='images/blue_flag.png') }}" alt="Blue flag for {{ boathouse }} }}" />
         {% else %}
-            <img class="flag" src="{{ url_for('static', filename='images/red_flag.png') }}" />
+            <img class="flag" src="{{ url_for('static', filename='images/red_flag.png') }}" alt="Red flag for {{ boathouse }} }}" />
         {% endif %}
         <br />
         {{ boathouse }}
