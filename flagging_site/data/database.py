@@ -91,7 +91,9 @@ def execute_sql_from_file(file_name: str) -> Optional[pd.DataFrame]:
     """
     path = os.path.join(current_app.config['QUERIES_DIR'], file_name)
     with current_app.open_resource(path) as f:
-        return execute_sql(f.read().decode('utf8'))
+        s = f.read().decode('utf8')
+        print(s)
+        return execute_sql(s)
 
 
 def create_db(overwrite: bool = False) -> bool:
