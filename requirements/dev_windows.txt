@@ -244,7 +244,7 @@ tqdm==4.54.1
     # via nltk
 tweepy==3.9.0
     # via -r _core.in
-urllib3==1.26.3
+urllib3==1.26.4
     # via requests
 werkzeug==1.0.1
     # via
