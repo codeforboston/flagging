@@ -18,6 +18,6 @@
         show the name of the boathouse.
     </p>
     <div class="widget-container">
-    {% include get_widget_filename(version=2) %}
+    {%with flagging_message='' %}{% include get_widget_filename(version=2) %}{% endwith %}
     </div>
 {% endblock %}
