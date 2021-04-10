@@ -103,7 +103,7 @@ class Config:
     # https://flask-caching.readthedocs.io/en/latest/
     # Set CACHE_TYPE=null in environment variables to turn off.
     CACHE_DEFAULT_TIMEOUT: int = 60 * 60 * 7
-    CACHE_TYPE: str = os.getenv('CACHE_TYPE', 'RedisCache')
+    CACHE_TYPE: str = os.getenv('CACHE_TYPE', 'redis')
     CACHE_REDIS_URL: str = os.getenv('REDIS_URL', 'redis://localhost:6379/')
     CACHE_KEY_PREFIX: str = 'frontend_cache'
 
