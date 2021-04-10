@@ -10,6 +10,7 @@ is passed in via `db.init_app(app)`, and the `db` object looks for the config
 variable `SQLALCHEMY_DATABASE_URI`.
 """
 import os
+from abc import ABCMeta
 from textwrap import dedent
 from typing import Optional
 
@@ -27,10 +28,8 @@ from sqlalchemy.exc import ResourceClosedError
 from flask_caching import Cache
 
 from celery import Celery
-from celery import chain
 from celery import Task
 
-from ..config import get_config_from_env
 
 celery_app = Celery(__name__)
 db = SQLAlchemy()
@@ -43,7 +42,7 @@ def init_celery(app: Flask):
         result_backend=app.config['CELERY_RESULT_BACKEND']
     )
 
-    class WithAppContextTask(Task):
+    class WithAppContextTask(Task, metaclass=ABCMeta):
         abstract = True
 
         def __call__(self, *args, **kwargs):
