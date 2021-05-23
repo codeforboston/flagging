@@ -1,3 +1,5 @@
+from inspect import cleandoc
+
 import tweepy
 from flask import Flask
 from flask import current_app
@@ -41,22 +43,19 @@ def compose_tweet() -> str:
     current_time = get_current_time().strftime('%I:%M:%S %p, %m/%d/%Y')
 
     unsafe_count = len([k for k, v in flags.items() if v is False])
-    total_count = len(flags)
 
-    base_msg = (
-        'The CRWA is reporting that {some_or_all} boathouses are {safe_or_unsafe}'
-        ' as of {current_time}.{text_if_not_safe}'
-    )
-
-    text_if_not_safe = \
-        ' Review our site for more details. https://crwa-flagging.herokuapp.com/'
-
-    msg = base_msg.format(
-        some_or_all='some' if total_count > unsafe_count > 0 else 'all',
-        safe_or_unsafe='unsafe' if unsafe_count > 0 else 'safe',
-        current_time=current_time,
-        text_if_not_safe=text_if_not_safe if unsafe_count > 0 else ''
-    )
+    if unsafe_count == 0:
+        msg = cleandoc(
+            f"""Blue flags are being flown at all boathouses on the Lower
+            Charles as of {current_time}. Happy boating!"""
+        )
+    else:
+        some_or_all = 'some' if len(flags) > unsafe_count > 0 else 'all'
+        msg = cleandoc(
+            f"""🚩 Red flags are being flown at {some_or_all} boathouses on the
+            Lower Charles as of {current_time}. See our website for more
+            details. https://crwa-flagging.herokuapp.com/"""
+        )
 
     return msg
 

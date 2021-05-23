@@ -67,9 +67,9 @@ def tweets_parametrization(func: callable):
     @pytest.mark.parametrize(
         ('overrides', 'expected_text'),
         [
-            (0, 'all boathouses are safe as of'),
-            (2, 'some boathouses are unsafe as of'),
-            (999, 'all boathouses are unsafe as of'),
+            (0, 'Blue flags are being flown'),
+            (2, 'Red flags are being flown at some'),
+            (999, 'Red flags are being flown at all'),
         ]
     )
     @wraps(func)
