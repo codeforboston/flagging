@@ -7,3 +7,4 @@
 
 release: flask clear-cache
 web: gunicorn --worker-class="egg:meinheld#gunicorn_worker" "flagging_site:create_app()"
+worker: flask celery worker

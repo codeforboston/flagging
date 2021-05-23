@@ -9,4 +9,5 @@ set /p USE_MOCK_DATA="Use mock data? [y/n]: "
 
 flask create-db
 flask init-db
+flask clear-cache
 flask run

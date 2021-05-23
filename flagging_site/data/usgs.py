@@ -14,6 +14,8 @@ from tenacity import retry
 from tenacity import wait_fixed
 from tenacity import stop_after_attempt
 
+from .database import celery_app
+
 # Constants
 USGS_URL = 'https://waterdata.usgs.gov/nwis/uv'
 
@@ -21,7 +23,12 @@ USGS_STATIC_FILE_NAME = 'usgs.pickle'
 # ~ ~ ~ ~
 
 
-@retry(wait=wait_fixed(1), stop=stop_after_attempt(3))
+@celery_app.task
+def live_usgs_data_task(days_ago: int = 14) -> dict:
+    return get_live_usgs_data(days_ago=days_ago).to_dict(orient='records')
+
+
+@retry(reraise=True, wait=wait_fixed(1), stop=stop_after_attempt(3))
 def get_live_usgs_data(days_ago: int = 14) -> pd.DataFrame:
     """This function runs through the whole process for retrieving data from
     usgs: first we perform the request, and then we parse the data.

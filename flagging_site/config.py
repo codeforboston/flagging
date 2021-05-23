@@ -103,7 +103,13 @@ class Config:
     # https://flask-caching.readthedocs.io/en/latest/
     # Set CACHE_TYPE=null in environment variables to turn off.
     CACHE_DEFAULT_TIMEOUT: int = 60 * 60 * 7
-    CACHE_TYPE: str = os.getenv('CACHE_TYPE', 'simple')
+    CACHE_TYPE: str = os.getenv('CACHE_TYPE', 'redis')
+    CACHE_REDIS_URL: str = os.getenv('REDIS_URL', 'redis://localhost:6379/')
+    CACHE_KEY_PREFIX: str = 'frontend_cache'
+
+    # Celery
+    CELERY_BROKER_URL: str = os.getenv('REDIS_URL', 'redis://localhost:6379/')
+    CELERY_RESULT_BACKEND: str = os.getenv('REDIS_URL', 'redis://localhost:6379/')
 
     # ==========================================================================
     # MISC. CUSTOM CONFIG OPTIONS
@@ -177,10 +183,9 @@ class ProductionConfig(Config):
     internet. Currently the only part of the website that's pretty fleshed out
     is the `flagging` part, so that's the only blueprint we import.
     """
+    CACHE_TYPE: str = 'redis'
     PREFERRED_URL_SCHEME: str = 'https'
     SEND_TWEETS: bool = strtobool(os.getenv('SEND_TWEETS', 'true'))
-    CACHE_TYPE: str = 'redis'
-    CACHE_REDIS_URL: str = os.getenv('REDIS_URL')
 
     def __init__(self):
         """Initializing the production config allows us to ensure the existence

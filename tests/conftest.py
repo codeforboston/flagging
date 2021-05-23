@@ -68,3 +68,9 @@ def cli_runner(app):
 def mock_send_tweet():
     with patch.object(tweepy_api, 'update_status') as mocked_func:
         yield mocked_func
+
+
+# @pytest.fixture(autouse=True)
+# def _celery_worker(celery_worker):
+#     """Make sure celery is available for every test."""
+#     yield celery_worker

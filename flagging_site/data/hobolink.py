@@ -12,6 +12,8 @@ from tenacity import retry
 from tenacity import wait_fixed
 from tenacity import stop_after_attempt
 
+from .database import celery_app
+
 # Constants
 
 HOBOLINK_URL = 'http://webservice.hobolink.com/restv2/data/custom/file'
@@ -35,7 +37,12 @@ HOBOLINK_STATIC_FILE_NAME = 'hobolink.pickle'
 # ~ ~ ~ ~
 
 
-@retry(wait=wait_fixed(1), stop=stop_after_attempt(3))
+@celery_app.task
+def live_hobolink_task(export_name: str = DEFAULT_HOBOLINK_EXPORT_NAME) -> dict:
+    return get_live_hobolink_data(export_name=export_name).to_dict(orient='records')
+
+
+@retry(reraise=True, wait=wait_fixed(1), stop=stop_after_attempt(3))
 def get_live_hobolink_data(
         export_name: str = DEFAULT_HOBOLINK_EXPORT_NAME
 ) -> pd.DataFrame:
@@ -77,6 +84,8 @@ def request_to_hobolink(
         'query': export_name,
         'authentication': current_app.config['HOBOLINK_AUTH']
     }
+
+    print(data)
 
     res = requests.post(HOBOLINK_URL, json=data)
 

@@ -5,6 +5,7 @@
 
 # Testing related stuff
 pytest
+pytest-celery
 pytest-cov
 pytest-flask-sqlalchemy
 schemathesis

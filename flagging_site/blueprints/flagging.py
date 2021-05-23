@@ -25,6 +25,14 @@ def before_request():
     current_time = get_current_time()
 
     # Calculate difference between now and latest prediction time
+    # TODO:
+    #  If model_outputs has zero rows, we raise the following error:
+    #  _
+    #  > TypeError: unsupported operand type(s) for -: 'Timestamp' and 'NoneType'
+    #  _
+    #  I feel like there's probably a better way to handle this particular case
+    #  of the database being empty than for the error to happen here as a
+    #  TypeError.
     diff = current_time - last_pred_time
 
     # If more than 48 hours, flash message.

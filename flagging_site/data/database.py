@@ -10,6 +10,7 @@ is passed in via `db.init_app(app)`, and the `db` object looks for the config
 variable `SQLALCHEMY_DATABASE_URI`.
 """
 import os
+from abc import ABCMeta
 from textwrap import dedent
 from typing import Optional
 
@@ -18,6 +19,7 @@ import psycopg2
 import psycopg2.errors
 from psycopg2 import connect
 import click
+from flask import Flask
 from flask import current_app
 
 from flask_sqlalchemy import SQLAlchemy
@@ -25,9 +27,29 @@ from sqlalchemy.exc import ResourceClosedError
 
 from flask_caching import Cache
 
+from celery import Celery
+from celery import Task
 
+
+celery_app = Celery(__name__)
 db = SQLAlchemy()
 cache = Cache()
+
+
+def init_celery(app: Flask):
+    celery_app.conf.update(
+        broker_url=app.config['CELERY_BROKER_URL'],
+        result_backend=app.config['CELERY_RESULT_BACKEND']
+    )
+
+    class WithAppContextTask(Task, metaclass=ABCMeta):
+        abstract = True
+
+        def __call__(self, *args, **kwargs):
+            with app.app_context():
+                return super().__call__(*args, **kwargs)
+
+    celery_app.Task = WithAppContextTask
 
 
 def execute_sql(query: str) -> Optional[pd.DataFrame]:
@@ -68,7 +90,9 @@ def execute_sql_from_file(file_name: str) -> Optional[pd.DataFrame]:
     """
     path = os.path.join(current_app.config['QUERIES_DIR'], file_name)
     with current_app.open_resource(path) as f:
-        return execute_sql(f.read().decode('utf8'))
+        s = f.read().decode('utf8')
+        print(s)
+        return execute_sql(s)
 
 
 def create_db(overwrite: bool = False) -> bool:
@@ -91,11 +115,13 @@ def create_db(overwrite: bool = False) -> bool:
     cursor.execute('ROLLBACK')
 
     if overwrite:
-        cursor.execute("SELECT bool_or(datname = 'flagging') FROM pg_database;")
-        exists = cursor.fetchall()[0][0]
-        if exists:
-            cursor.execute(f'DROP DATABASE {database};')
-            click.echo(f'Dropped database {database!r}.')
+        try:
+            cursor.execute(f"DROP DATABASE {database};")
+        except psycopg2.errors.lookup("3D000"):
+            click.echo(f"Database {database!r} does not exist.")
+            cursor.execute("ROLLBACK")
+        else:
+            click.echo(f"Database {database!r} was deleted.")
 
     try:
         cursor.execute(f'CREATE DATABASE {database};')
@@ -128,42 +154,8 @@ def init_db():
     # The file for keeping track of if it's currently boating season
     execute_sql_from_file('define_default_options.sql')
 
-    # Create a database trigger
-    #
-    # Eventually this can cause problems because of the Heroku free tier row
-    # limit of 10,000. The rest of the database takes up just above ~2,500 rows.
-    # The table "override_history" takes a while to fil,l but eventually it can
-    # fill, if this website sticks around in prod for a while.
-    #
-    # TODO:
-    #   Solve the aforementioned problem in an elegant way? Right now there is
-    #   no solution for this other than to flush it after a couple years...
-    execute_sql(dedent('''\
-        CREATE OR REPLACE FUNCTION record_override_change()
-            RETURNS trigger AS $$
-                BEGIN
-                    INSERT INTO override_history(
-                        time,
-                        boathouse,
-                        overridden,
-                        reason
-                    )
-                    VALUES(
-                        now() AT TIME ZONE 'EST',
-                        NEW.boathouse,
-                        NEW.overridden,
-                        NEW.reason
-                    );
-                    RETURN NULL;
-                END; $$
-            LANGUAGE 'plpgsql'
-        ;
-
-        CREATE TRIGGER record_manual_overrides
-            AFTER UPDATE OF overridden, reason ON boathouses
-            FOR EACH ROW
-            EXECUTE PROCEDURE record_override_change()
-        ;'''))
+    # Create a database trigger for manual overrides.
+    execute_sql_from_file('override_event_triggers.sql')
 
     # The function that updates the database periodically should be run after
     # this runs.

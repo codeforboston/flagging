@@ -16,6 +16,7 @@ from flask import request
 from flask import current_app
 from flask import Markup
 from flask import send_file
+from flask.cli import with_appcontext
 
 from werkzeug.middleware.proxy_fix import ProxyFix
 
@@ -56,9 +57,14 @@ def create_app(config: Optional[str] = None) -> Flask:
 
 def register_extensions(app: Flask):
     """Register all extensions for the app."""
-    from .data import db, cache
+    from .data import db
     db.init_app(app)
+
+    from .data import cache
     cache.init_app(app)
+
+    from .data.database import init_celery
+    init_celery(app)
 
     from .admin import init_admin
     init_admin(app)
@@ -234,6 +240,7 @@ def register_commands(app: Flask):
                   show_default=True,
                   help='If true, then do a db update when initializing the db.')
     @click.pass_context
+    @with_appcontext
     def init_db_command(ctx: click.Context, pop: bool):
         """Clear existing data and create new tables."""
         from .data.database import init_db
@@ -355,6 +362,9 @@ def register_commands(app: Flask):
         from .data import cache
         cache.clear()
 
+    from celery.bin.celery import celery as celery_cmd
+    app.cli.add_command(celery_cmd)
+
 
 def register_misc(app: Flask):
     """For things that don't neatly fit into the other "register" functions.
@@ -391,6 +401,7 @@ def register_misc(app: Flask):
         from flask import current_app as app  # noqa: F401
         from flask.testing import FlaskClient  # noqa: F401
         from .data import db  # noqa: F401
+        from .data import celery_app  # noqa: F401
         from .data.database import execute_sql  # noqa: F401
         from .data.hobolink import get_live_hobolink_data  # noqa: F401
         from .data.hobolink import request_to_hobolink  # noqa: F401
