@@ -1,5 +1,3 @@
-from inspect import cleandoc
-
 import tweepy
 from flask import Flask
 from flask import current_app
@@ -45,16 +43,16 @@ def compose_tweet() -> str:
     unsafe_count = len([k for k, v in flags.items() if v is False])
 
     if unsafe_count == 0:
-        msg = cleandoc(
-            f"""Blue flags are being flown at all boathouses on the Lower
-            Charles as of {current_time}. Happy boating!"""
+        msg = (
+            "Blue flags are being flown at all boathouses on the Lower"
+            f" Charles as of {current_time}. Happy boating!"
         )
     else:
         some_or_all = 'some' if len(flags) > unsafe_count > 0 else 'all'
-        msg = cleandoc(
-            f"""🚩 Red flags are being flown at {some_or_all} boathouses on the
-            Lower Charles as of {current_time}. See our website for more
-            details. https://crwa-flagging.herokuapp.com/"""
+        msg = (
+            f"🚩 Red flags are being flown at {some_or_all} boathouses on the"
+            f" Lower Charles as of {current_time}. See our website for more"
+            " details. https://crwa-flagging.herokuapp.com/"""
         )
 
     return msg
