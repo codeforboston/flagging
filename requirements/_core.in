@@ -6,7 +6,7 @@ Flask-BasicAuth
 Flask-Caching
 Flask-SQLAlchemy
 Flask
-gunicorn
+gunicorn<20
 Jinja2
 markdown
 pandas
