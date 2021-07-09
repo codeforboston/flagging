@@ -9,11 +9,11 @@ Flask
 gunicorn<20
 Jinja2
 markdown
-pandas
+pandas<1.2
 python-dotenv
 PyYAML
 redis
 requests
-SQLAlchemy
+SQLAlchemy<1.4
 tenacity
 tweepy
