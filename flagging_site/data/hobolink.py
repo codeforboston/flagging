@@ -147,7 +147,7 @@ def parse_hobolink_data(res: str) -> pd.DataFrame:
     df = df[HOBOLINK_COLUMNS.values()]
 
     # Remove the rows with all missing values again.
-    df = df.loc[df['water_temp'].notna()]
+    df = df.loc[df['air_temp'].notna()]
 
     # Convert time column to Pandas datetime
     df['time'] = pd.to_datetime(df['time'], format='%m/%d/%y %H:%M:%S')

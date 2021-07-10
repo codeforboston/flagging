@@ -66,7 +66,7 @@ def process_data(
             'wind_speed': np.mean,
             'gust_speed': np.mean,
             'wind_dir': np.mean,
-            'water_temp': np.mean,
+            # 'water_temp': np.mean,
             'air_temp': np.mean,
         })
         .reset_index()
