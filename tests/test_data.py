@@ -10,7 +10,7 @@ from flagging_site.data.hobolink import get_live_hobolink_data
 from flagging_site.data.usgs import get_live_usgs_data
 
 
-STATIC_RESOURCES = os.path.join(os.path.dirname(__file__), 'static')
+STATIC_RESOURCES = os.path.join(os.path.dirname(__file__), 'resources')
 
 
 @pytest.fixture

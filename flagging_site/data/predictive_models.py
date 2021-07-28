@@ -66,7 +66,7 @@ def process_data(
             'wind_speed': np.mean,
             'gust_speed': np.mean,
             'wind_dir': np.mean,
-            'water_temp': np.mean,
+            # 'water_temp': np.mean,
             'air_temp': np.mean,
         })
         .reset_index()
@@ -286,6 +286,11 @@ def latest_model_outputs(hours: int = 1) -> pd.DataFrame:
     return df
 
 
-def get_latest_prediction_time():
+def get_latest_prediction_time(to_str: bool = False):
     """Returns the latest timestamp in model outputs."""
-    return execute_sql('SELECT MAX(time) FROM model_outputs;').iloc[0]['max']
+    ts = execute_sql('SELECT MAX(time) FROM model_outputs;').iloc[0, 0]
+    if to_str:
+        # Return in string format
+        return ts.strftime("%Y-%m-%d %I:%M:%S %p")
+    else:
+        return ts

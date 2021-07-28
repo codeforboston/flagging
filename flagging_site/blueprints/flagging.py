@@ -65,7 +65,7 @@ def flag_widget_params(force_display: bool = False) -> Dict[str, Any]:
     """
     return dict(
         flags=Boathouse.all_flags(),
-        model_last_updated_time=get_latest_prediction_time(),
+        model_last_updated_time=get_latest_prediction_time(to_str=True),
         boating_season=force_display or LiveWebsiteOptions.is_boating_season(),
         flagging_message=LiveWebsiteOptions.get_flagging_message()
     )

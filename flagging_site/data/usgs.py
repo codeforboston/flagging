@@ -6,6 +6,8 @@ Link to the web interface (not the api)
 https://waterdata.usgs.gov/nwis/uv?site_no=01104500
 """
 import os
+from typing import Union
+
 import pandas as pd
 import requests
 from flask import abort
@@ -66,14 +68,16 @@ def request_to_usgs(days_ago: int = 14) -> requests.models.Response:
     }
 
     res = requests.get(USGS_URL, params=payload)
-    if res.status_code // 100 in [4, 5]:
+    if res.status_code >= 400:
         error_msg = 'API request to the USGS endpoint failed with status ' \
                     f'code {res.status_code}.'
         abort(res.status_code, error_msg)
     return res
 
 
-def parse_usgs_data(res) -> pd.DataFrame:
+def parse_usgs_data(
+        res: Union[str, requests.models.Response]
+) -> pd.DataFrame:
     """
     Clean the response from the USGS API.
 
@@ -83,10 +87,12 @@ def parse_usgs_data(res) -> pd.DataFrame:
     Returns:
         Pandas DataFrame containing the usgs data.
     """
+    if isinstance(res, requests.models.Response):
+        res = res.text
 
     raw_data = [
         i.split('\t')
-        for i in res.text.split('\n')
+        for i in res.split('\n')
         if not i.startswith('#') and i != ''
     ]
 

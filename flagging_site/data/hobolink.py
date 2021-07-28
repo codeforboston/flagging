@@ -4,6 +4,8 @@ formatting of the data that we receive from it.
 """
 import os
 import io
+from typing import Union
+
 import requests
 import pandas as pd
 from flask import abort
@@ -29,7 +31,7 @@ HOBOLINK_COLUMNS = {
     'Wind Speed': 'wind_speed',
     'Gust Speed': 'gust_speed',
     'Wind Dir': 'wind_dir',
-    'Water Temp': 'water_temp',
+    # 'Water Temp': 'water_temp',
     'Temp': 'air_temp',
     # 'Batt, V, Charles River Weather Station': 'battery'
 }
@@ -85,13 +87,11 @@ def request_to_hobolink(
         'authentication': current_app.config['HOBOLINK_AUTH']
     }
 
-    print(data)
-
     res = requests.post(HOBOLINK_URL, json=data)
 
     # handle HOBOLINK errors by checking HTTP status code
     # status codes in 400's are client errors, in 500's are server errors
-    if res.status_code // 100 in [4, 5]:
+    if res.status_code >= 400:
         error_msg = 'API request to the HOBOlink endpoint failed with status ' \
                     f'code {res.status_code}.'
         abort(res.status_code, error_msg)
@@ -99,7 +99,9 @@ def request_to_hobolink(
     return res
 
 
-def parse_hobolink_data(res: str) -> pd.DataFrame:
+def parse_hobolink_data(
+        res: Union[str, requests.models.Response]
+) -> pd.DataFrame:
     """
     Clean the response from the HOBOlink API.
 
@@ -147,9 +149,9 @@ def parse_hobolink_data(res: str) -> pd.DataFrame:
     df = df[HOBOLINK_COLUMNS.values()]
 
     # Remove the rows with all missing values again.
-    df = df.loc[df['water_temp'].notna()]
+    df = df.loc[df['air_temp'].notna()]
 
     # Convert time column to Pandas datetime
     df['time'] = pd.to_datetime(df['time'], format='%m/%d/%y %H:%M:%S')
 
-    return df.reset_index()
+    return df.reset_index(drop=True)
