@@ -29,7 +29,7 @@ HOBOLINK_COLUMNS = {
     'Wind Speed': 'wind_speed',
     'Gust Speed': 'gust_speed',
     'Wind Dir': 'wind_dir',
-    'Water Temp': 'water_temp',
+    # 'Water Temp': 'water_temp',
     'Temp': 'air_temp',
     # 'Batt, V, Charles River Weather Station': 'battery'
 }
@@ -84,8 +84,6 @@ def request_to_hobolink(
         'query': export_name,
         'authentication': current_app.config['HOBOLINK_AUTH']
     }
-
-    print(data)
 
     res = requests.post(HOBOLINK_URL, json=data)
 
