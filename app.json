@@ -37,6 +37,9 @@
     "TWITTER_API_KEY_SECRET": { "required": false },
     "TWITTER_ACCESS_TOKEN": { "required": false },
     "TWITTER_ACCESS_TOKEN_SECRET": { "required": false },
+    "MAIL_USERNAME": { "required": false },
+    "MAIL_PASSWORD": { "required": false },
+    "MAIL_ALERTS_TO": { "required": false },
     "SECRET_KEY": { "generator": "secret" },
     "SEND_TWEETS": { "value": "true" }
   }
