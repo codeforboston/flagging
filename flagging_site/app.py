@@ -75,6 +75,9 @@ def register_extensions(app: Flask):
     from .blueprints.api import init_swagger
     init_swagger(app)
 
+    from .mail import mail
+    mail.init_app(app)
+
 
 def register_blueprints(app: Flask):
     """Register the "blueprints." Blueprints are basically like mini web apps
@@ -203,6 +206,8 @@ def register_commands(app: Flask):
     line.
     """
 
+    from .mail import mail_on_fail
+
     def dev_only(func: callable) -> callable:
         """Decorator that ensures a function only runs in the development
         environment. Commands tagged with this will raise an error when you run
@@ -265,6 +270,8 @@ def register_commands(app: Flask):
         delete_db(dbname=dbname)
 
     @app.cli.command('update-db')
+    @with_appcontext
+    @mail_on_fail("mail/update_db_fail.html")
     def update_db_command():
         """Update the database with the latest live data."""
         from .data.database import update_db

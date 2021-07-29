@@ -9,12 +9,19 @@ from flagging_site.data import Boathouse
 from flagging_site.data import LiveWebsiteOptions
 from flagging_site.data import database
 from flagging_site.twitter import compose_tweet
+from flagging_site.mail import mail
 
 
 @pytest.fixture
 def mock_update_db():
     with patch.object(database, 'update_db') as mocked_func:
         yield mocked_func
+
+
+@pytest.fixture
+def outbox():
+    with mail.record_messages() as o:
+        yield o
 
 
 @pytest.mark.parametrize('cmd', ['update-db', 'update-website'])
@@ -26,6 +33,23 @@ def test_update_runs(cmd, app, cli_runner, mock_update_db, mock_send_tweet):
 
     if cmd == 'update-db':
         assert mock_send_tweet.call_count == 0
+
+
+def test_mail_when_error_raised(outbox, app, cli_runner, monkeypatch):
+    assert len(outbox) == 0
+
+    # This should not cause an email to be send:
+    monkeypatch.setattr(database, 'update_db', lambda: None)
+    cli_runner.invoke(app.cli, ['update-db'])
+    assert len(outbox) == 0
+
+    def raise_an_error():
+        raise ValueError
+
+    # This however should trigger an email to be sent:
+    monkeypatch.setattr(database, 'update_db', raise_an_error)
+    cli_runner.invoke(app.cli, ['update-db'])
+    assert len(outbox) == 1
 
 
 def test_no_tweet_off_season(app, db_session, cli_runner,
