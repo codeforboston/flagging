@@ -118,7 +118,7 @@ class Config:
     MAIL_USE_SSL = False
     MAIL_USERNAME = os.getenv('MAIL_USERNAME')
     MAIL_PASSWORD = os.getenv('MAIL_PASSWORD')
-    MAIL_ALERTS_TO = os.getenv('MAIL_ALERTS_TO')
+    MAIL_ALERTS_TO = os.getenv('MAIL_ALERTS_TO', '')
 
     # ==========================================================================
     # MISC. CUSTOM CONFIG OPTIONS
@@ -240,6 +240,8 @@ class TestingConfig(Config):
     USE_MOCK_DATA: bool = True
     TWITTER_AUTH: dict = {k: None for k in Config.TWITTER_AUTH}
     POSTGRES_DB: str = os.getenv('POSTGRES_DB', 'flagging') + '_test'
+    MAIL_USERNAME = 'admin@admin.com'
+    MAIL_ALERTS_TO = 'some@email.com'
 
 
 class DemoConfig(ProductionConfig):
