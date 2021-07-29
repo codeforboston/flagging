@@ -111,6 +111,15 @@ class Config:
     CELERY_BROKER_URL: str = os.getenv('REDIS_URL', 'redis://localhost:6379/')
     CELERY_RESULT_BACKEND: str = os.getenv('REDIS_URL', 'redis://localhost:6379/')
 
+    # Mail
+    MAIL_SERVER = 'smtp.gmail.com'
+    MAIL_PORT = 587
+    MAIL_USE_TLS = True
+    MAIL_USE_SSL = False
+    MAIL_USERNAME = os.getenv('MAIL_USERNAME')
+    MAIL_PASSWORD = os.getenv('MAIL_PASSWORD')
+    MAIL_ALERTS_TO = os.getenv('MAIL_ALERTS_TO')
+
     # ==========================================================================
     # MISC. CUSTOM CONFIG OPTIONS
     #

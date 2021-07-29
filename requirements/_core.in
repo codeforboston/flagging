@@ -5,6 +5,7 @@ Flask-Admin
 Flask-BasicAuth
 Flask-Caching
 Flask-SQLAlchemy
+Flask-Mail
 Flask
 gunicorn<20
 Jinja2
