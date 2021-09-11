@@ -11,7 +11,7 @@ https://freefrontend.com/css-tables/
 .table-wrapper {
     max-width: 90%;
     margin: 2em auto 4em auto;
-    box-shadow: 0px 35px 50px rgba( 0, 0, 0, 0.2 );
+    box-shadow: 0 35px 50px rgba( 0, 0, 0, 0.2 );
 }
 
 .table-wrapper .table-header-wrapper {
@@ -65,7 +65,7 @@ https://freefrontend.com/css-tables/
         display: block;
         width: 100%;
     }
-    .table-wrapper: before{
+    .table-wrapper:before {
         content: "Scroll horizontally >";
         display: block;
         text-align: right;
@@ -120,7 +120,8 @@ https://freefrontend.com/css-tables/
         background: transparent;
     }
     .dataframe tr td {
-        border-right: 1px solid #f8fbd;
+        border-top: 0;
+        border-bottom: 0;
     }
     .dataframe tr td:nth-child(odd) {
         background: #dce9f2;

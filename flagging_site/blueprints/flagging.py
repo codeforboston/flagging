@@ -85,8 +85,8 @@ def stylize_model_output(df: pd.DataFrame) -> str:
     """
     df = df.copy()
 
-    # remove reach number
-    df = df.drop(columns=['reach'])
+    # remove reach number and log_odds
+    df = df.drop(columns=['reach', 'log_odds'])
 
     def _apply_flag(x: bool) -> str:
         flag_class = 'blue-flag' if x else 'red-flag'

@@ -1,6 +1,4 @@
 import io
-import click
-import decimal
 import traceback
 from functools import wraps
 
@@ -28,7 +26,7 @@ class ErrorEmail(Message):
     @wraps(Message.__init__)
     def __init__(self, **kwargs):
         recipients = [
-            i.strip() for i in current_app.config['MAIL_ALERTS_TO'].split(';')
+            i.strip() for i in current_app.config['MAIL_ERROR_ALERTS_TO'].split(';')
         ]
         kwargs.setdefault('subject', 'Flagging site error')
         kwargs.setdefault('recipients', recipients)
