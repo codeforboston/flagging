@@ -3,8 +3,8 @@
 
     <div id="boathouse_map" style="max-width: 600px; height: 400px; margin: auto; padding-bottom: 1em;"></div>
     <script>
-
-        var flagMap = L.map('boathouse_map').setView([42.36, -71.12], 12);
+        // {tap: false} fixes an issue on mobile: https://github.com/Leaflet/Leaflet/issues/7255
+        var flagMap = L.map('boathouse_map', {tap: false}).setView([42.36, -71.12], 12);
 
         L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={{ MAPBOX_ACCESS_TOKEN }}', {
             maxZoom: 18,
@@ -40,7 +40,7 @@
                     icon: boathouse['safe'] ? blueFlagIcon : redFlagIcon
                 }
             ).addTo(flagMap);
-            marker.bindPopup("<b>" + boathouse['boathouse'] + "</b>");
+            marker.bindPopup(`<strong>${boathouse['boathouse']}</strong>`);
         }
 
         // Call the JSON from the Boathouses API,

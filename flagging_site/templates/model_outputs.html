@@ -21,11 +21,10 @@
     {% for reach, tbl in tables.items() %}
         <div class="table-wrapper">
             <div class="table-header-wrapper">
-                <h2 style="display: inline; ">Predictive Model for Reach {{ reach }}</h2>
-                <div class="tooltip">{{INFO_ICON}}
+                <h2 style="display: inline;">Predictive Model for Reach {{ reach }}</h2>
+                <div class="tooltip">{{ INFO_ICON }}
                     <div class="tooltiptext">
-                        <b>Boathouses:</b>
-                        <br />
+                        <strong>Boathouses:</strong>
                         <ul>
                         {% for boathouse in boathouses_by_reach.get(reach) %}
                             <li>{{ boathouse }}</li>

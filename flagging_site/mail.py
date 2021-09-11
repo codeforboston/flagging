@@ -1,6 +1,4 @@
 import io
-import click
-import decimal
 import traceback
 from functools import wraps
 
@@ -12,7 +10,6 @@ from flask_mail import Message
 
 class Mail(_Mail):
 
-    @wraps(_Mail.send)
     def send(self, message):
         # Only use this in staging and production.
         if current_app.env not in ['production', 'staging']:
@@ -25,10 +22,9 @@ mail = Mail()
 
 class ErrorEmail(Message):
 
-    @wraps(Message.__init__)
     def __init__(self, **kwargs):
         recipients = [
-            i.strip() for i in current_app.config['MAIL_ALERTS_TO'].split(';')
+            i.strip() for i in current_app.config['MAIL_ERROR_ALERTS_TO'].split(';')
         ]
         kwargs.setdefault('subject', 'Flagging site error')
         kwargs.setdefault('recipients', recipients)
