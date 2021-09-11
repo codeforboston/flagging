@@ -10,7 +10,6 @@ from flask_mail import Message
 
 class Mail(_Mail):
 
-    @wraps(_Mail.send)
     def send(self, message):
         # Only use this in staging and production.
         if current_app.env not in ['production', 'staging']:
@@ -23,7 +22,6 @@ mail = Mail()
 
 class ErrorEmail(Message):
 
-    @wraps(Message.__init__)
     def __init__(self, **kwargs):
         recipients = [
             i.strip() for i in current_app.config['MAIL_ERROR_ALERTS_TO'].split(';')
