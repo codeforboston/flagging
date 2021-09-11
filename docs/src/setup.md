@@ -10,7 +10,7 @@ Install all of the following programs onto your computer:
 
 **Required:**
 
-- [Python 3](https://www.python.org/downloads/) - specifically 3.7 or higher
+- [Python 3](https://www.python.org/downloads/) - specifically 3.8 or higher
 - [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) (first time setup guide [here](https://git-scm.com/book/en/v2/Getting-Started-First-Time-Git-Setup))
 - [Postgres](https://www.postgresql.org/) _(see installation instructions below)_
 - [7zip](https://www.7-zip.org/) (If on OSX, install via Homebrew: `brew install p7zip`)

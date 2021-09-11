@@ -6,9 +6,9 @@
 #
 amqp==5.0.6
     # via kombu
-anyio==3.2.1
+anyio==3.3.1
     # via starlette
-attrs==20.3.0
+attrs==21.2.0
     # via
     #   hypothesis
     #   hypothesis-graphql
@@ -25,7 +25,7 @@ celery==5.1.2
     #   pytest-celery
 certifi==2021.5.30
     # via requests
-chardet==4.0.0
+charset-normalizer==2.0.4
     # via requests
 click==7.1.2
     # via
@@ -77,27 +77,27 @@ flask-sqlalchemy==2.5.1
     #   pytest-flask-sqlalchemy
 ghp-import==2.0.1
     # via mkdocs
-graphql-core==3.1.5
+graphql-core==3.1.6
     # via hypothesis-graphql
-greenlet==0.4.16
+greenlet==0.4.17
     # via meinheld
 gunicorn==19.10.0
     # via -r requirements/_core.in
-hypothesis==6.14.1
+hypothesis==6.21.0
     # via
     #   hypothesis-graphql
     #   hypothesis-jsonschema
     #   schemathesis
-hypothesis-graphql==0.5.0
+hypothesis-graphql==0.5.1
     # via schemathesis
 hypothesis-jsonschema==0.20.1
     # via schemathesis
-idna==2.10
+idna==3.2
     # via
     #   anyio
     #   requests
     #   yarl
-importlib-metadata==4.6.1
+importlib-metadata==4.8.1
     # via mkdocs
 iniconfig==1.1.1
     # via pytest
@@ -136,22 +136,20 @@ mergedeep==1.3.4
     # via mkdocs
 mistune==0.8.4
     # via flasgger
-mkdocs==1.2.1
+mkdocs==1.2.2
     # via
     #   -r requirements/_docs.in
     #   mkdocs-macros-plugin
     #   mkdocs-material
-mkdocs-macros-plugin==0.5.12
+mkdocs-macros-plugin==0.6.0
     # via -r requirements/_docs.in
-mkdocs-material==7.1.9
-    # via
-    #   -r requirements/_docs.in
-    #   mkdocs-material-extensions
-mkdocs-material-extensions==1.0.1
+mkdocs-material==7.2.6
+    # via -r requirements/_docs.in
+mkdocs-material-extensions==1.0.3
     # via mkdocs-material
 multidict==5.1.0
     # via yarl
-numpy==1.21.0
+numpy==1.21.2
     # via
     #   pandas
     #   pyarrow
@@ -164,25 +162,25 @@ packaging==21.0
     #   pytest-flask-sqlalchemy
 pandas==1.1.5
     # via -r requirements/_core.in
-pep517==0.10.0
+pep517==0.11.0
     # via pip-tools
 pip-tools==6.2.0
     # via -r requirements/_dev_core.in
-pluggy==0.13.1
+pluggy==1.0.0
     # via pytest
-prompt-toolkit==3.0.19
+prompt-toolkit==3.0.20
     # via click-repl
 psycopg2-binary==2.9.1
     # via -r requirements/dev_osx.in
 py==1.10.0
     # via pytest
-pyarrow==4.0.1
+pyarrow==5.0.0
     # via -r requirements/_dev_core.in
 pycodestyle==2.7.0
     # via flake8
 pyflakes==2.3.1
     # via flake8
-pygments==2.9.0
+pygments==2.10.0
     # via
     #   -r requirements/_docs.in
     #   mkdocs-material
@@ -196,7 +194,7 @@ pyrsistent==0.18.0
     # via jsonschema
 pysocks==1.7.1
     # via requests
-pytest==6.2.4
+pytest==6.2.5
     # via
     #   -r requirements/_dev_core.in
     #   pytest-cov
@@ -214,12 +212,12 @@ pytest-mock==3.6.1
     # via pytest-flask-sqlalchemy
 pytest-subtests==0.5.0
     # via schemathesis
-python-dateutil==2.8.1
+python-dateutil==2.8.2
     # via
     #   ghp-import
     #   mkdocs-macros-plugin
     #   pandas
-python-dotenv==0.18.0
+python-dotenv==0.19.0
     # via -r requirements/_core.in
 pytz==2021.1
     # via
@@ -237,7 +235,7 @@ pyyaml-env-tag==0.1
     # via mkdocs
 redis==3.5.3
     # via -r requirements/_core.in
-requests[socks]==2.25.1
+requests[socks]==2.26.0
     # via
     #   -r requirements/_core.in
     #   curlify
@@ -246,7 +244,7 @@ requests[socks]==2.25.1
     #   tweepy
 requests-oauthlib==1.3.0
     # via tweepy
-schemathesis==3.9.3
+schemathesis==3.9.7
     # via -r requirements/_dev_core.in
 six==1.16.0
     # via
@@ -265,20 +263,21 @@ sqlalchemy==1.3.24
     #   -r requirements/_core.in
     #   flask-sqlalchemy
     #   pytest-flask-sqlalchemy
-starlette==0.15.0
+starlette==0.16.0
     # via schemathesis
-tenacity==8.0.0
+tenacity==8.0.1
     # via -r requirements/_core.in
 termcolor==1.1.0
     # via mkdocs-macros-plugin
 toml==0.10.2
     # via
-    #   pep517
     #   pytest
     #   pytest-cov
+tomli==1.2.1
+    # via pep517
 tweepy==3.10.0
     # via -r requirements/_core.in
-typing-extensions==3.10.0.0
+typing-extensions==3.10.0.2
     # via schemathesis
 urllib3==1.26.6
     # via requests
@@ -287,7 +286,7 @@ vine==5.0.0
     #   amqp
     #   celery
     #   kombu
-watchdog==2.1.3
+watchdog==2.1.5
     # via mkdocs
 wcwidth==0.2.5
     # via prompt-toolkit
@@ -295,7 +294,7 @@ werkzeug==2.0.1
     # via
     #   flask
     #   schemathesis
-wheel==0.36.2
+wheel==0.37.0
     # via pip-tools
 wtforms==2.3.3
     # via flask-admin
