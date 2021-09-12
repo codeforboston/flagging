@@ -1,0 +1,7 @@
+library(jsonlite)
+library(tidyverse)
+
+url <- "{{ url_for('api.predictive_model_api', _external=True) }}"
+res <- fromJSON(url) %>% as_tibble
+df <- res$model_outputs %>% unnest(predictions)
+df

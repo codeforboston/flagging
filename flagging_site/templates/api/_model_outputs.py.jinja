@@ -1,0 +1,18 @@
+import pandas as pd
+import requests
+
+# Get data and parse returned JSON
+url = "{{ url_for('api.predictive_model_api', _external=True) }}"
+res = requests.get(url).json()
+records = [
+    {
+        "reach": reach["reach"],
+        **row
+    }
+    for reach in res["model_outputs"]
+    for row in reach["predictions"]
+]
+
+# Turn into Pandas DataFrame
+df = pd.DataFrame(records)
+print(df.head())

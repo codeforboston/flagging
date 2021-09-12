@@ -1,0 +1,6 @@
+library(jsonlite)
+library(tidyverse)
+
+url <- "{{ url_for('api.boathouses_api', _external=True) }}"
+df <- fromJSON(url) %>% as_tibble
+df

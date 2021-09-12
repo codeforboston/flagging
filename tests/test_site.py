@@ -1,6 +1,10 @@
+import sys
+import json
 from base64 import b64encode
 
 import pytest
+import requests
+import pandas as pd
 
 from flagging_site.data import Boathouse
 
@@ -157,3 +161,67 @@ def test_override_on_home_page(client, db_session, cache):
 
     assert flags4['red'] == flags1['red'] + 1
     assert flags4['blue'] == flags1['blue'] - 1
+
+
+@pytest.mark.parametrize(
+    ('template_name', 'script_name', 'expected_columns'),
+    [
+        ('api/_boathouses.py.jinja',
+         'test_script_boathouses',
+         ['boathouse', 'latitude', 'reach']),
+        ('api/_model_outputs.py.jinja',
+         'test_script_model_outputs',
+         ['reach', 'probability', 'safe'])
+    ]
+)
+def test_pandas_code_snippets(
+        app, client, tmpdir, monkeypatch,
+        template_name, script_name, expected_columns
+):
+    """Bit of a complicated test, but TLDR: test that the API example Python
+    scripts work.
+
+    This test is a bit complicated and is pretty low impact, so if you're
+    struggling to maintain this, I recommend adding a `@pytest.mark.skip` on
+    top of the test function.
+    """
+    # We need to mock a few things to test that the Pandas code works:
+
+    monkeypatch.setitem(
+        app.jinja_env.globals,
+        'url_for',
+        lambda loc, **kwargs: loc
+    )
+
+    class MockResponse:
+        def __init__(self, data):
+            self.json = lambda: json.loads(data)
+
+    def _get(loc: str, **kwargs):
+        reversed_url_map = {
+            i.endpoint: i.rule
+            for i
+            in app.url_map.iter_rules()
+        }
+        res = client.get(reversed_url_map[loc])
+        return MockResponse(data=res.data)
+
+    monkeypatch.setattr(requests, 'get', _get)
+
+    # Now let's render the code:
+
+    py_code = app.jinja_env \
+        .get_template(template_name) \
+        .render()
+
+    f = tmpdir.mkdir('code').join(f'{script_name}.py')
+    f.write(py_code)
+
+    # Import the script as a module
+    sys.path.append(f.dirname)
+    __import__(script_name)
+    mod = sys.modules[script_name]
+
+    assert hasattr(mod, 'df')
+    assert isinstance(mod.df, pd.DataFrame)  # noqa
+    assert all([c in mod.df.columns for c in expected_columns])  # noqa
