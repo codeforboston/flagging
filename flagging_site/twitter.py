@@ -1,3 +1,7 @@
+"""This module contains the logic for sending the current flagging status to
+Twitter. The message is written by the function `compose_tweet()`, and actually
+sending the message is handled by `tweet_current_status()`.
+"""
 import tweepy
 from flask import Flask
 from flask import current_app
@@ -38,7 +42,7 @@ def compose_tweet() -> str:
     """
 
     flags = Boathouse.all_flags()
-    current_time = get_current_time().strftime('%I:%M:%S %p, %m/%d/%Y')
+    current_time = get_current_time().strftime('%I:%M %p, %m/%d/%Y')
 
     unsafe_count = len([k for k, v in flags.items() if v is False])
 

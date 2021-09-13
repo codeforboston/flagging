@@ -28,7 +28,6 @@ def auth_to_header(auth: str) -> dict:
         ('/api', 200),
         ('/api/docs', 200),
         ('/api/v1/model', 200),
-        ('/api/v1/model?reach=4&hours=20', 200),
         ('/api/v1/boathouses', 200),
         ('/api/v1/model_input_data', 200),
     ]
