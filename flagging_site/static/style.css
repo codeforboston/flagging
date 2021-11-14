@@ -29,9 +29,16 @@ p {
   line-height: 25px;
 }
 
-ul {
+ul, ol {
   line-height: 1.7em;
+}
+
+ul {
   list-style-type: square;
+}
+
+ol {
+  list-style-type: decimal;
 }
 /***** End Element Styling *****/
 

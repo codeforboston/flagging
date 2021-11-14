@@ -175,7 +175,10 @@ def register_jinja_env(app: Flask):
 
     def get_widget_filename(version: int = None):
         """Function that gets stuck inside the Jinja env to get the proper file
-        for the widget.
+        for the widget. Why parametrize the widget filename? Because there may
+        be a reason we need to swap to an older version, and this makes it
+        easier to do that. (Just swap the config variable.) Unlikely to matter,
+        but if it ever does...
         """
         if version is None:
             version = current_app.config['DEFAULT_WIDGET_VERSION']
@@ -211,7 +214,8 @@ def register_commands(app: Flask):
     def dev_only(func: callable) -> callable:
         """Decorator that ensures a function only runs in the development
         environment. Commands tagged with this will raise an error when you run
-        them in production.
+        them in production. This is a safeguard against accidentally doing
+        something you shouldn't be doing.
         """
 
         @wraps(func)
@@ -271,7 +275,7 @@ def register_commands(app: Flask):
 
     @app.cli.command('update-db')
     @with_appcontext
-    @mail_on_fail("mail/update_db_fail.html")
+    @mail_on_fail
     def update_db_command():
         """Update the database with the latest live data."""
         from .data.database import update_db
@@ -280,6 +284,7 @@ def register_commands(app: Flask):
 
     @app.cli.command('update-website')
     @click.pass_context
+    @mail_on_fail
     def update_website_command(ctx: click.Context):
         """Updates the database, then Tweets a message."""
         from .data.live_website_options import LiveWebsiteOptions

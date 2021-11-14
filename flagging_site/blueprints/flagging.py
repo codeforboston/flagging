@@ -25,24 +25,27 @@ def before_request():
     current_time = get_current_time()
 
     # Calculate difference between now and latest prediction time
-    # TODO:
-    #  If model_outputs has zero rows, we raise the following error:
-    #  _
-    #  > TypeError: unsupported operand type(s) for -: 'Timestamp' and 'NoneType'
-    #  _
-    #  I feel like there's probably a better way to handle this particular case
-    #  of the database being empty than for the error to happen here as a
-    #  TypeError.
-    diff = current_time - last_pred_time
+    # If model_outputs has zero rows, we raise the following error:
+    # > TypeError: unsupported operand type(s) for -: 'Timestamp' and 'NoneType'
+    # In this case, just have diff be None.
+    if last_pred_time is not None:
+        diff = current_time - last_pred_time
+    else:
+        diff = None
 
     # If more than 48 hours, flash message.
     if current_app.env == 'demo':
         flash(
             'This website is currently in demo mode. It is not using live data.'
         )
-    elif diff >= pd.Timedelta(48, 'hr'):
+    elif diff is None:
         flash(
-            '<b>Note:</b> The database has not updated in at least 48 hours. '
+            'A unknown error occurred. It is likely that the database does not '
+            'contain any data. Please contact the website administrator.'
+        )
+    elif diff is not None and diff >= pd.Timedelta(24, 'hr'):
+        flash(
+            '<b>Note:</b> The database has not updated in at least 24 hours. '
             'The information displayed on this page may be outdated.'
         )
 
@@ -105,13 +108,15 @@ def index() -> str:
     The home page of the website. This page contains a brief description of the
     purpose of the website, and the latest outputs for the flagging model.
     """
-    return render_template('index.html', **flag_widget_params())
+    return render_template('index.html',
+                           **flag_widget_params())
 
 
 @bp.route('/boathouses')
 @cache.cached()
 def boathouses() -> str:
-    return render_template('boathouses.html', **flag_widget_params(force_display=True))
+    return render_template('boathouses.html',
+                           **flag_widget_params(force_display=True))
 
 
 @bp.route('/about')

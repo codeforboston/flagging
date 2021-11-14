@@ -37,55 +37,13 @@
     <h3>Python Code Examples</h3>
         <p>Note: Requires Pandas (<code>pip install pandas</code>) and Requests (<code>pip install requests</code>).</p>
         <h4>Predictive Model Outputs API</h4>
-            <pre class="prettyprint lang-python">
-import pandas as pd
-import requests
-
-# Get data and parse returned JSON
-url = "{{ url_for('api.predictive_model_api', _external=True) }}"
-res = requests.get(url).json()
-records = [
-    {
-        "reach": reach["reach"],
-        **row
-    }
-    for reach in res["model_outputs"]
-    for row in reach["predictions"]
-]
-
-# Turn into Pandas DataFrame
-df = pd.DataFrame(records)
-print(df.head())</pre>
+            <pre class="prettyprint lang-python">{% include 'api/_model_outputs.py.jinja' %}</pre>
         <h4>Boathouses API</h4>
-            <pre class="prettyprint lang-python">
-import pandas as pd
-import requests
-
-# Get data and parse returned JSON
-url = "{{ url_for('api.boathouses_api', _external=True) }}"
-res = requests.get(url).json()
-records = res["boathouses"]
-
-# Turn into Pandas DataFrame
-df = pd.DataFrame(records)
-print(df.head())</pre>
+            <pre class="prettyprint lang-python">{% include 'api/_boathouses.py.jinja' %}</pre>
     <h3>R (Tidyverse) Code Examples</h3>
         <p>Note: Requires Tidyverse (<code>install.packages("tidyverse")</code>) and jsonlite (<code>install.packages("jsonlite")</code>).</p>
         <h4>Predictive Model Outputs API</h4>
-                <pre class="prettyprint lang-r">
-library(jsonlite)
-library(tidyverse)
-
-url <- "{{ url_for('api.predictive_model_api', _external=True) }}"
-res <- fromJSON(url) %>% as_tibble
-df <- res$model_outputs %>% unnest(predictions)
-df</pre>
+                <pre class="prettyprint lang-r">{% include 'api/_model_outputs.R.jinja' %}</pre>
         <h4>Boathouses API</h4>
-            <pre class="prettyprint lang-r">
-library(jsonlite)
-library(tidyverse)
-
-url <- "{{ url_for('api.boathouses_api', _external=True) }}"
-df <- fromJSON(url) %>% as_tibble
-df</pre>
+            <pre class="prettyprint lang-r">{% include 'api/_boathouses.R.jinja' %}</pre>
 {% endblock %}

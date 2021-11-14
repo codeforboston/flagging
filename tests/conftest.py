@@ -1,6 +1,7 @@
 import pytest
 
 from unittest.mock import patch
+from flask import url_for
 
 from flagging_site import create_app
 from flagging_site.twitter import tweepy_api
@@ -12,8 +13,8 @@ from flagging_site.data.database import update_db
 
 @pytest.fixture(scope='session')
 def app():
-    """Create and configure a new app instance for each test."""
     app = create_app(config='testing')
+
     with app.app_context():
         create_db(overwrite=True)
         init_db()

@@ -32,25 +32,38 @@ class ErrorEmail(Message):
         super().__init__(**kwargs)
 
 
-def mail_on_fail(template_name: str):
+def mail_on_fail(func: callable):
     """Send an email when something fails. Use this as a decorator."""
-    def decorator(func: callable):
-        @wraps(func)
-        def _wrap(*args, **kwargs):
-            try:
-                return func(*args, **kwargs)
-            except Exception:
-                # Get the stack trace
-                f = io.StringIO()
-                traceback.print_exc(file=f)
-                f.seek(0)
+    @wraps(func)
+    def _wrap(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except Exception as e:
+            # Handle recursive error handling.
+            # This way if a task wrapped in `@mail_on_fail` sends an email, we
+            # don't sent multiple emails.
+            if getattr(e, '__email_sent__', False):
+                raise e
 
-                # Send the email
-                html = render_template(template_name, stack_trace=f.read())
-                msg = ErrorEmail(html=html)
-                mail.send(msg)
+            # Get the stack trace
+            f = io.StringIO()
+            traceback.print_exc(file=f)
+            f.seek(0)
 
-                # Raise the error
-                raise
-        return _wrap
-    return decorator
+            # Render the email body
+            html = render_template(
+                'mail/error.html',
+                stack_trace=f.read(),
+                func_name=getattr(func, '__name__', repr(func))
+            )
+
+            # Send the email
+            msg = ErrorEmail(html=html)
+            mail.send(msg)
+
+            # Mark as sent
+            e.__email_sent__ = True
+
+            # Raise the error
+            raise e
+    return _wrap
