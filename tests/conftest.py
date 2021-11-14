@@ -3,12 +3,12 @@ import pytest
 from unittest.mock import patch
 from flask import url_for
 
-from flagging_site import create_app
-from flagging_site.twitter import tweepy_api
-from flagging_site.data.database import cache as _cache
-from flagging_site.data.database import create_db
-from flagging_site.data.database import init_db
-from flagging_site.data.database import update_db
+from app import create_app
+from app.twitter import tweepy_api
+from app.data.database import cache as _cache
+from app.data.database import create_db
+from app.data.database import init_db
+from app.data.database import update_db
 
 
 @pytest.fixture(scope='session')
@@ -56,7 +56,7 @@ def _db(app):
     Basically, this '_db' fixture is required for the above extension to work.
     We use that extension to allow for easy testing of the database.
     """
-    from flagging_site.data.database import db
+    from app.data.database import db
     yield db
 
 

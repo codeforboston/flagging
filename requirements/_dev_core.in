@@ -13,4 +13,3 @@ schemathesis
 # Misc. dev stuff
 flake8
 pip-tools
-pyarrow  # for loading .feather file

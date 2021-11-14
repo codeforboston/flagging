@@ -1,0 +1,17 @@
+JSON of model input data
+---
+tags:
+  - Model Input Data
+responses:
+  200:
+    description: JSON records of the processed input data used to make predictions
+    schema:
+      id: model_input_data
+      type: object
+      properties:
+        model_input_data:
+          type: array
+          description: All fields used to predict the state of the Charles River. The schema for the input data is not
+                       maintained in these docs as the specific fields may be subject to occasional change.
+          items:
+            type: integer # object

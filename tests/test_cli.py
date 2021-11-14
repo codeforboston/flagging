@@ -5,11 +5,10 @@ from functools import wraps
 import requests
 import pytest
 
-from flagging_site.data import Boathouse
-from flagging_site.data import LiveWebsiteOptions
-from flagging_site.data import database
-from flagging_site.twitter import compose_tweet
-from flagging_site.mail import mail
+from app.data import Boathouse, WebsiteOptions
+from app.data import database
+from app.twitter import compose_tweet
+from app.mail import mail
 
 
 @pytest.fixture
@@ -63,8 +62,8 @@ def test_no_tweet_off_season(app, db_session, cli_runner,
 
     # Now set boating_season to false.
     db_session \
-        .query(LiveWebsiteOptions) \
-        .filter(LiveWebsiteOptions.id == 1) \
+        .query(WebsiteOptions) \
+        .filter(WebsiteOptions.id == 1) \
         .update({'boating_season': False})
     db_session.commit()
 

@@ -79,7 +79,7 @@ Sometimes it can be a little confusing and overwhelming seeing all the files str
 │   ├── mkdocs.yml
 │   ├── site
 │   └── src
-├── flagging_site
+├── app
 │   └── ...
 ├── LICENSE
 ├── Procfile
@@ -100,7 +100,7 @@ Sometimes it can be a little confusing and overwhelming seeing all the files str
 - `.gitignore`: Tells git what files to ignore. ([more info](https://git-scm.com/docs/gitignore))
 - `app.json`: Used by Heroku to set up one-click deployment for the app. ([more info](https://devcenter.heroku.com/articles/app-json-schema))
 - `docs`: Contains source code for the documentation. Rendered with Mkdocs. ([more info](https://www.mkdocs.org/))
-- `flagging_site`: The actual code base for the flagging website.
+- `app`: The actual code base for the flagging website.
 - `LICENSE`: License that governs the project's code base.
 - `Procfile`: Heroku uses this to know what to run on the deployed instance. ([more info](https://devcenter.heroku.com/articles/procfile))
 - `pytest.ini`: Unit-testing configuration. When you run `python -m pytest ./tests`, this file is read in. We need it for some Pytest extensions, and to define a label we use to skip tests that require credentials. ([more info](https://docs.pytest.org/en/stable/customize.html))

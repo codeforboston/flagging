@@ -176,7 +176,7 @@ After you get everything set up, you should run the website at least once. The p
     You should be good if you eventually see something like the following in your terminal:
     
     ```
-     * Serving Flask app "flagging_site:create_app" (lazy loading)
+     * Serving Flask app "app:create_app" (lazy loading)
      * Environment: development
      * Debug mode: on
      * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)

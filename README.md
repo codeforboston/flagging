@@ -1,6 +1,6 @@
 # Flagging Website
 
-![](flagging_site/static/images/og_preview.png)
+![](app/static/images/og_preview.png)
 
 **Our website is live at: [https://crwa-flagging.herokuapp.com/](https://crwa-flagging.herokuapp.com/)**
 

@@ -50,7 +50,7 @@ heroku config:set VAULT_PASSWORD=vault_password_goes_here -a crwa-flagging
 
 ```shell
 heroku config:set FLASK_ENV=production -a crwa-flagging
-heroku config:set FLASK_APP="flagging_site:create_app" -a crwa-flagging
+heroku config:set FLASK_APP="app.main:create_app" -a crwa-flagging
 ```
 
 5. Add a `BASIC_AUTH_USERNAME` and `BASIC_AUTH_PASSWORD` for the admin panel. The username can be whatever you want; e.g. `admin` does the trick. The password should be hard to guess.

@@ -2,7 +2,7 @@
 
 The Flagging Website is basically just a deployed predictive model, so in a sense this document covers the real core of the code base. This page explains the models and the data transformations that occur from the original data. At the bottom, there are some notes on how to change the model coefficients and rerun the website with new coefficients.
 
-The predictive models are stored in the file `/flagging_site/data/models.py`. These models are run as part of the `update-db` command. The input for the models are a combination of the HOBOlink and USGS data with some transformations of the data. The outputs are stored in the SQL table named `model_outputs`.
+The predictive models are stored in the file `/app/data/models.py`. These models are run as part of the `update-db` command. The input for the models are a combination of the HOBOlink and USGS data with some transformations of the data. The outputs are stored in the SQL table named `model_outputs`.
 
 ???+ tip
     There is a fair bit of Pandas in this document and it may be intimidating. However, if you only want to change the model's coefficients and nothing more, you won't need to touch the Pandas directly.

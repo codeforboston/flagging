@@ -4,7 +4,7 @@ in the YAML files, and they in turn define how the API is supposed to work.
 import pytest
 import schemathesis
 
-from flagging_site.data import Boathouse
+from app.data import Boathouse
 
 
 @pytest.fixture

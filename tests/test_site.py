@@ -6,7 +6,7 @@ import pytest
 import requests
 import pandas as pd
 
-from flagging_site.data import Boathouse
+from app.data import Boathouse
 
 
 def auth_to_header(auth: str) -> dict:
@@ -53,11 +53,11 @@ def test_pages(client, page, expected_status_code):
         ('/admin/boathouses/', None, 401),
         ('/admin/boathouses/', 'bad:credentials', 401),
 
-        ('/admin/livewebsiteoptions/', None, 401),
-        ('/admin/livewebsiteoptions/', 'bad:credentials', 401),
+        ('/admin/websiteoptions/', None, 401),
+        ('/admin/websiteoptions/', 'bad:credentials', 401),
 
         ('/admin/', 'admin:password', 200),
-        ('/admin/livewebsiteoptions/', 'admin:password', 302),
+        ('/admin/websiteoptions/', 'admin:password', 302),
         ('/admin/manual_overrides/', 'admin:password', 200),
         ('/admin/boathouses/', 'admin:password', 200),
         ('/admin/db/update/', 'admin:password', 200),

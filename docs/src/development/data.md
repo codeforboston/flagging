@@ -71,7 +71,7 @@ There are two sources of data for our website:
 
 #### USGS 
 
-The code for retrieving and processing the HOBOlink data is in `flagging_site/data/usgs.py`.
+The code for retrieving and processing the HOBOlink data is in `app/data/usgs.py`.
 
 The USGS API very is straightforward. It's a very typical REST API. Our preprocessing of the USGS API consists of parsing the response into a Pandas dataframe.
 
@@ -79,7 +79,7 @@ The data returned by the USGS API is in 15 minute increments, and it measures th
 
 #### HOBOlink
 
-The code for retrieving and processing the HOBOlink data is in `flagging_site/data/hobolink.py`.
+The code for retrieving and processing the HOBOlink data is in `app/data/hobolink.py`.
 
 The HOBOlink device captures various information about the Charles River at the location it's stationed:
 
