@@ -22,11 +22,8 @@ from flask import current_app
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import ResourceClosedError
 
-from flask_caching import Cache
-
 
 db = SQLAlchemy()
-cache = Cache()
 
 
 def execute_sql(query: str) -> Optional[pd.DataFrame]:
@@ -157,6 +154,8 @@ def update_db():
     }
 
     hours = current_app.config['STORAGE_HOURS']
+
+    from .globals import cache
 
     try:
         # Populate the `usgs` table.

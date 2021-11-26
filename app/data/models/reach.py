@@ -8,7 +8,7 @@ from sqlalchemy.sql.operators import ColumnOperators
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.dialects.postgresql import aggregate_order_by
 
-from app.data import db
+from app.data.database import db
 from app.data.processing.predictive_models import latest_model_outputs
 
 

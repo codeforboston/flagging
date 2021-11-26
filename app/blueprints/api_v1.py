@@ -18,9 +18,8 @@ with warnings.catch_warnings():
 from ..data.globals import website_options
 from app.data.processing.predictive_models import latest_model_outputs
 from app.data.processing.predictive_models import MODEL_VERSION
-from ..data import Boathouse
+from ..data import Boathouse, cache
 from ..data.database import execute_sql
-from ..data.database import cache
 from ..data.database import get_current_time
 
 bp = Blueprint('api', __name__, url_prefix='/api')

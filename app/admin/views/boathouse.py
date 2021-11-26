@@ -4,10 +4,9 @@ from flask_admin.contrib.sqla import tools
 
 from sqlalchemy.orm import Session
 
-from app.data import Boathouse
+from app.data import Boathouse, cache
 from app.admin.base import ModelView
 from app.data.database import db
-from app.data.database import cache
 
 
 class _BaseBoathouseView(ModelView):

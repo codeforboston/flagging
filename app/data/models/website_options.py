@@ -1,7 +1,7 @@
 from typing import Optional
 import markdown
 from markupsafe import Markup
-from app.data import db
+from app.data.database import db
 
 
 class WebsiteOptions(db.Model):

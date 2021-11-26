@@ -6,11 +6,11 @@ from flask.testing import FlaskClient
 
 from app import create_app
 from app.twitter import tweepy_api
-from app.data.database import cache as _cache
 from app.data.database import create_db
 from app.data.database import init_db
 from app.data.database import update_db
-from app.data import globals as globals_
+from app.data import globals as globals_, cache as _cache
+from flask import g
 
 
 @pytest.fixture(scope='session')
@@ -21,8 +21,6 @@ def app():
         create_db(overwrite=True)
         init_db()
         update_db()
-        app.teardown_bkp = app.teardown_appcontext_funcs
-        app.teardown_appcontext_funcs = []
         yield app
 
 
@@ -73,3 +71,13 @@ def cli_runner(app):
 def mock_send_tweet():
     with patch.object(tweepy_api, 'update_status') as mocked_func:
         yield mocked_func
+
+
+@pytest.fixture(scope='function', autouse=True)
+def monkeypatch_globals(db_session):
+
+    yield
+
+    for o in ['website_options', 'boathouse_list', 'reach_list']:
+        if o in g:
+            g.pop(o)

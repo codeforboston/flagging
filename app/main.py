@@ -58,7 +58,7 @@ def register_extensions(app: Flask):
     from .data import db
     db.init_app(app)
 
-    from .data import cache
+    from app.data import cache
     cache.init_app(app)
 
     from .data.celery import init_celery
@@ -377,7 +377,7 @@ def register_commands(app: Flask):
 
         https://devcenter.heroku.com/articles/release-phase
         """
-        from .data import cache
+        from app.data import cache
         cache.clear()
 
     from celery.bin.celery import celery as celery_cmd
