@@ -15,9 +15,10 @@ with warnings.catch_warnings():
     from flasgger import LazyString
     from flasgger import swag_from
 
+from ..data.globals import website_options
 from app.data.processing.predictive_models import latest_model_outputs
 from app.data.processing.predictive_models import MODEL_VERSION
-from ..data import Boathouse, WebsiteOptions
+from ..data import Boathouse
 from ..data.database import execute_sql
 from ..data.database import cache
 from ..data.database import get_current_time
@@ -39,8 +40,8 @@ def model_api(reaches: List[int], hours: int) -> dict:
     def _slice_df_by_reach(r: int) -> Dict[str, Any]:
         return (
             df
-            .loc[df['reach'] == r, :]
-            .drop(columns=['reach'])
+            .loc[df['reach_id'] == r, :]
+            .drop(columns=['reach_id'])
             .to_dict(orient='records')
         )
 
@@ -48,7 +49,7 @@ def model_api(reaches: List[int], hours: int) -> dict:
         'model_version': MODEL_VERSION,
         'time_returned': get_current_time(),
         # For some reason this casts to int when not wrapped in `bool()`:
-        'is_boating_season': WebsiteOptions.is_boating_season(),
+        'is_boating_season': website_options.boating_season,
         'model_outputs': [
             {
                 'predictions': _slice_df_by_reach(reach),

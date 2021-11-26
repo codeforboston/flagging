@@ -4,15 +4,15 @@ from flask import Flask
 from flask import request
 from flask_admin import Admin
 
-from ..data.database import db
-from .auth import basic_auth
-from .views.data import DownloadView
-from .views.data import DatabaseView
-from .views.misc import LogoutView
-from .views.misc import AdminIndexView
-from .views.website_options import WebsiteOptionsModelView
-from .views.boathouse import ManualOverridesModelView
-from .views.boathouse import BoathouseModelView
+from app.data.database import db
+from app.admin.auth import basic_auth
+from app.admin.views.data import DownloadView
+from app.admin.views.data import DatabaseView
+from app.admin.views.misc import LogoutView
+from app.admin.views.misc import AdminIndexView
+from app.admin.views.website_options import WebsiteOptionsModelView
+from app.admin.views.boathouse import ManualOverridesModelView
+from app.admin.views.boathouse import BoathouseModelView
 
 
 admin = Admin(template_mode='bootstrap3', index_view=AdminIndexView())

@@ -78,7 +78,7 @@ class DownloadView(BaseView):
         'hobolink',
         'usgs',
         'processed_data',
-        'model_outputs',
+        'prediction',
         'boathouses',
         'override_history'
     ]
@@ -142,7 +142,7 @@ class DownloadView(BaseView):
         return send_csv_attachment_of_dataframe(
             df=df, file_name='model_processed_data.csv')
 
-    @expose('/csv/model_outputs_source')
+    @expose('/csv/prediction_source')
     def source_model_outputs(self):
         df_usgs = get_live_usgs_data(days_ago=90)
         df_hobolink = get_live_hobolink_data('code_for_boston_export_90d')
@@ -151,7 +151,7 @@ class DownloadView(BaseView):
 
         return send_csv_attachment_of_dataframe(
             df=model_outs,
-            file_name='model_outputs_source.csv'
+            file_name='prediction_source.csv'
         )
 
 

@@ -12,6 +12,8 @@ db.metadata.clear()
 # SqlAlchemy database models
 from .models.boathouse import Boathouse
 from .models.website_options import WebsiteOptions
+from .models.prediction import Prediction
+from .models.reach import Reach
 
 # External data calls
 from .processing import usgs

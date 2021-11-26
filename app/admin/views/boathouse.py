@@ -12,8 +12,8 @@ from app.data.database import cache
 
 class _BaseBoathouseView(ModelView):
     list_template = 'admin/list_boathouses.html'
-    column_filters = ('reach',)
-    column_default_sort = [('reach', False), ('boathouse', False)]
+    column_filters = ('reach_id',)
+    column_default_sort = [('reach_id', False), ('name', False)]
 
 
 class BoathouseModelView(_BaseBoathouseView):
@@ -21,7 +21,7 @@ class BoathouseModelView(_BaseBoathouseView):
         super().__init__(
             Boathouse,
             session,
-            ignore_columns=['id', 'overridden', 'reach', 'reason'],
+            ignore_columns=['id', 'overridden', 'reach_id', 'reason'],
             endpoint='boathouses',
             name='Boathouses'
         )

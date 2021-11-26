@@ -2,8 +2,8 @@ from flask_admin import expose
 from sqlalchemy.orm import Session
 from werkzeug.utils import redirect
 
-from ..base import ModelView
-from ...data import WebsiteOptions
+from app.admin.base import ModelView
+from app.data import WebsiteOptions
 
 
 class WebsiteOptionsModelView(ModelView):

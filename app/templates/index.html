@@ -8,12 +8,13 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 {% endblock %}
 {% block content %}
+{% if boating_season %}
 <h2>Water Quality Today</h2>
 <div class="widget-container">
     {% include get_widget_filename() %}
 </div>
 <div class="last-updated">
-    ( Last updated: {{ model_last_updated_time }} )
+    ( Last updated: {{ model_last_updated_time | strftime }} )
 </div>
 <h2>What Do the Flags Mean?</h2>
 <ul class="flag-explanation">
@@ -21,6 +22,7 @@
     <li><span style="color: #AA0000; font-weight: bold;">Red</span> flags indicate potential health risks. Consider
         avoiding areas where red flags are posted or make sure you wash after boating nearby.</li>
 </ul>
+{% endif %}
 <h2>About CRWA's Water Quality Models</h2>
 <p>CRWA uses 3 different indicators to determine flag colors at each boathouse.</p>
 <ol>

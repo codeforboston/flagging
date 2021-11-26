@@ -21,6 +21,6 @@
     {%with flagging_message='' %}{% include get_widget_filename(version=2) %}{% endwith %}
     </div>
     <div class="last-updated">
-        ( Last updated: {{ model_last_updated_time }} )
+        ( Last updated: {{ model_last_updated_time | strftime }} )
     </div>
 {% endblock %}

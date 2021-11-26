@@ -88,7 +88,7 @@ def test_boathouse_trigger(db_session):
 
     db_session \
         .query(Boathouse) \
-        .filter(Boathouse.boathouse == 'Union Boat Club') \
+        .filter(Boathouse.name == 'Union Boat Club') \
         .update({"overridden": True})
     db_session.commit()
 

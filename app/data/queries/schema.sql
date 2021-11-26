@@ -31,7 +31,7 @@ CREATE TABLE model_outputs (
 
 CREATE TABLE IF NOT EXISTS override_history (
     time            timestamp,
-    boathouse       text,
+    boathouse_name  text,
     overridden      boolean,
     reason          text
 );

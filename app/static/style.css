@@ -329,6 +329,23 @@ nav a:hover {
   z-index: 0;
 }
 
+.auth-container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.auth-img {
+  float: left;
+  display: block;
+  width: 480px;
+  max-width: 47%;
+  max-height: 47%;
+  height: auto;
+  padding: 0 1em 1em 0;
+}
+
+
 /***** End About Page *****/
 
 /***** Start API Index Page *****/

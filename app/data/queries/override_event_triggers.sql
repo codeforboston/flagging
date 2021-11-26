@@ -4,13 +4,13 @@ CREATE OR REPLACE FUNCTION record_override_change()
         BEGIN
             INSERT INTO override_history(
                 time,
-                boathouse,
+                boathouse_name,
                 overridden,
                 reason
             )
             VALUES(
                 now() AT TIME ZONE 'EST',
-                NEW.boathouse,
+                NEW.name,
                 NEW.overridden,
                 NEW.reason
             );

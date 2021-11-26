@@ -2,6 +2,7 @@ import pytest
 
 from unittest.mock import patch
 from flask import url_for
+from flask.testing import FlaskClient
 
 from app import create_app
 from app.twitter import tweepy_api
@@ -9,6 +10,7 @@ from app.data.database import cache as _cache
 from app.data.database import create_db
 from app.data.database import init_db
 from app.data.database import update_db
+from app.data import globals as globals_
 
 
 @pytest.fixture(scope='session')
@@ -19,6 +21,8 @@ def app():
         create_db(overwrite=True)
         init_db()
         update_db()
+        app.teardown_bkp = app.teardown_appcontext_funcs
+        app.teardown_appcontext_funcs = []
         yield app
 
 
@@ -32,7 +36,7 @@ def live_app(app):
     app.config['USE_MOCK_DATA'] = old
 
 
-@pytest.fixture
+@pytest.fixture(scope='function')
 def client(app):
     """A test client for the app. You can think of the test like a web browser;
     it retrieves data from the website in a similar way that a browser would.
@@ -69,9 +73,3 @@ def cli_runner(app):
 def mock_send_tweet():
     with patch.object(tweepy_api, 'update_status') as mocked_func:
         yield mocked_func
-
-
-# @pytest.fixture(autouse=True)
-# def _celery_worker(celery_worker):
-#     """Make sure celery is available for every test."""
-#     yield celery_worker

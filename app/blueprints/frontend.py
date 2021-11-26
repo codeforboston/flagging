@@ -7,10 +7,12 @@ from flask import current_app
 from flask import render_template
 from flask import flash
 
-from ..data import Boathouse, WebsiteOptions
-from ..data.database import cache
-from ..data.database import get_current_time
-from app.data.processing.predictive_models import get_latest_prediction_time
+from app.data.models.boathouse import Boathouse
+from app.data.database import cache
+from app.data.database import get_current_time
+from app.data.globals import website_options
+from app.data.globals import boathouses
+from app.data.models.prediction import get_latest_prediction_time
 from app.data.processing.predictive_models import latest_model_outputs
 
 bp = Blueprint('flagging', __name__)
@@ -21,7 +23,6 @@ bp = Blueprint('flagging', __name__)
 def before_request():
     last_pred_time = get_latest_prediction_time()
     current_time = get_current_time()
-
     # Calculate difference between now and latest prediction time
     # If model_outputs has zero rows, we raise the following error:
     # > TypeError: unsupported operand type(s) for -: 'Timestamp' and 'NoneType'
@@ -49,7 +50,7 @@ def before_request():
 
     # ~ ~ ~
 
-    if not WebsiteOptions.is_boating_season():
+    if not website_options.boating_season:
         flash(
             '<b>Note:</b> It is currently not boating season. We do not '
             'display flags when it is not boating season. We hope to see you '
@@ -65,10 +66,11 @@ def flag_widget_params(force_display: bool = False) -> Dict[str, Any]:
     >>> **flag_widget_params()
     """
     return dict(
-        flags=Boathouse.all_flags(),
-        model_last_updated_time=get_latest_prediction_time(to_str=True),
-        boating_season=force_display or WebsiteOptions.is_boating_season(),
-        flagging_message=WebsiteOptions.get_flagging_message()
+        boathouses=boathouses,
+        website_options=website_options,
+        model_last_updated_time=get_latest_prediction_time(),
+        boating_season=force_display or website_options.boating_season,
+        flagging_message=website_options.rendered_flagging_message
     )
 
 
@@ -87,7 +89,7 @@ def stylize_model_output(df: pd.DataFrame) -> str:
     df = df.copy()
 
     # remove reach number
-    df = df.drop(columns=['reach'])
+    df = df.drop(columns=['reach_id'])
 
     def _apply_flag(x: bool) -> str:
         flag_class = 'blue-flag' if x else 'red-flag'
@@ -112,7 +114,7 @@ def index() -> str:
 
 @bp.route('/boathouses')
 @cache.cached()
-def boathouses() -> str:
+def boathouses_page() -> str:
     return render_template('boathouses.html',
                            **flag_widget_params(force_display=True))
 
@@ -137,9 +139,9 @@ def model_outputs() -> str:
     df = latest_model_outputs(hours=24)
 
     reach_html_tables = {
-        r: stylize_model_output(df.loc[df['reach'] == r])
+        r: stylize_model_output(df.loc[df['reach_id'] == r])
         for r
-        in df['reach'].unique()
+        in df['reach_id'].unique()
     }
 
     boathouses_by_reach = Boathouse.boathouse_names_by_reach()

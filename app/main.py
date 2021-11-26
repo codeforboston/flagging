@@ -70,7 +70,7 @@ def register_extensions(app: Flask):
     from .twitter import init_tweepy
     init_tweepy(app)
 
-    from .blueprints.api import init_swagger
+    from .blueprints.api_v1 import init_swagger
     init_swagger(app)
 
     from .mail import mail
@@ -83,7 +83,7 @@ def register_blueprints(app: Flask):
     """
     app.url_map.strict_slashes = False
 
-    from .blueprints.api import bp as api_bp
+    from .blueprints.api_v1 import bp as api_bp
     app.register_blueprint(api_bp)
 
     from .blueprints.frontend import bp as flagging_bp
@@ -153,6 +153,14 @@ def register_jinja_env(app: Flask):
     change the colors using CSS.) This function loads SVG markup into our Jinja
     environment via reading from SVG files.
     """
+    @app.template_filter('strftime')
+    def strftime(
+            value: datetime.datetime,
+            fmt: str = "%Y-%m-%d %I:%M:%S %p"
+    ) -> str:
+        """Render datetimes with a default format for the frontend."""
+        return value.strftime(fmt)
+
     import hashlib
 
     def _load_svg(file_name: str):
@@ -285,7 +293,7 @@ def register_commands(app: Flask):
     @mail_on_fail
     def update_website_command(ctx: click.Context):
         """Updates the database, then Tweets a message."""
-        from app.data import WebsiteOptions
+        from app.data.globals import website_options
 
         # Update the database
         ctx.invoke(update_db_command)
@@ -293,7 +301,7 @@ def register_commands(app: Flask):
         # If the model updated and it's boating season, send a tweet.
         # Otherwise, do nothing.
         if (
-                WebsiteOptions.is_boating_season()
+                website_options.boating_season
                 and current_app.config['SEND_TWEETS']
         ):
             from .twitter import tweet_current_status

@@ -125,6 +125,7 @@ def init_db():
 
     # The boathouses table is populated. This table doesn't change, so it
     # only needs to be populated once.
+    execute_sql_from_file('define_reach.sql')
     execute_sql_from_file('define_boathouse.sql')
 
     # The file for keeping track of if it's currently boating season
@@ -177,7 +178,7 @@ def update_db():
         # Populate the `model_outputs` table.
         from app.data.processing.predictive_models import all_models
         model_outs = all_models(df)
-        model_outs.to_sql('model_outputs', **options)
+        model_outs.to_sql('prediction', **options)
 
     finally:
         # Clear the cache every time this function runs.

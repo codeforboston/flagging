@@ -19,7 +19,7 @@ class BaseView(_BaseView):
             self.url = self.url or self.endpoint
             self.endpoint = f'admin_{self.endpoint}'
 
-    def is_accessible(self):
+    def is_accessible(self) -> bool:
         return basic_auth.authenticate()
 
     def inaccessible_callback(self, name, **kwargs):

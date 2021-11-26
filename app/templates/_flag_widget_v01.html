@@ -2,16 +2,16 @@
     This is the flag widget. It is the HTML that renders the flags on the website.
 #}
 {% if boating_season %}
-    {{ flagging_message }}
-    {% for boathouse, safe in flags.items() %}
+    {{ website_options.rendered_flagging_message }}
+    {% for boathouse in boathouses %}
     <div class="flag-container">
-        {% if safe %}
-            <img class="flag" src="{{ url_for('static', filename='images/blue_flag.png') }}" alt="Blue flag for {{ boathouse }}" />
+        {% if boathouse.safe %}
+            <img class="flag" src="{{ url_for('static', filename='images/blue_flag.png') }}" alt="Blue flag for {{ boathouse.name }}" />
         {% else %}
-            <img class="flag" src="{{ url_for('static', filename='images/red_flag.png') }}" alt="Red flag for {{ boathouse }}" />
+            <img class="flag" src="{{ url_for('static', filename='images/red_flag.png') }}" alt="Red flag for {{ boathouse.name }}" />
         {% endif %}
         <br />
-        {{ boathouse }}
+        {{ boathouse.name }}
     </div>
 
     {% endfor %}

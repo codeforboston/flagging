@@ -78,13 +78,13 @@ def test_admin_pages(client, page, auth, expected_status_code):
         ('/admin/db/download/csv/hobolink', 'admin:password', 200),
         ('/admin/db/download/csv/usgs', 'admin:password', 200),
         ('/admin/db/download/csv/processed_data', 'admin:password', 200),
-        ('/admin/db/download/csv/model_outputs', 'admin:password', 200),
+        ('/admin/db/download/csv/prediction', 'admin:password', 200),
         ('/admin/db/download/csv/boathouses', 'admin:password', 200),
         ('/admin/db/download/csv/override_history', 'admin:password', 200),
         ('/admin/db/download/csv/hobolink_source', 'admin:password', 200),
         ('/admin/db/download/csv/usgs_source', 'admin:password', 200),
         ('/admin/db/download/csv/processed_data_source', 'admin:password', 200),
-        ('/admin/db/download/csv/model_outputs_source', 'admin:password', 200),
+        ('/admin/db/download/csv/prediction_source', 'admin:password', 200),
 
         # Errors
         ('/admin/db/download/csv/arbitrary_table', 'admin:password', 404),
@@ -140,7 +140,7 @@ def test_override_on_home_page(client, db_session, cache):
 
     db_session \
         .query(Boathouse) \
-        .filter(Boathouse.boathouse == 'Union Boat Club') \
+        .filter(Boathouse.name == 'Union Boat Club') \
         .update({"overridden": True})
     db_session.commit()
 

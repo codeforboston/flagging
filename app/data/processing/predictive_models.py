@@ -141,9 +141,9 @@ def reach_2_model(df: pd.DataFrame, rows: int = None) -> pd.DataFrame:
     )
 
     df['safe'] = df['probability'] <= SAFETY_THRESHOLD
-    df['reach'] = 2
+    df['reach_id'] = 2
 
-    return df[['reach', 'time', 'probability', 'safe']]
+    return df[['reach_id', 'time', 'probability', 'safe']]
 
 
 def reach_3_model(df: pd.DataFrame, rows: int = None) -> pd.DataFrame:
@@ -174,9 +174,9 @@ def reach_3_model(df: pd.DataFrame, rows: int = None) -> pd.DataFrame:
     )
 
     df['safe'] = df['probability'] <= SAFETY_THRESHOLD
-    df['reach'] = 3
+    df['reach_id'] = 3
 
-    return df[['reach', 'time', 'probability', 'safe']]
+    return df[['reach_id', 'time', 'probability', 'safe']]
 
 
 def reach_4_model(df: pd.DataFrame, rows: int = None) -> pd.DataFrame:
@@ -208,9 +208,9 @@ def reach_4_model(df: pd.DataFrame, rows: int = None) -> pd.DataFrame:
     )
 
     df['safe'] = df['probability'] <= SAFETY_THRESHOLD
-    df['reach'] = 4
+    df['reach_id'] = 4
 
-    return df[['reach', 'time', 'probability', 'safe']]
+    return df[['reach_id', 'time', 'probability', 'safe']]
 
 
 def reach_5_model(df: pd.DataFrame, rows: int = None) -> pd.DataFrame:
@@ -240,9 +240,9 @@ def reach_5_model(df: pd.DataFrame, rows: int = None) -> pd.DataFrame:
     )
 
     df['safe'] = df['probability'] <= SAFETY_THRESHOLD
-    df['reach'] = 5
+    df['reach_id'] = 5
 
-    return df[['reach', 'time', 'probability', 'safe']]
+    return df[['reach_id', 'time', 'probability', 'safe']]
 
 
 def all_models(df: pd.DataFrame, *args, **kwargs):
@@ -252,7 +252,7 @@ def all_models(df: pd.DataFrame, *args, **kwargs):
         reach_4_model(df, *args, **kwargs),
         reach_5_model(df, *args, **kwargs),
     ], axis=0)
-    out = out.sort_values(['reach', 'time'])
+    out = out.sort_values(['reach_id', 'time'])
     return out
 
 
@@ -280,13 +280,3 @@ def latest_model_outputs(hours: int = 1) -> pd.DataFrame:
                          'cannot be less than one')
 
     return df
-
-
-def get_latest_prediction_time(to_str: bool = False):
-    """Returns the latest timestamp in model outputs."""
-    ts = execute_sql('SELECT MAX(time) FROM model_outputs;').iloc[0, 0]
-    if to_str:
-        # Return in string format
-        return ts.strftime("%Y-%m-%d %I:%M:%S %p")
-    else:
-        return ts
