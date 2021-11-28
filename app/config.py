@@ -59,6 +59,8 @@ class Config:
     POSTGRES_PORT: str = os.getenv('POSTGRES_PORT', '5432')
     POSTGRES_DB: str = os.getenv('POSTGRES_DB', 'flagging')
 
+    FLASK_POSTGRES_CLI_DISALLOWED_ENVS = ["production"]
+
     @property
     def SQLALCHEMY_DATABASE_URI(self) -> str:
         """

@@ -2,6 +2,8 @@ from typing import Any
 from typing import List
 from werkzeug.local import LocalProxy
 from flask import g
+from flask import Flask
+from flask import has_app_context
 
 from flask_caching import Cache as _Cache
 from app.data.models.website_options import WebsiteOptions
@@ -19,10 +21,23 @@ class Cache(_Cache):
         super().__init__()
         self.app_context_variables = []
 
+    def _clear_appcontext(self):
+        if has_app_context():
+            for i in self.app_context_variables:
+                if i in g:
+                    g.pop(i)
+
+    def init_app(self, app: Flask, config=None) -> None:
+        super().init_app(app=app, config=config)
+
+        @app.teardown_appcontext
+        def teardown_g(*args, **kwargs):
+            self._clear_appcontext()
+
     def clear(self) -> None:
-        for i in self.app_context_variables:
-            if i in g:
-                g.pop(i)
+        # Clearing `g` shouldn't be necessary when cleaning the cache.
+        # Still, better safe than sorry.
+        self._clear_appcontext()
         super().clear()
 
 
@@ -37,12 +52,16 @@ def cached_proxy(func: callable, key: str) -> Any:
     cache.app_context_variables.append(key)
 
     def _fetch():
-        active = g.get(key)
-        if active:
-            return active
+        if has_app_context():
+            active = g.get(key)
+            if active:
+                return active
+            else:
+                res = func()
+                g.setdefault(key, res)
+                return res
         else:
             res = func()
-            g.setdefault(key, res)
             return res
 
     return LocalProxy(_fetch)

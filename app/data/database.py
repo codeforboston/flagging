@@ -20,6 +20,7 @@ import click
 from flask import current_app
 
 from flask_sqlalchemy import SQLAlchemy
+from flask_postgres import init_db_callback
 from sqlalchemy.exc import ResourceClosedError
 
 
@@ -65,6 +66,7 @@ def execute_sql_from_file(file_name: str) -> Optional[pd.DataFrame]:
     path = os.path.join(current_app.config['QUERIES_DIR'], file_name)
     with current_app.open_resource(path) as f:
         s = f.read().decode('utf8')
+        print(s)
         return execute_sql(s)
 
 
@@ -107,6 +109,7 @@ def create_db(overwrite: bool = False) -> bool:
         return True
 
 
+@init_db_callback
 def init_db():
     """This data clears and then populates the database from scratch. You only
     need to run this function once per instance of the database.
@@ -130,9 +133,6 @@ def init_db():
 
     # Create a database trigger for manual overrides.
     execute_sql_from_file('override_event_triggers.sql')
-
-    # The function that updates the database periodically should be run after
-    # this runs.
 
 
 def update_db():

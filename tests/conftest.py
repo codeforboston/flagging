@@ -1,27 +1,37 @@
 import pytest
 
 from unittest.mock import patch
-from flask import url_for
-from flask.testing import FlaskClient
-
 from app import create_app
 from app.twitter import tweepy_api
-from app.data.database import create_db
 from app.data.database import init_db
 from app.data.database import update_db
-from app.data import globals as globals_, cache as _cache
+from app.data.globals import cache as _cache
 from flask import g
+from pytest_postgresql.janitor import DatabaseJanitor
 
 
 @pytest.fixture(scope='session')
 def app():
     app = create_app(config='testing')
 
+    janitor = DatabaseJanitor(
+        user=app.config['POSTGRES_USER'],
+        password=app.config['POSTGRES_PASSWORD'],
+        host=app.config['POSTGRES_HOST'],
+        port=app.config['POSTGRES_PORT'],
+        dbname=app.config['POSTGRES_DB'],
+        version=12
+    )
+
+    try:
+        janitor.drop()
+    except:
+        pass
+
+    janitor.init()
     with app.app_context():
-        create_db(overwrite=True)
-        init_db()
-        update_db()
         yield app
+    janitor.drop()
 
 
 @pytest.fixture
@@ -59,6 +69,9 @@ def _db(app):
     We use that extension to allow for easy testing of the database.
     """
     from app.data.database import db
+    with app.app_context():
+        init_db()
+        update_db()
     yield db
 
 
@@ -75,9 +88,7 @@ def mock_send_tweet():
 
 @pytest.fixture(scope='function', autouse=True)
 def monkeypatch_globals(db_session):
-
     yield
-
     for o in ['website_options', 'boathouse_list', 'reach_list']:
         if o in g:
             g.pop(o)

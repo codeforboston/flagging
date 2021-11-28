@@ -7,6 +7,7 @@
 pytest
 pytest-celery
 pytest-cov
+pytest-postgresql<4
 pytest-flask-sqlalchemy
 schemathesis
 

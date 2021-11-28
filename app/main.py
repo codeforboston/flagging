@@ -236,49 +236,6 @@ def register_commands(app: Flask):
 
         return _wrap
 
-    @app.cli.command('create-db')
-    @click.option('--overwrite/--no-overwrite',
-                  default=False,
-                  is_flag=True,
-                  show_default=True,
-                  help='If true, overwrite the database if it exists.')
-    @dev_only
-    def create_db_command(overwrite: bool = False):
-        """Create the database."""
-        from .data.database import create_db
-        create_db(overwrite=overwrite)
-
-    @app.cli.command('init-db')
-    @click.option('--pop/--no-pop',
-                  default=True,
-                  is_flag=True,
-                  show_default=True,
-                  help='If true, then do a db update when initializing the db.')
-    @click.pass_context
-    @with_appcontext
-    def init_db_command(ctx: click.Context, pop: bool):
-        """Clear existing data and create new tables."""
-        from .data.database import init_db
-        init_db()
-        click.echo('Initialized the database.')
-        if pop:
-            ctx.invoke(update_db_command)
-
-    @app.cli.command('delete-db')
-    @click.option('--test-db', '-t',
-                  default=False,
-                  is_flag=True,
-                  help='Deletes the database "flagging_test".')
-    @dev_only
-    def delete_db_command(test_db: bool):
-        """Delete the database."""
-        from .data.database import delete_db
-        if test_db:
-            dbname = 'flagging_test'
-        else:
-            dbname = current_app.config['POSTGRES_DB']
-        delete_db(dbname=dbname)
-
     @app.cli.command('update-db')
     @with_appcontext
     @mail_on_fail
