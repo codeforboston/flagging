@@ -6,9 +6,8 @@ import tweepy
 from flask import Flask
 from flask import current_app
 
-from .data import Boathouse
 from app.data.globals import boathouses
-from .data.database import get_current_time
+from app.data.database import get_current_time
 
 tweepy_api = tweepy.API()
 
@@ -44,7 +43,6 @@ def compose_tweet() -> str:
 
     # Number of boathouses that are not safe. (`not b.safe`)
 
-    flags = Boathouse.all_flags()
     current_time = get_current_time().strftime('%I:%M %p, %m/%d/%Y')
 
     unsafe_count = len(list(filter(lambda b: not b.safe, boathouses)))
@@ -55,7 +53,7 @@ def compose_tweet() -> str:
             f" Charles as of {current_time}. Happy boating!"
         )
     else:
-        some_or_all = 'some' if len(flags) > unsafe_count > 0 else 'all'
+        some_or_all = 'some' if len(boathouses) > unsafe_count > 0 else 'all'
         msg = (
             f"🚩 Red flags are being flown at {some_or_all} boathouses on the"
             f" Lower Charles as of {current_time}. See our website for more"

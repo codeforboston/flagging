@@ -1,6 +1,4 @@
-
-
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 
 from sqlalchemy import func
 from sqlalchemy import and_, not_
@@ -28,3 +26,15 @@ class Reach(db.Model):
     @classmethod
     def get_all(cls) -> List['Reach']:
         return db.session.query(cls).order_by(cls.id).all()
+
+    def predictions_last_x_hours(self, x: Optional[int] = None) -> List['Prediction']:
+        if x is None:
+            return self.predictions
+        from app.data.models.prediction import Prediction
+        return (
+            db.session.query(Prediction)
+            .filter(Prediction.reach_id == self.id)
+            .order_by(Prediction.time.desc())
+            .limit(x)
+            .all()
+        )

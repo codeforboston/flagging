@@ -79,7 +79,7 @@ def test_admin_pages(client, page, auth, expected_status_code):
         ('/admin/db/download/csv/usgs', 'admin:password', 200),
         ('/admin/db/download/csv/processed_data', 'admin:password', 200),
         ('/admin/db/download/csv/prediction', 'admin:password', 200),
-        ('/admin/db/download/csv/boathouses', 'admin:password', 200),
+        ('/admin/db/download/csv/boathouse', 'admin:password', 200),
         ('/admin/db/download/csv/override_history', 'admin:password', 200),
         ('/admin/db/download/csv/hobolink_source', 'admin:password', 200),
         ('/admin/db/download/csv/usgs_source', 'admin:password', 200),
@@ -88,7 +88,7 @@ def test_admin_pages(client, page, auth, expected_status_code):
 
         # Errors
         ('/admin/db/download/csv/arbitrary_table', 'admin:password', 404),
-        ('/admin/db/download/csv/boathouses', 'bad:credentials', 401),
+        ('/admin/db/download/csv/boathouse', 'bad:credentials', 401),
         ('/admin/db/download/csv/hobolink_source', None, 401),
     ]
 )

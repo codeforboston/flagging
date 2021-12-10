@@ -12,6 +12,7 @@ from app.data import cache
 from app.data.database import get_current_time
 from app.data.globals import website_options
 from app.data.globals import boathouses
+from app.data.globals import reaches
 from app.data.models.prediction import get_latest_prediction_time
 from app.data.processing.predictive_models import latest_model_outputs
 
@@ -136,19 +137,18 @@ def model_outputs() -> str:
     Returns:
         Rendering of the model outputs via the `model_outputs.html` template.
     """
+    # TODO: deprecate access via Pandas
     df = latest_model_outputs(hours=24)
 
-    reach_html_tables = {
+    html_tables = {
         r: stylize_model_output(df.loc[df['reach_id'] == r])
         for r
         in df['reach_id'].unique()
     }
 
-    boathouses_by_reach = Boathouse.boathouse_names_by_reach()
-
     return render_template('model_outputs.html',
-                           tables=reach_html_tables,
-                           boathouses_by_reach=boathouses_by_reach)
+                           html_tables=html_tables,
+                           reaches=reaches)
 
 
 @bp.route('/flags')

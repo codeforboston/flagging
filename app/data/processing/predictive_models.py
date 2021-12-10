@@ -13,7 +13,7 @@ https://www.mass.gov/files/documents/2016/08/tz/36wqara.pdf
 """
 import numpy as np
 import pandas as pd
-from app.data.database import execute_sql
+
 
 MODEL_VERSION = '2020'
 

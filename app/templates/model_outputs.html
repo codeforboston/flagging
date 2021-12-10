@@ -18,22 +18,22 @@
         events may leave the Charles River unsuitable for recreational activities, even when the predictive model has a
         "safe" prediction.
     </p>
-    {% for reach, tbl in tables.items() %}
+    {% for reach in reaches %}
         <div class="table-wrapper">
             <div class="table-header-wrapper">
-                <h2 style="display: inline;">Predictive Model for Reach {{ reach }}</h2>
+                <h2 style="display: inline;">Predictive Model for Reach {{ reach.id }}</h2>
                 <div class="tooltip">{{ INFO_ICON }}
                     <div class="tooltiptext">
                         <strong>Boathouses:</strong>
                         <ul>
-                        {% for boathouse in boathouses_by_reach.get(reach) %}
-                            <li>{{ boathouse }}</li>
+                        {% for boathouse in reach.boathouses %}
+                            <li>{{ boathouse.name }}</li>
                         {% endfor %}
                         </ul>
                     </div>
                 </div>
             </div>
-            {{ tbl | safe }}
+            {{ html_tables[reach.id] | safe }}
         </div>
     {% endfor %}
 <script>

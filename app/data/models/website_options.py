@@ -5,7 +5,7 @@ from app.data.database import db
 
 
 class WebsiteOptions(db.Model):
-    __tablename__ = 'live_website_options'
+    __tablename__ = 'website_options'
     id: int = db.Column(db.Integer, primary_key=True)
     flagging_message: Optional[str] = db.Column(db.Text, nullable=True)
     boating_season: bool = db.Column(db.Boolean, default=True, nullable=False)

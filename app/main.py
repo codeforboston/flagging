@@ -228,9 +228,9 @@ def register_commands(app: Flask):
         def _wrap(*args, **kwargs):
             if current_app.env not in ['development', 'testing']:
                 raise RuntimeError(
-                    'You can only run this in the development environment. '
-                    'Make sure you set up the environment correctly if you '
-                    'believe you are in dev.'
+                    'You can only run this in the development environment.'
+                    ' Make sure you set up the environment correctly if you'
+                    ' believe you are in dev.'
                 )
             return func(*args, **kwargs)
 

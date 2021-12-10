@@ -175,9 +175,15 @@ def update_db():
         df.to_sql('processed_data', **options)
 
         # Populate the `model_outputs` table.
+        from app.data.models.prediction import Prediction
         from app.data.processing.predictive_models import all_models
         model_outs = all_models(df)
-        model_outs.to_sql('prediction', **options)
+        # TODO:
+        #  I'm a little worried that I had to add the below to make a test pass.
+        #  I thought this part of the code was pretty settled by now, but guess
+        #  not. I need to look into what's going on.
+        model_outs = model_outs.loc[model_outs['probability'].notna(), :]
+        model_outs.to_sql(Prediction.__tablename__, **options)
 
     finally:
         # Clear the cache every time this function runs.

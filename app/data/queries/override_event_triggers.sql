@@ -19,7 +19,7 @@ CREATE OR REPLACE FUNCTION record_override_change()
     LANGUAGE 'plpgsql'
 ;
 CREATE TRIGGER record_manual_overrides
-    AFTER UPDATE OF overridden, reason ON boathouses
+    AFTER UPDATE OF overridden, reason ON boathouse
     FOR EACH ROW
     EXECUTE PROCEDURE record_override_change()
 ;

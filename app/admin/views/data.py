@@ -79,7 +79,7 @@ class DownloadView(BaseView):
         'usgs',
         'processed_data',
         'prediction',
-        'boathouses',
+        'boathouse',
         'override_history'
     ]
 

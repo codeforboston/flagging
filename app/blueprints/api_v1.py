@@ -16,52 +16,14 @@ with warnings.catch_warnings():
     from flasgger import swag_from
 
 from ..data.globals import website_options
-from app.data.processing.predictive_models import latest_model_outputs
 from app.data.processing.predictive_models import MODEL_VERSION
-from ..data import Boathouse, cache
+from app.data.globals import boathouses
+from app.data.globals import reaches
+from ..data import cache
 from ..data.database import execute_sql
 from ..data.database import get_current_time
 
 bp = Blueprint('api', __name__, url_prefix='/api')
-
-
-def model_api(reaches: List[int], hours: int) -> dict:
-    """
-    Class method that retrieves data from hobolink and usgs and processes
-    data, then creates json-like dictionary structure for model output.
-
-    returns: dict
-    """
-
-    # get model output data from database
-    df = latest_model_outputs(hours)
-
-    def _slice_df_by_reach(r: int) -> Dict[str, Any]:
-        return (
-            df
-            .loc[df['reach_id'] == r, :]
-            .drop(columns=['reach_id'])
-            .to_dict(orient='records')
-        )
-
-    return {
-        'model_version': MODEL_VERSION,
-        'time_returned': get_current_time(),
-        # For some reason this casts to int when not wrapped in `bool()`:
-        'is_boating_season': website_options.boating_season,
-        'model_outputs': [
-            {
-                'predictions': _slice_df_by_reach(reach),
-                'reach': reach
-            }
-            for reach in reaches
-        ]
-    }
-
-
-# ========================================
-# The REST API endpoints are defined below
-# ========================================
 
 
 @bp.route('/v1/model')
@@ -70,17 +32,28 @@ def model_api(reaches: List[int], hours: int) -> dict:
 def predictive_model_api():
     """Returns JSON of the predictive model outputs."""
     # Get the reaches from the query parameters.
-    reaches = request.args.getlist('reach', type=int) or [2, 3, 4, 5]
+    selected_reaches = request.args.getlist('reach', type=int) or [2, 3, 4, 5]
 
     # Hours query parameter must be between 1 and API_MAX_HOURS.
-    hours = request.args.get('hours', default=24, type=int)
-    hours = min(hours, current_app.config['API_MAX_HOURS'])
-    hours = max(hours, 1)
+    selected_hours = request.args.get('hours', default=24, type=int)
+    selected_hours = min(selected_hours, current_app.config['API_MAX_HOURS'])
+    selected_hours = max(selected_hours, 1)
 
-    # Get data
-    data = model_api(reaches, hours)
-
-    return jsonify(data)
+    return jsonify({
+        'model_version': MODEL_VERSION,
+        'time_returned': get_current_time(),
+        'is_boating_season': website_options.boating_season,
+        'model_outputs': [
+            {
+                'reach': r.id,
+                'predictions': [
+                    p.api_v1_to_dict()
+                    for p in r.predictions_last_x_hours(x=selected_hours)
+                ]
+            }
+            for r in filter(lambda _: _.id in selected_reaches, reaches)
+        ]
+    })
 
 
 @bp.route('/v1/boathouses')
@@ -88,7 +61,7 @@ def predictive_model_api():
 @swag_from('openapi/boathouse.yml')
 def boathouses_api():
     """Returns JSON of the boathouses."""
-    return jsonify(boathouses=Boathouse.all_boathouses_dict())
+    return jsonify(boathouses=[bh.api_v1_to_dict() for bh in boathouses])
 
 
 @bp.route('/v1/model_input_data')

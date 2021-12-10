@@ -47,6 +47,13 @@ class Prediction(db.Model):
             .all()
         )
 
+    def api_v1_to_dict(self) -> Dict[str, Any]:
+        return {
+            'probability': self.probability,
+            'safe': self.safe,
+            'time': self.time
+        }
+
 
 def get_latest_prediction_time() -> datetime:
     return db.session.query(func.max(Prediction.time)).scalar()

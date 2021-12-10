@@ -1,4 +1,4 @@
-INSERT INTO boathouses
+INSERT INTO boathouse
     (reach_id, name,                                  latitude,  longitude, overridden, reason)
 VALUES
     (2,        'Newton Yacht Club',                   42.358698, -71.172850, FALSE,      NULL),
