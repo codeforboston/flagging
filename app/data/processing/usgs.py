@@ -16,14 +16,15 @@ from tenacity import retry
 from tenacity import wait_fixed
 from tenacity import stop_after_attempt
 
-# Constants
-USGS_URL = 'https://waterdata.usgs.gov/nwis/uv'
+from app.data.processing._utils import mock_source
 
+
+USGS_URL = 'https://waterdata.usgs.gov/nwis/uv'
 USGS_STATIC_FILE_NAME = 'usgs.pickle'
-# ~ ~ ~ ~
 
 
 @retry(reraise=True, wait=wait_fixed(1), stop=stop_after_attempt(3))
+@mock_source(filename=USGS_STATIC_FILE_NAME)
 def get_live_usgs_data(days_ago: int = 14) -> pd.DataFrame:
     """This function runs through the whole process for retrieving data from
     usgs: first we perform the request, and then we parse the data.
@@ -31,14 +32,8 @@ def get_live_usgs_data(days_ago: int = 14) -> pd.DataFrame:
     Returns:
         Pandas Dataframe containing the usgs data.
     """
-    if current_app.config['USE_MOCK_DATA']:
-        fpath = os.path.join(
-            current_app.config['DATA_STORE'], USGS_STATIC_FILE_NAME
-        )
-        df = pd.read_pickle(fpath)
-    else:
-        res = request_to_usgs(days_ago=days_ago)
-        df = parse_usgs_data(res)
+    res = request_to_usgs(days_ago=days_ago)
+    df = parse_usgs_data(res)
     return df
 
 

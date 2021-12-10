@@ -2,7 +2,7 @@ from flask_admin import expose, AdminIndexView as _AdminIndexView
 from werkzeug.utils import redirect
 
 from app.admin.base import BaseView
-from app.data import cache
+from app.data.globals import cache
 
 
 class LogoutView(BaseView):

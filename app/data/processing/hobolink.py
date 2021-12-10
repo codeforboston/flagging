@@ -14,6 +14,8 @@ from tenacity import retry
 from tenacity import wait_fixed
 from tenacity import stop_after_attempt
 
+from app.data.processing._utils import mock_source
+
 # Constants
 
 HOBOLINK_URL = 'http://webservice.hobolink.com/restv2/data/custom/file'
@@ -34,12 +36,10 @@ HOBOLINK_COLUMNS = {
     # 'Batt, V, Charles River Weather Station': 'battery'
 }
 HOBOLINK_STATIC_FILE_NAME = 'hobolink.pickle'
-# ~ ~ ~ ~
-
-
 
 
 @retry(reraise=True, wait=wait_fixed(1), stop=stop_after_attempt(3))
+@mock_source(filename=HOBOLINK_STATIC_FILE_NAME)
 def get_live_hobolink_data(
         export_name: str = DEFAULT_HOBOLINK_EXPORT_NAME
 ) -> pd.DataFrame:
@@ -53,14 +53,8 @@ def get_live_hobolink_data(
     Returns:
         Pandas Dataframe containing the cleaned-up Hobolink data.
     """
-    if current_app.config['USE_MOCK_DATA']:
-        fpath = os.path.join(
-            current_app.config['DATA_STORE'], HOBOLINK_STATIC_FILE_NAME
-        )
-        df = pd.read_pickle(fpath)
-    else:
-        res = request_to_hobolink(export_name=export_name)
-        df = parse_hobolink_data(res.text)
+    res = request_to_hobolink(export_name=export_name)
+    df = parse_hobolink_data(res.text)
     return df
 
 

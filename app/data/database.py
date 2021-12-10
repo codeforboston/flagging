@@ -66,7 +66,6 @@ def execute_sql_from_file(file_name: str) -> Optional[pd.DataFrame]:
     path = os.path.join(current_app.config['QUERIES_DIR'], file_name)
     with current_app.open_resource(path) as f:
         s = f.read().decode('utf8')
-        print(s)
         return execute_sql(s)
 
 
@@ -115,13 +114,12 @@ def init_db():
     need to run this function once per instance of the database.
     """
 
-    # This file drops the tables if they already exist, and then defines
-    # the tables. This is the only query that CREATES tables.
+    # This file creates tables for all of the tables that don't have
+    # SQLAlchemy models associated with this.
     execute_sql_from_file('schema.sql')
 
-    # The models available in Base are given corresponding tables if they
-    # do not already exist.
-    db.create_all(app=current_app)
+    # This creates tables for everything with a SQLAlchemy model.
+    db.create_all()
 
     # The boathouses table is populated. This table doesn't change, so it
     # only needs to be populated once.

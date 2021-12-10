@@ -6,7 +6,7 @@ import pytest
 import requests
 import pandas as pd
 
-from app.data import Boathouse
+from app.data.models.boathouse import Boathouse
 
 
 def auth_to_header(auth: str) -> dict:

@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from werkzeug.utils import redirect
 
 from app.admin.base import ModelView
-from app.data import WebsiteOptions
+from app.data.models.website_options import WebsiteOptions
 
 
 class WebsiteOptionsModelView(ModelView):

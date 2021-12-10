@@ -4,7 +4,7 @@ from flask_admin import BaseView as _BaseView
 from flask_admin.contrib import sqla
 
 from app.admin.auth import basic_auth
-from app.data import cache
+from app.data.globals import cache
 
 
 class BaseView(_BaseView):

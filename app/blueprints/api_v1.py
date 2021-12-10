@@ -15,13 +15,13 @@ with warnings.catch_warnings():
     from flasgger import LazyString
     from flasgger import swag_from
 
-from ..data.globals import website_options
+from app.data.globals import website_options
 from app.data.processing.predictive_models import MODEL_VERSION
 from app.data.globals import boathouses
 from app.data.globals import reaches
-from ..data import cache
-from ..data.database import execute_sql
-from ..data.database import get_current_time
+from app.data.globals import cache
+from app.data.database import execute_sql
+from app.data.database import get_current_time
 
 bp = Blueprint('api', __name__, url_prefix='/api')
 
@@ -75,7 +75,7 @@ def model_input_data_api():
     hours = min(hours, current_app.config['API_MAX_HOURS'])
     hours = max(hours, 1)
 
-    df = execute_sql('''SELECT * FROM processed_data ORDER BY time''')
+    df = execute_sql('''SELECT * FROM processed_data ORDER BY time;''')
 
     model_input_data = df.tail(n=hours).to_dict(orient='records')
 

@@ -5,7 +5,7 @@ import pytest
 import pandas as pd
 from flask import g
 
-from app.data import Boathouse
+from app.data.models.boathouse import Boathouse
 from app.data.processing import hobolink
 
 from app.data.processing.hobolink import get_live_hobolink_data

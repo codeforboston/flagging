@@ -5,7 +5,8 @@ from functools import wraps
 import requests
 import pytest
 
-from app.data import Boathouse, WebsiteOptions
+from app.data.models.boathouse import Boathouse
+from app.data.models.website_options import WebsiteOptions
 from app.data import database
 from app.twitter import compose_tweet
 from app.mail import mail

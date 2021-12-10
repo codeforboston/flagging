@@ -58,7 +58,7 @@ def register_extensions(app: Flask):
     from .data import db
     db.init_app(app)
 
-    from app.data import cache
+    from app.data.globals import cache
     cache.init_app(app)
 
     from .data.celery import init_celery
@@ -334,7 +334,7 @@ def register_commands(app: Flask):
 
         https://devcenter.heroku.com/articles/release-phase
         """
-        from app.data import cache
+        from app.data.globals import cache
         cache.clear()
 
     from celery.bin.celery import celery as celery_cmd
@@ -375,15 +375,18 @@ def register_misc(app: Flask):
         import numpy as np  # noqa: F401
         from flask import current_app as app  # noqa: F401
         from flask.testing import FlaskClient  # noqa: F401
-        from .data import db  # noqa: F401
-        from .data import celery_app  # noqa: F401
-        from .data.database import execute_sql  # noqa: F401
+        from app.data import db  # noqa: F401
+        from app.data.celery import celery_app  # noqa: F401
+        from app.data.database import execute_sql  # noqa: F401
+        from app.data.globals import reaches  # noqa: F401
+        from app.data.globals import website_options  # noqa: F401
+        from app.data.globals import boathouses  # noqa: F401
         from app.data.processing.hobolink import get_live_hobolink_data  # noqa: F401
         from app.data.processing.hobolink import request_to_hobolink  # noqa: F401
         from app.data.processing.predictive_models import process_data  # noqa: F401
         from app.data.processing.usgs import get_live_usgs_data  # noqa: F401
         from app.data.processing.usgs import request_to_usgs  # noqa: F401
-        from .twitter import compose_tweet  # noqa: F401
+        from app.twitter import compose_tweet  # noqa: F401
 
         def get_auth():
             from base64 import b64encode

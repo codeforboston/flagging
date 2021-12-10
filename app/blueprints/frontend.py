@@ -8,7 +8,7 @@ from flask import render_template
 from flask import flash
 
 from app.data.models.boathouse import Boathouse
-from app.data import cache
+from app.data.globals import cache
 from app.data.database import get_current_time
 from app.data.globals import website_options
 from app.data.globals import boathouses
