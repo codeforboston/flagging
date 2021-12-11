@@ -18,7 +18,7 @@
         <tbody>
             {% for p in reach.predictions_last_x_hours(24) %}
                 <tr>
-                    <td>{{ p.time }}</td>
+                    <td>{{ p.time | strftime }}</td>
                     <td>{{ p.probability }}</td>
                     <td>{{ format_flag(p.safe) }}</td>
                     </tr>

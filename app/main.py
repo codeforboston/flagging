@@ -4,6 +4,7 @@ This file handles the construction of the Flask application object.
 import os
 import click
 import decimal
+import hashlib
 
 import datetime
 from typing import Optional
@@ -55,25 +56,25 @@ def create_app(config: Optional[str] = None) -> Flask:
 
 def register_extensions(app: Flask):
     """Register all extensions for the app."""
-    from .data import db
+    from app.data.database import db
     db.init_app(app)
 
     from app.data.globals import cache
     cache.init_app(app)
 
-    from .data.celery import init_celery
+    from app.data.celery import init_celery
     init_celery(app)
 
     from app.admin.main import init_admin
     init_admin(app)
 
-    from .twitter import init_tweepy
+    from app.twitter import init_tweepy
     init_tweepy(app)
 
-    from .blueprints.api_v1 import init_swagger
+    from app.blueprints.api_v1 import init_swagger
     init_swagger(app)
 
-    from .mail import mail
+    from app.mail import mail
     mail.init_app(app)
 
 
@@ -83,10 +84,10 @@ def register_blueprints(app: Flask):
     """
     app.url_map.strict_slashes = False
 
-    from .blueprints.api_v1 import bp as api_bp
+    from app.blueprints.api_v1 import bp as api_bp
     app.register_blueprint(api_bp)
 
-    from .blueprints.frontend import bp as flagging_bp
+    from app.blueprints.frontend import bp as flagging_bp
     app.register_blueprint(flagging_bp)
 
     @app.route('/favicon.ico')
@@ -160,8 +161,6 @@ def register_jinja_env(app: Flask):
     ) -> str:
         """Render datetimes with a default format for the frontend."""
         return value.strftime(fmt)
-
-    import hashlib
 
     def _load_svg(file_name: str):
         """Load an svg file from `static/images/`."""
