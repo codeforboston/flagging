@@ -20,10 +20,9 @@ https://freefrontend.com/css-tables/
 }
 
 .dataframe {
-    border-radius: 5px;
     font-size: 12px;
     font-weight: normal;
-    border: none;
+    border: 1px;
     border-collapse: collapse;
     width: 100%;
     max-width: 100%;

@@ -75,33 +75,6 @@ def flag_widget_params(force_display: bool = False) -> Dict[str, Any]:
     )
 
 
-def stylize_model_output(df: pd.DataFrame) -> str:
-    """
-    This function function stylizes the dataframe that we will output for our
-    web page. This function replaces the bools with colorized values, and then
-    returns the HTML of the table excluding the index.
-
-    Args:
-        df: (pd.DataFrame) Pandas Dataframe containing predictive model outputs.
-
-    Returns:
-        HTML table.
-    """
-    df = df.copy()
-
-    # remove reach number
-    df = df.drop(columns=['reach_id'])
-
-    def _apply_flag(x: bool) -> str:
-        flag_class = 'blue-flag' if x else 'red-flag'
-        return f'<span class="{flag_class}">{x}</span>'
-
-    df['safe'] = df['safe'].apply(_apply_flag)
-    df.columns = [i.title().replace('_', ' ') for i in df.columns]
-
-    return df.to_html(index=False, escape=False)
-
-
 @bp.route('/')
 @cache.cached()
 def index() -> str:
@@ -137,18 +110,7 @@ def model_outputs() -> str:
     Returns:
         Rendering of the model outputs via the `model_outputs.html` template.
     """
-    # TODO: deprecate access via Pandas
-    df = latest_model_outputs(hours=24)
-
-    html_tables = {
-        r: stylize_model_output(df.loc[df['reach_id'] == r])
-        for r
-        in df['reach_id'].unique()
-    }
-
-    return render_template('model_outputs.html',
-                           html_tables=html_tables,
-                           reaches=reaches)
+    return render_template('model_outputs.html', reaches=reaches)
 
 
 @bp.route('/flags')

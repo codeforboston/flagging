@@ -1,3 +1,32 @@
+{% macro format_flag(safe) %}
+    {% if safe %}
+        <span class="blue-flag">True</span>
+    {% else %}
+        <span class="red-flag">False</span>
+    {% endif %}
+{% endmacro %}
+
+{% macro render_table(reach) %}
+    <table class="dataframe">
+        <thead>
+            <tr style="text-align: right;">
+                <th>Time</th>
+                <th>Probability</th>
+                <th>Safe</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in reach.predictions_last_x_hours(24) %}
+                <tr>
+                    <td>{{ p.time }}</td>
+                    <td>{{ p.probability }}</td>
+                    <td>{{ format_flag(p.safe) }}</td>
+                    </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endmacro %}
+
 {% extends "_base.html" %}
 {% block head %}
     {{ super() }}
@@ -33,7 +62,7 @@
                     </div>
                 </div>
             </div>
-            {{ html_tables[reach.id] | safe }}
+            {{ render_table(reach) }}
         </div>
     {% endfor %}
 <script>
