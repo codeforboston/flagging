@@ -13,10 +13,6 @@ import os
 from typing import Optional
 
 import pandas as pd
-import psycopg2
-import psycopg2.errors
-from psycopg2 import connect
-import click
 from flask import current_app
 
 from flask_sqlalchemy import SQLAlchemy
@@ -69,45 +65,6 @@ def execute_sql_from_file(file_name: str) -> Optional[pd.DataFrame]:
         return execute_sql(s)
 
 
-def create_db(overwrite: bool = False) -> bool:
-    """If the database defined by `POSTGRES_DB` doesn't exist, create it and
-    return True, otherwise do nothing and return False. By default, the
-    config variable `POSTGRES_DB` is set to "flagging".
-    Returns:
-        bool for whether the database needed to be created.
-    """
-    # connect to postgres database, get cursor
-    conn = connect(
-        user=current_app.config['POSTGRES_USER'],
-        password=current_app.config['POSTGRES_PASSWORD'],
-        host=current_app.config['POSTGRES_HOST'],
-        port=current_app.config['POSTGRES_PORT'],
-        dbname='postgres'
-    )
-    database = current_app.config['POSTGRES_DB']
-    cursor = conn.cursor()
-    cursor.execute('ROLLBACK')
-
-    if overwrite:
-        try:
-            cursor.execute(f"DROP DATABASE {database};")
-        except psycopg2.errors.lookup("3D000"):
-            click.echo(f"Database {database!r} does not exist.")
-            cursor.execute("ROLLBACK")
-        else:
-            click.echo(f"Database {database!r} was deleted.")
-
-    try:
-        cursor.execute(f'CREATE DATABASE {database};')
-    except psycopg2.errors.lookup('42P04'):
-        click.echo(f'Database {database!r} already exists.')
-        cursor.execute('ROLLBACK')
-        return False
-    else:
-        click.echo(f'Created database {database!r}.')
-        return True
-
-
 @init_db_callback
 def init_db():
     """This data clears and then populates the database from scratch. You only
@@ -116,6 +73,8 @@ def init_db():
 
     # This file creates tables for all of the tables that don't have
     # SQLAlchemy models associated with this.
+    # Somewhat of a formality because we'll overwrite most of these
+    # soon.
     execute_sql_from_file('schema.sql')
 
     # This creates tables for everything with a SQLAlchemy model.
@@ -131,6 +90,9 @@ def init_db():
 
     # Create a database trigger for manual overrides.
     execute_sql_from_file('override_event_triggers.sql')
+
+    # Now update the database
+    update_db()
 
 
 def update_db():
@@ -196,33 +158,3 @@ def get_current_time() -> pd.Timestamp:
         .tz_convert('US/Eastern')
         .tz_localize(None)
     )
-
-
-def delete_db(dbname: str = None):
-    """Delete the database."""
-    conn = connect(
-        user=current_app.config['POSTGRES_USER'],
-        password=current_app.config['POSTGRES_PASSWORD'],
-        host=current_app.config['POSTGRES_HOST'],
-        port=current_app.config['POSTGRES_PORT'],
-        dbname='postgres'
-    )
-
-    database = dbname or current_app.config['POSTGRES_DB']
-    cursor = conn.cursor()
-    cursor.execute('ROLLBACK')
-
-    # Don't validate name for `flagging_test`.
-    if database != 'flagging_test':
-        # Make sure we want to do this.
-        click.echo(f'Are you sure you want to delete database {database!r}?')
-        click.echo("Type in the database name '" +
-                   click.style(database, fg='red') + "' to confirm")
-        confirmation = click.prompt('Database name')
-        if database != confirmation:
-            click.echo('The input does not match. '
-                       'The database will not be deleted.')
-            return None
-
-    cursor.execute(f'DROP DATABASE {database};')
-    click.echo(f'Database {database!r} was deleted.')
