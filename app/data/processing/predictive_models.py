@@ -41,6 +41,11 @@ def process_data(
     df_hobolink = df_hobolink.copy()
     df_usgs = df_usgs.copy()
 
+    # Cast to datetime type.
+    # When this comes from Celery, it might be a string.
+    df_hobolink['time'] = pd.to_datetime(df_hobolink['time'])
+    df_usgs['time'] = pd.to_datetime(df_usgs['time'])
+
     # Convert all timestamps to hourly in preparation for aggregation.
     df_usgs['time'] = df_usgs['time'].dt.floor('h')
     df_hobolink['time'] = df_hobolink['time'].dt.floor('h')
@@ -246,6 +251,10 @@ def reach_5_model(df: pd.DataFrame, rows: int = None) -> pd.DataFrame:
 
 
 def all_models(df: pd.DataFrame, *args, **kwargs):
+    # Cast to datetime type.
+    # When this comes from Celery, it might be a string.
+    df['time'] = pd.to_datetime(df['time'])
+
     out = pd.concat([
         reach_2_model(df, *args, **kwargs),
         reach_3_model(df, *args, **kwargs),
@@ -253,6 +262,13 @@ def all_models(df: pd.DataFrame, *args, **kwargs):
         reach_5_model(df, *args, **kwargs),
     ], axis=0)
     out = out.sort_values(['reach_id', 'time'])
+
+    # TODO:
+    #  I'm a little worried that I had to add the below to make a test pass.
+    #  I thought this part of the code was pretty settled by now, but guess
+    #  not. I need to look into what's going on.
+
+    out = out.loc[out['probability'].notna(), :]
     return out
 
 

@@ -96,6 +96,22 @@ def init_db():
 
 
 def update_db():
+    from app.data.celery import celery_app
+    from app.data.celery import build_pipeline
+    from app.data.globals import cache
+
+    celery_app.health()
+    future = build_pipeline(write_to_db=True).delay()
+
+    # TODO: is there a better way to add teardown logic to a Celery chord?
+    try:
+        future.wait()
+    finally:
+        cache.clear()
+
+
+# Deprecated!
+def _update_db():
     """This function basically controls all of our data refreshes. The
     following tables are updated in order:
 
@@ -138,11 +154,6 @@ def update_db():
         from app.data.models.prediction import Prediction
         from app.data.processing.predictive_models import all_models
         model_outs = all_models(df)
-        # TODO:
-        #  I'm a little worried that I had to add the below to make a test pass.
-        #  I thought this part of the code was pretty settled by now, but guess
-        #  not. I need to look into what's going on.
-        model_outs = model_outs.loc[model_outs['probability'].notna(), :]
         model_outs.to_sql(Prediction.__tablename__, **options)
 
     finally:
