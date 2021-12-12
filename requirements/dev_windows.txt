@@ -4,6 +4,8 @@
 #
 #    pip-compile requirements/dev_windows.in
 #
+alembic==1.7.5
+    # via flask-db
 amqp==5.0.6
     # via kombu
 anyio==3.3.1
@@ -64,6 +66,7 @@ flask==2.0.1
     #   flask-admin
     #   flask-basicauth
     #   flask-caching
+    #   flask-db
     #   flask-mail
     #   flask-postgres
     #   flask-sqlalchemy
@@ -73,6 +76,8 @@ flask-basicauth==0.2.0
     # via -r requirements/_core.in
 flask-caching==1.10.1
     # via -r requirements/_core.in
+flask-db==0.3.2
+    # via -r requirements/_core.in
 flask-mail==0.9.1
     # via -r requirements/_core.in
 flask-postgres==0.2.0
@@ -80,6 +85,7 @@ flask-postgres==0.2.0
 flask-sqlalchemy==2.5.1
     # via
     #   -r requirements/_core.in
+    #   flask-db
     #   flask-postgres
     #   pytest-flask-sqlalchemy
 ghp-import==2.0.1
@@ -103,7 +109,11 @@ idna==3.2
     #   requests
     #   yarl
 importlib-metadata==4.8.1
-    # via mkdocs
+    # via
+    #   alembic
+    #   mkdocs
+importlib-resources==5.4.0
+    # via alembic
 iniconfig==1.1.1
     # via pytest
 itsdangerous==2.0.1
@@ -123,6 +133,8 @@ junit-xml==1.9
     # via schemathesis
 kombu==5.1.0
     # via celery
+mako==1.1.6
+    # via alembic
 markdown==3.3.4
     # via
     #   -r requirements/_core.in
@@ -132,6 +144,7 @@ markdown==3.3.4
 markupsafe==2.0.1
     # via
     #   jinja2
+    #   mako
     #   wtforms
 mccabe==0.6.1
     # via flake8
@@ -265,6 +278,7 @@ six==1.16.0
     #   jsonschema
     #   junit-xml
     #   python-dateutil
+    #   sqlalchemy-utils
     #   tweepy
 sniffio==1.2.0
     # via anyio
@@ -273,9 +287,14 @@ sortedcontainers==2.4.0
 sqlalchemy==1.3.24
     # via
     #   -r requirements/_core.in
+    #   alembic
+    #   flask-db
     #   flask-postgres
     #   flask-sqlalchemy
     #   pytest-flask-sqlalchemy
+    #   sqlalchemy-utils
+sqlalchemy-utils==0.37.9
+    # via flask-db
 starlette==0.16.0
     # via schemathesis
 tenacity==8.0.1
@@ -314,7 +333,9 @@ wtforms==2.3.3
 yarl==1.6.3
     # via schemathesis
 zipp==3.5.0
-    # via importlib-metadata
+    # via
+    #   importlib-metadata
+    #   importlib-resources
 
 # The following packages are considered to be unsafe in a requirements file:
 # pip

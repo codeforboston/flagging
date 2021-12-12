@@ -13,6 +13,7 @@ import os
 from typing import Optional
 
 import pandas as pd
+from celery.result import AsyncResult
 from flask import current_app
 
 from flask_sqlalchemy import SQLAlchemy
@@ -92,26 +93,12 @@ def init_db():
     execute_sql_from_file('override_event_triggers.sql')
 
     # Now update the database
-    update_db()
+    res = update_db()
+    # We'll await the results, just to be sure.
+    res.wait()
 
 
-def update_db():
-    from app.data.celery import celery_app
-    from app.data.celery import build_pipeline
-    from app.data.globals import cache
-
-    celery_app.health()
-    future = build_pipeline(write_to_db=True).delay()
-
-    # TODO: is there a better way to add teardown logic to a Celery chord?
-    try:
-        future.wait()
-    finally:
-        cache.clear()
-
-
-# Deprecated!
-def _update_db():
+def update_db() -> AsyncResult:
     """This function basically controls all of our data refreshes. The
     following tables are updated in order:
 
@@ -122,7 +109,19 @@ def _update_db():
 
     The functions run to calculate the data are imported from other files
     within the data folder.
+
+    This function uses Celery to run the pipeline. The pipeline is not
+    awaited, meaning that this function returns before the job finishes.
     """
+    from app.data.celery import celery_app
+    from app.data.celery import build_pipeline
+
+    celery_app.health()
+    return build_pipeline(write_to_db=True).delay()
+
+
+def update_db_old_way():
+    """Deprecated. Left around (for now) just in case Celery misbehaves."""
     options = {
         'con': db.engine,
         'index': False,

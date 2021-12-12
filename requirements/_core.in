@@ -4,6 +4,7 @@ flasgger
 Flask-Admin
 Flask-BasicAuth
 Flask-Caching
+Flask-DB
 Flask-SQLAlchemy
 Flask-Mail
 flask-postgres

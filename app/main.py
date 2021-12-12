@@ -235,14 +235,32 @@ def register_commands(app: Flask):
 
         return _wrap
 
-    @app.cli.command('update-db')
+    @app.cli.command('update-db-old-way')
     @with_appcontext
     @mail_on_fail
     def update_db_command():
         """Update the database with the latest live data."""
-        from .data.database import update_db
-        update_db()
+        from app.data.database import update_db_old_way
+        update_db_old_way()
         click.echo('Updated the database successfully.')
+
+    @app.cli.command('update-db')
+    @click.option('--wait/--dont-wait', '-w/-dw',
+                  is_flag=True,
+                  default=True,
+                  help='If true, wait for the job and raise an error if it'
+                       ' fails.')
+    @with_appcontext
+    @mail_on_fail
+    def update_db_command(wait: bool = False):
+        """Update the database with the latest live data."""
+        from app.data.database import update_db
+        res = update_db()
+        if wait:
+            res.wait()
+            click.echo('Updated the database successfully.')
+        else:
+            click.echo('Started update database job.')
 
     @app.cli.command('update-website')
     @click.pass_context
