@@ -1,0 +1,48 @@
+{#
+    You can pass the following three params into this template.
+
+    - redirect_to (str): Path to redirect to.
+    - message (str) (optional; default = "") Message to show the user.
+    - seconds (int): (optional; default = 2) Number of seconds to wait before
+               redirecting to the target page.
+#}
+{% extends "admin/base.html" %}
+{% block body %}
+    <p>
+        Update Database Task ID: <code>{{ task_id }}</code>
+    </p>
+    <h2>Status</h2>
+    <p id="loading_status"></p>
+{% endblock %}
+
+{% block tail %}
+    <script>
+        function checkStatus(){
+            $.getJSON({
+                url: "{{ url_for('admin_databaseview.check_status_json', task_id=task_id) }}",
+                success: function(data){
+                    switch(data.status) {
+                        case "RETRY":
+                        case "STARTED":
+                        case "PENDING":
+                            $('#loading_status').html('<img src="{{ url_for('static', filename='images/spinning_circle.gif') }}" alt="Loading" style="max-width:200px;height:auto;" />')
+                            break;
+                        case "SUCCESS":
+                            $('#loading_status').html('<span class="btn btn-primary" id="status_button" onclick="checkStatus()"><i class="glyphicon glyphicon-ok"></i> Success</span>')
+                            clearInterval(intervalId)
+                            break;
+                        case "FAILURE":
+                            $('#loading_status').html('<span class="btn btn-primary" id="status_button" onclick="checkStatus()"><i class="glyphicon glyphicon-remove"></i> Failure</span>')
+                            clearInterval(intervalId)
+                            break;
+                        default:
+                            $('#loading_status').html('<span class="btn btn-primary" id="status_button" onclick="checkStatus()"><i class="glyphicon glyphicon-question-sign"></i> Unknown</span>')
+                            break;
+                    }
+                }
+            })
+        }
+        var intervalId = window.setInterval(checkStatus, 5000)
+        $(document).ready(checkStatus)
+    </script>
+{% endblock %}

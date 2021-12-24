@@ -93,12 +93,11 @@ def init_db():
     execute_sql_from_file('override_event_triggers.sql')
 
     # Now update the database
-    res = update_db()
-    # We'll await the results, just to be sure.
-    res.wait()
+    from app.data.processing.core import update_db
+    update_db()
 
 
-def update_db() -> AsyncResult:
+def update_db_async() -> AsyncResult:
     """This function basically controls all of our data refreshes. The
     following tables are updated in order:
 
@@ -118,48 +117,6 @@ def update_db() -> AsyncResult:
 
     celery_app.health()
     return build_pipeline(write_to_db=True).delay()
-
-
-def update_db_old_way():
-    """Deprecated. Left around (for now) just in case Celery misbehaves."""
-    options = {
-        'con': db.engine,
-        'index': False,
-        'if_exists': 'replace'
-    }
-
-    hours = current_app.config['STORAGE_HOURS']
-
-    from .globals import cache
-
-    try:
-        # Populate the `usgs` table.
-        from app.data.processing.usgs import get_live_usgs_data
-        df_usgs = get_live_usgs_data()
-        df_usgs.tail(hours * 4).to_sql('usgs', **options)
-
-        # Populate the `hobolink` table.
-        from app.data.processing.hobolink import get_live_hobolink_data
-        df_hobolink = get_live_hobolink_data()
-        df_hobolink.tail(hours * 6).to_sql('hobolink', **options)
-
-        # Populate the `processed_data` table.
-        from app.data.processing.predictive_models import process_data
-        df = process_data(df_hobolink=df_hobolink, df_usgs=df_usgs)
-        df = df.tail(hours)
-        df.to_sql('processed_data', **options)
-
-        # Populate the `model_outputs` table.
-        from app.data.models.prediction import Prediction
-        from app.data.processing.predictive_models import all_models
-        model_outs = all_models(df)
-        model_outs.to_sql(Prediction.__tablename__, **options)
-
-    finally:
-        # Clear the cache every time this function runs.
-        # the try -> finally makes sure this always runs, even if an error
-        # occurs somewhere when updating.
-        cache.clear()
 
 
 def get_current_time() -> pd.Timestamp:

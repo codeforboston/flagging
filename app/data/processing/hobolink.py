@@ -15,11 +15,13 @@ from tenacity import wait_fixed
 from tenacity import stop_after_attempt
 
 from app.data.processing._utils import mock_source
+from app.mail import mail_on_fail
 
 # Constants
 
 HOBOLINK_URL = 'http://webservice.hobolink.com/restv2/data/custom/file'
-DEFAULT_HOBOLINK_EXPORT_NAME = 'code_for_boston_export_21d'
+HOBOLINK_DEFAULT_EXPORT_NAME = 'code_for_boston_export_21d'
+HOBOLINK_ROWS_PER_HOUR = 6
 # Each key is the original column name; the value is the renamed column.
 HOBOLINK_COLUMNS = {
     'Time, GMT-': 'time',
@@ -40,8 +42,9 @@ HOBOLINK_STATIC_FILE_NAME = 'hobolink.pickle'
 
 @retry(reraise=True, wait=wait_fixed(1), stop=stop_after_attempt(3))
 @mock_source(filename=HOBOLINK_STATIC_FILE_NAME)
+@mail_on_fail
 def get_live_hobolink_data(
-        export_name: str = DEFAULT_HOBOLINK_EXPORT_NAME
+        export_name: str = HOBOLINK_DEFAULT_EXPORT_NAME
 ) -> pd.DataFrame:
     """This function runs through the whole process for retrieving data from
     HOBOlink: first we perform the request, and then we clean the data.
@@ -59,7 +62,7 @@ def get_live_hobolink_data(
 
 
 def request_to_hobolink(
-        export_name: str = DEFAULT_HOBOLINK_EXPORT_NAME,
+        export_name: str = HOBOLINK_DEFAULT_EXPORT_NAME,
 ) -> requests.models.Response:
     """
     Get a request from the Hobolink server.

@@ -4,7 +4,7 @@ from unittest.mock import patch
 from app import create_app
 from app.twitter import tweepy_api
 from app.data.database import init_db
-from app.data.database import update_db
+from app.data.processing.core import update_db
 from app.data.globals import cache as _cache
 from flask import g
 from pytest_postgresql.janitor import DatabaseJanitor

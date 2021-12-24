@@ -235,32 +235,14 @@ def register_commands(app: Flask):
 
         return _wrap
 
-    @app.cli.command('update-db-old-way')
+    @app.cli.command('update-db')
     @with_appcontext
     @mail_on_fail
     def update_db_command():
         """Update the database with the latest live data."""
-        from app.data.database import update_db_old_way
-        update_db_old_way()
+        from app.data.processing.core import update_db
+        update_db()
         click.echo('Updated the database successfully.')
-
-    @app.cli.command('update-db')
-    @click.option('--wait/--dont-wait', '-w/-dw',
-                  is_flag=True,
-                  default=True,
-                  help='If true, wait for the job and raise an error if it'
-                       ' fails.')
-    @with_appcontext
-    @mail_on_fail
-    def update_db_command(wait: bool = False):
-        """Update the database with the latest live data."""
-        from app.data.database import update_db
-        res = update_db()
-        if wait:
-            res.wait()
-            click.echo('Updated the database successfully.')
-        else:
-            click.echo('Started update database job.')
 
     @app.cli.command('update-website')
     @click.pass_context
@@ -336,6 +318,10 @@ def register_commands(app: Flask):
         subprocess.call(['pip-compile', 'requirements/dev_windows.in', *ctx.args])
         subprocess.call(['pip-compile', 'requirements/prod.in', *ctx.args])
         subprocess.call(['pip-compile', 'requirements/_docs.in', *ctx.args])
+
+    @app.cli.command('email-90-day-data')
+    def email_90_day_data_command():
+        pass
 
     @app.cli.command('clear-cache')
     def clear_cache():

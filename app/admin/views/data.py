@@ -1,7 +1,12 @@
 import io
 
 import pandas as pd
-from flask import Response, send_file, abort, url_for
+from flask import Response
+from flask import send_file
+from flask import abort
+from flask import url_for
+from flask import request
+from flask import redirect
 from flask_admin import expose
 from sqlalchemy.exc import ProgrammingError
 from werkzeug.exceptions import HTTPException
@@ -9,11 +14,13 @@ from werkzeug.exceptions import HTTPException
 from app.admin.base import BaseView
 from app.data.database import get_current_time
 from app.data.database import execute_sql
-from app.data.database import update_db
+from app.data.processing.core import update_db
+from app.data.celery import celery_app
 from app.data.processing.hobolink import get_live_hobolink_data
 from app.data.processing.usgs import get_live_usgs_data
-from app.data.processing.predictive_models import process_data
-from app.data.processing.predictive_models import all_models
+from app.data.processing.core import combine_job
+from app.data.processing.core import predict_job
+from app.data.celery import update_db_task
 
 
 def send_csv_attachment_of_dataframe(
@@ -117,40 +124,33 @@ class DownloadView(BaseView):
 
     @expose('/csv/hobolink_source')
     def source_hobolink(self):
-        df_hobolink = get_live_hobolink_data('code_for_boston_export_90d')
-
+        df = get_live_hobolink_data('code_for_boston_export_90d')
         return send_csv_attachment_of_dataframe(
-            df=df_hobolink,
+            df=df,
             file_name='hobolink_source.csv'
         )
 
     @expose('/csv/usgs_source')
     def source_usgs(self):
-        df_usgs = get_live_usgs_data(days_ago=90)
-
+        df = get_live_usgs_data(days_ago=90)
         return send_csv_attachment_of_dataframe(
-            df=df_usgs,
+            df=df,
             file_name='usgs_source.csv'
         )
 
     @expose('/csv/processed_data_source')
     def source_processed_data(self):
-        df_usgs = get_live_usgs_data(days_ago=90)
-        df_hobolink = get_live_hobolink_data('code_for_boston_export_90d')
-        df = process_data(df_hobolink=df_hobolink, df_usgs=df_usgs)
-
+        df = combine_job(days_ago=90, export_name='code_for_boston_export_90d')
         return send_csv_attachment_of_dataframe(
-            df=df, file_name='model_processed_data.csv')
+            df=df,
+            file_name='model_processed_data.csv'
+        )
 
     @expose('/csv/prediction_source')
     def source_model_outputs(self):
-        df_usgs = get_live_usgs_data(days_ago=90)
-        df_hobolink = get_live_hobolink_data('code_for_boston_export_90d')
-        df = process_data(df_hobolink=df_hobolink, df_usgs=df_usgs)
-        model_outs = all_models(df, rows=len(df))
-
+        df = predict_job(days_ago=90, export_name='code_for_boston_export_90d')
         return send_csv_attachment_of_dataframe(
-            df=model_outs,
+            df=df,
             file_name='prediction_source.csv'
         )
 
@@ -162,15 +162,38 @@ class DatabaseView(BaseView):
     def index(self):
         return self.render('admin/update.html')
 
-    @expose('/run-update')
+    @expose('/update-db')
     def update_db(self):
         """When this function is called, the database updates. This function is
         designed to be available in the app during runtime, and is protected by
         BasicAuth so that only administrators can run it.
         """
+        async_result = update_db_task()
+
+        # Notify the user that the update was successful, then redirect:
+        return redirect(url_for('admin_databaseview.check_status', task_id=async_result.id))
+
+    @expose('check-status')
+    def check_status(self):
+        return self.render(
+            'admin/update-is-running.html',
+            task_id=request.args.get('task_id')
+        )
+
+    @expose('/check-status-json')
+    def check_status_json(self):
+        """Check the status of a pipeline task."""
+        task_id = request.args.get('task_id')
+        return {'status': celery_app.AsyncResult(task_id).status}
+
+    @expose('/update-db-sync')
+    def update_db_sync(self):
+        """When this function is called, the database updates synchronously.
+        Same as /run-update but it's a safety valve.
+        """
         update_db()
 
         # Notify the user that the update was successful, then redirect:
         return self.render('admin/redirect.html',
-                           message='Database updated.',
+                           message='The database has updated.',
                            redirect_to=url_for('admin.index'))

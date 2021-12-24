@@ -7,14 +7,14 @@ import pytest
 
 from app.data.models.boathouse import Boathouse
 from app.data.models.website_options import WebsiteOptions
-from app.data import database
+from app.data.processing import core
 from app.twitter import compose_tweet
 from app.mail import mail
 
 
 @pytest.fixture
 def mock_update_db():
-    with patch.object(database, 'update_db') as mocked_func:
+    with patch.object(core, 'update_db') as mocked_func:
         yield mocked_func
 
 
@@ -39,7 +39,7 @@ def test_mail_when_error_raised(outbox, app, cli_runner, monkeypatch):
     assert len(outbox) == 0
 
     # This should not cause an email to be send:
-    monkeypatch.setattr(database, 'update_db', lambda: None)
+    monkeypatch.setattr(core, 'update_db', lambda: None)
     cli_runner.invoke(app.cli, ['update-db'])
     assert len(outbox) == 0
 
@@ -47,7 +47,7 @@ def test_mail_when_error_raised(outbox, app, cli_runner, monkeypatch):
         raise ValueError
 
     # This however should trigger an email to be sent:
-    monkeypatch.setattr(database, 'update_db', raise_an_error)
+    monkeypatch.setattr(core, 'update_db', raise_an_error)
     cli_runner.invoke(app.cli, ['update-db'])
     assert len(outbox) == 1
 
