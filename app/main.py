@@ -321,7 +321,9 @@ def register_commands(app: Flask):
 
     @app.cli.command('email-90-day-data')
     def email_90_day_data_command():
-        pass
+        from app.data.processing.core import send_database_exports
+        send_database_exports()
+        click.echo('Database export email has been sent.')
 
     @app.cli.command('clear-cache')
     def clear_cache():

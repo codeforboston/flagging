@@ -19,7 +19,10 @@ from app.data.processing.predictive_models import all_models
 from app.data.globals import cache
 from app.data.models.prediction import Prediction
 from app.data.database import db
+from app.data.database import get_current_time
 from app.mail import mail_on_fail
+from app.mail import ExportEmail
+from app.mail import mail
 
 
 def _write_to_db(
@@ -79,3 +82,22 @@ def update_db() -> None:
         # the try -> finally makes sure this always runs, even if an error
         # occurs somewhere when updating.
         cache.clear()
+
+
+@mail_on_fail
+def send_database_exports() -> None:
+    df_usgs = get_live_usgs_data(days_ago=90)
+    df_hobolink = get_live_hobolink_data(export_name='code_for_boston_export_90d')
+    df_combined = process_data(df_hobolink=df_hobolink, df_usgs=df_usgs)
+    df_predictions = all_models(df_combined)
+
+    todays_date = get_current_time().strftime('%Y_%m_%d')
+
+    msg = ExportEmail()
+
+    msg.attach_dataframe(df_usgs, f'{todays_date}-usgs.csv')
+    msg.attach_dataframe(df_hobolink, f'{todays_date}-hobolink.csv')
+    msg.attach_dataframe(df_combined, f'{todays_date}-combined.csv')
+    msg.attach_dataframe(df_predictions, f'{todays_date}-prediction.csv')
+
+    mail.send(msg)

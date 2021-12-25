@@ -121,6 +121,7 @@ class Config:
     MAIL_USERNAME = os.getenv('MAIL_USERNAME')
     MAIL_PASSWORD = os.getenv('MAIL_PASSWORD')
     MAIL_ERROR_ALERTS_TO = os.getenv('MAIL_ERROR_ALERTS_TO', '')
+    MAIL_DATABASE_EXPORTS_TO = os.getenv('MAIL_DATABASE_EXPORTS_TO', '')
 
     # ==========================================================================
     # MISC. CUSTOM CONFIG OPTIONS

@@ -16,7 +16,7 @@ from tenacity import retry
 from tenacity import wait_fixed
 from tenacity import stop_after_attempt
 
-from app.data.processing._utils import mock_source
+from app.data.processing.utils import mock_source
 from app.mail import mail_on_fail
 
 

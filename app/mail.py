@@ -6,6 +6,7 @@ from flask import render_template
 from flask import current_app
 from flask_mail import Mail as _Mail
 from flask_mail import Message
+import pandas as pd
 
 
 class Mail(_Mail):
@@ -30,6 +31,25 @@ class ErrorEmail(Message):
         kwargs.setdefault('recipients', recipients)
         kwargs.setdefault('sender', current_app.config['MAIL_USERNAME'])
         super().__init__(**kwargs)
+
+
+class ExportEmail(Message):
+
+    def __init__(self, **kwargs):
+        recipients = [
+            i.strip() for i in current_app.config['MAIL_DATABASE_EXPORTS_TO'].split(';')
+        ]
+        html = render_template('mail/periodic_data_delivery.html')
+        kwargs.setdefault('html', html)
+        kwargs.setdefault('subject', 'Flagging site data exports')
+        kwargs.setdefault('recipients', recipients)
+        kwargs.setdefault('sender', current_app.config['MAIL_USERNAME'])
+        super().__init__(**kwargs)
+
+    def attach_dataframe(self, df: pd.DataFrame, filename: str) -> None:
+        with io.StringIO() as f:
+            df.to_csv(f, index=False)
+            self.attach(filename, "text/csv", f.getvalue())
 
 
 def mail_on_fail(func: callable):
