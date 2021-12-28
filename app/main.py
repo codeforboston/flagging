@@ -314,10 +314,8 @@ def register_commands(app: Flask):
         This command is for development purposes only.
         """
         import subprocess
-        subprocess.call(['pip-compile', 'requirements/dev_osx.in', *ctx.args])
-        subprocess.call(['pip-compile', 'requirements/dev_windows.in', *ctx.args])
-        subprocess.call(['pip-compile', 'requirements/prod.in', *ctx.args])
-        subprocess.call(['pip-compile', 'requirements/_docs.in', *ctx.args])
+        subprocess.call(['pip-compile', 'requirements.in', *ctx.args])
+        subprocess.call(['pip-compile', 'docs/requirements.in', *ctx.args])
 
     @app.cli.command('email-90-day-data')
     def email_90_day_data_command():

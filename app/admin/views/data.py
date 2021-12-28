@@ -21,6 +21,7 @@ from app.data.processing.usgs import get_live_usgs_data
 from app.data.processing.core import combine_job
 from app.data.processing.core import predict_job
 from app.data.celery import update_db_task
+from app.data.globals import file_cache
 
 
 def send_csv_attachment_of_dataframe(
@@ -55,8 +56,11 @@ def send_csv_attachment_of_dataframe(
         file_name = f'{todays_date}-{file_name}'
 
     # Flask can only return byte streams as file attachments.
-    # As a warning, this is "leaky." Handle with care!
+    # As a warning, this is "leaky." The file_cache attempts to resolve the
+    # leakiness issue by periodically closing and garbage collecting the file
+    # streams.
     bytesio = io.BytesIO()
+    file_cache.append(bytesio)
 
     # Write csv to stream, then encode it.
     with io.StringIO() as strio:
@@ -168,7 +172,7 @@ class DatabaseView(BaseView):
         designed to be available in the app during runtime, and is protected by
         BasicAuth so that only administrators can run it.
         """
-        async_result = update_db_task()
+        async_result = update_db_task.delay()
 
         # Notify the user that the update was successful, then redirect:
         return redirect(url_for('admin_databaseview.check_status', task_id=async_result.id))

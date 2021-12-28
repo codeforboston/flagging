@@ -1,3 +1,0 @@
--r _dev_core.in
-colorama
-psycopg2

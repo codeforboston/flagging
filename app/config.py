@@ -106,12 +106,12 @@ class Config:
     # Set CACHE_TYPE=null in environment variables to turn off.
     CACHE_DEFAULT_TIMEOUT: int = 60 * 60 * 7
     CACHE_TYPE: str = 'flask_caching.backends.' + os.getenv('CACHE_TYPE', 'redis')
-    CACHE_REDIS_URL: str = os.getenv('REDIS_URL', 'redis://localhost:6379/')
+    CACHE_REDIS_URL: str = os.getenv('REDIS_URL', 'redis://redis:6379/')
     CACHE_KEY_PREFIX: str = 'frontend_cache'
 
     # Celery
-    CELERY_BROKER_URL: str = os.getenv('REDIS_URL', 'redis://localhost:6379/')
-    CELERY_RESULT_BACKEND: str = os.getenv('REDIS_URL', 'redis://localhost:6379/')
+    CELERY_BROKER_URL: str = os.getenv('REDIS_URL', 'redis://redis:6379/')
+    CELERY_RESULT_BACKEND: str = os.getenv('REDIS_URL', 'redis://redis:6379/')
 
     # Mail
     MAIL_SERVER = 'smtp.gmail.com'
@@ -230,7 +230,7 @@ class DevelopmentConfig(Config):
     TESTING: bool = True
     CACHE_DEFAULT_TIMEOUT: int = 60
     USE_MOCK_DATA: bool = strtobool(os.getenv('USE_MOCK_DATA', 'false'))
-    SQLALCHEMY_ECHO: bool = strtobool(os.getenv('SQLALCHEMY_ECHO', 'true'))
+    SQLALCHEMY_ECHO: bool = strtobool(os.getenv('SQLALCHEMY_ECHO', 'false'))
 
 
 class TestingConfig(Config):
@@ -241,7 +241,7 @@ class TestingConfig(Config):
     TESTING: bool = True
     CACHE_TYPE: str = 'flask_caching.backends.simple'
     USE_MOCK_DATA: bool = True
-    TWITTER_AUTH: dict = {k: None for k in Config.TWITTER_AUTH}
+    TWITTER_AUTH: dict = {k: '?' for k in Config.TWITTER_AUTH}
     POSTGRES_DB: str = os.getenv('POSTGRES_DB', 'flagging') + '_test'
     MAIL_USERNAME = 'admin@admin.com'
     MAIL_ERROR_ALERTS_TO = 'some@email.com'

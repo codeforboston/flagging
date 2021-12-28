@@ -1,4 +1,5 @@
 from abc import ABCMeta
+import logging
 from typing import Any
 from typing import Dict
 from typing import List
@@ -51,17 +52,9 @@ class Celery(_Celery):
 
 
 celery_app = Celery(__name__)
-logger = get_task_logger(__name__)
 
-
-@task_prerun.connect()
-def task_starting_handler(sender=None, task_id=None, **kwargs):
-    logger.info(f'Starting task {task_id!r} from {sender!r}')
-
-
-@task_postrun.connect()
-def task_finished_handler(sender=None, task_id=None, **kwargs):
-    logger.info(f'Finished task {task_id!r} from {sender!r}')
+logger: logging.Logger = get_task_logger(__name__)
+logger.setLevel(logging.INFO)
 
 
 def init_celery(app: Flask):
@@ -70,6 +63,16 @@ def init_celery(app: Flask):
         broker_url=app.config['CELERY_BROKER_URL'],
         result_backend=app.config['CELERY_RESULT_BACKEND']
     )
+
+
+@task_prerun.connect
+def task_starting_handler(*args, **kwargs):
+    logger.info(f'Starting task.')
+
+
+@task_postrun.connect
+def task_finished_handler(*args, **kwargs):
+    logger.info(f'Finished task.')
 
 
 @celery_app.task
@@ -101,60 +104,9 @@ def update_db_task(*args, **kwargs) -> None:
     update_db(*args, **kwargs)
 
 
-def build_pipeline(
-        write_to_db: bool = False,
-        hobolink_kwargs: Dict[str, Any] = None,
-        usgs_kwargs: Dict[str, Any] = None,
-) -> Signature:
-    if hobolink_kwargs is None:
-        hobolink_kwargs = {}
-    if usgs_kwargs is None:
-        usgs_kwargs = {}
-
-    pipeline = group((
-        live_hobolink_data_task.s(write_to_db=write_to_db, **hobolink_kwargs),
-        live_usgs_data_task.s(write_to_db=write_to_db, **usgs_kwargs)
-    ))
-
-    pipeline |= combine_data_task.s(write_to_db=write_to_db)
-    pipeline |= run_predictive_models_task.s(write_to_db=write_to_db)
-    pipeline |= clear_cache_task.si()
-
-    return pipeline
-
-
-# def build_email_pipeline(
-#         hobolink_kwargs: Dict[str, Any] = None,
-#         usgs_kwargs: Dict[str, Any] = None,
-# ) -> Signature:
-#     if hobolink_kwargs is None:
-#         hobolink_kwargs = {}
-#     if usgs_kwargs is None:
-#         usgs_kwargs = {}
-#
-#     pipeline = group((
-#         live_hobolink_data_task.s(**hobolink_kwargs),
-#         live_usgs_data_task.s(**usgs_kwargs)
-#     ))
-#
-#     pipeline |= combine_data_task.s()
-#     pipeline |= run_predictive_models_task.s()
-#
-#     return pipeline
-
-
-def parse_pipeline_result_object(res: AsyncResult) -> Dict[str, AsyncResult]:
-
-    return {
-        'prediction': res,
-        'processed_data': res.parent,
-        'hobolink': res.parent.results[0],
-        'usgs': res.parent.results[1],
-    }
-
-
 live_hobolink_data_task: WithAppContextTask
 live_usgs_data_task: WithAppContextTask
 combine_data_task: WithAppContextTask
-run_predictive_models_task: WithAppContextTask
 clear_cache_task: WithAppContextTask
+predict_task: WithAppContextTask
+update_db_task: WithAppContextTask

@@ -66,16 +66,14 @@ def mail_on_fail(func: callable):
                 raise e
 
             # Get the stack trace
-            f = io.StringIO()
-            traceback.print_exc(file=f)
-            f.seek(0)
-
-            # Render the email body
-            html = render_template(
-                'mail/error.html',
-                stack_trace=f.read(),
-                func_name=getattr(func, '__name__', repr(func))
-            )
+            with io.StringIO() as f:
+                traceback.print_exc(file=f)
+                # Render the email body
+                html = render_template(
+                    'mail/error.html',
+                    stack_trace=f.getvalue(),
+                    func_name=getattr(func, '__name__', repr(func))
+                )
 
             # Send the email
             msg = ErrorEmail(html=html)

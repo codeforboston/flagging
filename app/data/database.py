@@ -97,28 +97,6 @@ def init_db():
     update_db()
 
 
-def update_db_async() -> AsyncResult:
-    """This function basically controls all of our data refreshes. The
-    following tables are updated in order:
-
-    - usgs
-    - hobolink
-    - processed_data
-    - model_outputs
-
-    The functions run to calculate the data are imported from other files
-    within the data folder.
-
-    This function uses Celery to run the pipeline. The pipeline is not
-    awaited, meaning that this function returns before the job finishes.
-    """
-    from app.data.celery import celery_app
-    from app.data.celery import build_pipeline
-
-    celery_app.health()
-    return build_pipeline(write_to_db=True).delay()
-
-
 def get_current_time() -> pd.Timestamp:
     return (
         pd.Timestamp('now', tz='UTC')

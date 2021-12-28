@@ -19,9 +19,9 @@ def mock_update_db():
 
 
 @pytest.fixture
-def outbox():
-    with mail.record_messages() as o:
-        yield o
+def mail_send():
+    with patch.object(mail, 'send') as mocked_func:
+        yield mocked_func
 
 
 @pytest.mark.parametrize('cmd', ['update-db', 'update-website'])
@@ -35,13 +35,11 @@ def test_update_runs(cmd, app, cli_runner, mock_update_db, mock_send_tweet):
         assert mock_send_tweet.call_count == 0
 
 
-def test_mail_when_error_raised(outbox, app, cli_runner, monkeypatch):
-    assert len(outbox) == 0
-
+def test_mail_when_error_raised(mail_send, app, cli_runner, monkeypatch, db_session):
     # This should not cause an email to be send:
     monkeypatch.setattr(core, 'update_db', lambda: None)
     cli_runner.invoke(app.cli, ['update-db'])
-    assert len(outbox) == 0
+    assert mail_send.call_count == 0
 
     def raise_an_error():
         raise ValueError
@@ -49,7 +47,7 @@ def test_mail_when_error_raised(outbox, app, cli_runner, monkeypatch):
     # This however should trigger an email to be sent:
     monkeypatch.setattr(core, 'update_db', raise_an_error)
     cli_runner.invoke(app.cli, ['update-db'])
-    assert len(outbox) == 1
+    assert mail_send.call_count == 1
 
 
 def test_no_tweet_off_season(app, db_session, cli_runner,

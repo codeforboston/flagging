@@ -1,0 +1,49 @@
+x-app: &app-container-config
+  build: .
+  depends_on:
+    - postgres
+    - redis
+    - celeryworker
+  env_file:
+    - .env
+  environment:
+    FLASK_ENV: development # ${FLASK_ENV:-development}
+  restart: unless-stopped
+  stop_grace_period: "5s"
+  tty: true
+  volumes:
+    - .:/var/www/app
+
+version: "3.3"
+services:
+
+  web:
+    <<: *app-container-config
+    ports:
+      - 80:80
+    links:
+      - postgres
+      - redis
+      - celeryworker
+
+  redis:
+    image: redis:alpine
+
+  postgres:
+    image: postgres:10
+    env_file:
+      - .env
+    tty: true
+    volumes:
+      - postgres:/var/lib/postgresql/data
+
+  celeryworker:
+    <<: *app-container-config
+    entrypoint: ["flask", "celery", "worker", "--uid", "nobody", "--gid", "nogroup"]
+    ports:
+      - 5555:5555
+    depends_on:
+      - redis
+
+volumes:
+  postgres: {}
