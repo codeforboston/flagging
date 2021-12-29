@@ -32,7 +32,7 @@ jobs:
     - name: Python 3.7 Setup
       uses: actions/setup-python@v2
       with:
-        python-version: 3.7
+        python-version: 3.8
     - name: Install dependencies
       run: |
         sudo apt-get update
