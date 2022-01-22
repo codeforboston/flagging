@@ -92,6 +92,9 @@ class Config:
     # CONFIG OPTIONS FROM OTHER EXTENSIONS
     # ==========================================================================
 
+    # Flask-DB
+    FLASK_DB_SEEDS_PATH = 'alembic/seeds.py'
+
     # Flask-Admin
     # https://flask-admin.readthedocs.io/en/latest/
     FLASK_ADMIN_SWATCH = 'lumen'
