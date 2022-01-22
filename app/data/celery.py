@@ -1,34 +1,22 @@
-from abc import ABCMeta
 import logging
+from abc import ABCMeta
 from typing import Any
 from typing import Dict
 from typing import List
-from typing import Optional
-from typing import Tuple
 from typing import TypeVar
 
-import pandas as pd
 from celery import Celery as _Celery
-from celery import group
 from celery import Task
-from celery.canvas import Signature
-from celery.result import AsyncResult
 from celery.signals import task_postrun
 from celery.signals import task_prerun
 from celery.utils.log import get_task_logger
-from flask import current_app
 from flask import Flask
 
-from app.data.database import db
-from app.data.processing.hobolink import HOBOLINK_DEFAULT_EXPORT_NAME
-from app.data.processing.hobolink import get_live_hobolink_data
-from app.data.processing.predictive_models import all_models
-from app.data.processing.predictive_models import process_data
-from app.data.processing.usgs import get_live_usgs_data
 from app.data.processing.core import combine_job
 from app.data.processing.core import predict_job
 from app.data.processing.core import update_db
-from app.mail import mail_on_fail
+from app.data.processing.hobolink import get_live_hobolink_data
+from app.data.processing.usgs import get_live_usgs_data
 
 RecordsType = TypeVar('RecordsType', bound=List[Dict[str, Any]])
 
@@ -67,12 +55,12 @@ def init_celery(app: Flask):
 
 @task_prerun.connect
 def task_starting_handler(*args, **kwargs):
-    logger.info(f'Starting task.')
+    logger.info('Starting task.')
 
 
 @task_postrun.connect
 def task_finished_handler(*args, **kwargs):
-    logger.info(f'Finished task.')
+    logger.info('Finished task.')
 
 
 @celery_app.task
@@ -100,8 +88,8 @@ def predict_task(*args, **kwargs) -> RecordsType:
 
 
 @celery_app.task
-def update_db_task(*args, **kwargs) -> None:
-    update_db(*args, **kwargs)
+def update_db_task() -> None:
+    update_db()
 
 
 live_hobolink_data_task: WithAppContextTask

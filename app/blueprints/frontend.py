@@ -1,20 +1,18 @@
 from typing import Any
 from typing import Dict
-import pandas as pd
 
+import pandas as pd
 from flask import Blueprint
 from flask import current_app
-from flask import render_template
 from flask import flash
+from flask import render_template
 
-from app.data.models.boathouse import Boathouse
-from app.data.globals import cache
 from app.data.database import get_current_time
-from app.data.globals import website_options
 from app.data.globals import boathouses
+from app.data.globals import cache
 from app.data.globals import reaches
+from app.data.globals import website_options
 from app.data.models.prediction import get_latest_prediction_time
-from app.data.processing.predictive_models import latest_model_outputs
 
 bp = Blueprint('flagging', __name__)
 

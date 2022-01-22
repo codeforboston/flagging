@@ -19,7 +19,7 @@
     <script>
         function checkStatus(){
             $.getJSON({
-                url: "{{ url_for('admin_databaseview.check_status_json', task_id=task_id) }}",
+                url: "{{ url_for('admin_databaseview.check_status', task_id=task_id) }}",
                 success: function(data){
                     switch(data.status) {
                         case "RETRY":

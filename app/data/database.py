@@ -13,7 +13,6 @@ import os
 from typing import Optional
 
 import pandas as pd
-from celery.result import AsyncResult
 from flask import current_app
 
 from flask_sqlalchemy import SQLAlchemy

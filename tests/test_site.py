@@ -81,10 +81,10 @@ def test_admin_pages(client, page, auth, expected_status_code):
         ('/admin/db/download/csv/prediction', 'admin:password', 200),
         ('/admin/db/download/csv/boathouse', 'admin:password', 200),
         ('/admin/db/download/csv/override_history', 'admin:password', 200),
-        ('/admin/db/download/csv/hobolink_source', 'admin:password', 200),
-        ('/admin/db/download/csv/usgs_source', 'admin:password', 200),
-        ('/admin/db/download/csv/processed_data_source', 'admin:password', 200),
-        ('/admin/db/download/csv/prediction_source', 'admin:password', 200),
+        ('/admin/db/download/csv/hobolink_source_old', 'admin:password', 200),
+        ('/admin/db/download/csv/usgs_source_old', 'admin:password', 200),
+        ('/admin/db/download/csv/processed_data_source_old', 'admin:password', 200),
+        ('/admin/db/download/csv/prediction_source_old', 'admin:password', 200),
 
         # Errors
         ('/admin/db/download/csv/arbitrary_table', 'admin:password', 404),

@@ -2,26 +2,27 @@ import io
 
 import pandas as pd
 from flask import Response
-from flask import send_file
 from flask import abort
-from flask import url_for
-from flask import request
 from flask import redirect
+from flask import request
+from flask import send_file
+from flask import url_for
 from flask_admin import expose
 from sqlalchemy.exc import ProgrammingError
 from werkzeug.exceptions import HTTPException
 
 from app.admin.base import BaseView
-from app.data.database import get_current_time
-from app.data.database import execute_sql
-from app.data.processing.core import update_db
 from app.data.celery import celery_app
-from app.data.processing.hobolink import get_live_hobolink_data
-from app.data.processing.usgs import get_live_usgs_data
+from app.data.celery import live_hobolink_data_task
+from app.data.celery import live_usgs_data_task
+from app.data.celery import update_db_task
+from app.data.database import execute_sql
+from app.data.database import get_current_time
+from app.data.globals import file_cache
 from app.data.processing.core import combine_job
 from app.data.processing.core import predict_job
-from app.data.celery import update_db_task
-from app.data.globals import file_cache
+from app.data.processing.hobolink import get_live_hobolink_data
+from app.data.processing.usgs import get_live_usgs_data
 
 
 def send_csv_attachment_of_dataframe(
@@ -126,37 +127,85 @@ class DownloadView(BaseView):
             file_name=f'{sql_table_name}.csv'
         )
 
-    @expose('/csv/hobolink_source')
-    def source_hobolink(self):
+    @expose('/csv/hobolink_source_old')
+    def source_hobolink_old(self):
         df = get_live_hobolink_data('code_for_boston_export_90d')
         return send_csv_attachment_of_dataframe(
             df=df,
             file_name='hobolink_source.csv'
         )
 
-    @expose('/csv/usgs_source')
-    def source_usgs(self):
+    @expose('/csv/usgs_source_old')
+    def source_usgs_old(self):
         df = get_live_usgs_data(days_ago=90)
         return send_csv_attachment_of_dataframe(
             df=df,
             file_name='usgs_source.csv'
         )
 
-    @expose('/csv/processed_data_source')
-    def source_processed_data(self):
+    @expose('/csv/processed_data_source_old')
+    def source_processed_data_old(self):
         df = combine_job(days_ago=90, export_name='code_for_boston_export_90d')
         return send_csv_attachment_of_dataframe(
             df=df,
             file_name='model_processed_data.csv'
         )
 
-    @expose('/csv/prediction_source')
-    def source_model_outputs(self):
+    @expose('/csv/prediction_source_old')
+    def source_model_outputs_old(self):
         df = predict_job(days_ago=90, export_name='code_for_boston_export_90d')
         return send_csv_attachment_of_dataframe(
             df=df,
             file_name='prediction_source.csv'
         )
+
+    @expose('/csv/hobolink_source')
+    def source_hobolink(self):
+        async_result = live_hobolink_data_task \
+            .s(export_name='code_for_boston_export_90d').delay()
+        return redirect(url_for(
+            'admin_databaseview.download_status',
+            task_id=async_result.id,
+            data_source='hobolink_source'
+        ))
+
+    @expose('/csv/usgs_source')
+    def source_usgs(self):
+        async_result = live_usgs_data_task.s(days_ago=90).delay()
+        return redirect(url_for(
+            'admin_databaseview.download_status',
+            task_id=async_result.id,
+            data_source='usgs_source'
+        ))
+
+    # @expose('/csv/processed_data_source')
+    # def source_processed_data(self):
+    #     df = combine_job(days_ago=90, export_name='code_for_boston_export_90d')
+    #     return send_csv_attachment_of_dataframe(
+    #         df=df,
+    #         file_name='model_processed_data.csv'
+    #     )
+    #
+    # @expose('/csv/prediction_source')
+    # def source_model_outputs(self):
+    #     df = predict_job(days_ago=90, export_name='code_for_boston_export_90d')
+    #     return send_csv_attachment_of_dataframe(
+    #         df=df,
+    #         file_name='prediction_source.csv'
+    #     )
+    #
+    # @expose('/csv')
+    # def download_csv(self):
+    #     task_id = request.args.get('task_id')
+    #     data_source_name = request.args.get('data_source')
+    #     task = celery_app.AsyncResult(task_id)
+    #     data = task.result
+    #     if data is None:
+    #         return {'status': task.status}, 202
+    #     return send_csv_attachment_of_dataframe(
+    #         df=pd.DataFrame(data),
+    #         file_name=f'{data_source_name}.csv'
+    #     )
 
 
 class DatabaseView(BaseView):
@@ -173,31 +222,21 @@ class DatabaseView(BaseView):
         BasicAuth so that only administrators can run it.
         """
         async_result = update_db_task.delay()
+        return redirect(url_for(
+            'admin_databaseview.update_db_status',
+            task_id=async_result.id
+        ))
 
-        # Notify the user that the update was successful, then redirect:
-        return redirect(url_for('admin_databaseview.check_status', task_id=async_result.id))
-
-    @expose('check-status')
+    @expose('/update-db-status')
     def check_status(self):
         return self.render(
-            'admin/update-is-running.html',
+            'admin/wait-update-db.html',
             task_id=request.args.get('task_id')
         )
 
-    @expose('/check-status-json')
+    @expose('/check-status')
     def check_status_json(self):
         """Check the status of a pipeline task."""
         task_id = request.args.get('task_id')
-        return {'status': celery_app.AsyncResult(task_id).status}
-
-    @expose('/update-db-sync')
-    def update_db_sync(self):
-        """When this function is called, the database updates synchronously.
-        Same as /run-update but it's a safety valve.
-        """
-        update_db()
-
-        # Notify the user that the update was successful, then redirect:
-        return self.render('admin/redirect.html',
-                           message='The database has updated.',
-                           redirect_to=url_for('admin.index'))
+        task = celery_app.AsyncResult(task_id)
+        return {'status': task.status}

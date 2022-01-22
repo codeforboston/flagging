@@ -1,14 +1,12 @@
 import warnings
-from typing import Any
-from typing import Dict
-from typing import List
 
 from flask import Blueprint
-from flask import request
+from flask import Flask
 from flask import current_app
 from flask import jsonify
+from flask import request
 from flask import url_for
-from flask import Flask
+
 with warnings.catch_warnings():
     warnings.simplefilter('ignore', category=DeprecationWarning)
     from flasgger import Swagger

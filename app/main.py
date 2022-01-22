@@ -154,6 +154,7 @@ def register_jinja_env(app: Flask):
     change the colors using CSS.) This function loads SVG markup into our Jinja
     environment via reading from SVG files.
     """
+
     @app.template_filter('strftime')
     def strftime(
             value: datetime.datetime,
@@ -190,7 +191,15 @@ def register_jinja_env(app: Flask):
         v = str(version).zfill(2)
         return f'_flag_widget_v{v}.html'
 
+    import os.path as op
+
+    def read_file(filename: str):
+        with open(op.join('app', 'templates', filename), 'r') as f:
+            s = f.read()
+        return s
+
     app.jinja_env.globals.update({
+        'read': read_file,
         # SVG files
         'GITHUB_SVG': _load_svg('github.svg'),
         'TWITTER_SVG': _load_svg('twitter.svg'),

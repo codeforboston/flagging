@@ -39,6 +39,8 @@ jobs:
         sudo apt-get install python-dev libpq-dev
         python -m pip install --upgrade pip
         python -m pip install -r requirements.txt
+    - name: Run linter
+      run: flake8 app tests alembic
     - name: Run Celery worker
       run: flask celery worker &
       env:

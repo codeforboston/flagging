@@ -3,7 +3,7 @@ Synchronous processing functions. Designed to be simple-stupid, and not shy
 about adding a little repetition and not worrying about async processing-- both
 in service of simplifying the code for ease of maintenance.
 """
-import typing as t
+from typing import Optional
 
 from flask import current_app
 import pandas as pd
@@ -28,7 +28,7 @@ from app.mail import mail
 def _write_to_db(
         df: pd.DataFrame,
         table_name: str,
-        rows: t.Optional[int] = None
+        rows: Optional[int] = None
 ) -> None:
     """Takes a Pandas DataFrame, and writes it to the database."""
     if rows is not None:

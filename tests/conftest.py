@@ -25,7 +25,7 @@ def app():
 
     try:
         janitor.drop()
-    except:
+    except Exception:
         pass
 
     janitor.init()

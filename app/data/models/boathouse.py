@@ -26,7 +26,7 @@ class Boathouse(db.Model):
         # Join on the latest prediction per reach.
         primaryjoin='and_('
                     'Prediction.reach_id == foreign(Boathouse.reach_id),'
-                    ' Prediction.time == select([func.max(Prediction.time)]).as_scalar()'
+                    ' Prediction.time == select([func.max(Prediction.time)]).as_scalar()'  # noqa: E501
                     ')',
         lazy='subquery',
         viewonly=True,

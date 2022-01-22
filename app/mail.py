@@ -2,18 +2,19 @@ import io
 import traceback
 from functools import wraps
 
-from flask import render_template
+import pandas as pd
 from flask import current_app
+from flask import render_template
 from flask_mail import Mail as _Mail
 from flask_mail import Message
-import pandas as pd
 
 
 class Mail(_Mail):
 
-    def send(self, message):
+    def send(self, message: str):
         # Only use this in staging and production.
         if current_app.env not in ['production', 'staging']:
+            print("(Not actually sending email.)")
             return
         super().send(message)
 

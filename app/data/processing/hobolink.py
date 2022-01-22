@@ -2,7 +2,6 @@
 This file handles connections to the HOBOlink API, including cleaning and
 formatting of the data that we receive from it.
 """
-import os
 import io
 from typing import Union
 

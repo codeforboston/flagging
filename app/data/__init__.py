@@ -6,4 +6,4 @@ processing, collection, and storage.
 from .database import db
 
 # Register to metadata.
-from .models import _all
+from . import models

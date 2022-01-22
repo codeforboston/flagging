@@ -106,23 +106,21 @@ class Config:
     # Set CACHE_TYPE=null in environment variables to turn off.
     CACHE_DEFAULT_TIMEOUT: int = 60 * 60 * 7
     CACHE_TYPE: str = 'flask_caching.backends.' + os.getenv('CACHE_TYPE', 'redis')
-    CACHE_REDIS_URL: str = os.getenv('REDIS_URL', 'redis://redis:6379/')
+    CACHE_REDIS_URL: str = os.getenv('REDIS_URL', 'redis://localhost:6379/')
     CACHE_KEY_PREFIX: str = 'frontend_cache'
 
     # Celery
-    CELERY_BROKER_URL: str = os.getenv('REDIS_URL', 'redis://redis:6379/')
-    CELERY_RESULT_BACKEND: str = os.getenv('REDIS_URL', 'redis://redis:6379/')
+    CELERY_BROKER_URL: str = os.getenv('REDIS_URL', 'redis://localhost:6379/')
+    CELERY_RESULT_BACKEND: str = os.getenv('REDIS_URL', 'redis://localhost:6379/')
 
     # Mail
     MAIL_SERVER = 'smtp.gmail.com'
     MAIL_PORT = 587
     MAIL_USE_TLS = True
-    MAIL_USE_SSL = False
     MAIL_USERNAME = os.getenv('MAIL_USERNAME')
     MAIL_PASSWORD = os.getenv('MAIL_PASSWORD')
     MAIL_ERROR_ALERTS_TO = os.getenv('MAIL_ERROR_ALERTS_TO', '')
     MAIL_DATABASE_EXPORTS_TO = os.getenv('MAIL_DATABASE_EXPORTS_TO', '')
-
     # ==========================================================================
     # MISC. CUSTOM CONFIG OPTIONS
     #
@@ -270,6 +268,7 @@ def get_config_from_env(env: str) -> Config:
     """
     config_mapping = {
         'production': ProductionConfig,
+        'staging': ProductionConfig,
         'development': DevelopmentConfig,
         'testing': TestingConfig,
         'demo': DemoConfig

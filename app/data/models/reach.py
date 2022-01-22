@@ -1,23 +1,17 @@
-from typing import Dict, Any, List, Optional
-
-from sqlalchemy import func
-from sqlalchemy import and_, not_
-from sqlalchemy.sql.operators import ColumnOperators
-from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.dialects.postgresql import aggregate_order_by
+from typing import List
+from typing import Optional
 
 from app.data.database import db
-from app.data.processing.predictive_models import latest_model_outputs
 
 
 class Reach(db.Model):
     __tablename__ = 'reach'
     id: int = db.Column(db.Integer, primary_key=True, unique=True)
-    boathouses: List['Boathouse'] = db.relationship(
+    boathouses: List['Boathouse'] = db.relationship(  # noqa: F821
         'Boathouse',
         order_by='asc(Boathouse.name)',
         back_populates='reach')
-    predictions: List['Prediction'] = db.relationship(
+    predictions: List['Prediction'] = db.relationship(  # noqa: F821
         'Prediction',
         order_by='asc(Prediction.time)',
         uselist=True,
@@ -27,7 +21,10 @@ class Reach(db.Model):
     def get_all(cls) -> List['Reach']:
         return db.session.query(cls).order_by(cls.id).all()
 
-    def predictions_last_x_hours(self, x: Optional[int] = None) -> List['Prediction']:
+    def predictions_last_x_hours(
+            self,
+            x: Optional[int] = None
+    ) -> List['Prediction']:  # noqa: F821
         if x is None:
             return self.predictions
         from app.data.models.prediction import Prediction

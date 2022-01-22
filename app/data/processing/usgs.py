@@ -5,20 +5,17 @@ gauge.
 Link to the web interface (not the api)
 https://waterdata.usgs.gov/nwis/uv?site_no=01104500
 """
-import os
 from typing import Union
 
 import pandas as pd
 import requests
 from flask import abort
-from flask import current_app
 from tenacity import retry
-from tenacity import wait_fixed
 from tenacity import stop_after_attempt
+from tenacity import wait_fixed
 
 from app.data.processing.utils import mock_source
 from app.mail import mail_on_fail
-
 
 USGS_URL = 'https://waterdata.usgs.gov/nwis/uv'
 USGS_STATIC_FILE_NAME = 'usgs.pickle'

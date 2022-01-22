@@ -4,10 +4,10 @@ x-app: &app-container-config
     - postgres
     - redis
     - celeryworker
-  env_file:
-    - .env
   environment:
-    FLASK_ENV: development # ${FLASK_ENV:-development}
+    FLASK_ENV: ${FLASK_ENV:-development}
+    BASIC_AUTH_USERNAME: ${BASIC_AUTH_USERNAME:-development}
+    POSTGRES_HOST: postgres
   restart: unless-stopped
   stop_grace_period: "5s"
   tty: true
