@@ -1,4 +1,4 @@
-name: Run unit-tests
+name: Quality check
 
 on:
 - push
