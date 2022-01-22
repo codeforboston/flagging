@@ -89,7 +89,7 @@ def init_db():
     execute_sql_from_file('define_default_options.sql')
 
     # Create a database trigger for manual overrides.
-    execute_sql_from_file('override_event_triggers.sql')
+    execute_sql_from_file('override_event_triggers_v2.sql')
 
     # Now update the database
     from app.data.processing.core import update_db

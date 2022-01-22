@@ -1,3 +1,5 @@
+DROP TRIGGER IF EXISTS record_manual_overrides ON boathouse;
+
 CREATE OR REPLACE FUNCTION record_override_change()
     -- Create a trigger that records the history of manual overrides.
     RETURNS trigger AS $$
@@ -18,6 +20,7 @@ CREATE OR REPLACE FUNCTION record_override_change()
         END; $$
     LANGUAGE 'plpgsql'
 ;
+
 CREATE TRIGGER record_manual_overrides
     AFTER UPDATE OF overridden, reason ON boathouse
     FOR EACH ROW
