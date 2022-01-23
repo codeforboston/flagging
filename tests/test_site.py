@@ -6,7 +6,7 @@ import pytest
 import requests
 import pandas as pd
 
-from flagging_site.data import Boathouse
+from app.data.models.boathouse import Boathouse
 
 
 def auth_to_header(auth: str) -> dict:
@@ -53,11 +53,11 @@ def test_pages(client, page, expected_status_code):
         ('/admin/boathouses/', None, 401),
         ('/admin/boathouses/', 'bad:credentials', 401),
 
-        ('/admin/livewebsiteoptions/', None, 401),
-        ('/admin/livewebsiteoptions/', 'bad:credentials', 401),
+        ('/admin/websiteoptions/', None, 401),
+        ('/admin/websiteoptions/', 'bad:credentials', 401),
 
         ('/admin/', 'admin:password', 200),
-        ('/admin/livewebsiteoptions/', 'admin:password', 302),
+        ('/admin/websiteoptions/', 'admin:password', 302),
         ('/admin/manual_overrides/', 'admin:password', 200),
         ('/admin/boathouses/', 'admin:password', 200),
         ('/admin/db/update/', 'admin:password', 200),
@@ -75,36 +75,27 @@ def test_admin_pages(client, page, auth, expected_status_code):
     ('page', 'auth', 'expected_status_code'),
     [
         # Valid
-        ('/admin/db/download/csv/hobolink', 'admin:password', 200),
-        ('/admin/db/download/csv/usgs', 'admin:password', 200),
-        ('/admin/db/download/csv/processed_data', 'admin:password', 200),
-        ('/admin/db/download/csv/model_outputs', 'admin:password', 200),
-        ('/admin/db/download/csv/boathouses', 'admin:password', 200),
-        ('/admin/db/download/csv/override_history', 'admin:password', 200),
-        ('/admin/db/download/csv/hobolink_source', 'admin:password', 200),
-        ('/admin/db/download/csv/usgs_source', 'admin:password', 200),
-        ('/admin/db/download/csv/processed_data_source', 'admin:password', 200),
-        ('/admin/db/download/csv/model_outputs_source', 'admin:password', 200),
+        ('/admin/db/download/csv/src/hobolink', 'admin:password', 200),
+        ('/admin/db/download/csv/src/usgs', 'admin:password', 200),
+        ('/admin/db/download/csv/src/processed_data', 'admin:password', 200),
+        ('/admin/db/download/csv/src/prediction', 'admin:password', 200),
+        ('/admin/db/download/csv/src/boathouse', 'admin:password', 200),
+        ('/admin/db/download/csv/src/override_history', 'admin:password', 200),
+        ('/admin/db/download/csv/src/hobolink_source', 'admin:password', 302),
+        ('/admin/db/download/csv/src/usgs_source', 'admin:password', 302),
+        ('/admin/db/download/csv/src/processed_data_source', 'admin:password', 302),
+        ('/admin/db/download/csv/src/prediction_source', 'admin:password', 302),
 
         # Errors
         ('/admin/db/download/csv/arbitrary_table', 'admin:password', 404),
-        ('/admin/db/download/csv/boathouses', 'bad:credentials', 401),
+        ('/admin/db/download/csv/boathouse', 'bad:credentials', 401),
         ('/admin/db/download/csv/hobolink_source', None, 401),
     ]
 )
 def test_admin_downloads(client, page, auth, expected_status_code):
     headers = auth_to_header(auth)
     res = client.get(page, headers=headers)
-
     assert res.status_code == expected_status_code
-
-    if res.status_code >= 400:
-        assert res.mimetype == 'text/html'
-    else:
-        assert res.mimetype == 'text/csv'
-        # make sure it's returning *something*
-        if 'override_history' not in page:
-            assert res.data.count(b'\n') >= 5
 
 
 def test_override_on_home_page(client, db_session, cache):
@@ -140,7 +131,7 @@ def test_override_on_home_page(client, db_session, cache):
 
     db_session \
         .query(Boathouse) \
-        .filter(Boathouse.boathouse == 'Union Boat Club') \
+        .filter(Boathouse.name == 'Union Boat Club') \
         .update({"overridden": True})
     db_session.commit()
 

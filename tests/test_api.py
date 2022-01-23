@@ -4,7 +4,7 @@ in the YAML files, and they in turn define how the API is supposed to work.
 import pytest
 import schemathesis
 
-from flagging_site.data import Boathouse
+from app.data.models.boathouse import Boathouse
 
 
 @pytest.fixture
@@ -48,7 +48,7 @@ def test_manual_override(client, db_session, cache):
     # Now update the entry in the database
     db_session \
         .query(Boathouse) \
-        .filter(Boathouse.boathouse == 'Newton Yacht Club') \
+        .filter(Boathouse.name == 'Newton Yacht Club') \
         .update({"overridden": True})
     db_session.commit()
     cache.clear()

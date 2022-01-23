@@ -1,25 +1,37 @@
 import pytest
 
 from unittest.mock import patch
-from flask import url_for
-
-from flagging_site import create_app
-from flagging_site.twitter import tweepy_api
-from flagging_site.data.database import cache as _cache
-from flagging_site.data.database import create_db
-from flagging_site.data.database import init_db
-from flagging_site.data.database import update_db
+from app.main import create_app
+from app.twitter import tweepy_api
+from app.data.database import init_db
+from app.data.processing.core import update_db
+from app.data.globals import cache as _cache
+from flask import g
+from pytest_postgresql.janitor import DatabaseJanitor
 
 
 @pytest.fixture(scope='session')
 def app():
     app = create_app(config='testing')
 
+    janitor = DatabaseJanitor(
+        user=app.config['POSTGRES_USER'],
+        password=app.config['POSTGRES_PASSWORD'],
+        host=app.config['POSTGRES_HOST'],
+        port=app.config['POSTGRES_PORT'],
+        dbname=app.config['POSTGRES_DB'],
+        version=12
+    )
+
+    try:
+        janitor.drop()
+    except Exception:
+        pass
+
+    janitor.init()
     with app.app_context():
-        create_db(overwrite=True)
-        init_db()
-        update_db()
         yield app
+    janitor.drop()
 
 
 @pytest.fixture
@@ -32,7 +44,7 @@ def live_app(app):
     app.config['USE_MOCK_DATA'] = old
 
 
-@pytest.fixture
+@pytest.fixture(scope='function')
 def client(app):
     """A test client for the app. You can think of the test like a web browser;
     it retrieves data from the website in a similar way that a browser would.
@@ -56,7 +68,10 @@ def _db(app):
     Basically, this '_db' fixture is required for the above extension to work.
     We use that extension to allow for easy testing of the database.
     """
-    from flagging_site.data.database import db
+    from app.data.database import db
+    with app.app_context():
+        init_db()
+        update_db()
     yield db
 
 
@@ -71,7 +86,9 @@ def mock_send_tweet():
         yield mocked_func
 
 
-# @pytest.fixture(autouse=True)
-# def _celery_worker(celery_worker):
-#     """Make sure celery is available for every test."""
-#     yield celery_worker
+@pytest.fixture(scope='function', autouse=True)
+def monkeypatch_globals(db_session):
+    yield
+    for o in ['website_options', 'boathouse_list', 'reach_list']:
+        if o in g:
+            g.pop(o)

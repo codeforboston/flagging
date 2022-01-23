@@ -1,0 +1,21 @@
+{#
+    You can pass the following three params into this template.
+
+    - redirect_to (str): Path to redirect to.
+    - message (str) (optional; default = "") Message to show the user.
+    - seconds (int): (optional; default = 2) Number of seconds to wait before
+               redirecting to the target page.
+#}
+{% extends "admin/base.html" %}
+{% set _seconds = seconds | default(2) %}
+{% block head %}
+    <script>
+    setTimeout(function(){
+        window.location.href = "{{ _redirect_to | default('/admin') }}";
+    }, {{ _seconds * 1000 }});
+    </script>
+{% endblock %}
+{% block body %}
+        {% if message %}<p>{{ message }}</p>{% endif %}
+        <p>Redirecting in {{ _seconds }} seconds...</p>
+{% endblock %}

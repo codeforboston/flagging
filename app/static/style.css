@@ -1,0 +1,405 @@
+/***** Start Element Styling *****/
+html {
+  font-family: sans-serif;
+  overflow-x: hidden;
+}
+
+body {
+  max-width: 1260px;
+  margin: 0 auto;
+  background: #dce9f2;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4 {
+  color: #27475e;
+}
+
+a {
+  color: #377ba8;
+  text-decoration: none;
+}
+
+hr {
+  border: none;
+  border-top: thin solid #dce9f2;
+}
+
+p {
+  line-height: 25px;
+}
+
+ul, ol {
+  line-height: 1.7em;
+}
+
+ul {
+  list-style-type: square;
+}
+
+ol {
+  list-style-type: decimal;
+}
+/***** End Element Styling *****/
+
+/***** Start Common Classes *****/
+.above-fold {
+  /* Everything above the bottom of the screen */
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.centered {
+  text-align: center;
+}
+
+.non-breaking {
+  display: inline-block;
+}
+/***** End Common Classes *****/
+
+/***** Start Header Section *****/
+.page-header {
+  position: fixed; /* Set the navbar to fixed position */
+  top: 0; /* Position the navbar at the top of the page */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 1260px;
+  text-align: center;
+  border-bottom: 0 solid #dce9f2;
+  height: fit-content;
+  background: white;
+  z-index: 2000;
+}
+
+.page-header > .header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-height: 100px;
+  padding: 0 20px;
+  box-sizing: border-box;
+}
+
+.logo-and-links {
+  display: flex;
+  align-items: center;
+}
+
+.header-logo {
+  width: min-content;
+  height: min-content;
+  padding: 15px;
+}
+
+.header-logo > a > img {
+  width: 260px;
+  min-width: 260px;
+}
+
+nav {
+  display: flex;
+  letter-spacing: 0.1em;
+  padding: 0.5em;
+  font-size: 0.9em;
+  flex-basis: auto;
+  max-width: 100%;
+}
+
+nav > .nav-link {
+  display: flex;
+  align-items: center;
+  width: auto;
+}
+nav > .nav-link:not(:first-child) {
+  margin-left: 25px;
+}
+
+@media(max-width: 780px) {
+  nav,
+  .social-section {
+    display: none;
+  }
+}
+
+nav a:hover {
+  -webkit-transition: all 0.25s;
+  transition: all 0.25s;
+  color: #27475e;
+}
+
+.social-section {
+  white-space: nowrap;
+  padding: 15px;
+}
+
+.social svg {
+  width: 2.1rem;
+  height: 2.1rem;
+  padding-left: 0.2em;
+  fill: #4f8fbd;
+}
+
+.social svg:hover {
+  -webkit-transition: all 0.25s;
+  transition: all 0.25s;
+  fill: #27475e;
+}
+
+.hamburger-button {
+  border: none;
+  background: transparent;
+  padding: 15px;
+}
+
+.dropdown-menu {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  padding: 20px 0;
+  border-top: thin solid #dce9f2;
+  box-shadow: 0 4px 10px -2px #dce9f2;
+  overflow: hidden;
+  
+  max-height: 300px; /* exclusively for transition */
+  transition: padding 0.3s, max-height 0.3s, border-top-width 0.3s;
+}
+.dropdown-menu.hidden {
+  max-height: 0;
+  padding: 0;
+  border-top-width: 0;
+}
+/*
+ * Same styles as non-hidden but below .hidden definition,
+ * so it takes priority. (To see why, try reloading the page
+ * and pressing tab a few times.)
+ */
+.dropdown-menu:focus-within {
+  padding: 20px 0;
+  max-height: 300px; /* exclusively for transition */
+  border-top: thin solid #dce9f2;
+}
+
+.dropdown-menu > a {
+  width: fit-content;
+}
+.dropdown-menu > a:not(:first-child) {
+  margin-top: 15px;
+}
+
+@media(min-width: 781px) {
+  .hamburger-button,
+  .dropdown-menu {
+    display: none;
+  }
+}
+
+/***** End Header Section *****/
+
+/***** Start Content Section *****/
+.flash {
+  padding: 0.2em;
+  width: 80%;
+  margin: auto;
+  line-height: 20px;
+}
+
+.flash-message {
+  padding: 0.8em;
+  border-radius: 8px;
+  margin: 0.6em auto;
+  background-color: #ffff6f;
+}
+
+.page-title {
+  margin-bottom: 1.3em;
+  font-size: 1.9em;
+}
+
+.body {
+  background: white;
+  flex-grow: 1;
+  margin-top: 80px;
+  padding: 1.9em;
+}
+
+@media(min-width: 1024px) {
+  .body {
+    padding: 48px 10%;
+  }
+}
+
+.body:last-child {
+  margin-bottom: 0;
+}
+
+.body form {
+  margin: 1em 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.body label {
+  font-weight: bold;
+  margin-bottom: 0.5em;
+}
+
+.body input,
+.body textarea {
+  margin-bottom: 1em;
+}
+
+.body textarea {
+  min-height: 12em;
+  resize: vertical;
+}
+/***** End Content Section *****/
+
+/***** Start Footer Section *****/
+.footer {
+  text-align: center;
+  padding: 3em 1em 3em 1em;
+  font-size: 0.85em;
+  background: white;
+  border-top: thin solid #dce9f2;
+}
+
+.footer p {
+  line-height: normal;
+}
+
+.footer .footer-section:not(:first-child) {
+  padding-top: 30px;
+}
+/***** End Footer *****/
+
+/***** Start Home Page *****/
+.home-boat-house {
+  margin: 5px 0;
+  text-align: left;
+}
+
+.home-reach {
+  border: 1px solid black;
+  border-collapse: collapse;
+  padding: 15px;
+  margin: 0 auto;            
+}
+
+.twitter-tweet {
+  margin: 0 auto;
+}
+
+.widget-container {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  margin: auto;
+}
+
+/***** End Home Page *****/
+
+/***** Start About Page *****/
+
+.shrink-youtube {
+  max-width: 645px;
+  margin: auto;
+}
+
+.youtube-container {
+  position: relative;
+  padding-bottom: 56.25%;
+  height: 0;
+  overflow: hidden;
+}
+
+.youtube-container iframe,
+.youtube-container object,
+.youtube-container embed {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+.auth-container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.auth-img {
+  float: left;
+  display: block;
+  width: 480px;
+  max-width: 47%;
+  max-height: 47%;
+  height: auto;
+  padding: 0 1em 1em 0;
+}
+
+
+/***** End About Page *****/
+
+/***** Start API Index Page *****/
+
+pre.prettyprint {
+  overflow-x: scroll;
+  overflow-y: hidden;
+  width: 90%;
+  margin: 2em auto;
+  border: none !important;
+  display: inline-block;
+}
+
+.tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip svg {
+  width: 1.4em;
+  height: 1.4em;
+  padding-left: 0.8em;
+  fill: #7db553;
+}
+
+.tooltip svg:hover {
+  -webkit-transition: all 0.25s;
+  transition: all 0.25s;
+  fill: #3e5a29;
+}
+
+.tooltip .tooltiptext {
+  visibility: hidden;
+  background-color: white;
+  width: 340px;
+  text-align: left;
+  padding: 14px;
+  margin: 0 0 0;
+  border-radius: 10px;
+  position: absolute;
+  z-index: 1;
+  font-style: normal;
+  font-size: 16px;
+  box-shadow: 0 15px 20px rgba( 0, 0, 0, 0.15 );
+  /* Animation */
+  opacity: 0;
+  transition: opacity 0.25s;
+  -webkit-transition: opacity 0.25s;
+}
+
+.tooltip:hover .tooltiptext {
+  opacity: 1;
+  visibility: visible;
+  font-style: normal;
+}
+
+/***** End API Index Page *****/

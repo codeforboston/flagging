@@ -23,7 +23,7 @@ source venv/bin/activate
 $PYEXEC -m pip install -r requirements/dev_osx.txt
 
 # Set up and run the Flask application
-export FLASK_APP=flagging_site:create_app
+export FLASK_APP=app:create_app
 export FLASK_ENV=development
 # export DATABASE_URL=$(heroku config:get DATABASE_URL)
 

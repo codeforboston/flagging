@@ -3,11 +3,11 @@ import os
 import pytest
 import pandas as pd
 
-from flagging_site.data import hobolink
-from flagging_site.data import Boathouse
+from app.data.models.boathouse import Boathouse
+from app.data.processing import hobolink
 
-from flagging_site.data.hobolink import get_live_hobolink_data
-from flagging_site.data.usgs import get_live_usgs_data
+from app.data.processing.hobolink import get_live_hobolink_data
+from app.data.processing.usgs import get_live_usgs_data
 
 
 STATIC_RESOURCES = os.path.join(os.path.dirname(__file__), 'resources')
@@ -88,7 +88,7 @@ def test_boathouse_trigger(db_session):
 
     db_session \
         .query(Boathouse) \
-        .filter(Boathouse.boathouse == 'Union Boat Club') \
+        .filter(Boathouse.name == 'Union Boat Club') \
         .update({"overridden": True})
     db_session.commit()
 

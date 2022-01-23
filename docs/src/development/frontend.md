@@ -36,7 +36,7 @@ In general, we try to use the following naming convention:
 - Things _not_ rendered directly, such as partial components or the base template, start with an underscore. This loosely follows the Python convention of having the single leading underscore indicate the value is "for internal use only."
 Our core website inherits from `_base.html`.
 
-The `/flagging_site/templates/admin` folder is the main exception to this. This folder is structured and named in a specific way to mimic Flask-Admin's template schema and (occasionally) overwrite some of its templates.
+The `/app/templates/admin` folder is the main exception to this. This folder is structured and named in a specific way to mimic Flask-Admin's template schema and (occasionally) overwrite some of its templates.
 
 All of the front-end templates for the core website "extend" the `_base.html` template. You can think of `_base.html` as defining the scaffolding of the website.
 
@@ -90,4 +90,4 @@ But something like `{"foo": "not a number"}` would be an _invalid_ response, acc
 
 As a developer, I might want to tell other "my endpoint always behaves this way-- it returns positive integers named 'foo'. And it does not return text or decimals or anything else." There are a few ways to do that, but one commonly accepted way is OAS-- a way to standardize how you describe your web API endpoint's behavior.
 
-You will see references in the code to Swagger and "swag," and you'll also see some YAML files inside the `/flagging_site/blueprints` folder. All of that stuff is related to the OAS specification, and we've implemented it with a community-run extension called [Flasgger](https://github.com/flasgger/flasgger).
+You will see references in the code to Swagger and "swag," and you'll also see some YAML files inside the `/app/blueprints` folder. All of that stuff is related to the OAS specification, and we've implemented it with a community-run extension called [Flasgger](https://github.com/flasgger/flasgger).

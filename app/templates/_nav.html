@@ -1,0 +1,9 @@
+{#
+    The website navigation. This is separate from '_base.html' for convenience, and also because it is in two places
+    inside '_base.html' so this makes edits consistent across both locations.
+#}
+<a class="nav-link" href="{{ url_for('flagging.index') }}">Home</a>
+<a class="nav-link" href="{{ url_for('flagging.about') }}">About</a>
+<a class="nav-link" href="{{ url_for('flagging.boathouses_page') }}">Boathouses</a>
+<a class="nav-link" href="{{ url_for('flagging.model_outputs') }}">Model</a>
+<a class="nav-link" href="{{ url_for('flagging.api_index') }}">API</a>

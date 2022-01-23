@@ -1,0 +1,54 @@
+{% extends '_base.html' %}
+{% block title %}Flagging Program - Live Water Quality Alerts{% endblock %}
+{% block head %}
+    {{ super() }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='flags.css', v=FLAGS_CSS_MD5) }}" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+{% endblock %}
+{% block content %}
+{% if boating_season %}
+<h2>Water Quality Today</h2>
+<div class="widget-container">
+    {% include get_widget_filename() %}
+</div>
+<div class="last-updated">
+    ( Last updated: {{ model_last_updated_time | strftime }} )
+</div>
+<h2>What Do the Flags Mean?</h2>
+<ul class="flag-explanation">
+    <li><span style="color: #0000AA; font-weight: bold;">Blue</span> flags indicate suitable boating conditions.</li>
+    <li><span style="color: #AA0000; font-weight: bold;">Red</span> flags indicate potential health risks. Consider
+        avoiding areas where red flags are posted or make sure you wash after boating nearby.</li>
+</ul>
+{% endif %}
+<h2>About CRWA's Water Quality Models</h2>
+<p>CRWA uses 3 different indicators to determine flag colors at each boathouse.</p>
+<ol>
+    <li>If any <strong>Combined Sewer Overflow (CSO)</strong> discharges took place in the past 48 hours in the Lower
+    Basin, red flags will be flown at all boathouses.</li>
+    <li>If a <strong>cyanobacteria (blue-green algae) bloom</strong> is present in the vicinity, red flags will be flown
+    at the affected boathouses for the duration of the bloom. Cyanobacteria monitoring is conducted at least every two
+    weeks while the notification program is active and CRWA coordinates closely with the MA Department of Public Health
+    who recommends bloom advisories.</li>
+    <li>If <strong>CRWA's water quality models</strong> predict E. coli bacteria levels that exceed the State's
+    recreational water quality standards, red flags will be flown at the affected boathouses. CRWA estimates E. coli
+    bacteria levels using models that take into account a variety of environmental factors including rainfall and river
+    flow. CRWA collects water samples weekly to verify the model forecasts.</li>
+</ol>
+<h2>Stay Updated</h2>
+<p>
+    The best way to keep up with the CRWA flagging updates is to <a href="https://www.crwa.org/flagging-program.html">sign
+    up for email alerts</a>. Email communications from the CRWA are the official source for status updates relating to
+    the Charles River.
+</p>
+<p>
+    You can also <a href="https://twitter.com/crwaflagging">follow the CRWA Flagging Program on Twitter</a> to get
+    automated updates from this website. Our Twitterr bot posts automatic updates every time the predictive model is run.
+</p>
+<div class="centered">
+    <a class="twitter-timeline" data-lang="en" data-width="400" data-height="400" href="https://twitter.com/crwaflagging?ref_src=twsrc%5Etfw">Tweets by crwaflagging</a>
+    <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+</div>
+{% endblock %}

@@ -1,4 +1,4 @@
-name: Run unit-tests
+name: Quality check
 
 on:
 - push
@@ -32,13 +32,15 @@ jobs:
     - name: Python 3.7 Setup
       uses: actions/setup-python@v2
       with:
-        python-version: 3.7
+        python-version: 3.8
     - name: Install dependencies
       run: |
         sudo apt-get update
         sudo apt-get install python-dev libpq-dev
         python -m pip install --upgrade pip
-        python -m pip install -r requirements/dev_osx.txt
+        python -m pip install -r requirements.txt
+    - name: Run linter
+      run: flake8 app tests alembic
     - name: Run Celery worker
       run: flask celery worker &
       env:

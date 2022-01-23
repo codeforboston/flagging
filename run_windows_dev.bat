@@ -3,7 +3,7 @@ python -m venv venv
 call venv\Scripts\activate.bat
 python -m pip install -r requirements/dev_windows.txt
 
-set FLASK_APP=flagging_site:create_app
+set FLASK_APP=app:create_app
 set FLASK_ENV=development
 set /p USE_MOCK_DATA="Use mock data? [y/n]: "
 
