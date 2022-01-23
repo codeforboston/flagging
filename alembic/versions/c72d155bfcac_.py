@@ -10,9 +10,10 @@ Create Date: 2022-01-22 15:49:40.837695
 """
 from alembic import op
 import sqlalchemy as sa
+from sqlalchemy import schema
 from sqlalchemy.engine.reflection import Inspector
 
-from app.data.database import execute_sql_from_file
+from app.config import QUERIES_DIR
 
 # revision identifiers, used by Alembic.
 revision = '016fff145273'
@@ -34,9 +35,13 @@ def upgrade():
     # These are rewritten each time; their data doesn't need to be persisted.
 
     if 'boathouses' not in tables:
+        op.execute(schema.CreateSequence(schema.Sequence('boathouse_id_sequence')))
         op.create_table(
             'boathouses',
-            sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
+            sa.Column(
+                'id', sa.Integer(), autoincrement=True, nullable=False,
+                server_default=sa.text("nextval('boathouses_id_seq'::regclass)")
+            ),
             sa.Column('boathouse', sa.String(length=255), nullable=False),
             sa.Column('reach', sa.Integer(), nullable=True),
             sa.Column('latitude', sa.Numeric(), nullable=True),
@@ -45,7 +50,9 @@ def upgrade():
             sa.Column('reason', sa.String(length=255), nullable=True),
             sa.PrimaryKeyConstraint('boathouse')
         )
-        execute_sql_from_file('override_event_triggers_v1.sql')
+        with open(QUERIES_DIR + '/override_event_triggers_v1.sql', 'r') as f:
+            sql = sa.text(f.read())
+            conn.execute(sql)
     if 'live_website_options' not in tables:
         op.create_table(
             'live_website_options',

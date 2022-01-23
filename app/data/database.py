@@ -10,6 +10,7 @@ is passed in via `db.init_app(app)`, and the `db` object looks for the config
 variable `SQLALCHEMY_DATABASE_URI`.
 """
 import os
+import subprocess
 from typing import Optional
 
 import pandas as pd
@@ -67,29 +68,12 @@ def execute_sql_from_file(file_name: str) -> Optional[pd.DataFrame]:
 
 @init_db_callback
 def init_db():
-    """This data clears and then populates the database from scratch. You only
-    need to run this function once per instance of the database.
-    """
+    import alembic.config
+    alembic.config.main(['upgrade', 'head'])
 
-    # This file creates tables for all of the tables that don't have
-    # SQLAlchemy models associated with this.
-    # Somewhat of a formality because we'll overwrite most of these
-    # soon.
-    execute_sql_from_file('schema.sql')
-
-    # This creates tables for everything with a SQLAlchemy model.
-    db.create_all()
-
-    # The boathouses table is populated. This table doesn't change, so it
-    # only needs to be populated once.
     execute_sql_from_file('define_reach.sql')
     execute_sql_from_file('define_boathouse.sql')
-
-    # The file for keeping track of if it's currently boating season
     execute_sql_from_file('define_default_options.sql')
-
-    # Create a database trigger for manual overrides.
-    execute_sql_from_file('override_event_triggers_v2.sql')
 
     # Now update the database
     from app.data.processing.core import update_db

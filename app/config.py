@@ -231,7 +231,7 @@ class DevelopmentConfig(Config):
     TESTING: bool = True
     CACHE_DEFAULT_TIMEOUT: int = 60
     USE_MOCK_DATA: bool = strtobool(os.getenv('USE_MOCK_DATA', 'false'))
-    SQLALCHEMY_ECHO: bool = strtobool(os.getenv('SQLALCHEMY_ECHO', 'false'))
+    SQLALCHEMY_ECHO: bool = strtobool(os.getenv('SQLALCHEMY_ECHO', 'true'))
 
 
 class TestingConfig(Config):

@@ -10,7 +10,7 @@ from alembic import op
 import sqlalchemy as sa
 from sqlalchemy.engine.reflection import Inspector
 
-from app.data.database import execute_sql_from_file
+from app.config import QUERIES_DIR
 
 # revision identifiers, used by Alembic.
 revision = '39a4e575f68c'
@@ -53,6 +53,9 @@ def upgrade():
     # Migrate override history.
     op.alter_column('override_history', 'boathouse', new_column_name='boathouse_name')
 
+    # Migrate website options.
+    op.rename_table('live_website_options', 'website_options')
+
     # Migrate boathouse table
     op.alter_column('boathouses', 'boathouse', new_column_name='name')
     op.alter_column('boathouses', 'reach', new_column_name='reach_id')
@@ -60,7 +63,9 @@ def upgrade():
     op.create_unique_constraint(None, 'boathouses', ['name'])
     op.create_foreign_key(None, 'boathouses', 'reach', ['reach_id'], ['id'])
     op.rename_table('boathouses', 'boathouse')
-    execute_sql_from_file('override_event_triggers_v2.sql')
+    with open(QUERIES_DIR + '/override_event_triggers_v2.sql', 'r') as f:
+        sql = sa.text(f.read())
+        conn.execute(sql)
 
 
 def downgrade():
