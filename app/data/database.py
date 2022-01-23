@@ -10,7 +10,6 @@ is passed in via `db.init_app(app)`, and the `db` object looks for the config
 variable `SQLALCHEMY_DATABASE_URI`.
 """
 import os
-import subprocess
 from typing import Optional
 
 import pandas as pd
