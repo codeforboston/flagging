@@ -23,7 +23,7 @@ billiard==3.6.4.0
     # via celery
 blinker==1.4
     # via flask-mail
-celery==5.2.1
+celery==5.2.2
     # via
     #   -r requirements.in
     #   flower
