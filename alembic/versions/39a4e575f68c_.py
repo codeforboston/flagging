@@ -32,6 +32,15 @@ def upgrade():
         sa.UniqueConstraint('id')
     )
 
+    # We need to make sure that we can add the foreign key constraint to the
+    # boathouse relation. If the boathouse table is already populated, this
+    # necessitates running this now before adding the constraint.
+    num_boathouses = conn.execute(sa.text('select * from boathouses;')).scalar()
+    if num_boathouses > 0:
+        with open(QUERIES_DIR + '/define_reach.sql', 'r') as f:
+            sql = sa.text(f.read())
+            conn.execute(sql)
+
     # Migrate predictions
     # Technically speaking, the types won't match the SQLA schema because Pandas
     # overwrites the tables.

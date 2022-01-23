@@ -5,6 +5,6 @@
 # https://devcenter.heroku.com/articles/procfile
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-release: flask clear-cache
+release: flask db migrate & flask clear-cache
 web: gunicorn --worker-class="egg:meinheld#gunicorn_worker" "app:create_app()"
 worker: flask celery worker

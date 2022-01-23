@@ -1,6 +1,6 @@
 FROM python:3.8
 
-# MAINTAINER Daniel Reeves "xdanielreeves@gmail.com"
+MAINTAINER Daniel Reeves "xdanielreeves@gmail.com"
 
 WORKDIR /
 COPY requirements.txt app/requirements.txt

@@ -4,7 +4,7 @@
   "buildpacks": [
     { "url": "heroku/python" }
   ],
-  "scripts": { "postdeploy": "flask init-db" },
+  "scripts": { "postdeploy": "flask psql init" },
   "addons": [
     "scheduler",
     {
@@ -14,7 +14,7 @@
     {
       "plan": "heroku-redis:hobby-dev",
       "as": "REDIS",
-      "options": { "maxmemory_policy": "volatile-lru" }
+      "options": { "maxmemory_policy": "allkeys-lru" }
     }
   ],
   "env": {
