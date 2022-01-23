@@ -36,7 +36,7 @@ def upgrade():
     # boathouse relation. If the boathouse table is already populated, this
     # necessitates running this now before adding the constraint.
     num_boathouses = conn.execute(sa.text('select * from boathouses;')).scalar()
-    if num_boathouses > 0:
+    if num_boathouses is not None and num_boathouses > 0:
         with open(QUERIES_DIR + '/define_reach.sql', 'r') as f:
             sql = sa.text(f.read())
             conn.execute(sql)
