@@ -12,11 +12,6 @@ from celery.signals import task_prerun
 from celery.utils.log import get_task_logger
 from flask import Flask
 
-from app.data.processing.core import combine_job
-from app.data.processing.core import predict_job
-from app.data.processing.core import update_db
-from app.data.processing.hobolink import get_live_hobolink_data
-from app.data.processing.usgs import get_live_usgs_data
 
 RecordsType = TypeVar('RecordsType', bound=List[Dict[str, Any]])
 
@@ -65,36 +60,61 @@ def task_finished_handler(*args, **kwargs):
 
 @celery_app.task
 def live_hobolink_data_task(*args, **kwargs) -> RecordsType:
+    from app.data.processing.hobolink import get_live_hobolink_data
     df = get_live_hobolink_data(*args, **kwargs)
     return df.to_dict(orient='records')
 
 
 @celery_app.task
 def live_usgs_data_task(*args, **kwargs) -> RecordsType:
+    from app.data.processing.usgs import get_live_usgs_data
     df = get_live_usgs_data(*args, **kwargs)
     return df.to_dict(orient='records')
 
 
 @celery_app.task
 def combine_data_task(*args, **kwargs) -> RecordsType:
+    from app.data.processing.core import combine_job
     df = combine_job(*args, **kwargs)
     return df.to_dict(orient='records')
 
 
 @celery_app.task
 def prediction_task(*args, **kwargs) -> RecordsType:
+    from app.data.processing.core import predict_job
     df = predict_job(*args, **kwargs)
     return df.to_dict(orient='records')
 
 
 @celery_app.task
 def update_db_task() -> None:
+    from app.data.processing.core import update_db
     update_db()
 
 
+@celery_app.task
+def update_website_task() -> None:
+    from app.data.processing.core import update_db
+    from app.data.globals import website_options
+    from app.twitter import tweet_current_status
+    update_db()
+    if website_options.boating_season:
+        tweet_current_status()
+
+
+@celery_app.task
+def send_database_exports_task() -> None:
+    from app.data.processing.core import send_database_exports
+    send_database_exports()
+
+
+# Some IDEs have a hard time getting type annotations for decorated objects.
+# Down here, we define the types for the tasks to help the IDE.
 live_hobolink_data_task: WithAppContextTask
 live_usgs_data_task: WithAppContextTask
 combine_data_task: WithAppContextTask
 clear_cache_task: WithAppContextTask
 prediction_task: WithAppContextTask
 update_db_task: WithAppContextTask
+update_website_task: WithAppContextTask
+send_database_exports_task: WithAppContextTask

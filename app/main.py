@@ -245,33 +245,41 @@ def register_commands(app: Flask):
         return _wrap
 
     @app.cli.command('update-db')
+    @click.option('--async', 'async_',
+                  is_flag=True,
+                  default=False,
+                  help='If set, then run this command in Celery.'
+                       ' This can help save a bit of money on Heroku compute.')
     @with_appcontext
     @mail_on_fail
-    def update_db_command():
+    def update_db_command(async_: bool = False):
         """Update the database with the latest live data."""
-        from app.data.processing.core import update_db
-        update_db()
-        click.echo('Updated the database successfully.')
+        from app.data.celery import update_db_task
+        if async_:
+            res = update_db_task.delay()
+            click.echo(f'Started update database task ({res.id!r}).')
+        else:
+            click.echo('Updating the database...')
+            update_db_task.run()
+            click.echo('Updated the database successfully.')
 
     @app.cli.command('update-website')
-    @click.pass_context
+    @click.option('--async', 'async_',
+                  is_flag=True,
+                  default=False,
+                  help='If set, then run this command in Celery.'
+                       ' This can help save a bit of money on Heroku compute.')
     @mail_on_fail
-    def update_website_command(ctx: click.Context):
+    def update_website_command(async_: bool = False):
         """Updates the database, then Tweets a message."""
-        from app.data.globals import website_options
-
-        # Update the database
-        ctx.invoke(update_db_command)
-
-        # If the model updated and it's boating season, send a tweet.
-        # Otherwise, do nothing.
-        if (
-                website_options.boating_season
-                and current_app.config['SEND_TWEETS']
-        ):
-            from .twitter import tweet_current_status
-            msg = tweet_current_status()
-            click.echo(f'Sent out tweet: {msg!r}')
+        from app.data.celery import update_website_task
+        if async_:
+            res = update_website_task.delay()
+            click.echo(f'Started update website task ({res.id!r}).')
+        else:
+            click.echo('Updating the website...')
+            update_website_task.run()
+            click.echo('Updated the website successfully.')
 
     @app.cli.command('gen-mock-data')
     @dev_only
@@ -327,10 +335,21 @@ def register_commands(app: Flask):
         subprocess.call(['pip-compile', 'docs/requirements.in', *ctx.args])
 
     @app.cli.command('email-90-day-data')
-    def email_90_day_data_command():
-        from app.data.processing.core import send_database_exports
-        send_database_exports()
-        click.echo('Database export email has been sent.')
+    @click.option('--async', 'async_',
+                  is_flag=True,
+                  default=False,
+                  help='If set, then run this command in Celery.'
+                       ' This can help save a bit of money on Heroku compute.')
+    @mail_on_fail
+    def email_90_day_data_command(async_: bool = False):
+        from app.data.celery import send_database_exports_task
+        if async_:
+            res = send_database_exports_task.delay()
+            click.echo(f'Started send database exports task ({res.id!r}).')
+        else:
+            click.echo('Sending database dump email...')
+            send_database_exports_task.run()
+            click.echo('Sent the database export email successfully.')
 
     @app.cli.command('clear-cache')
     def clear_cache():
