@@ -35,7 +35,7 @@ def upgrade():
     # These are rewritten each time; their data doesn't need to be persisted.
 
     if 'boathouses' not in tables:
-        op.execute(schema.CreateSequence(schema.Sequence('boathouse_id_sequence')))
+        op.execute(schema.CreateSequence(schema.Sequence('boathouses_id_seq')))
         op.create_table(
             'boathouses',
             sa.Column(
