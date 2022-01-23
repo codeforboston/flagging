@@ -1,15 +1,14 @@
 {#
     You can pass the following three params into this template.
 
-    - redirect_to (str): Path to redirect to.
-    - message (str) (optional; default = "") Message to show the user.
-    - seconds (int): (optional; default = 2) Number of seconds to wait before
-               redirecting to the target page.
+    - task_id (str)
+    - status_url (str)
+    - callback_url (str)
 #}
 {% extends "admin/base.html" %}
 {% block body %}
     <p>
-        Update Database Task ID: <code>{{ task_id }}</code>
+        Task ID: <code>{{ task_id }}</code>
     </p>
     <h2>Status</h2>
     <p id="loading_status"></p>
@@ -19,7 +18,7 @@
     <script>
         function checkStatus(){
             $.getJSON({
-                url: "{{ url_for('admin_databaseview.check_status', task_id=task_id) }}",
+                url: "{{ status_url | safe }}",
                 success: function(data){
                     switch(data.status) {
                         case "RETRY":
@@ -28,7 +27,7 @@
                             $('#loading_status').html('<img src="{{ url_for('static', filename='images/spinning_circle.gif') }}" alt="Loading" style="max-width:200px;height:auto;" />')
                             break;
                         case "SUCCESS":
-                            $('#loading_status').html('<span class="btn btn-primary" id="status_button"><i class="glyphicon gl/yphicon-ok"></i> Success<span>')
+                            $('#loading_status').html('<a href="{{ callback_url }}"><span class="btn btn-primary" id="status_button"><i class="glyphicon gl/yphicon-ok"></i> Done<span></a>')
                             clearInterval(intervalId)
                             break;
                         case "FAILURE":

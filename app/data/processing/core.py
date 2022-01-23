@@ -19,6 +19,7 @@ from app.data.processing.predictive_models import all_models
 from app.data.globals import cache
 from app.data.models.prediction import Prediction
 from app.data.database import db
+from app.data.database import execute_sql
 from app.data.database import get_current_time
 from app.mail import mail_on_fail
 from app.mail import ExportEmail
@@ -90,6 +91,7 @@ def send_database_exports() -> None:
     df_hobolink = get_live_hobolink_data(export_name='code_for_boston_export_90d')
     df_combined = process_data(df_hobolink=df_hobolink, df_usgs=df_usgs)
     df_predictions = all_models(df_combined)
+    df_override_history = execute_sql('select * from override_history;')
 
     todays_date = get_current_time().strftime('%Y_%m_%d')
 
@@ -99,5 +101,9 @@ def send_database_exports() -> None:
     msg.attach_dataframe(df_hobolink, f'{todays_date}-hobolink.csv')
     msg.attach_dataframe(df_combined, f'{todays_date}-combined.csv')
     msg.attach_dataframe(df_predictions, f'{todays_date}-prediction.csv')
+    msg.attach_dataframe(
+        df_override_history,
+        f'{todays_date}-override-history.csv'
+    )
 
     mail.send(msg)

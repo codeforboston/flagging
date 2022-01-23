@@ -82,7 +82,7 @@ def combine_data_task(*args, **kwargs) -> RecordsType:
 
 
 @celery_app.task
-def predict_task(*args, **kwargs) -> RecordsType:
+def prediction_task(*args, **kwargs) -> RecordsType:
     df = predict_job(*args, **kwargs)
     return df.to_dict(orient='records')
 
@@ -96,5 +96,5 @@ live_hobolink_data_task: WithAppContextTask
 live_usgs_data_task: WithAppContextTask
 combine_data_task: WithAppContextTask
 clear_cache_task: WithAppContextTask
-predict_task: WithAppContextTask
+prediction_task: WithAppContextTask
 update_db_task: WithAppContextTask
