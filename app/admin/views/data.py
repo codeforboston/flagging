@@ -7,6 +7,7 @@ from flask import redirect
 from flask import request
 from flask import send_file
 from flask import url_for
+from flask import current_app
 from flask_admin import expose
 from sqlalchemy.exc import ProgrammingError
 from werkzeug.exceptions import HTTPException
@@ -95,7 +96,12 @@ class DownloadView(BaseView):
 
     @expose('/')
     def index(self):
-        return self.render('admin/download.html')
+        download_style = \
+            'src' if current_app.config['USE_CELERY'] else 'src_sync'
+        return self.render(
+            'admin/download.html',
+            download_style=download_style
+        )
 
     @expose('/csv/src/<sql_table_name>')
     def download_from_db(self, sql_table_name: str):
@@ -201,6 +207,47 @@ class DownloadView(BaseView):
         return send_csv_attachment_of_dataframe(
             df=pd.DataFrame(data),
             filename=f'{data_source}.csv'
+        )
+
+    # ---
+    # The below views are used when USE_CELERY is turned off.
+
+    @expose('/csv/src_sync/hobolink_source')
+    def sync_source_hobolink(self):
+        df = live_hobolink_data_task.run('code_for_boston_export_90d')
+        return send_csv_attachment_of_dataframe(
+            df=pd.DataFrame(df),
+            filename='hobolink_source.csv'
+        )
+
+    @expose('/csv/src_sync/usgs_source')
+    def sync_source_usgs(self):
+        df = live_usgs_data_task.run(days_ago=90)
+        return send_csv_attachment_of_dataframe(
+            df=pd.DataFrame(df),
+            filename='usgs_source.csv'
+        )
+
+    @expose('/csv/src_sync/processed_data_source')
+    def sync_source_combine_data(self):
+        df = combine_data_task.run(
+            days_ago=90,
+            export_name='code_for_boston_export_90d'
+        )
+        return send_csv_attachment_of_dataframe(
+            df=pd.DataFrame(df),
+            filename='model_processed_data.csv'
+        )
+
+    @expose('/csv/src_sync/prediction_source')
+    def sync_source_prediction(self):
+        df = prediction_task.run(
+            days_ago=90,
+            export_name='code_for_boston_export_90d'
+        )
+        return send_csv_attachment_of_dataframe(
+            df=pd.DataFrame(df),
+            filename='prediction_source.csv'
         )
 
 

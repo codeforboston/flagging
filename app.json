@@ -42,6 +42,10 @@
     "MAIL_ERROR_ALERTS_TO": { "required": false },
     "MAIL_DATABASE_EXPORTS_TO": {"required": false },
     "SECRET_KEY": { "generator": "secret" },
-    "SEND_TWEETS": { "value": "true" }
+    "SEND_TWEETS": { "value": "true" },
+    "USE_CELERY": {
+      "value":  "production",
+      "description": "If you have too many dynos, you can remove the worker."
+    }
   }
 }

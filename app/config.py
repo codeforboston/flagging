@@ -171,6 +171,14 @@ class Config:
     to be well within that limit to the extent we can assure it.
     """
 
+    USE_CELERY: bool = strtobool(
+        os.getenv('USE_CELERY', 'true'))
+    """We need to get around Heroku free tier limitations by not using a worker
+    dyno to process backend database stuff. This will end up blocking requests
+    during heavy operations, but oh well. That's the price for not funding
+    river science.
+    """
+
     SEND_TWEETS: bool = strtobool(os.getenv('SEND_TWEETS', 'false'))
     """If True, the website behaves normally. If False, any time the app would
     send a Tweet, it does not do so. It is useful to turn this off when
@@ -214,6 +222,10 @@ class ProductionConfig(Config):
             )
             print(msg)
             raise
+
+
+class StagingConfig(ProductionConfig):
+    pass
 
 
 class DevelopmentConfig(Config):
@@ -269,7 +281,7 @@ def get_config_from_env(env: str) -> Config:
     """
     config_mapping = {
         'production': ProductionConfig,
-        'staging': ProductionConfig,
+        'staging': StagingConfig,
         'development': DevelopmentConfig,
         'testing': TestingConfig,
         'demo': DemoConfig
