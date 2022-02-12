@@ -5,7 +5,4 @@ repos:
     -   id: check-yaml
     -   id: end-of-file-fixer
     -   id: trailing-whitespace
--   repo: https://github.com/pycqa/flake8
-    rev: ''  # pick a git hash / tag to point to
-    hooks:
     -   id: flake8
