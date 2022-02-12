@@ -44,8 +44,8 @@
     "SECRET_KEY": { "generator": "secret" },
     "SEND_TWEETS": { "value": "true" },
     "USE_CELERY": {
-      "value":  "production",
-      "description": "If you have too many dynos, you can remove the worker."
+      "value":  "true",
+      "description": "If you have too many dynos, you can remove the worker by setting this to 'false'."
     }
   }
 }
