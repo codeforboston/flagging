@@ -256,7 +256,10 @@ class DatabaseView(BaseView):
 
     @expose('/')
     def index(self):
-        return self.render('admin/update.html')
+        update_path = \
+            './update-db' if current_app.config['USE_CELERY'] \
+            else './sync-update-db'
+        return self.render('admin/update.html', update_path=update_path)
 
     @expose('/update-db')
     def update_db(self):
@@ -269,6 +272,14 @@ class DatabaseView(BaseView):
             'admin_databaseview.wait',
             task_id=async_result.id
         ))
+
+    @expose('/sync-update-db')
+    def sync_update_db(self):
+        update_db_task.run()
+        return self.render(
+            'admin/redirect.html',
+            message='Successfully updated database.'
+        )
 
     @expose('/wait')
     def wait(self):

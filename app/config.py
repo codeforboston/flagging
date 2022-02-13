@@ -137,10 +137,10 @@ class Config:
     }
 
     TWITTER_AUTH: dict = {
-        'api_key': os.getenv('TWITTER_API_KEY'),
-        'api_key_secret': os.getenv('TWITTER_API_KEY_SECRET'),
-        'access_token': os.getenv('TWITTER_ACCESS_TOKEN'),
-        'access_token_secret': os.getenv('TWITTER_ACCESS_TOKEN_SECRET')
+        'api_key': os.getenv('TWITTER_API_KEY') or '',
+        'api_key_secret': os.getenv('TWITTER_API_KEY_SECRET') or '',
+        'access_token': os.getenv('TWITTER_ACCESS_TOKEN') or '',
+        'access_token_secret': os.getenv('TWITTER_ACCESS_TOKEN_SECRET') or ''
     }
 
     USE_MOCK_DATA: bool = False

@@ -37,15 +37,30 @@
     "TWITTER_API_KEY_SECRET": { "required": false },
     "TWITTER_ACCESS_TOKEN": { "required": false },
     "TWITTER_ACCESS_TOKEN_SECRET": { "required": false },
-    "MAIL_USERNAME": { "required": false },
-    "MAIL_PASSWORD": { "required": false },
-    "MAIL_ERROR_ALERTS_TO": { "required": false },
-    "MAIL_DATABASE_EXPORTS_TO": {"required": false },
+    "MAIL_USERNAME": {
+        "description": "SMTP credentials.",
+        "required": false
+    },
+    "MAIL_PASSWORD": {
+      "description": "SMTP credentials.",
+      "required": false
+    },
+    "MAIL_ERROR_ALERTS_TO": {
+        "description": "Delimit multiple emails with semicolons.",
+        "required": false
+    },
+    "MAIL_DATABASE_EXPORTS_TO": {
+      "description": "Delimit multiple emails with semicolons.",
+      "required": false
+    },
     "SECRET_KEY": { "generator": "secret" },
-    "SEND_TWEETS": { "value": "true" },
+    "SEND_TWEETS": {
+      "description": "If false, then 'flask update-website' doesn't send tweets.",
+      "value": "true"
+    },
     "USE_CELERY": {
       "value":  "true",
-      "description": "If you have too many dynos, you can remove the worker by setting this to 'false'."
+      "description": "If you have too many dynos, you can unhook tasks from the worker by setting this to 'false'."
     }
   }
 }
