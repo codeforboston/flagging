@@ -24,6 +24,7 @@ python-dotenv
 PyYAML
 redis
 requests
+rich-click
 SQLAlchemy<1.4
 tenacity
 tweepy

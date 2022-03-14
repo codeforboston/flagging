@@ -21,7 +21,6 @@ from app.data.celery import prediction_task
 from app.data.celery import update_db_task
 from app.data.database import execute_sql
 from app.data.database import get_current_time
-from app.data.globals import file_cache
 
 
 def send_csv_attachment_of_dataframe(
@@ -60,7 +59,6 @@ def send_csv_attachment_of_dataframe(
     # leakiness issue by periodically closing and garbage collecting the file
     # streams.
     bytesio = io.BytesIO()
-    file_cache.append(bytesio)
 
     # Write csv to stream, then encode it.
     with io.StringIO() as strio:
@@ -75,7 +73,8 @@ def send_csv_attachment_of_dataframe(
         bytesio,
         as_attachment=True,
         attachment_filename=filename,
-        mimetype='text/csv'
+        mimetype='text/csv',
+        max_age=60*15,
     )
 
 

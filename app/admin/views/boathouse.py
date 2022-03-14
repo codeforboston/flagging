@@ -21,7 +21,7 @@ class BoathouseModelView(_BaseBoathouseView):
         super().__init__(
             Boathouse,
             session,
-            ignore_columns=['id', 'overridden', 'reach_id', 'reason'],
+            ignore_columns=['id', 'overridden', 'reason'],
             endpoint='boathouses',
             name='Boathouses'
         )
