@@ -28,8 +28,8 @@ class BoathouseModelView(_BaseBoathouseView):
 
 
 class ManualOverridesModelView(_BaseBoathouseView):
-    can_delete = False
-    can_create = False
+    # can_delete = False
+    # can_create = False
 
     form_choices = {
         'reason': [
@@ -47,7 +47,7 @@ class ManualOverridesModelView(_BaseBoathouseView):
             ignore_columns=['id', 'latitude', 'longitude'],
             name='Manual Overrides'
         )
-        self.form_columns = ['overridden', 'reason']
+        self.form_columns = ['boathouse', 'reach', 'overridden', 'reason']
 
     def _flip_all_overrides(self, ids, change_flags_to: bool):
         query = tools.get_query_for_ids(self.get_query(), self.model, ids)
@@ -70,6 +70,6 @@ class ManualOverridesModelView(_BaseBoathouseView):
         return self._flip_all_overrides(ids, change_flags_to=False)
 
     def on_form_prefill(self, form, *args, **kwargs):
-        form.boathouse.render_kw = {'readonly': True}
-        form.reach.render_kw = {'readonly': True}
+        form.name.render_kw = {'readonly': True}
+        form.reach_id.render_kw = {'readonly': True}
         super().on_form_prefill(form, *args, **kwargs)
