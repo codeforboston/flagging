@@ -4,6 +4,8 @@ x-app: &app-container-config
     - postgres
     - redis
     - celeryworker
+  env_file:
+    - .env
   environment:
     FLASK_ENV: ${FLASK_ENV:-development}
     BASIC_AUTH_USERNAME: ${BASIC_AUTH_USERNAME:-development}
@@ -34,8 +36,23 @@ services:
     env_file:
       - .env
     tty: true
+    networks:
+      - db
     volumes:
       - postgres:/var/lib/postgresql/data
+
+  pgadmin:
+    image: dpage/pgadmin4
+    depends_on:
+      - postgres
+    env_file:
+      - .env
+    networks:
+      - db
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin:/var/lib/pgadmin
 
   celeryworker:
     <<: *app-container-config
@@ -45,5 +62,12 @@ services:
     depends_on:
       - redis
 
+
+networks:
+  db:
+    driver: bridge
+
+
 volumes:
   postgres: {}
+  pgadmin: {}

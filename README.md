@@ -16,6 +16,13 @@ This code base is built in Python 3.7+ and utilizes the Flask library heavily. T
 
 **[Read our documentation here.](https://codeforboston.github.io/flagging/)** Our documentation contains information on everything related to the website, including [first time setup](https://codeforboston.github.io/flagging/setup/).
 
+```shell
+docker compose build
+docker compose up -d
+docker compose exec web flask psql init
+docker compose up
+```
+
 ## Deploy to Heroku
 
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
