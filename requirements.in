@@ -8,6 +8,7 @@ flasgger
 Flask-Admin
 Flask-BasicAuth
 Flask-Caching
+flask-cors
 Flask-DB
 Flask-SQLAlchemy
 Flask-Mail

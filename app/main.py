@@ -2,14 +2,13 @@
 This file handles the construction of the Flask application object.
 """
 import os
-import click
 import decimal
 import hashlib
-
 import datetime
 from typing import Optional
 from functools import wraps
 
+import click
 from flask import Flask
 from flask import render_template
 from flask import jsonify
@@ -18,6 +17,7 @@ from flask import current_app
 from flask import Markup
 from flask import send_file
 from flask.cli import with_appcontext
+from flask_cors import CORS
 
 from werkzeug.middleware.proxy_fix import ProxyFix
 
@@ -76,6 +76,12 @@ def register_extensions(app: Flask):
 
     from app.mail import mail
     mail.init_app(app)
+
+    cors = CORS(resources={
+        '/api/*': {'origins': '*'},
+        '/flags': {'origins': '*'}
+    })
+    cors.init_app(app)
 
 
 def register_blueprints(app: Flask):

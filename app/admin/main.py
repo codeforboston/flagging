@@ -2,6 +2,7 @@ import re
 
 from flask import Flask
 from flask import request
+from flask import redirect
 from flask_admin import Admin
 
 from app.data.database import db
@@ -29,6 +30,13 @@ def init_admin(app: Flask):
     def auth_protect_admin_pages():
         """Authorize all paths that start with /admin/."""
         if re.match('^/admin(?:$|/+)', request.path):
+
+            # Force HTTPS
+            if not request.is_secure:
+                url = request.url.replace('http://', 'https://', 1)
+                return redirect(url, code=301)
+
+            # Now check if logged in. (Error is raised if not authorized.)
             basic_auth.get_login()
 
     with app.app_context():

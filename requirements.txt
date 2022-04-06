@@ -77,6 +77,7 @@ flask==2.0.2
     #   flask-admin
     #   flask-basicauth
     #   flask-caching
+    #   flask-cors
     #   flask-db
     #   flask-mail
     #   flask-postgres
@@ -86,6 +87,8 @@ flask-admin==1.5.8
 flask-basicauth==0.2.0
     # via -r requirements.in
 flask-caching==1.10.1
+    # via -r requirements.in
+flask-cors==3.0.10
     # via -r requirements.in
 flask-db==0.3.2
     # via -r requirements.in
@@ -274,6 +277,7 @@ six==1.16.0
     # via
     #   click-repl
     #   flasgger
+    #   flask-cors
     #   flask-talisman
     #   jsonschema
     #   junit-xml

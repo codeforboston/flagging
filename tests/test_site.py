@@ -66,7 +66,7 @@ def test_pages(client, page, expected_status_code):
 )
 def test_admin_pages(client, page, auth, expected_status_code):
     headers = auth_to_header(auth)
-    res = client.get(page, headers=headers)
+    res = client.get(page, headers=headers, base_url='https://localhost')
 
     assert res.status_code == expected_status_code
 
@@ -96,7 +96,7 @@ def test_admin_pages(client, page, auth, expected_status_code):
 )
 def test_admin_downloads(client, page, auth, expected_status_code):
     headers = auth_to_header(auth)
-    res = client.get(page, headers=headers)
+    res = client.get(page, headers=headers, base_url='https://localhost')
     assert res.status_code == expected_status_code
 
 
@@ -217,3 +217,25 @@ def test_pandas_code_snippets(
     assert hasattr(mod, 'df')
     assert isinstance(mod.df, pd.DataFrame)  # noqa
     assert all([c in mod.df.columns for c in expected_columns])  # noqa
+
+
+@pytest.mark.parametrize(
+    ('page', 'cors_expected'),
+    [
+        ('/admin/', False),
+        ('/api/v1/boathouses', True),
+        ('/flags', True),
+    ]
+)
+def test_cors(client, page, cors_expected):
+    headers = auth_to_header('admin:password')
+    res = client.get(page, headers=headers, base_url='https://localhost')
+
+    assert res.status_code == 200
+
+    cors_actual = 'Access-Control-Allow-Origin' in res.headers
+
+    if cors_actual:
+        assert res.headers['Access-Control-Allow-Origin'] == '*'
+
+    assert cors_expected == cors_actual
