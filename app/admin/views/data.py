@@ -3,20 +3,20 @@ import io
 import pandas as pd
 from flask import Response
 from flask import abort
+from flask import current_app
 from flask import redirect
 from flask import request
 from flask import send_file
 from flask import url_for
-from flask import current_app
 from flask_admin import expose
 from sqlalchemy.exc import ProgrammingError
 from werkzeug.exceptions import HTTPException
 
 from app.admin.base import BaseView
 from app.data.celery import celery_app
+from app.data.celery import combine_data_task
 from app.data.celery import live_hobolink_data_task
 from app.data.celery import live_usgs_data_task
-from app.data.celery import combine_data_task
 from app.data.celery import prediction_task
 from app.data.celery import update_db_task
 from app.data.database import execute_sql

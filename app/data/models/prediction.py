@@ -1,8 +1,10 @@
-from typing import Dict, Any, List
 from datetime import datetime
+from typing import Any
+from typing import Dict
+from typing import List
 
-from sqlalchemy import func
 from sqlalchemy import and_
+from sqlalchemy import func
 from sqlalchemy import select
 
 from app.data.database import db

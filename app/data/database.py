@@ -14,11 +14,9 @@ from typing import Optional
 
 import pandas as pd
 from flask import current_app
-
-from flask_sqlalchemy import SQLAlchemy
 from flask_postgres import init_db_callback
+from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import ResourceClosedError
-
 
 db = SQLAlchemy()
 

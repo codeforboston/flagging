@@ -6,9 +6,9 @@ this module is loaded, meaning if you change the env variables _after_ you load
 this module, they won't refresh.
 """
 import os
-from flask.cli import load_dotenv
 from distutils.util import strtobool
 
+from flask.cli import load_dotenv
 
 # Constants
 # ~~~~~~~~~

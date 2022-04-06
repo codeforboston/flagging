@@ -1,20 +1,19 @@
 import re
 
 from flask import Flask
-from flask import request
 from flask import redirect
+from flask import request
 from flask_admin import Admin
 
-from app.data.database import db
 from app.admin.auth import basic_auth
-from app.admin.views.data import DownloadView
-from app.admin.views.data import DatabaseView
-from app.admin.views.misc import LogoutView
-from app.admin.views.misc import AdminIndexView
-from app.admin.views.website_options import WebsiteOptionsModelView
-from app.admin.views.boathouse import ManualOverridesModelView
 from app.admin.views.boathouse import BoathouseModelView
-
+from app.admin.views.boathouse import ManualOverridesModelView
+from app.admin.views.data import DatabaseView
+from app.admin.views.data import DownloadView
+from app.admin.views.misc import AdminIndexView
+from app.admin.views.misc import LogoutView
+from app.admin.views.website_options import WebsiteOptionsModelView
+from app.data.database import db
 
 admin = Admin(template_mode='bootstrap3', index_view=AdminIndexView())
 

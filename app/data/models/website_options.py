@@ -1,6 +1,8 @@
 from typing import Optional
+
 import markdown
 from markupsafe import Markup
+
 from app.data.database import db
 
 

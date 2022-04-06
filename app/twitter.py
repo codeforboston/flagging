@@ -6,8 +6,8 @@ import tweepy
 from flask import Flask
 from flask import current_app
 
-from app.data.globals import boathouses
 from app.data.database import get_current_time
+from app.data.globals import boathouses
 
 tweepy_api = tweepy.API()
 

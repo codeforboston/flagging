@@ -1,24 +1,23 @@
 """
 This file handles the construction of the Flask application object.
 """
-import os
+import datetime
 import decimal
 import hashlib
-import datetime
-from typing import Optional
+import os
 from functools import wraps
+from typing import Optional
 
 import click
 from flask import Flask
-from flask import render_template
-from flask import jsonify
-from flask import request
-from flask import current_app
 from flask import Markup
+from flask import current_app
+from flask import jsonify
+from flask import render_template
+from flask import request
 from flask import send_file
 from flask.cli import with_appcontext
 from flask_cors import CORS
-
 from werkzeug.middleware.proxy_fix import ProxyFix
 
 
@@ -308,10 +307,10 @@ def register_commands(app: Flask):
         def _format_path(fn: str) -> str:
             return os.path.join(current_app.config['DATA_STORE'], fn)
 
-        from app.data.processing.usgs import get_live_usgs_data
-        from app.data.processing.usgs import USGS_STATIC_FILE_NAME
-        from app.data.processing.hobolink import get_live_hobolink_data
         from app.data.processing.hobolink import HOBOLINK_STATIC_FILE_NAME
+        from app.data.processing.hobolink import get_live_hobolink_data
+        from app.data.processing.usgs import USGS_STATIC_FILE_NAME
+        from app.data.processing.usgs import get_live_usgs_data
 
         df_hobolink = get_live_hobolink_data()
         df_usgs = get_live_usgs_data()
@@ -408,19 +407,23 @@ def register_misc(app: Flask):
         the need to manually declare an import. This is just a convenience for
         using the Flask shell.
         """
-        import pandas as pd  # noqa: F401
         import numpy as np  # noqa: F401
+        import pandas as pd  # noqa: F401
         from flask import current_app as app  # noqa: F401
         from flask.testing import FlaskClient  # noqa: F401
+
         from app.data import db  # noqa: F401
         from app.data.celery import celery_app  # noqa: F401
         from app.data.database import execute_sql  # noqa: F401
+        from app.data.globals import boathouses  # noqa: F401
         from app.data.globals import reaches  # noqa: F401
         from app.data.globals import website_options  # noqa: F401
-        from app.data.globals import boathouses  # noqa: F401
-        from app.data.processing.hobolink import get_live_hobolink_data  # noqa: F401
-        from app.data.processing.hobolink import request_to_hobolink  # noqa: F401
-        from app.data.processing.predictive_models import process_data  # noqa: F401
+        from app.data.processing.hobolink import \
+            get_live_hobolink_data  # noqa: F401
+        from app.data.processing.hobolink import \
+            request_to_hobolink  # noqa: F401
+        from app.data.processing.predictive_models import \
+            process_data  # noqa: F401
         from app.data.processing.usgs import get_live_usgs_data  # noqa: F401
         from app.data.processing.usgs import request_to_usgs  # noqa: F401
         from app.twitter import compose_tweet  # noqa: F401

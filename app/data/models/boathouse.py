@@ -1,8 +1,11 @@
-from typing import Dict, Any, List
+from typing import Any
+from typing import Dict
+from typing import List
 
-from sqlalchemy import and_, not_
-from sqlalchemy.sql.operators import ColumnOperators
+from sqlalchemy import and_
+from sqlalchemy import not_
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.sql.operators import ColumnOperators
 
 from app.data.database import db
 from app.data.models.prediction import Prediction

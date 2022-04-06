@@ -1,13 +1,12 @@
 from flask import redirect
 from flask_admin.actions import action
 from flask_admin.contrib.sqla import tools
-
 from sqlalchemy.orm import Session
 
-from app.data.models.boathouse import Boathouse
-from app.data.globals import cache
 from app.admin.base import ModelView
 from app.data.database import db
+from app.data.globals import cache
+from app.data.models.boathouse import Boathouse
 
 
 class _BaseBoathouseView(ModelView):

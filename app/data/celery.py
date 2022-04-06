@@ -12,7 +12,6 @@ from celery.signals import task_prerun
 from celery.utils.log import get_task_logger
 from flask import Flask
 
-
 RecordsType = TypeVar('RecordsType', bound=List[Dict[str, Any]])
 
 
@@ -94,8 +93,8 @@ def update_db_task() -> None:
 
 @celery_app.task
 def update_website_task() -> None:
-    from app.data.processing.core import update_db
     from app.data.globals import website_options
+    from app.data.processing.core import update_db
     from app.twitter import tweet_current_status
     update_db()
     if website_options.boating_season:

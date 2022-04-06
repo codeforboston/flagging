@@ -5,25 +5,25 @@ in service of simplifying the code for ease of maintenance.
 """
 from typing import Optional
 
-from flask import current_app
 import pandas as pd
+from flask import current_app
 
-from app.data.processing.hobolink import get_live_hobolink_data
-from app.data.processing.hobolink import HOBOLINK_DEFAULT_EXPORT_NAME
-from app.data.processing.hobolink import HOBOLINK_ROWS_PER_HOUR
-from app.data.processing.usgs import get_live_usgs_data
-from app.data.processing.usgs import USGS_DEFAULT_DAYS_AGO
-from app.data.processing.usgs import USGS_ROWS_PER_HOUR
-from app.data.processing.predictive_models import process_data
-from app.data.processing.predictive_models import all_models
-from app.data.globals import cache
-from app.data.models.prediction import Prediction
 from app.data.database import db
 from app.data.database import execute_sql
 from app.data.database import get_current_time
-from app.mail import mail_on_fail
+from app.data.globals import cache
+from app.data.models.prediction import Prediction
+from app.data.processing.hobolink import HOBOLINK_DEFAULT_EXPORT_NAME
+from app.data.processing.hobolink import HOBOLINK_ROWS_PER_HOUR
+from app.data.processing.hobolink import get_live_hobolink_data
+from app.data.processing.predictive_models import all_models
+from app.data.processing.predictive_models import process_data
+from app.data.processing.usgs import USGS_DEFAULT_DAYS_AGO
+from app.data.processing.usgs import USGS_ROWS_PER_HOUR
+from app.data.processing.usgs import get_live_usgs_data
 from app.mail import ExportEmail
 from app.mail import mail
+from app.mail import mail_on_fail
 
 
 def _write_to_db(

@@ -14,7 +14,6 @@ https://www.mass.gov/files/documents/2016/08/tz/36wqara.pdf
 import numpy as np
 import pandas as pd
 
-
 MODEL_VERSION = '2020'
 
 SIGNIFICANT_RAIN = 0.2

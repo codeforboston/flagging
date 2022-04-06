@@ -5,13 +5,13 @@ formatting of the data that we receive from it.
 import io
 from typing import Union
 
-import requests
 import pandas as pd
+import requests
 from flask import abort
 from flask import current_app
 from tenacity import retry
-from tenacity import wait_fixed
 from tenacity import stop_after_attempt
+from tenacity import wait_fixed
 
 from app.data.processing.utils import mock_source
 from app.mail import mail_on_fail

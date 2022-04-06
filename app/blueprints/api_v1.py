@@ -13,13 +13,13 @@ with warnings.catch_warnings():
     from flasgger import LazyString
     from flasgger import swag_from
 
-from app.data.globals import website_options
-from app.data.processing.predictive_models import MODEL_VERSION
-from app.data.globals import boathouses
-from app.data.globals import reaches
-from app.data.globals import cache
 from app.data.database import execute_sql
 from app.data.database import get_current_time
+from app.data.globals import boathouses
+from app.data.globals import cache
+from app.data.globals import reaches
+from app.data.globals import website_options
+from app.data.processing.predictive_models import MODEL_VERSION
 
 bp = Blueprint('api', __name__, url_prefix='/api')
 

@@ -1,4 +1,5 @@
-from flask_admin import expose, AdminIndexView as _AdminIndexView
+from flask_admin import AdminIndexView as _AdminIndexView
+from flask_admin import expose
 from werkzeug.utils import redirect
 
 from app.admin.base import BaseView

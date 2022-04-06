@@ -1,9 +1,9 @@
+import os
 import typing as t
 from functools import wraps
-import os
+
 import pandas as pd
 from flask import current_app
-
 
 F = t.TypeVar('F', bound=t.Callable[..., pd.DataFrame])
 
