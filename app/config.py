@@ -120,7 +120,7 @@ class Config:
     MAIL_SERVER = os.getenv('MAILGUN_SMTP_SERVER') or 'smtp.gmail.com'
     MAIL_PORT = int(os.getenv('MAILGUN_SMTP_PORT') or 587)
     MAIL_USE_TLS = True
-    MAIL_USERNAME = os.getenv('MAILGUN_SMTP_SERVER') or os.getenv('MAIL_USERNAME')
+    MAIL_USERNAME = os.getenv('MAILGUN_SMTP_LOGIN') or os.getenv('MAIL_USERNAME')
     MAIL_PASSWORD = os.getenv('MAILGUN_SMTP_PASSWORD') or os.getenv('MAIL_PASSWORD')
     MAIL_ERROR_ALERTS_TO = os.getenv('MAIL_ERROR_ALERTS_TO', '')
     MAIL_DATABASE_EXPORTS_TO = os.getenv('MAIL_DATABASE_EXPORTS_TO', '')
