@@ -15,6 +15,7 @@ from app.admin.views.misc import LogoutView
 from app.admin.views.website_options import WebsiteOptionsModelView
 from app.data.database import db
 
+
 admin = Admin(template_mode='bootstrap3', index_view=AdminIndexView())
 
 

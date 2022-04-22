@@ -8,12 +8,13 @@ Revises:
 Create Date: 2022-01-22 15:49:40.837695
 
 """
-from alembic import op
 import sqlalchemy as sa
 from sqlalchemy import schema
 from sqlalchemy.engine.reflection import Inspector
 
+from alembic import op
 from app.config import QUERIES_DIR
+
 
 # revision identifiers, used by Alembic.
 revision = '016fff145273'

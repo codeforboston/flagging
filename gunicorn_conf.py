@@ -1,13 +1,16 @@
-from pprint import pprint
+# flake8: noqa: F841
 import multiprocessing
 import os
 
 
-def gen_config() -> dict:
+def gen_config():
     loglevel = os.getenv("LOG_LEVEL", "info")
 
     _workers_per_core = int(os.getenv('WORKERS_PER_CORE', '2'))
-    workers = int(os.getenv('WEB_CONCURRENCY', multiprocessing.cpu_count() * _workers_per_core))
+    workers = int(os.getenv(
+        'WEB_CONCURRENCY',
+        multiprocessing.cpu_count() * _workers_per_core
+    ))
 
     threads = int(os.getenv('PYTHON_MAX_THREADS', 1))
 

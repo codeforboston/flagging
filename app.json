@@ -7,6 +7,7 @@
   "scripts": { "postdeploy": "flask psql init" },
   "addons": [
     "scheduler",
+    "mailgun:starter",
     {
       "plan": "heroku-postgresql:hobby-dev",
       "as": "DATABASE"

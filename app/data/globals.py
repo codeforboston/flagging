@@ -10,6 +10,7 @@ from app.data.models.boathouse import Boathouse
 from app.data.models.reach import Reach
 from app.data.models.website_options import WebsiteOptions
 
+
 T = t.TypeVar('T')
 
 

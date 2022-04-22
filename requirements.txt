@@ -21,8 +21,8 @@ backports.entry-points-selectable==1.1.1
     # via virtualenv
 billiard==3.6.4.0
     # via celery
-blinker==1.4
-    # via flask-mail
+cachetools==5.0.0
+    # via premailer
 celery==5.2.2
     # via
     #   -r requirements.in
@@ -58,6 +58,10 @@ commonmark==0.9.1
     # via rich
 coverage[toml]==6.2
     # via pytest-cov
+cssselect==1.1.0
+    # via premailer
+cssutils==2.4.0
+    # via premailer
 curlify==2.2.1
     # via schemathesis
 deprecated==1.2.13
@@ -79,7 +83,6 @@ flask==2.0.2
     #   flask-caching
     #   flask-cors
     #   flask-db
-    #   flask-mail
     #   flask-postgres
     #   flask-sqlalchemy
 flask-admin==1.5.8
@@ -91,8 +94,6 @@ flask-caching==1.10.1
 flask-cors==3.0.10
     # via -r requirements.in
 flask-db==0.3.2
-    # via -r requirements.in
-flask-mail==0.9.1
     # via -r requirements.in
 flask-postgres==0.2.1
     # via -r requirements.in
@@ -138,6 +139,8 @@ importlib-resources==5.4.0
     # via alembic
 iniconfig==1.1.1
     # via pytest
+isort==5.10.1
+    # via -r requirements.in
 itsdangerous==2.0.1
     # via flask
 jinja2==3.0.3
@@ -153,6 +156,8 @@ junit-xml==1.9
     # via schemathesis
 kombu==5.2.2
     # via celery
+lxml==4.8.0
+    # via premailer
 mako==1.1.6
     # via alembic
 markdown==3.3.6
@@ -198,6 +203,8 @@ port-for==0.6.1
     # via pytest-postgresql
 pre-commit==2.16.0
     # via -r requirements.in
+premailer==3.10.0
+    # via yagmail
 prometheus-client==0.12.0
     # via flower
 prompt-toolkit==3.0.24
@@ -262,6 +269,7 @@ requests==2.26.0
     # via
     #   -r requirements.in
     #   curlify
+    #   premailer
     #   requests-oauthlib
     #   schemathesis
     #   tweepy
@@ -338,6 +346,8 @@ wrapt==1.13.3
     # via deprecated
 wtforms==3.0.1
     # via flask-admin
+yagmail==0.15.277
+    # via -r requirements.in
 yarl==1.7.2
     # via schemathesis
 zipp==3.6.0

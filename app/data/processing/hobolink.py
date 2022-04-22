@@ -16,6 +16,7 @@ from tenacity import wait_fixed
 from app.data.processing.utils import mock_source
 from app.mail import mail_on_fail
 
+
 # Constants
 
 HOBOLINK_URL = 'http://webservice.hobolink.com/restv2/data/custom/file'

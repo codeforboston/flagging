@@ -1,11 +1,11 @@
 from logging.config import fileConfig
 
-from flask import has_app_context
 from flask import current_app
-from alembic import context
+from flask import has_app_context
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
+from alembic import context
 from app.main import create_app
 
 

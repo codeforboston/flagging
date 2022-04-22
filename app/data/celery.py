@@ -12,6 +12,7 @@ from celery.signals import task_prerun
 from celery.utils.log import get_task_logger
 from flask import Flask
 
+
 RecordsType = TypeVar('RecordsType', bound=List[Dict[str, Any]])
 
 

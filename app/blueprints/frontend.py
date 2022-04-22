@@ -14,6 +14,7 @@ from app.data.globals import reaches
 from app.data.globals import website_options
 from app.data.models.prediction import get_latest_prediction_time
 
+
 bp = Blueprint('flagging', __name__)
 
 

@@ -1,11 +1,10 @@
 import os
 
-import pytest
 import pandas as pd
+import pytest
 
 from app.data.models.boathouse import Boathouse
 from app.data.processing import hobolink
-
 from app.data.processing.hobolink import get_live_hobolink_data
 from app.data.processing.usgs import get_live_usgs_data
 

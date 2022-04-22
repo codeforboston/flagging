@@ -7,6 +7,7 @@ from flask import jsonify
 from flask import request
 from flask import url_for
 
+
 with warnings.catch_warnings():
     warnings.simplefilter('ignore', category=DeprecationWarning)
     from flasgger import Swagger
@@ -20,6 +21,7 @@ from app.data.globals import cache
 from app.data.globals import reaches
 from app.data.globals import website_options
 from app.data.processing.predictive_models import MODEL_VERSION
+
 
 bp = Blueprint('api', __name__, url_prefix='/api')
 

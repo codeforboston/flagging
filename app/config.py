@@ -6,23 +6,25 @@ this module is loaded, meaning if you change the env variables _after_ you load
 this module, they won't refresh.
 """
 import os
+import os.path as op
 from distutils.util import strtobool
 
 from flask.cli import load_dotenv
 
+
 # Constants
 # ~~~~~~~~~
 
-ROOT_DIR = os.path.abspath(os.path.dirname(__file__))
-QUERIES_DIR = os.path.join(ROOT_DIR, 'data', 'queries')
-DATA_STORE = os.path.join(ROOT_DIR, 'data', '_store')
+ROOT_DIR = op.abspath(op.dirname(__file__))
+QUERIES_DIR = op.join(ROOT_DIR, 'data', 'queries')
+DATA_STORE = op.join(ROOT_DIR, 'data', '_store')
 
 # Load dotenv
 # ~~~~~~~~~~~
 
 if os.getenv('FLASK_ENV') != 'production':
-    load_dotenv(os.path.join(ROOT_DIR, '..', '.env'))
-    load_dotenv(os.path.join(ROOT_DIR, '..', '.flaskenv'))
+    load_dotenv(op.join(ROOT_DIR, '..', '.env'))
+    load_dotenv(op.join(ROOT_DIR, '..', '.flaskenv'))
 
 
 # Configs
@@ -115,11 +117,11 @@ class Config:
     CELERY_RESULT_BACKEND: str = os.getenv('REDIS_URL', 'redis://localhost:6379/')
 
     # Mail
-    MAIL_SERVER = 'smtp.gmail.com'
-    MAIL_PORT = 587
+    MAIL_SERVER = os.getenv('MAILGUN_SMTP_SERVER') or 'smtp.gmail.com'
+    MAIL_PORT = int(os.getenv('MAILGUN_SMTP_PORT') or 587)
     MAIL_USE_TLS = True
-    MAIL_USERNAME = os.getenv('MAIL_USERNAME')
-    MAIL_PASSWORD = os.getenv('MAIL_PASSWORD')
+    MAIL_USERNAME = os.getenv('MAILGUN_SMTP_SERVER') or os.getenv('MAIL_USERNAME')
+    MAIL_PASSWORD = os.getenv('MAILGUN_SMTP_PASSWORD') or os.getenv('MAIL_PASSWORD')
     MAIL_ERROR_ALERTS_TO = os.getenv('MAIL_ERROR_ALERTS_TO', '')
     MAIL_DATABASE_EXPORTS_TO = os.getenv('MAIL_DATABASE_EXPORTS_TO', '')
     # ==========================================================================

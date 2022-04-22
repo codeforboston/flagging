@@ -16,4 +16,4 @@ repos:
   rev: 5.10.1
   hooks:
     - id: isort
-      entry: isort --sl
+      entry: isort --sl --lines-after-imports=2

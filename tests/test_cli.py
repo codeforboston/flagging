@@ -1,15 +1,15 @@
 import warnings
-from unittest.mock import patch
 from functools import wraps
+from unittest.mock import patch
 
-import requests
 import pytest
+import requests
 
 from app.data.models.boathouse import Boathouse
 from app.data.models.website_options import WebsiteOptions
 from app.data.processing import core
-from app.twitter import compose_tweet
 from app.mail import mail
+from app.twitter import compose_tweet
 
 
 @pytest.fixture

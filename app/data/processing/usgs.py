@@ -17,6 +17,7 @@ from tenacity import wait_fixed
 from app.data.processing.utils import mock_source
 from app.mail import mail_on_fail
 
+
 USGS_URL = 'https://waterdata.usgs.gov/nwis/uv'
 USGS_STATIC_FILE_NAME = 'usgs.pickle'
 USGS_DEFAULT_DAYS_AGO = 14
