@@ -10,6 +10,7 @@ Flask-BasicAuth
 Flask-Caching
 flask-cors
 Flask-DB
+Flask-Mail
 Flask-SQLAlchemy
 flask-postgres
 flask-talisman
@@ -28,7 +29,6 @@ rich-click
 SQLAlchemy<1.4
 tenacity
 tweepy
-yagmail
 
 # ==========================================================
 # Testing

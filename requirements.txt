@@ -4,26 +4,26 @@
 #
 #    pip-compile requirements.in
 #
-alembic==1.7.5
+alembic==1.7.7
     # via flask-db
-amqp==5.0.9
+amqp==5.1.1
     # via kombu
-anyio==3.4.0
+anyio==3.5.0
     # via starlette
-attrs==21.2.0
+async-timeout==4.0.2
+    # via redis
+attrs==21.4.0
     # via
     #   hypothesis
     #   hypothesis-graphql
     #   jsonschema
     #   pytest
     #   schemathesis
-backports.entry-points-selectable==1.1.1
-    # via virtualenv
 billiard==3.6.4.0
     # via celery
-cachetools==5.0.0
-    # via premailer
-celery==5.2.2
+blinker==1.4
+    # via flask-mail
+celery==5.2.6
     # via
     #   -r requirements.in
     #   flower
@@ -32,9 +32,9 @@ certifi==2021.10.8
     # via requests
 cfgv==3.3.1
     # via pre-commit
-charset-normalizer==2.0.9
+charset-normalizer==2.0.12
     # via requests
-click==8.0.3
+click==8.1.2
     # via
     #   -r requirements.in
     #   celery
@@ -56,25 +56,21 @@ colorama==0.4.4
     # via schemathesis
 commonmark==0.9.1
     # via rich
-coverage[toml]==6.2
+coverage[toml]==6.3.2
     # via pytest-cov
-cssselect==1.1.0
-    # via premailer
-cssutils==2.4.0
-    # via premailer
 curlify==2.2.1
     # via schemathesis
 deprecated==1.2.13
     # via redis
 distlib==0.3.4
     # via virtualenv
-filelock==3.4.0
+filelock==3.6.0
     # via virtualenv
 flake8==4.0.1
     # via -r requirements.in
 flasgger==0.9.5
     # via -r requirements.in
-flask==2.0.2
+flask==2.1.1
     # via
     #   -r requirements.in
     #   flasgger
@@ -83,9 +79,10 @@ flask==2.0.2
     #   flask-caching
     #   flask-cors
     #   flask-db
+    #   flask-mail
     #   flask-postgres
     #   flask-sqlalchemy
-flask-admin==1.5.8
+flask-admin==1.6.0
     # via -r requirements.in
 flask-basicauth==0.2.0
     # via -r requirements.in
@@ -95,7 +92,9 @@ flask-cors==3.0.10
     # via -r requirements.in
 flask-db==0.3.2
     # via -r requirements.in
-flask-postgres==0.2.1
+flask-mail==0.9.1
+    # via -r requirements.in
+flask-postgres==0.2.2
     # via -r requirements.in
 flask-sqlalchemy==2.5.1
     # via
@@ -103,66 +102,67 @@ flask-sqlalchemy==2.5.1
     #   flask-db
     #   flask-postgres
     #   pytest-flask-sqlalchemy
-flask-talisman==0.8.1
+flask-talisman==1.0.0
     # via -r requirements.in
 flower==1.0.0
     # via -r requirements.in
-graphql-core==3.1.7
+graphql-core==3.2.1
     # via hypothesis-graphql
 greenlet==0.4.17
     # via meinheld
 gunicorn==20.1.0
     # via -r requirements.in
-humanize==3.13.1
+humanize==4.0.0
     # via flower
-hypothesis==6.32.1
+hypothesis==6.44.0
     # via
     #   hypothesis-graphql
     #   hypothesis-jsonschema
     #   schemathesis
 hypothesis-graphql==0.5.1
     # via schemathesis
-hypothesis-jsonschema==0.20.1
+hypothesis-jsonschema==0.22.0
     # via schemathesis
-identify==2.4.0
+identify==2.4.12
     # via pre-commit
 idna==3.3
     # via
     #   anyio
     #   requests
     #   yarl
-importlib-metadata==4.10.0
+importlib-metadata==4.11.3
     # via
     #   alembic
+    #   flask
     #   markdown
-importlib-resources==5.4.0
-    # via alembic
+importlib-resources==5.7.1
+    # via
+    #   alembic
+    #   jsonschema
 iniconfig==1.1.1
     # via pytest
 isort==5.10.1
     # via -r requirements.in
-itsdangerous==2.0.1
+itsdangerous==2.1.2
     # via flask
 jinja2==3.0.3
     # via
     #   -r requirements.in
     #   flask
-jsonschema==3.2.0
+jsonschema==4.4.0
     # via
     #   flasgger
     #   hypothesis-jsonschema
     #   schemathesis
 junit-xml==1.9
     # via schemathesis
-kombu==5.2.2
+kombu==5.2.4
     # via celery
-lxml==4.8.0
-    # via premailer
-mako==1.1.6
+mako==1.2.0
     # via alembic
 markdown==3.3.6
     # via -r requirements.in
-markupsafe==2.0.1
+markupsafe==2.1.1
     # via
     #   jinja2
     #   mako
@@ -171,51 +171,52 @@ mccabe==0.6.1
     # via flake8
 meinheld==1.0.2
     # via -r requirements.in
-mirakuru==2.4.1
+mirakuru==2.4.2
     # via pytest-postgresql
-mistune==2.0.0
+mistune==2.0.2
     # via flasgger
-multidict==5.2.0
+multidict==6.0.2
     # via yarl
 nodeenv==1.6.0
     # via pre-commit
-numpy==1.21.5
+numpy==1.22.3
     # via
     #   pandas
     #   pyarrow
-oauthlib==3.1.1
-    # via requests-oauthlib
+oauthlib==3.2.0
+    # via
+    #   requests-oauthlib
+    #   tweepy
 packaging==21.3
     # via
     #   pytest
     #   pytest-flask-sqlalchemy
+    #   redis
 pandas==1.1.5
     # via -r requirements.in
 pep517==0.12.0
     # via pip-tools
-pip-tools==6.4.0
+pip-tools==6.6.0
     # via -r requirements.in
-platformdirs==2.4.0
+platformdirs==2.5.2
     # via virtualenv
 pluggy==1.0.0
     # via pytest
-port-for==0.6.1
+port-for==0.6.2
     # via pytest-postgresql
-pre-commit==2.16.0
+pre-commit==2.18.1
     # via -r requirements.in
-premailer==3.10.0
-    # via yagmail
-prometheus-client==0.12.0
+prometheus-client==0.14.1
     # via flower
-prompt-toolkit==3.0.24
+prompt-toolkit==3.0.29
     # via click-repl
-psutil==5.8.0
+psutil==5.9.0
     # via mirakuru
-psycopg2==2.9.2
+psycopg2==2.9.3
     # via -r requirements.in
 py==1.11.0
     # via pytest
-pyarrow==6.0.1
+pyarrow==7.0.0
     # via -r requirements.in
 pycodestyle==2.8.0
     # via flake8
@@ -223,11 +224,11 @@ pyflakes==2.4.0
     # via flake8
 pygments==2.11.2
     # via rich
-pyparsing==3.0.6
+pyparsing==3.0.8
     # via packaging
-pyrsistent==0.18.0
+pyrsistent==0.18.1
     # via jsonschema
-pytest==6.2.5
+pytest==7.1.1
     # via
     #   -r requirements.in
     #   pytest-cov
@@ -242,17 +243,17 @@ pytest-cov==3.0.0
     # via -r requirements.in
 pytest-flask-sqlalchemy==1.0.2
     # via -r requirements.in
-pytest-mock==3.6.1
+pytest-mock==3.7.0
     # via pytest-flask-sqlalchemy
-pytest-postgresql==3.1.2
+pytest-postgresql==3.1.3
     # via -r requirements.in
-pytest-subtests==0.5.0
+pytest-subtests==0.7.0
     # via schemathesis
 python-dateutil==2.8.2
     # via pandas
-python-dotenv==0.19.2
+python-dotenv==0.20.0
     # via -r requirements.in
-pytz==2021.3
+pytz==2022.1
     # via
     #   celery
     #   flower
@@ -263,31 +264,28 @@ pyyaml==6.0
     #   flasgger
     #   pre-commit
     #   schemathesis
-redis==4.0.2
+redis==4.2.2
     # via -r requirements.in
-requests==2.26.0
+requests==2.27.1
     # via
     #   -r requirements.in
     #   curlify
-    #   premailer
     #   requests-oauthlib
     #   schemathesis
     #   tweepy
-requests-oauthlib==1.3.0
+requests-oauthlib==1.3.1
     # via tweepy
-rich==12.0.0
+rich==12.2.0
     # via rich-click
-rich-click==1.2.1
+rich-click==1.3.0
     # via -r requirements.in
-schemathesis==3.11.7
+schemathesis==3.14.2
     # via -r requirements.in
 six==1.16.0
     # via
     #   click-repl
     #   flasgger
     #   flask-cors
-    #   flask-talisman
-    #   jsonschema
     #   junit-xml
     #   python-dateutil
     #   sqlalchemy-utils
@@ -305,52 +303,55 @@ sqlalchemy==1.3.24
     #   flask-sqlalchemy
     #   pytest-flask-sqlalchemy
     #   sqlalchemy-utils
-sqlalchemy-utils==0.38.1
+sqlalchemy-utils==0.38.2
     # via flask-db
-starlette==0.17.1
+starlette==0.19.1
     # via schemathesis
 tenacity==8.0.1
     # via -r requirements.in
 toml==0.10.2
-    # via
-    #   pre-commit
-    #   pytest
-tomli==2.0.0
+    # via pre-commit
+tomli==2.0.1
     # via
     #   coverage
     #   pep517
+    #   pytest
+    #   schemathesis
+tomli-w==1.0.0
+    # via schemathesis
 tornado==6.1
     # via flower
-tweepy==4.4.0
+tweepy==4.8.0
     # via -r requirements.in
-typing-extensions==3.10.0.2
-    # via schemathesis
-urllib3==1.26.7
+typing-extensions==4.2.0
+    # via
+    #   rich
+    #   schemathesis
+    #   starlette
+urllib3==1.26.9
     # via requests
 vine==5.0.0
     # via
     #   amqp
     #   celery
     #   kombu
-virtualenv==20.10.0
+virtualenv==20.14.1
     # via pre-commit
 wcwidth==0.2.5
     # via prompt-toolkit
-werkzeug==2.0.2
+werkzeug==2.1.1
     # via
     #   flask
     #   schemathesis
 wheel==0.37.1
     # via pip-tools
-wrapt==1.13.3
+wrapt==1.14.0
     # via deprecated
 wtforms==3.0.1
     # via flask-admin
-yagmail==0.15.277
-    # via -r requirements.in
 yarl==1.7.2
     # via schemathesis
-zipp==3.6.0
+zipp==3.8.0
     # via
     #   importlib-metadata
     #   importlib-resources
