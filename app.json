@@ -8,6 +8,7 @@
   "addons": [
     "scheduler",
     "mailgun:starter",
+    "logtail:free",
     {
       "plan": "heroku-postgresql:hobby-dev",
       "as": "DATABASE"
