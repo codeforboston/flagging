@@ -9,6 +9,7 @@ VALUES
     (3,        'Harvard''s Weld Boathouse',           42.369566, -71.122083, FALSE,      NULL),
     (3,        'Cambridge Boat Club',                 42.372277, -71.133824, FALSE,      NULL),
     (4,        'Riverside Boat Club',                 42.358272, -71.115763, FALSE,      NULL),
+    (4,        'Boston University DeWolfe Boathouse', 42.354018, -71.108961, FALSE,      NULL),
     (5,        'Charles River Yacht Club',            42.360526, -71.084760, FALSE,      NULL),
     (5,        'Union Boat Club',                     42.357816, -71.073319, FALSE,      NULL),
     (5,        'Community Boating',                   42.359935, -71.073035, FALSE,      NULL),
