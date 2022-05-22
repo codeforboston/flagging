@@ -86,7 +86,7 @@ def request_to_hobolink(
     if res.status_code >= 400:
         error_msg = 'API request to the HOBOlink endpoint failed with status ' \
                     f'code {res.status_code}.'
-        abort(res.status_code, error_msg)
+        abort(500, error_msg)
 
     return res
 

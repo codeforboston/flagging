@@ -72,7 +72,7 @@ def send_csv_attachment_of_dataframe(
     return send_file(
         bytesio,
         as_attachment=True,
-        attachment_filename=filename,
+        download_name=filename,
         mimetype='text/csv',
         max_age=60*15,
     )

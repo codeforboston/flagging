@@ -1,15 +1,21 @@
-x-app: &app-container-config
+x-app: &app-config
   build: .
   depends_on:
     - postgres
     - redis
-    - celeryworker
   env_file:
     - .env
   environment:
+    POSTGRES_USER: postgres
+    POSTGRES_HOST: postgres
+    POSTGRES_PASSWORD: postgres
+    POSTGRES_DB: flagging
+    REDIS_URL: redis://redis:6379
     FLASK_ENV: ${FLASK_ENV:-development}
     BASIC_AUTH_USERNAME: ${BASIC_AUTH_USERNAME:-development}
-    POSTGRES_HOST: postgres
+  networks:
+    - db
+    - redis
   restart: unless-stopped
   stop_grace_period: "5s"
   tty: true
@@ -20,7 +26,7 @@ version: "3.3"
 services:
 
   web:
-    <<: *app-container-config
+    <<: *app-config
     ports:
       - 80:80
     links:
@@ -30,9 +36,16 @@ services:
 
   redis:
     image: redis:alpine
+    networks:
+      - redis
 
   postgres:
     image: postgres:10
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_HOST: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: flagging
     env_file:
       - .env
     tty: true
@@ -55,7 +68,7 @@ services:
       - pgadmin:/var/lib/pgadmin
 
   celeryworker:
-    <<: *app-container-config
+    <<: *app-config
     entrypoint: ["flask", "celery", "worker", "--uid", "nobody", "--gid", "nogroup"]
     ports:
       - 5555:5555
@@ -64,6 +77,8 @@ services:
 
 
 networks:
+  redis:
+    driver: bridge
   db:
     driver: bridge
 

@@ -61,7 +61,7 @@ def request_to_usgs(days_ago: int = 14) -> requests.models.Response:
     if res.status_code >= 400:
         error_msg = 'API request to the USGS endpoint failed with status ' \
                     f'code {res.status_code}.'
-        abort(res.status_code, error_msg)
+        abort(500, error_msg)
     return res
 
 

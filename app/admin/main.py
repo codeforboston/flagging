@@ -32,9 +32,11 @@ def init_admin(app: Flask):
         if re.match('^/admin(?:$|/+)', request.path):
 
             # Force HTTPS
-            if not request.is_secure:
+            if app.env == 'development':
+                pass
+            elif not request.is_secure:
                 url = request.url.replace('http://', 'https://', 1)
-                return redirect(url, code=301)
+                return redirect(url)
 
             # Now check if logged in. (Error is raised if not authorized.)
             basic_auth.get_login()
