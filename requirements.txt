@@ -173,7 +173,7 @@ meinheld==1.0.2
     # via -r requirements.in
 mirakuru==2.4.2
     # via pytest-postgresql
-mistune==2.0.2
+mistune==2.0.3
     # via flasgger
 multidict==6.0.2
     # via yarl
