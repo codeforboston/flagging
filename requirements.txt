@@ -104,7 +104,7 @@ flask-sqlalchemy==2.5.1
     #   pytest-flask-sqlalchemy
 flask-talisman==1.0.0
     # via -r requirements.in
-flower==1.0.0
+flower==1.2.0
     # via -r requirements.in
 graphql-core==3.2.1
     # via hypothesis-graphql
