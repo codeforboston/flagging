@@ -183,7 +183,7 @@ numpy==1.22.3
     # via
     #   pandas
     #   pyarrow
-oauthlib==3.2.0
+oauthlib==3.2.1
     # via
     #   requests-oauthlib
     #   tweepy
