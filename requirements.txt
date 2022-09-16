@@ -158,7 +158,7 @@ junit-xml==1.9
     # via schemathesis
 kombu==5.2.4
     # via celery
-mako==1.2.0
+mako==1.2.2
     # via alembic
 markdown==3.3.6
     # via -r requirements.in
