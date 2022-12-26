@@ -343,7 +343,7 @@ werkzeug==2.1.1
     # via
     #   flask
     #   schemathesis
-wheel==0.37.1
+wheel==0.38.1
     # via pip-tools
 wrapt==1.14.0
     # via deprecated
