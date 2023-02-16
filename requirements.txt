@@ -166,6 +166,7 @@ markupsafe==2.1.1
     # via
     #   jinja2
     #   mako
+    #   werkzeug
     #   wtforms
 mccabe==0.6.1
     # via flake8
@@ -339,7 +340,7 @@ virtualenv==20.14.1
     # via pre-commit
 wcwidth==0.2.5
     # via prompt-toolkit
-werkzeug==2.1.1
+werkzeug==2.2.3
     # via
     #   flask
     #   schemathesis
