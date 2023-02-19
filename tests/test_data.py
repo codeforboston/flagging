@@ -2,6 +2,7 @@ import os
 
 import pandas as pd
 import pytest
+from pandas.testing import assert_frame_equal
 
 from app.data.models.boathouse import Boathouse
 from app.data.processing import hobolink
@@ -74,7 +75,7 @@ def test_hobolink_handles_erroneous_csv(
     )
 
     with live_app.app_context():
-        assert get_live_hobolink_data().equals(expected_dataframe)
+        assert_frame_equal(get_live_hobolink_data(), expected_dataframe)
 
 
 def test_boathouse_trigger(db_session):

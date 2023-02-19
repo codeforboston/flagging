@@ -12,5 +12,5 @@ VALUES
     (4,        'Boston University DeWolfe Boathouse', 42.354018, -71.108961, FALSE,      NULL),
     (5,        'Charles River Yacht Club',            42.360526, -71.084760, FALSE,      NULL),
     (5,        'Union Boat Club',                     42.357816, -71.073319, FALSE,      NULL),
-    (5,        'Community Boating',                   42.359935, -71.073035, FALSE,      NULL),
+--  (5,        'Community Boating',                   42.359935, -71.073035, FALSE,      NULL),
     (5,        'Paddle Boston at Kendall Square',     42.362964, -71.082112, FALSE,      NULL);

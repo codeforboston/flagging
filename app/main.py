@@ -2,7 +2,6 @@
 This file handles the construction of the Flask application object.
 """
 import datetime
-import decimal
 import hashlib
 import os
 from functools import wraps
@@ -34,7 +33,7 @@ def create_app(config: Optional[str] = None) -> Flask:
     app = Flask(__name__)
 
     from .config import get_config_from_env
-    cfg = get_config_from_env(config or app.env)
+    cfg = get_config_from_env(config or os.getenv('ENV'))
     app.config.from_object(cfg)
 
     with app.app_context():
@@ -239,7 +238,7 @@ def register_commands(app: Flask):
 
         @wraps(func)
         def _wrap(*args, **kwargs):
-            if current_app.env not in ['development', 'testing']:
+            if current_app.config['ENV'] not in ['development', 'testing']:
                 raise RuntimeError(
                     'You can only run this in the development environment.'
                     ' Make sure you set up the environment correctly if you'
@@ -380,26 +379,8 @@ def register_commands(app: Flask):
 def register_misc(app: Flask):
     """For things that don't neatly fit into the other "register" functions.
 
-    This function updates the JSON encoder (i.e. what the REST API uses to
-    ranslate Python objects to JSON), and adds defaults to the Flask shell.
+    This function currently just adds defaults to the Flask shell.
     """
-
-    # In most cases this is equivalent to:
-    # >>> from flask.json import JSONEncoder
-    # However this way of doing it is safe in case an extension overrides it.
-    JSONEncoder = app.json_encoder
-
-    class CustomJSONEncoder(JSONEncoder):
-        """Add support for Decimal types and datetimes."""
-        def default(self, o):
-            if isinstance(o, decimal.Decimal):
-                return float(o)
-            elif isinstance(o, datetime.date):
-                return o.isoformat()
-            else:
-                return super().default(o)
-
-    app.json_encoder = CustomJSONEncoder
 
     @app.shell_context_processor
     def make_shell_context():

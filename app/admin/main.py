@@ -32,7 +32,7 @@ def init_admin(app: Flask):
         if re.match('^/admin(?:$|/+)', request.path):
 
             # Force HTTPS
-            if app.env == 'development':
+            if app.config['ENV'] == 'development':
                 pass
             elif not request.is_secure:
                 url = request.url.replace('http://', 'https://', 1)

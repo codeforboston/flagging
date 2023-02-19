@@ -22,7 +22,7 @@ DATA_STORE = op.join(ROOT_DIR, 'data', '_store')
 # Load dotenv
 # ~~~~~~~~~~~
 
-if os.getenv('FLASK_ENV') != 'production':
+if os.getenv('ENV') != 'production':
     load_dotenv(op.join(ROOT_DIR, '..', '.env'))
     load_dotenv(op.join(ROOT_DIR, '..', '.flaskenv'))
 
@@ -132,6 +132,8 @@ class Config:
     # website.
     # ==========================================================================
 
+    ENV: str = None
+
     HOBOLINK_AUTH: dict = {
        'user': os.getenv('HOBOLINK_USERNAME'),
        'password': os.getenv('HOBOLINK_PASSWORD'),
@@ -204,6 +206,7 @@ class ProductionConfig(Config):
     internet. Currently the only part of the website that's pretty fleshed out
     is the `flagging` part, so that's the only blueprint we import.
     """
+    ENV: str = 'production'
     CACHE_TYPE: str = 'flask_caching.backends.redis'
     PREFERRED_URL_SCHEME: str = 'https'
     SEND_TWEETS: bool = strtobool(os.getenv('SEND_TWEETS', 'true'))
@@ -227,6 +230,7 @@ class ProductionConfig(Config):
 
 
 class StagingConfig(ProductionConfig):
+    ENV: str = 'staging'
     pass
 
 
@@ -239,6 +243,7 @@ class DevelopmentConfig(Config):
     for unhandled exceptions) and Flask's testing mode (which turns off the
     app instance's builtin exception handling).
     """
+    ENV: str = 'development'
     DEBUG: bool = True
     TESTING: bool = True
     CACHE_DEFAULT_TIMEOUT: int = 60
@@ -250,6 +255,7 @@ class TestingConfig(Config):
     """The Testing Config is used for unit-testing and integration-testing the
     website.
     """
+    ENV: str = 'testing'
     SEND_TWEETS: bool = True  # Won't actually send tweets.
     TESTING: bool = True
     CACHE_TYPE: str = 'flask_caching.backends.simple'
@@ -262,6 +268,7 @@ class TestingConfig(Config):
 
 class DemoConfig(ProductionConfig):
     """Config for the Heroku one-click deploy demo mode."""
+    ENV: str = 'demo'
     USE_MOCK_DATA: bool = True
 
 
@@ -273,7 +280,7 @@ def get_config_from_env(env: str) -> Config:
     Args:
         env: (str) A string. Usually this is from `app.env` inside of the
              `create_app` function, which in turn is set by the environment
-             variable `FLASK_ENV`.
+             variable `ENV`.
     Returns:
         A Config instance corresponding with the string passed.
 

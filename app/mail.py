@@ -13,7 +13,7 @@ class Mail(_Mail):
 
     def send(self, message: str):
         # Only use this in staging and production.
-        if current_app.env not in ['production', 'staging']:
+        if current_app.config['ENV'] not in ['production', 'staging']:
             print("(Not actually sending email.)")
             return
         super().send(message)

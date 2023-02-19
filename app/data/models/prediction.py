@@ -47,7 +47,7 @@ class Prediction(db.Model):
 
     def api_v1_to_dict(self) -> Dict[str, Any]:
         return {
-            'probability': self.probability,
+            'probability': float(self.probability),
             'safe': self.safe,
             'time': self.time
         }

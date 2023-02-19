@@ -75,7 +75,7 @@ def test_no_tweet_off_season(app, db_session, cli_runner,
 
 
 def test_shell_runs(app):
-    available = app.shell_context_processors[0]()
+    available = {k: v for i in app.shell_context_processors for k, v in i().items()}
     assert 'app' in available
     assert 'client' in available
     assert 'db' in available

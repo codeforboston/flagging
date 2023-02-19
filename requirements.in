@@ -11,14 +11,14 @@ Flask-Caching
 flask-cors
 Flask-DB
 Flask-Mail
-Flask-SQLAlchemy
+Flask-SQLAlchemy<3
 flask-postgres
 flask-talisman
 Flask
 flower
-Jinja2<3.1
+Jinja2
 markdown
-pandas<1.2
+pandas
 psycopg2
 pyarrow
 python-dotenv
@@ -26,7 +26,7 @@ PyYAML
 redis
 requests
 rich-click
-SQLAlchemy<1.4
+SQLAlchemy
 tenacity
 tweepy
 
@@ -37,7 +37,7 @@ tweepy
 pytest
 pytest-celery
 pytest-cov
-pytest-postgresql<4
+pytest-postgresql<4.0.0
 pytest-flask-sqlalchemy
 schemathesis
 
@@ -55,4 +55,3 @@ pre-commit
 # ==========================================================
 
 gunicorn>19
-meinheld

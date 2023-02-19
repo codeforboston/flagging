@@ -33,7 +33,7 @@ def before_request():
         diff = None
 
     # If more than 48 hours, flash message.
-    if current_app.env == 'demo':
+    if current_app.config['ENV'] == 'demo':
         flash(
             'This website is currently in demo mode. It is not using live data.'
         )

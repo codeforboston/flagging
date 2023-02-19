@@ -61,8 +61,8 @@ class Boathouse(db.Model):
         """Represents a Boathouse object as a dict."""
         return {
             'boathouse': self.name,
-            'latitude': self.latitude,
-            'longitude': self.longitude,
+            'latitude': float(self.latitude),
+            'longitude': float(self.longitude),
             'overridden': self.overridden,
             'reach': self.reach_id,
             'reason': self.reason,
