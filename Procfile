@@ -6,5 +6,5 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 release: flask db migrate & flask clear-cache
-web: gunicorn --worker-class="egg:meinheld#gunicorn_worker" "app.main:create_app()"
+web: gunicorn "app.main:create_app()"
 worker: flask celery worker
