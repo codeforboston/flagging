@@ -70,7 +70,7 @@ class Config:
             'postgres://postgres:password_here@localhost:5432/flagging'
         """
         if 'DATABASE_URL' in os.environ:
-            return os.getenv('DATABASE_URL')
+            return os.environ['DATABASE_URL'].replace('postgres://', 'postgresql://')
         else:
             user = self.POSTGRES_USER
             password = self.POSTGRES_PASSWORD
