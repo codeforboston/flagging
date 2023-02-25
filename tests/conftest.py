@@ -73,7 +73,7 @@ def _db(app):
     with app.app_context():
         init_db()
         update_db()
-    yield db
+        yield db
 
 
 @pytest.fixture

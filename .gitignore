@@ -7,9 +7,8 @@ Pipfile
 Pipfile.lock
 pgadmin4/
 mkdocs_env/
-secrets.json
-keys.json
 latest.dump
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
