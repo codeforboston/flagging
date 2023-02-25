@@ -36,7 +36,7 @@ celery==5.2.7
     #   -r requirements.in
     #   flower
     #   pytest-celery
-certifi==2022.9.24
+certifi==2022.12.7
     # via
     #   httpcore
     #   httpx
@@ -317,7 +317,7 @@ sqlalchemy==1.4.44
     #   sqlalchemy-utils
 sqlalchemy-utils==0.38.3
     # via flask-db
-starlette==0.22.0
+starlette==0.25.0
     # via schemathesis
 tenacity==8.1.0
     # via -r requirements.in
@@ -349,11 +349,11 @@ virtualenv==20.17.0
     # via pre-commit
 wcwidth==0.2.5
     # via prompt-toolkit
-werkzeug==2.2.2
+werkzeug==2.2.3
     # via
     #   flask
     #   schemathesis
-wheel==0.38.4
+wheel==0.38.42.1.1
     # via pip-tools
 wtforms==3.0.1
     # via flask-admin
