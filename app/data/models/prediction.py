@@ -16,7 +16,7 @@ class Prediction(db.Model):
         db.Integer, db.ForeignKey('reach.id'),
         primary_key=True, nullable=False)
     time = db.Column(db.DateTime, primary_key=True, nullable=False)
-    probability = db.Column(db.Numeric)
+    predicted_ecoli_cfu_100ml = db.Column(db.Numeric)
     safe = db.Column(db.Boolean)
 
     reach = db.relationship('Reach', back_populates='predictions')
@@ -47,7 +47,7 @@ class Prediction(db.Model):
 
     def api_v1_to_dict(self) -> Dict[str, Any]:
         return {
-            'probability': float(self.probability),
+            'predicted_ecoli_cfu_100ml': float(self.predicted_ecoli_cfu_100ml),
             'safe': self.safe,
             'time': self.time
         }

@@ -1,5 +1,4 @@
-JSON of the predictive model outputs
----
+# JSON of the predictive model outputs
 tags:
   - Predictive Model
 parameters:
@@ -59,8 +58,8 @@ responses:
                     log-odds:
                       description: Log odds output of the model.
                       type: number
-                    probability:
-                      description: Probability output of the model.
+                    predicted_ecoli_cfu_100ml:
+                      description: The model's predicted e.coli concentration in cfu/dL.
                       type: number
                     safe:
                       description: Indication of whether or not the water is safe according to the model.

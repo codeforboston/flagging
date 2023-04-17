@@ -14,6 +14,7 @@ https://www.mass.gov/files/documents/2016/08/tz/36wqara.pdf
 import numpy as np
 import pandas as pd
 
+
 MODEL_VERSION = '2020'
 
 SIGNIFICANT_RAIN = 0.2
@@ -97,9 +98,9 @@ def process_data(
     df['stream_flow_1d_mean'] = df['stream_flow'].rolling(24).mean()
 
     # Calculate rolling sums
-    df[f'rain_0_to_24h_sum'] = df['rain'].rolling(24).sum()
-    df[f'rain_0_to_48h_sum'] = df['rain'].rolling(48).sum()
-    df[f'rain_24_to_48h_sum'] = df[f'rain_0_to_48h_sum'] - df[f'rain_0_to_24h_sum']
+    df['rain_0_to_24h_sum'] = df['rain'].rolling(24).sum()
+    df['rain_0_to_48h_sum'] = df['rain'].rolling(48).sum()
+    df['rain_24_to_48h_sum'] = df['rain_0_to_48h_sum'] - df['rain_0_to_24h_sum']
 
     # Lastly, they measure the "time since last significant rain." Significant
     # rain is defined as a cumulative sum of 0.2 in over a 24 hour time period.

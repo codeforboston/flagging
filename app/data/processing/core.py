@@ -16,8 +16,8 @@ from app.data.models.prediction import Prediction
 from app.data.processing.hobolink import HOBOLINK_DEFAULT_EXPORT_NAME
 from app.data.processing.hobolink import HOBOLINK_ROWS_PER_HOUR
 from app.data.processing.hobolink import get_live_hobolink_data
-from app.data.processing.predictive_models import all_models
-from app.data.processing.predictive_models import process_data
+from app.data.processing.predictive_models import v1
+from app.data.processing.predictive_models import v2
 from app.data.processing.usgs import USGS_DEFAULT_DAYS_AGO
 from app.data.processing.usgs import USGS_ROWS_PER_HOUR
 from app.data.processing.usgs import get_live_usgs_data
@@ -43,25 +43,48 @@ def _write_to_db(
 
 
 @mail_on_fail
-def combine_job(
+def combine_v1_job(
         days_ago: int = USGS_DEFAULT_DAYS_AGO,
         export_name: str = HOBOLINK_DEFAULT_EXPORT_NAME
 ) -> pd.DataFrame:
     df_usgs = get_live_usgs_data(days_ago=days_ago)
     df_hobolink = get_live_hobolink_data(export_name=export_name)
-    df_combined = process_data(df_hobolink=df_hobolink, df_usgs=df_usgs)
+    df_combined = v1.process_data(df_hobolink=df_hobolink, df_usgs=df_usgs)
     return df_combined
 
 
 @mail_on_fail
-def predict_job(
+def combine_v2_job(
         days_ago: int = USGS_DEFAULT_DAYS_AGO,
         export_name: str = HOBOLINK_DEFAULT_EXPORT_NAME
 ) -> pd.DataFrame:
     df_usgs = get_live_usgs_data(days_ago=days_ago)
     df_hobolink = get_live_hobolink_data(export_name=export_name)
-    df_combined = process_data(df_hobolink=df_hobolink, df_usgs=df_usgs)
-    df_predictions = all_models(df_combined)
+    df_combined = v2.process_data(df_hobolink=df_hobolink, df_usgs=df_usgs)
+    return df_combined
+
+
+@mail_on_fail
+def predict_v1_job(
+        days_ago: int = USGS_DEFAULT_DAYS_AGO,
+        export_name: str = HOBOLINK_DEFAULT_EXPORT_NAME
+) -> pd.DataFrame:
+    df_usgs = get_live_usgs_data(days_ago=days_ago)
+    df_hobolink = get_live_hobolink_data(export_name=export_name)
+    df_combined = v1.process_data(df_hobolink=df_hobolink, df_usgs=df_usgs)
+    df_predictions = v1.all_models(df_combined)
+    return df_predictions
+
+
+@mail_on_fail
+def predict_v2_job(
+        days_ago: int = USGS_DEFAULT_DAYS_AGO,
+        export_name: str = HOBOLINK_DEFAULT_EXPORT_NAME
+) -> pd.DataFrame:
+    df_usgs = get_live_usgs_data(days_ago=days_ago)
+    df_hobolink = get_live_hobolink_data(export_name=export_name)
+    df_combined = v2.process_data(df_hobolink=df_hobolink, df_usgs=df_usgs)
+    df_predictions = v2.all_models(df_combined)
     return df_predictions
 
 
@@ -69,8 +92,8 @@ def predict_job(
 def update_db() -> None:
     df_usgs = get_live_usgs_data()
     df_hobolink = get_live_hobolink_data()
-    df_combined = process_data(df_hobolink=df_hobolink, df_usgs=df_usgs)
-    df_predictions = all_models(df_combined)
+    df_combined = v2.process_data(df_hobolink=df_hobolink, df_usgs=df_usgs)
+    df_predictions = v2.all_models(df_combined)
 
     hours = current_app.config['STORAGE_HOURS']
     try:
@@ -89,8 +112,8 @@ def update_db() -> None:
 def send_database_exports() -> None:
     df_usgs = get_live_usgs_data(days_ago=90)
     df_hobolink = get_live_hobolink_data(export_name='code_for_boston_export_90d')
-    df_combined = process_data(df_hobolink=df_hobolink, df_usgs=df_usgs)
-    df_predictions = all_models(df_combined)
+    df_combined = v2.process_data(df_hobolink=df_hobolink, df_usgs=df_usgs)
+    df_predictions = v2.all_models(df_combined)
     df_override_history = execute_sql('select * from override_history;')
 
     todays_date = get_current_time().strftime('%Y_%m_%d')
