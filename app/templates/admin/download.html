@@ -1,6 +1,6 @@
 {% extends "admin/base.html" %}
 {% block body %}
-    <h3>Database Downloads</h3>
+    <h2>Database Downloads</h2>
     <p>
         The following tables are available for download directly from the database as CSV files:
     </p>
@@ -12,7 +12,7 @@
         <li><a href="./csv/src/boathouses">Boathouses</a></li>
         <li><a href="./csv/src/override_history">Manual Override History</a></li>
     </ul>
-    <h3>Source Downloads</h3>
+    <h2>Source Downloads</h2>
     <p>
         Due to free tier hosting limitations, we cannot store lots of data at a time in the database.
     </p>
@@ -30,10 +30,17 @@
         distorted due to some data transformations that require looking backwards in time, e.g. rolling averages or time
         since last significant rainfall. It is suggested that you discard the earliest month of data for each download.
     </p>
+    <h3>Active sources</h3>
     <ul>
         <li><a href="./csv/{{ download_style }}/hobolink_source">HOBOlink</a></li>
         <li><a href="./csv/{{ download_style }}/usgs_source">USGS</a></li>
-        <li><a href="./csv/{{ download_style }}/processed_data_source">Processed Data</a></li>
-        <li><a href="./csv/{{ download_style }}/prediction_source">Predictions / Model Outputs</a></li>
+        <li><a href="./csv/{{ download_style }}/processed_data_v2_source">Processed Data</a></li>
+        <li><a href="./csv/{{ download_style }}/prediction_v2_source">Predictions / Model Outputs</a></li>
     </ul>
+    <h3>Old / deprecated sources</h3>
+    <ul>
+        <li><a href="./csv/{{ download_style }}/processed_data_v1_source">Processed Data (v1 - 2020 model)</a></li>
+        <li><a href="./csv/{{ download_style }}/prediction_v1_source">Predictions / Model Outputs (v1 - 2020 model)</a></li>
+    </ul>
+
 {% endblock %}

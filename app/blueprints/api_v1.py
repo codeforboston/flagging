@@ -20,7 +20,7 @@ from app.data.globals import boathouses
 from app.data.globals import cache
 from app.data.globals import reaches
 from app.data.globals import website_options
-from app.data.processing.predictive_models import MODEL_VERSION
+from app.data.processing.predictive_models.v2 import MODEL_VERSION
 
 
 bp = Blueprint('api', __name__, url_prefix='/api')

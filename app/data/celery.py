@@ -27,11 +27,12 @@ class Celery(_Celery):
     flask_app: Flask = None
 
     def health(self) -> None:
-        assert self.control.inspect().ping() is not None, (
-            'It looks like Celery is not ready.'
-            ' Open up a second terminal and run the command:'
-            ' `flask celery worker`'
-        )
+        if self.control.inspect().ping() is not None:
+            raise RuntimeError(
+                'It looks like Celery is not ready.'
+                ' Open up a second terminal and run the command:'
+                ' `flask celery worker`'
+            )
 
 
 celery_app = Celery(__name__)
@@ -73,16 +74,30 @@ def live_usgs_data_task(*args, **kwargs) -> RecordsType:
 
 
 @celery_app.task
-def combine_data_task(*args, **kwargs) -> RecordsType:
-    from app.data.processing.core import combine_job
-    df = combine_job(*args, **kwargs)
+def combine_data_v1_task(*args, **kwargs) -> RecordsType:
+    from app.data.processing.core import combine_v2_job
+    df = combine_v2_job(*args, **kwargs)
     return df.to_dict(orient='records')
 
 
 @celery_app.task
-def prediction_task(*args, **kwargs) -> RecordsType:
-    from app.data.processing.core import predict_job
-    df = predict_job(*args, **kwargs)
+def combine_data_v2_task(*args, **kwargs) -> RecordsType:
+    from app.data.processing.core import combine_v2_job
+    df = combine_v2_job(*args, **kwargs)
+    return df.to_dict(orient='records')
+
+
+@celery_app.task
+def predict_v1_task(*args, **kwargs) -> RecordsType:
+    from app.data.processing.core import predict_v1_job
+    df = predict_v1_job(*args, **kwargs)
+    return df.to_dict(orient='records')
+
+
+@celery_app.task
+def predict_v2_task(*args, **kwargs) -> RecordsType:
+    from app.data.processing.core import predict_v2_job
+    df = predict_v2_job(*args, **kwargs)
     return df.to_dict(orient='records')
 
 

@@ -399,12 +399,6 @@ def register_misc(app: Flask):
         from app.data.globals import boathouses  # noqa: F401
         from app.data.globals import reaches  # noqa: F401
         from app.data.globals import website_options  # noqa: F401
-        from app.data.processing.hobolink import \
-            get_live_hobolink_data  # noqa: F401
-        from app.data.processing.hobolink import \
-            request_to_hobolink  # noqa: F401
-        from app.data.processing.predictive_models import \
-            process_data  # noqa: F401
         from app.data.processing.usgs import get_live_usgs_data  # noqa: F401
         from app.data.processing.usgs import request_to_usgs  # noqa: F401
         from app.twitter import compose_tweet  # noqa: F401

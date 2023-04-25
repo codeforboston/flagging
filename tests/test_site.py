@@ -81,12 +81,12 @@ def test_admin_pages(client, page, auth, expected_status_code):
         ('/admin/db/download/csv/src/prediction', 'admin:password', 200),
         ('/admin/db/download/csv/src/boathouse', 'admin:password', 200),
         ('/admin/db/download/csv/src/override_history', 'admin:password', 200),
-        ('/admin/db/download/csv/src_sync/processed_data_source', 'admin:password', 200),  # noqa
-        ('/admin/db/download/csv/src_sync/prediction_source', 'admin:password', 200),
+        ('/admin/db/download/csv/src_sync/processed_data_v1_source', 'admin:password', 200),  # noqa
+        ('/admin/db/download/csv/src_sync/processed_data_v2_source', 'admin:password', 200),  # noqa
         ('/admin/db/download/csv/src_sync/hobolink_source', 'admin:password', 200),
         ('/admin/db/download/csv/src_sync/usgs_source', 'admin:password', 200),
-        ('/admin/db/download/csv/src_sync/processed_data_source', 'admin:password', 200),  # noqa
-        ('/admin/db/download/csv/src_sync/prediction_source', 'admin:password', 200),
+        ('/admin/db/download/csv/src_sync/prediction_v1_source', 'admin:password', 200),
+        ('/admin/db/download/csv/src_sync/prediction_v2_source', 'admin:password', 200),
 
         # Errors
         ('/admin/db/download/csv/arbitrary_table', 'admin:password', 404),
@@ -163,7 +163,7 @@ def test_override_on_home_page(client, db_session, cache):
          ['boathouse', 'latitude', 'reach']),
         ('api/_model_outputs.py.jinja',
          'test_script_model_outputs',
-         ['reach', 'probability', 'safe'])
+         ['reach', 'predicted_ecoli_cfu_100ml', 'safe'])
     ]
 )
 def test_pandas_code_snippets(
