@@ -285,7 +285,5 @@ def all_models(df: pd.DataFrame, *args, **kwargs):
     ], axis=0)
     out = out.sort_values(['reach_id', 'time'])
 
-    # TODO: keep in mind this may need to be uncommented out.
-    #  At this point I am unsure what it was doing in the v1 model.
-    # out = out.loc[out['predicted_ecoli_cfu_100ml'].notna(), :]
+    out = out.loc[out['predicted_ecoli_cfu_100ml'].notna(), :]
     return out
