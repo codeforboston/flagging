@@ -21,6 +21,10 @@ class Prediction(db.Model):
 
     reach = db.relationship('Reach', back_populates='predictions')
 
+    @property
+    def predicted_ecoli_cfu_100ml_rounded(self) -> float:
+        return round(self.predicted_ecoli_cfu_100ml, 1)
+
     @classmethod
     def _latest_ts_scalar_subquery(cls):
         return select(func.max(Prediction.time)).as_scalar()
