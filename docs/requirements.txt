@@ -9,9 +9,7 @@ click==8.0.3
 ghp-import==2.0.2
     # via mkdocs
 importlib-metadata==4.10.0
-    # via
-    #   markdown
-    #   mkdocs
+    # via mkdocs
 jinja2==3.0.3
     # via
     #   mkdocs
@@ -28,24 +26,24 @@ mergedeep==1.3.4
     # via mkdocs
 mkdocs==1.2.3
     # via
-    #   -r docs/requirements.in
+    #   -r requirements.in
     #   mkdocs-macros-plugin
     #   mkdocs-material
 mkdocs-macros-plugin==0.6.3
-    # via -r docs/requirements.in
+    # via -r requirements.in
 mkdocs-material==8.1.3
-    # via -r docs/requirements.in
+    # via -r requirements.in
 mkdocs-material-extensions==1.0.3
     # via mkdocs-material
 packaging==21.3
     # via mkdocs
 pygments==2.10.0
     # via
-    #   -r docs/requirements.in
+    #   -r requirements.in
     #   mkdocs-material
-pymdown-extensions==9.1
+pymdown-extensions==10.0
     # via
-    #   -r docs/requirements.in
+    #   -r requirements.in
     #   mkdocs-material
 pyparsing==3.0.6
     # via packaging
@@ -57,6 +55,7 @@ pyyaml==6.0
     # via
     #   mkdocs
     #   mkdocs-macros-plugin
+    #   pymdown-extensions
     #   pyyaml-env-tag
 pyyaml-env-tag==0.1
     # via mkdocs
