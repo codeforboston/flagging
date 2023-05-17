@@ -318,7 +318,7 @@ sqlalchemy==1.4.44
     #   sqlalchemy-utils
 sqlalchemy-utils==0.38.3
     # via flask-db
-starlette==0.25.0
+starlette==0.27.0
     # via
     #   schemathesis
     #   starlette-testclient
