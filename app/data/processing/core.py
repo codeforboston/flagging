@@ -92,8 +92,8 @@ def predict_v2_job(
 def update_db() -> None:
     df_usgs = get_live_usgs_data()
     df_hobolink = get_live_hobolink_data()
-    df_combined = v2.process_data(df_hobolink=df_hobolink, df_usgs=df_usgs)
-    df_predictions = v2.all_models(df_combined)
+    df_combined = v1.process_data(df_hobolink=df_hobolink, df_usgs=df_usgs)
+    df_predictions = v1.all_models(df_combined)
 
     hours = current_app.config['STORAGE_HOURS']
     try:
@@ -112,8 +112,8 @@ def update_db() -> None:
 def send_database_exports() -> None:
     df_usgs = get_live_usgs_data(days_ago=90)
     df_hobolink = get_live_hobolink_data(export_name='code_for_boston_export_90d')
-    df_combined = v2.process_data(df_hobolink=df_hobolink, df_usgs=df_usgs)
-    df_predictions = v2.all_models(df_combined)
+    df_combined = v1.process_data(df_hobolink=df_hobolink, df_usgs=df_usgs)
+    df_predictions = v1.all_models(df_combined)
     df_override_history = execute_sql('select * from override_history;')
 
     todays_date = get_current_time().strftime('%Y_%m_%d')
