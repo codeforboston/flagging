@@ -163,7 +163,7 @@ def test_override_on_home_page(client, db_session, cache):
          ['boathouse', 'latitude', 'reach']),
         ('api/_model_outputs.py.jinja',
          'test_script_model_outputs',
-         ['reach', 'predicted_ecoli_cfu_100ml', 'safe'])
+         ['reach', 'prediction', 'safe'])
     ]
 )
 def test_pandas_code_snippets(
@@ -216,7 +216,8 @@ def test_pandas_code_snippets(
 
     assert hasattr(mod, 'df')
     assert isinstance(mod.df, pd.DataFrame)  # noqa
-    assert all([c in mod.df.columns for c in expected_columns])  # noqa
+    for c in expected_columns:
+        assert c in mod.df.columns  # noqa
 
 
 @pytest.mark.parametrize(
