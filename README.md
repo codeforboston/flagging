@@ -4,6 +4,8 @@
 
 **Our website is live at: [https://crwa-flagging.herokuapp.com/](https://crwa-flagging.herokuapp.com/)**
 
+**ODSC blog post about this project: [https://opendatascience.com/civic-data-science-for-the-charles-river-watershed-association/](https://opendatascience.com/civic-data-science-for-the-charles-river-watershed-association/)**
+
 ## Overview
 
 This is the code base for the [Charles River Watershed Association's](https://crwa.org/) ("CRWA") flagging website. The flagging website hosts an interface for the CRWA's staff to monitor the outputs of a predictive model that determines whether it is reasonably safe to swim or boat in the Charles River.
