@@ -358,7 +358,7 @@ virtualenv==20.17.0
     # via pre-commit
 wcwidth==0.2.5
     # via prompt-toolkit
-werkzeug==2.2.3
+werkzeug==2.3.8
     # via
     #   flask
     #   schemathesis
