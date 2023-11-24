@@ -85,7 +85,7 @@ flake8==6.0.0
     # via -r requirements.in
 flasgger==0.9.5
     # via -r requirements.in
-flask==2.2.2
+flask==2.2.5
     # via
     #   -r requirements.in
     #   flasgger
