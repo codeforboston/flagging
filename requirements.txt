@@ -341,7 +341,7 @@ tomli==2.0.1
     #   schemathesis
 tomli-w==1.0.0
     # via schemathesis
-tornado==6.3.2
+tornado==6.3.3
     # via flower
 tweepy==4.12.1
     # via -r requirements.in
