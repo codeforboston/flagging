@@ -10,7 +10,7 @@ ghp-import==2.0.2
     # via mkdocs
 importlib-metadata==4.10.0
     # via mkdocs
-jinja2==3.0.3
+jinja2==3.1.3
     # via
     #   mkdocs
     #   mkdocs-macros-plugin
@@ -26,24 +26,24 @@ mergedeep==1.3.4
     # via mkdocs
 mkdocs==1.2.3
     # via
-    #   -r requirements.in
+    #   -r docs/requirements.in
     #   mkdocs-macros-plugin
     #   mkdocs-material
 mkdocs-macros-plugin==0.6.3
-    # via -r requirements.in
+    # via -r docs/requirements.in
 mkdocs-material==8.1.3
-    # via -r requirements.in
+    # via -r docs/requirements.in
 mkdocs-material-extensions==1.0.3
     # via mkdocs-material
 packaging==21.3
     # via mkdocs
 pygments==2.15.0
     # via
-    #   -r requirements.in
+    #   -r docs/requirements.in
     #   mkdocs-material
 pymdown-extensions==10.0
     # via
-    #   -r requirements.in
+    #   -r docs/requirements.in
     #   mkdocs-material
 pyparsing==3.0.6
     # via packaging
