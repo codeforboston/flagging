@@ -75,8 +75,8 @@ def live_usgs_data_task(*args, **kwargs) -> RecordsType:
 
 @celery_app.task
 def combine_data_v1_task(*args, **kwargs) -> RecordsType:
-    from app.data.processing.core import combine_v2_job
-    df = combine_v2_job(*args, **kwargs)
+    from app.data.processing.core import combine_v1_job
+    df = combine_v1_job(*args, **kwargs)
     return df.to_dict(orient='records')
 
 
@@ -84,6 +84,13 @@ def combine_data_v1_task(*args, **kwargs) -> RecordsType:
 def combine_data_v2_task(*args, **kwargs) -> RecordsType:
     from app.data.processing.core import combine_v2_job
     df = combine_v2_job(*args, **kwargs)
+    return df.to_dict(orient='records')
+
+
+@celery_app.task
+def combine_data_v3_task(*args, **kwargs) -> RecordsType:
+    from app.data.processing.core import combine_v3_job
+    df = combine_v3_job(*args, **kwargs)
     return df.to_dict(orient='records')
 
 
@@ -98,6 +105,13 @@ def predict_v1_task(*args, **kwargs) -> RecordsType:
 def predict_v2_task(*args, **kwargs) -> RecordsType:
     from app.data.processing.core import predict_v2_job
     df = predict_v2_job(*args, **kwargs)
+    return df.to_dict(orient='records')
+
+
+@celery_app.task
+def predict_v3_task(*args, **kwargs) -> RecordsType:
+    from app.data.processing.core import predict_v3_job
+    df = predict_v3_job(*args, **kwargs)
     return df.to_dict(orient='records')
 
 
@@ -127,9 +141,13 @@ def send_database_exports_task() -> None:
 # Down here, we define the types for the tasks to help the IDE.
 live_hobolink_data_task: WithAppContextTask
 live_usgs_data_task: WithAppContextTask
-combine_data_task: WithAppContextTask
+combine_data_v1_task: WithAppContextTask
+combine_data_v2_task: WithAppContextTask
+combine_data_v3_task: WithAppContextTask
 clear_cache_task: WithAppContextTask
-prediction_task: WithAppContextTask
+predict_v1_task: WithAppContextTask
+predict_v2_task: WithAppContextTask
+predict_v3_task: WithAppContextTask
 update_db_task: WithAppContextTask
 update_website_task: WithAppContextTask
 send_database_exports_task: WithAppContextTask

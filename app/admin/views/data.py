@@ -16,10 +16,12 @@ from app.admin.base import BaseView
 from app.data.celery import celery_app
 from app.data.celery import combine_data_v1_task
 from app.data.celery import combine_data_v2_task
+from app.data.celery import combine_data_v3_task
 from app.data.celery import live_hobolink_data_task
 from app.data.celery import live_usgs_data_task
 from app.data.celery import predict_v1_task
 from app.data.celery import predict_v2_task
+from app.data.celery import predict_v3_task
 from app.data.celery import update_db_task
 from app.data.database import execute_sql
 from app.data.database import get_current_time
@@ -151,6 +153,17 @@ class DownloadView(BaseView):
             data_source='usgs'
         ))
 
+    @expose('/csv/src/processed_data_v1_source')
+    def source_combine_data_v1(self):
+        async_result = combine_data_v1_task.s(
+            export_name='code_for_boston_export_90d',
+            days_ago=90).delay()
+        return redirect(url_for(
+            'admin_downloadview.csv_wait',
+            task_id=async_result.id,
+            data_source='combined'
+        ))
+
     @expose('/csv/src/processed_data_v2_source')
     def source_combine_data_v2(self):
         async_result = combine_data_v2_task.s(
@@ -162,15 +175,26 @@ class DownloadView(BaseView):
             data_source='combined'
         ))
 
-    @expose('/csv/src/processed_data_v1_source')
-    def source_combine_data_v1(self):
-        async_result = combine_data_v1_task.s(
+    @expose('/csv/src/processed_data_v3_source')
+    def source_combine_data_v3(self):
+        async_result = combine_data_v3_task.s(
             export_name='code_for_boston_export_90d',
             days_ago=90).delay()
         return redirect(url_for(
             'admin_downloadview.csv_wait',
             task_id=async_result.id,
             data_source='combined'
+        ))
+
+    @expose('/csv/src/prediction_v1_source')
+    def source_prediction_v1(self):
+        async_result = predict_v1_task.s(
+            export_name='code_for_boston_export_90d',
+            days_ago=90).delay()
+        return redirect(url_for(
+            'admin_downloadview.csv_wait',
+            task_id=async_result.id,
+            data_source='prediction'
         ))
 
     @expose('/csv/src/prediction_v2_source')
@@ -184,9 +208,9 @@ class DownloadView(BaseView):
             data_source='prediction'
         ))
 
-    @expose('/csv/src/prediction_v1_source')
-    def source_prediction_v1(self):
-        async_result = predict_v1_task.s(
+    @expose('/csv/src/prediction_v3_source')
+    def source_prediction_v3(self):
+        async_result = predict_v3_task.s(
             export_name='code_for_boston_export_90d',
             days_ago=90).delay()
         return redirect(url_for(
@@ -251,6 +275,17 @@ class DownloadView(BaseView):
             filename='usgs_source.csv'
         )
 
+    @expose('/csv/src_sync/processed_data_v1_source')
+    def sync_source_combine_data_v1(self):
+        df = combine_data_v1_task.run(
+            days_ago=90,
+            export_name='code_for_boston_export_90d'
+        )
+        return send_csv_attachment_of_dataframe(
+            df=pd.DataFrame(df),
+            filename='model_processed_data.csv'
+        )
+
     @expose('/csv/src_sync/processed_data_v2_source')
     def sync_source_combine_data_v2(self):
         df = combine_data_v2_task.run(
@@ -262,15 +297,26 @@ class DownloadView(BaseView):
             filename='model_processed_data.csv'
         )
 
-    @expose('/csv/src_sync/processed_data_v1_source')
-    def sync_source_combine_data_v1(self):
-        df = combine_data_v1_task.run(
+    @expose('/csv/src_sync/processed_data_v3_source')
+    def sync_source_combine_data_v3(self):
+        df = combine_data_v3_task.run(
             days_ago=90,
             export_name='code_for_boston_export_90d'
         )
         return send_csv_attachment_of_dataframe(
             df=pd.DataFrame(df),
             filename='model_processed_data.csv'
+        )
+
+    @expose('/csv/src_sync/prediction_v1_source')
+    def sync_source_prediction_v1(self):
+        df = predict_v1_task.run(
+            days_ago=90,
+            export_name='code_for_boston_export_90d'
+        )
+        return send_csv_attachment_of_dataframe(
+            df=pd.DataFrame(df),
+            filename='prediction_source.csv'
         )
 
     @expose('/csv/src_sync/prediction_v2_source')
@@ -284,9 +330,9 @@ class DownloadView(BaseView):
             filename='prediction_source.csv'
         )
 
-    @expose('/csv/src_sync/prediction_v1_source')
-    def sync_source_prediction_v1(self):
-        df = predict_v1_task.run(
+    @expose('/csv/src_sync/prediction_v3_source')
+    def sync_source_prediction_v3(self):
+        df = predict_v3_task.run(
             days_ago=90,
             export_name='code_for_boston_export_90d'
         )

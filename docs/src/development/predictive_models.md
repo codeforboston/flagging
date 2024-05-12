@@ -24,11 +24,11 @@ The feature transformations the CRWA uses depends on the year of the model, so b
 
 ???+ note
     We use 28 days of HOBOlink data to process the model. For most features, we only need the last 48 hours worth of data to calculate the most recent value, however the last significant rainfall feature requires a lot of historic data because it is not technically bounded or transformed otherwise. This means that even when calculating 1 row of output data, i.e. the latest hour of data, we still need 28 days.
-    
+
     In the deployed model, if we do not see any significant rainfall in the last 28 days, we return the difference between the timestamp and the earliest time in the dataframe, `#!python df['time'].min()`. In this scenario, the data will no longer be temporally consistent: a calculation right now will have `28.0` for `'days_since_sig_rain'`, but 12 hours from now it will be 27.5. This is fine though because the model will basically never predict E. coli blooms with 28+ days since significant rain, even when the data is not censored.
-    
+
     Unfortunately there's no pretty way to implement `days_since_sig_rain`, so the Pandas code that does all of this is one of the more inscrutable parts of the codebase. Note that `'last_sig_rain'` is calculating the timestamp of the last significant rain, and `'days_since_sig_rain'` calculates the time delta and translates into days:
-    
+
     ```python
     df['sig_rain'] = df['rain_0_to_24h_sum'] >= SIGNIFICANT_RAIN
     df['last_sig_rain'] = (
@@ -38,7 +38,7 @@ The feature transformations the CRWA uses depends on the year of the model, so b
         .fillna(df['time'].min())
     )
     df['days_since_sig_rain'] = (
-        (df['time'] - df['last_sig_rain']).dt.seconds / 60 / 60 / 24
+        (df['time'] - df['last_sig_rain']).dt.total_seconds() / 60 / 60 / 24
     )
     ```
 
@@ -60,7 +60,7 @@ def reach_3_model(df: pd.DataFrame, rows: int = None) -> pd.DataFrame:
     a- rainfall sum 0-24 hrs
     b- rainfall sum 24-48 hr
     d- Days since last rain
-    
+
     Logistic model: 0.267*a + 0.1681*b - 0.02855*d + 0.5157
 
     Args:
@@ -94,11 +94,11 @@ def reach_3_model(df: pd.DataFrame, rows: int = None) -> pd.DataFrame:
 ???+ note
 
     This section covers making changes to the following:
-    
+
     - The coefficients for the models.
     - The safety threshold.
     - The model features.
-    
+
     If you want to do anything more complicated, such as adding a new source of information to the model, that is outside the scope of this document. To accomplish that, you'll need to do more sleuthing into the code to really understand it.
 
 ???+ note

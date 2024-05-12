@@ -20,7 +20,7 @@ from app.data.globals import boathouses
 from app.data.globals import cache
 from app.data.globals import reaches
 from app.data.globals import website_options
-from app.data.processing.predictive_models.v2 import MODEL_VERSION
+from app.data.processing.predictive_models.v3 import MODEL_YEAR
 
 
 bp = Blueprint('api', __name__, url_prefix='/api')
@@ -40,7 +40,7 @@ def predictive_model_api():
     selected_hours = max(selected_hours, 1)
 
     return jsonify({
-        'model_version': MODEL_VERSION,
+        'model_version': MODEL_YEAR,
         'time_returned': get_current_time(),
         'is_boating_season': website_options.boating_season,
         'model_outputs': [

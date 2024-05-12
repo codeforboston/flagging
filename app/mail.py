@@ -1,12 +1,16 @@
 import io
 import traceback
 from functools import wraps
+from typing import TypeVar
 
 import pandas as pd
 from flask import current_app
 from flask import render_template
 from flask_mail import Mail as _Mail
 from flask_mail import Message
+
+
+T = TypeVar("T")
 
 
 class Mail(_Mail):
@@ -53,7 +57,7 @@ class ExportEmail(Message):
             self.attach(filename, "text/csv", f.getvalue())
 
 
-def mail_on_fail(func: callable):
+def mail_on_fail(func: T) -> T:
     """Send an email when something fails. Use this as a decorator."""
     @wraps(func)
     def _wrap(*args, **kwargs):
