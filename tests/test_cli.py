@@ -1,5 +1,8 @@
 import warnings
 from functools import wraps
+from typing import Any
+from typing import Callable
+from typing import TypeVar
 from unittest.mock import patch
 
 import pytest
@@ -10,6 +13,9 @@ from app.data.models.website_options import WebsiteOptions
 from app.data.processing import core
 from app.mail import mail
 from app.twitter import compose_tweet
+
+
+C = TypeVar("C", bound=Callable[..., Any])
 
 
 @pytest.fixture
@@ -81,7 +87,7 @@ def test_shell_runs(app):
     assert 'db' in available
 
 
-def tweets_parametrization(func: callable):
+def tweets_parametrization(func: C) -> C:
     """This decorator creates two new fixtures: overrides and expected_text.
     It performs the work of overriding a number of flags equivalent to the
     `overriddes` amount before the decorated text receives the db_session.

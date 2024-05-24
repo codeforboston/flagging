@@ -13,6 +13,7 @@ x-app: &app-config
     REDIS_URL: redis://redis:6379
     FLASK_ENV: ${FLASK_ENV:-development}
     BASIC_AUTH_USERNAME: ${BASIC_AUTH_USERNAME:-development}
+    USE_MOCK_DATA: ${USE_MOCK_DATA-false}
   networks:
     - db
     - redis
