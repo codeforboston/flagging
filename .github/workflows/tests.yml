@@ -37,10 +37,10 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install libpq-dev
-        python -m pip install --upgrade pip
-        python -m pip install -r requirements.txt
-    - name: Run linter
-      run: flake8 app tests alembic
+        pip install --upgrade uv
+        uv pip install --system -r requirements.txt
+    - name: Run pre-commit
+      run: pre-commit run -a
     - name: Run Celery worker
       run: flask celery worker &
       env:
