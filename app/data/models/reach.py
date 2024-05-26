@@ -6,6 +6,8 @@ from app.data.database import db
 
 class Reach(db.Model):
     __tablename__ = 'reach'
+    __allow_unmapped__ = True  # SQLA 3.0 compat. Todo: replace with Mapped[]
+
     id: int = db.Column(db.Integer, primary_key=True, unique=True)
     boathouses: List['Boathouse'] = db.relationship(  # noqa: F821
         'Boathouse',

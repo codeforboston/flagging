@@ -9,7 +9,6 @@ from typing import Optional
 
 import click
 from flask import Flask
-from flask import Markup
 from flask import current_app
 from flask import jsonify
 from flask import render_template
@@ -17,6 +16,7 @@ from flask import request
 from flask import send_file
 from flask.cli import with_appcontext
 from flask_cors import CORS
+from markupsafe import Markup
 from werkzeug.middleware.proxy_fix import ProxyFix
 
 
@@ -335,8 +335,14 @@ def register_commands(app: Flask):
         This command is for development purposes only.
         """
         import subprocess
-        subprocess.call(['pip-compile', 'requirements.in', *ctx.args])
-        subprocess.call(['pip-compile', 'docs/requirements.in', *ctx.args])
+        subprocess.call([
+            'uv', 'pip', 'compile',
+            'requirements.in', '-o', 'requirements.txt', *ctx.args
+        ])
+        subprocess.call([
+            'uv', 'pip', 'compile',
+            'docs/requirements.in', '-o', 'docs/requirements.txt', *ctx.args
+        ])
 
     @app.cli.command('email-90-day-data')
     @click.option('--async', 'async_',

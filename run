@@ -67,22 +67,16 @@ function psql {
   # Connect to PostgreSQL
   # shellcheck disable=SC1091
   . .env
- _dc postgres psql -U "${POSTGRES_USER}" "${@}"
+ docker compose --env-file .env exec -i --tty postgres psql -U "${POSTGRES_USER}" "${@}"
+}
+
+function bash {
+  docker compose --env-file .env exec --tty -i web /bin/bash
 }
 
 function redis-cli {
   # Connect to Redis
   _dc redis redis-cli "${@}"
-}
-
-function pip3:install {
-  # Install pip3 dependencies and write lock file
-  _build_run_down web bin/pip3-install
-}
-
-function pip3:outdated {
-  # List any installed packages that are outdated
-  cmd pip3 list --outdated
 }
 
 function ci:install-deps {

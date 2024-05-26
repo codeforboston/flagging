@@ -11,7 +11,7 @@ Flask-Caching
 flask-cors
 Flask-DB
 Flask-Mail
-Flask-SQLAlchemy<3
+Flask-SQLAlchemy
 flask-postgres
 flask-talisman
 Flask
@@ -47,7 +47,7 @@ schemathesis
 
 flake8
 isort
-pip-tools
+uv
 pre-commit
 
 # ==========================================================
@@ -55,3 +55,4 @@ pre-commit
 # ==========================================================
 
 gunicorn>19
+inotify  # For --reload flag

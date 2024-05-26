@@ -13,7 +13,7 @@ x-app: &app-config
     REDIS_URL: redis://redis:6379
     FLASK_ENV: ${FLASK_ENV:-development}
     BASIC_AUTH_USERNAME: ${BASIC_AUTH_USERNAME:-development}
-    USE_MOCK_DATA: ${USE_MOCK_DATA-false}
+    GUNICORN_CMD_ARGS: --reload
   networks:
     - db
     - redis
@@ -21,7 +21,7 @@ x-app: &app-config
   stop_grace_period: "5s"
   tty: true
   volumes:
-    - .:/var/www/app
+    - .:/app
 
 version: "3.3"
 services:
@@ -30,6 +30,8 @@ services:
     <<: *app-config
     ports:
       - 80:80
+    depends_on:
+      - postgres
     links:
       - postgres
       - redis
@@ -41,7 +43,7 @@ services:
       - redis
 
   postgres:
-    image: postgres:10
+    image: postgres:16
     environment:
       POSTGRES_USER: postgres
       POSTGRES_HOST: postgres

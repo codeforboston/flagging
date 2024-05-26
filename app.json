@@ -10,11 +10,11 @@
     "mailgun:starter",
     "logtail:free",
     {
-      "plan": "heroku-postgresql:hobby-dev",
+      "plan": "heroku-postgresql:essential-0",
       "as": "DATABASE"
     },
     {
-      "plan": "heroku-redis:hobby-dev",
+      "plan": "heroku-redis:mini",
       "as": "REDIS",
       "options": { "maxmemory_policy": "allkeys-lru" }
     }

@@ -16,7 +16,9 @@ import pandas as pd
 from flask import current_app
 from flask_postgres import init_db_callback
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import text
 from sqlalchemy.exc import ResourceClosedError
+
 
 db = SQLAlchemy()
 
@@ -33,8 +35,8 @@ def execute_sql(query: str) -> Optional[pd.DataFrame]:
         Either a Pandas Dataframe the selected data for read queries, or None
         for write queries.
     """
-    with db.engine.connect() as conn:
-        res = conn.execute(query)
+    with db.session() as conn:
+        res = conn.execute(text(query))
         try:
             df = pd.DataFrame(
                 res.fetchall(),
@@ -42,7 +44,7 @@ def execute_sql(query: str) -> Optional[pd.DataFrame]:
             )
             return df
         except ResourceClosedError:
-            return None
+            conn.commit()
 
 
 def execute_sql_from_file(file_name: str) -> Optional[pd.DataFrame]:

@@ -36,6 +36,7 @@ class Celery(_Celery):
 
 
 celery_app = Celery(__name__)
+celery_app.conf.broker_connection_retry_on_startup = True
 
 logger: logging.Logger = get_task_logger(__name__)
 logger.setLevel(logging.INFO)

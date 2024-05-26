@@ -1,21 +1,17 @@
-FROM python:3.8
+FROM python:3.12
 
 MAINTAINER Daniel Reeves "xdanielreeves@gmail.com"
-
-WORKDIR /
 
 ADD --chmod=755 https://astral.sh/uv/install.sh /install.sh
 RUN /install.sh && rm /install.sh
 
-COPY requirements.txt app/requirements.txt
-RUN /root/.cargo/bin/uv pip install --system --no-cache -r app/requirements.txt
+WORKDIR /app
+COPY requirements.txt ./requirements.txt
 
-COPY ./ /home/
-WORKDIR /home/
+RUN /root/.cargo/bin/uv pip install --system --no-cache -r requirements.txt
 
-ENV PYTHONPATH=/home
+COPY ./ .
+
 EXPOSE 80
 
-CMD ["gunicorn", \
-    "-c", "gunicorn_conf.py", \
-    "app.main:create_app()"]
+CMD ["bash", "-c", "flask db migrate && gunicorn -c gunicorn_conf.py app.main:create_app\\(\\)"]
