@@ -2,7 +2,13 @@
 Twitter. The message is written by the function `compose_tweet()`, and actually
 sending the message is handled by `tweet_current_status()`.
 """
-import tweepy
+import warnings
+
+
+with warnings.catch_warnings():
+    warnings.simplefilter("ignore", SyntaxWarning)
+    import tweepy
+
 from flask import Flask
 from flask import current_app
 

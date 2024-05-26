@@ -27,8 +27,8 @@ class BoathouseModelView(_BaseBoathouseView):
 
 
 class ManualOverridesModelView(_BaseBoathouseView):
-    # can_delete = False
-    # can_create = False
+    can_delete = False
+    can_create = False
 
     form_choices = {
         'reason': [

@@ -14,6 +14,7 @@ from app.data.models.prediction import Prediction
 # Todo: should update db.String(255) to db.Text.
 class Boathouse(db.Model):
     __tablename__ = 'boathouse'
+    __allow_unmapped__ = True  # SQLA 3.0 compat. Todo: replace with Mapped[]
 
     id: int = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name: str = db.Column(db.String(255), unique=True)
@@ -29,7 +30,7 @@ class Boathouse(db.Model):
         # Join on the latest prediction per reach.
         primaryjoin='and_('
                     'Prediction.reach_id == foreign(Boathouse.reach_id),'
-                    ' Prediction.time == select([func.max(Prediction.time)]).as_scalar()'  # noqa: E501
+                    ' Prediction.time == select(func.max(Prediction.time)).as_scalar()'  # noqa: E501
                     ')',
         lazy='subquery',
         viewonly=True,

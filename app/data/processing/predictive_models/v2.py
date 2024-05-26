@@ -57,7 +57,7 @@ def process_data(
         .fillna(df_hobolink['time'].min())
     )
     df_hobolink['days_since_sig_rain'] = (
-        (df_hobolink['time'] - df_hobolink['_last_sig_rain']).dt.seconds / 60 / 60 / 24
+        (df_hobolink['time'] - df_hobolink['_last_sig_rain']).dt.total_seconds() / 60 / 60 / 24
     )
 
     # Now collapse the data.
@@ -121,7 +121,7 @@ def process_data(
         .fillna(df['time'].min())
     )
     df['days_since_sig_rain'] = (
-        (df['time'] - df['last_sig_rain']).dt.seconds / 60 / 60 / 24
+        (df['time'] - df['last_sig_rain']).dt.total_seconds() / 60 / 60 / 24
     )
 
     return df

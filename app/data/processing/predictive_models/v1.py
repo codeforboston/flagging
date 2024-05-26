@@ -112,7 +112,7 @@ def process_data(
         .fillna(df['time'].min())
     )
     df['days_since_sig_rain'] = (
-        (df['time'] - df['last_sig_rain']).dt.seconds / 60 / 60 / 24
+        (df['time'] - df['last_sig_rain']).dt.total_seconds() / 60 / 60 / 24
     )
 
     return df
