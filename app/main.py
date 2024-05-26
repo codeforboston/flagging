@@ -35,7 +35,7 @@ def create_app(config: Optional[str] = None) -> Flask:
 
     from .config import get_config_from_env
 
-    cfg = get_config_from_env(config or os.getenv("ENV"))
+    cfg = get_config_from_env(config or os.getenv("FLASK_ENV") or os.getenv("ENV"))
     app.config.from_object(cfg)
 
     with app.app_context():
