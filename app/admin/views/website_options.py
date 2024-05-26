@@ -7,7 +7,6 @@ from app.data.models.website_options import WebsiteOptions
 
 
 class WebsiteOptionsModelView(ModelView):
-
     can_export = False
     # The following flags enforce the existence of only one set of options:
     can_create = False
@@ -15,14 +14,14 @@ class WebsiteOptionsModelView(ModelView):
     can_edit = True
     edit_modal = False
 
-    edit_template = 'admin/edit_with_markdown.html'
+    edit_template = "admin/edit_with_markdown.html"
 
-    form_args = {'flagging_message': dict(label='Flagging Status Message')}
-    form_widget_args = {'flagging_message': dict(rows=16)}
+    form_args = {"flagging_message": dict(label="Flagging Status Message")}
+    form_widget_args = {"flagging_message": dict(rows=16)}
 
     def __init__(self, session: Session):
-        super().__init__(WebsiteOptions, session, ignore_columns=['id'])
+        super().__init__(WebsiteOptions, session, ignore_columns=["id"])
 
-    @expose('/')
+    @expose("/")
     def index(self):
-        return redirect(self.url + '/edit/?id=1')
+        return redirect(self.url + "/edit/?id=1")

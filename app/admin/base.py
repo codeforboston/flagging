@@ -15,9 +15,9 @@ class BaseView(_BaseView):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if self.endpoint != 'admin':
+        if self.endpoint != "admin":
             self.url = self.url or self.endpoint
-            self.endpoint = f'admin_{self.endpoint}'
+            self.endpoint = f"admin_{self.endpoint}"
 
     def is_accessible(self) -> bool:
         return basic_auth.authenticate()
@@ -29,23 +29,16 @@ class BaseView(_BaseView):
 
 class ModelView(sqla.ModelView, BaseView):
     """Base Admin view for SQLAlchemy models."""
+
     can_export = True
-    export_types = ['csv']
+    export_types = ["csv"]
     create_modal = True
     edit_modal = True
 
-    def __init__(
-            self,
-            model,
-            session,
-            *args,
-            ignore_columns: List[str] = None,
-            **kwargs
-    ):
+    def __init__(self, model, session, *args, ignore_columns: List[str] = None, **kwargs):
         # Show all columns in form except any in `ignore_columns`
         self.column_list = [
-            c.key for c in model.__table__.columns
-            if c.key not in (ignore_columns or [])
+            c.key for c in model.__table__.columns if c.key not in (ignore_columns or [])
         ]
         self.form_columns = self.column_list
         super().__init__(model, session, *args, **kwargs)

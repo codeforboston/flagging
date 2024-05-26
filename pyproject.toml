@@ -1,0 +1,15 @@
+[tool.ruff]
+line-length = 100
+
+[tool.ruff.lint]
+ignore = []
+select = [
+    "E",
+    "F",
+    "I",
+    "W",
+]
+
+[tool.ruff.lint.isort]
+lines-after-imports = 2
+force-single-line = true

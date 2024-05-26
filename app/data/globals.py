@@ -11,12 +11,11 @@ from app.data.models.reach import Reach
 from app.data.models.website_options import WebsiteOptions
 
 
-T = t.TypeVar('T')
+T = t.TypeVar("T")
 
 
 class Cache(_Cache):
-    """Implementation of the cache that also handles the cached_proxy objects.
-    """
+    """Implementation of the cache that also handles the cached_proxy objects."""
 
     app_context_variables: t.List[str]
 
@@ -47,10 +46,7 @@ class Cache(_Cache):
 cache = Cache()
 
 
-def cached_proxy(
-        func: t.Callable[[], T],
-        key: str
-) -> t.Callable[[], T]:
+def cached_proxy(func: t.Callable[[], T], key: str) -> t.Callable[[], T]:
     """Factory for implementing a cache for a global object accessed via the
     Postgres database.
     """
@@ -73,11 +69,8 @@ def cached_proxy(
     return t.cast(t.Callable[[], T], LocalProxy(_fetch))
 
 
-website_options: WebsiteOptions = \
-    cached_proxy(WebsiteOptions.get, key='website_options')  # type: ignore
+website_options: WebsiteOptions = cached_proxy(WebsiteOptions.get, key="website_options")  # type: ignore
 
-boathouses: t.List[Boathouse] = \
-    cached_proxy(Boathouse.get_all, key='boathouse_list')  # type: ignore
+boathouses: t.List[Boathouse] = cached_proxy(Boathouse.get_all, key="boathouse_list")  # type: ignore
 
-reaches: t.List[Reach] = \
-    cached_proxy(Reach.get_all, key='reach_list')  # type: ignore
+reaches: t.List[Reach] = cached_proxy(Reach.get_all, key="reach_list")  # type: ignore

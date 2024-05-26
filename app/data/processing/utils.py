@@ -5,7 +5,8 @@ from functools import wraps
 import pandas as pd
 from flask import current_app
 
-F = t.TypeVar('F', bound=t.Callable[..., pd.DataFrame])
+
+F = t.TypeVar("F", bound=t.Callable[..., pd.DataFrame])
 
 
 def mock_source(filename: str) -> t.Callable[[F], F]:
@@ -17,16 +18,17 @@ def mock_source(filename: str) -> t.Callable[[F], F]:
 
     This function is a decorator.
     """
+
     def _decorator(func: F) -> F:
         @wraps(func)
         def _wrapper(*args, **kwargs):
-            if current_app.config['USE_MOCK_DATA']:
-                fpath = os.path.join(
-                    current_app.config['DATA_STORE'], filename
-                )
+            if current_app.config["USE_MOCK_DATA"]:
+                fpath = os.path.join(current_app.config["DATA_STORE"], filename)
                 df = pd.read_pickle(fpath)
                 return df
             else:
                 return func(*args, **kwargs)
+
         return _wrapper
+
     return _decorator

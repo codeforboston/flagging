@@ -2,6 +2,7 @@
 Twitter. The message is written by the function `compose_tweet()`, and actually
 sending the message is handled by `tweet_current_status()`.
 """
+
 import warnings
 
 
@@ -25,12 +26,12 @@ def init_tweepy(app: Flask):
     """
     # Pass Twitter API tokens into Tweepy's OAuthHandler
     auth = tweepy.OAuth1UserHandler(
-        consumer_key=app.config['TWITTER_AUTH']['api_key'],
-        consumer_secret=app.config['TWITTER_AUTH']['api_key_secret']
+        consumer_key=app.config["TWITTER_AUTH"]["api_key"],
+        consumer_secret=app.config["TWITTER_AUTH"]["api_key_secret"],
     )
     auth.set_access_token(
-        key=app.config['TWITTER_AUTH']['access_token'],
-        secret=app.config['TWITTER_AUTH']['access_token_secret']
+        key=app.config["TWITTER_AUTH"]["access_token"],
+        secret=app.config["TWITTER_AUTH"]["access_token_secret"],
     )
 
     # Register the auth defined above
@@ -50,7 +51,7 @@ def compose_tweet() -> str:
 
     # Number of boathouses that are not safe. (`not b.safe`)
 
-    current_time = get_current_time().strftime('%I:%M %p, %m/%d/%Y')
+    current_time = get_current_time().strftime("%I:%M %p, %m/%d/%Y")
 
     unsafe_count = len(list(filter(lambda b: not b.safe, boathouses)))
 
@@ -60,7 +61,7 @@ def compose_tweet() -> str:
             f" Charles as of {current_time}. Happy boating!"
         )
     else:
-        some_or_all = 'some' if len(boathouses) > unsafe_count > 0 else 'all'
+        some_or_all = "some" if len(boathouses) > unsafe_count > 0 else "all"
         msg = (
             f"🚩 Red flags are being flown at {some_or_all} boathouses on the"
             f" Lower Charles as of {current_time}. See our website for more"
@@ -77,6 +78,6 @@ def tweet_current_status() -> str:
         The message that was tweeted out.
     """
     msg = compose_tweet()
-    if current_app.config['SEND_TWEETS']:
+    if current_app.config["SEND_TWEETS"]:
         tweepy_api.update_status(msg)
     return msg
