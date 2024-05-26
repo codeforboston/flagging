@@ -1,24 +1,11 @@
 # flake8: noqa: E501
-"""
-This file contains all the logic for modeling. The model takes data from the SQL
-backend, do some calculations on that data, and then output model results.
-
-Useful links:
-
-- Hobolink documentation:
-https://www.metrics24.de/WebRoot/Store5/Shops/62187045/5D79/1FE4/31E4/0996/0440/0A0C/6D0B/7D8C/HOBOlink-Users-Guide.pdf
-
-- Regulatory standards in MA:
-https://www.mass.gov/files/documents/2016/08/tz/36wqara.pdf
-"""
-
 import numpy as np
 import pandas as pd
 
 
-MODEL_YEAR = "2020"
+MODEL_YEAR = "2024"
 
-SIGNIFICANT_RAIN = 0.2
+SIGNIFICANT_RAIN = 0.1
 SAFETY_THRESHOLD = 0.65
 
 
@@ -88,17 +75,15 @@ def process_data(df_hobolink: pd.DataFrame, df_usgs: pd.DataFrame) -> pd.DataFra
     # The code from here on consists of feature transformations.
 
     # Calculate rolling means
-    df["par_1d_mean"] = df["par"].rolling(24).mean()
     df["stream_flow_1d_mean"] = df["stream_flow"].rolling(24).mean()
+    df["pressure_2d_mean"] = df["pressure"].rolling(48).mean()
 
     # Calculate rolling sums
-    df["rain_0_to_24h_sum"] = df["rain"].rolling(24).sum()
-    df["rain_0_to_48h_sum"] = df["rain"].rolling(48).sum()
-    df["rain_24_to_48h_sum"] = df["rain_0_to_48h_sum"] - df["rain_0_to_24h_sum"]
+    df["rain_0_to_12h_sum"] = df["rain"].rolling(12).sum()
 
     # Lastly, they measure the "time since last significant rain." Significant
-    # rain is defined as a cumulative sum of 0.2 in over a 24 hour time period.
-    df["sig_rain"] = df["rain_0_to_24h_sum"] >= SIGNIFICANT_RAIN
+    # rain is defined as a cumulative sum of 0.1 in a 12-hour time period.
+    df["sig_rain"] = df["rain_0_to_12h_sum"] >= SIGNIFICANT_RAIN
     df["last_sig_rain"] = df["time"].where(df["sig_rain"]).ffill().fillna(df["time"].min())
     df["days_since_sig_rain"] = (df["time"] - df["last_sig_rain"]).dt.total_seconds() / 60 / 60 / 24
 
@@ -106,12 +91,13 @@ def process_data(df_hobolink: pd.DataFrame, df_usgs: pd.DataFrame) -> pd.DataFra
 
 
 def reach_2_model(df: pd.DataFrame, rows: int = None) -> pd.DataFrame:
-    """Model params:
-    a- rainfall sum 0-24 hrs
-    d- Days since last rain
-    f- PAR avg 24 hr
-
-    Logistic model: 0.3531*a - 0.0362*d - 0.000312*f + 0.6233
+    """
+    1NBS:
+    𝑎 = 1.444 ∗ 10^2
+    𝑤 = −1.586 ∗ 10^−4
+    𝑥 = 4.785
+    𝑦 = −6.973
+    𝑧 = 1.137
 
     Args:
         df: Input data from `process_data()`
@@ -126,10 +112,11 @@ def reach_2_model(df: pd.DataFrame, rows: int = None) -> pd.DataFrame:
         df = df.tail(n=rows).copy()
 
     df["probability"] = sigmoid(
-        0.6233
-        + 0.3531 * df["rain_0_to_24h_sum"]
-        - 0.0362 * df["days_since_sig_rain"]
-        - 0.000312 * df["par_1d_mean"]
+        14.44
+        - 0.0001586 * df["stream_flow_1d_mean"]
+        + 4.785 * df["pressure_2d_mean"]
+        - 6.973 * df["rain_0_to_12h_sum"]
+        + 1.137 * df["days_since_sig_rain"]
     )
 
     df["safe"] = df["probability"] <= SAFETY_THRESHOLD
@@ -140,14 +127,15 @@ def reach_2_model(df: pd.DataFrame, rows: int = None) -> pd.DataFrame:
 
 def reach_3_model(df: pd.DataFrame, rows: int = None) -> pd.DataFrame:
     """
-    a- rainfall sum 0-24 hrs
-    b- rainfall sum 24-48 hr
-    d- Days since last rain
-
-    Logistic model: 0.267*a + 0.1681*b - 0.02855*d + 0.5157
+    2LARZ:
+    𝑎 = −19.119085
+    𝑤 = −0.001841
+    𝑥 = 0.658676
+    𝑦 = −2.766888
+    𝑧 = 0.642593
 
     Args:
-        df: (pd.DataFrame) Input data from `process_data()`
+        df: Input data from `process_data()`
         rows: (int) Number of rows to return.
 
     Returns:
@@ -159,10 +147,11 @@ def reach_3_model(df: pd.DataFrame, rows: int = None) -> pd.DataFrame:
         df = df.tail(n=rows).copy()
 
     df["probability"] = sigmoid(
-        0.5157
-        + 0.267 * df["rain_0_to_24h_sum"]
-        + 0.1681 * df["rain_24_to_48h_sum"]
-        - 0.02855 * df["days_since_sig_rain"]
+        -19.119085
+        - 0.001841 * df["stream_flow_1d_mean"]
+        + 0.658676 * df["pressure_2d_mean"]
+        - 2.766888 * df["rain_0_to_12h_sum"]
+        + 0.642593 * df["days_since_sig_rain"]
     )
 
     df["safe"] = df["probability"] <= SAFETY_THRESHOLD
@@ -173,11 +162,12 @@ def reach_3_model(df: pd.DataFrame, rows: int = None) -> pd.DataFrame:
 
 def reach_4_model(df: pd.DataFrame, rows: int = None) -> pd.DataFrame:
     """
-    a- rainfall sum 0-24 hrs
-    b- rainfall sum 24-48 hr
-    d- Days since last rain
-    f- PAR avg 24 hr
-    Logistic model: 0.30276*a + 0.1611*b - 0.02267*d - 0.000427*f + 0.5791
+    3BU:
+    𝑎 = −23.96789
+    𝑤 = 0.00248
+    𝑥 = 0.83702
+    𝑦 = −5.34479
+    𝑧 = −0.02940
 
     Args:
         df: (pd.DataFrame) Input data from `process_data()`
@@ -192,11 +182,11 @@ def reach_4_model(df: pd.DataFrame, rows: int = None) -> pd.DataFrame:
         df = df.tail(n=rows).copy()
 
     df["probability"] = sigmoid(
-        0.5791
-        + 0.30276 * df["rain_0_to_24h_sum"]
-        + 0.1611 * df["rain_24_to_48h_sum"]
-        - 0.02267 * df["days_since_sig_rain"]
-        - 0.000427 * df["par_1d_mean"]
+        -23.96789
+        + 0.00248 * df["stream_flow_1d_mean"]
+        + 0.83702 * df["pressure_2d_mean"]
+        - 5.34479 * df["rain_0_to_12h_sum"]
+        - 0.02940 * df["days_since_sig_rain"]
     )
 
     df["safe"] = df["probability"] <= SAFETY_THRESHOLD
@@ -207,10 +197,12 @@ def reach_4_model(df: pd.DataFrame, rows: int = None) -> pd.DataFrame:
 
 def reach_5_model(df: pd.DataFrame, rows: int = None) -> pd.DataFrame:
     """
-    c- rainfall sum 0-48 hr
-    d- Days since last rain
-    e- Flow avg 0-24 hr
-    Logistic model: 0.1091*c - 0.01355*d + 0.000342*e + 0.3333
+    4LONG:
+    𝑎 = −395.24225
+    𝑤 = −0.03635
+    𝑥 = 13.67660
+    𝑦 = −19.65122
+    𝑧 = 11.64241
 
     Args:
         df: (pd.DataFrame) Input data from `process_data()`
@@ -225,10 +217,11 @@ def reach_5_model(df: pd.DataFrame, rows: int = None) -> pd.DataFrame:
         df = df.tail(n=rows).copy()
 
     df["probability"] = sigmoid(
-        0.3333
-        + 0.1091 * df["rain_0_to_48h_sum"]
-        - 0.01355 * df["days_since_sig_rain"]
-        + 0.000342 * df["stream_flow_1d_mean"]
+        -395.24225
+        - 0.03635 * df["stream_flow_1d_mean"]
+        + 13.67660 * df["pressure_2d_mean"]
+        - 19.65122 * df["rain_0_to_12h_sum"]
+        + 11.64241 * df["days_since_sig_rain"]
     )
 
     df["safe"] = df["probability"] <= SAFETY_THRESHOLD

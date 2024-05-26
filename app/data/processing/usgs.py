@@ -5,6 +5,7 @@ gauge.
 Link to the web interface (not the api)
 https://waterdata.usgs.gov/nwis/uv?site_no=01104500
 """
+
 from typing import Union
 
 import pandas as pd
@@ -18,8 +19,8 @@ from app.data.processing.utils import mock_source
 from app.mail import mail_on_fail
 
 
-USGS_URL = 'https://waterdata.usgs.gov/nwis/uv'
-USGS_STATIC_FILE_NAME = 'usgs.pickle'
+USGS_URL = "https://waterdata.usgs.gov/nwis/uv"
+USGS_STATIC_FILE_NAME = "usgs.pickle"
 USGS_DEFAULT_DAYS_AGO = 14
 USGS_ROWS_PER_HOUR = 4
 
@@ -50,24 +51,23 @@ def request_to_usgs(days_ago: int = 14) -> requests.models.Response:
     """
 
     payload = {
-        'cb_00060': 'on',
-        'cb_00065': 'on',
-        'format': 'rdb',
-        'site_no': '01104500',
-        'period': days_ago
+        "cb_00060": "on",
+        "cb_00065": "on",
+        "format": "rdb",
+        "site_no": "01104500",
+        "period": days_ago,
     }
 
     res = requests.get(USGS_URL, params=payload)
     if res.status_code >= 400:
-        error_msg = 'API request to the USGS endpoint failed with status ' \
-                    f'code {res.status_code}.'
+        error_msg = (
+            "API request to the USGS endpoint failed with status " f"code {res.status_code}."
+        )
         abort(500, error_msg)
     return res
 
 
-def parse_usgs_data(
-        res: Union[str, requests.models.Response]
-) -> pd.DataFrame:
+def parse_usgs_data(res: Union[str, requests.models.Response]) -> pd.DataFrame:
     """
     Clean the response from the USGS API.
 
@@ -80,33 +80,27 @@ def parse_usgs_data(
     if isinstance(res, requests.models.Response):
         res = res.text
 
-    raw_data = [
-        i.split('\t')
-        for i in res.split('\n')
-        if not i.startswith('#') and i != ''
-    ]
+    raw_data = [i.split("\t") for i in res.split("\n") if not i.startswith("#") and i != ""]
 
     # First row is column headers
     # Second row is ????
     # Third row downward is the data
     df = pd.DataFrame(raw_data[2:], columns=raw_data[0])
 
-    df = df.rename(columns={
-        'datetime': 'time',
-        '66190_00060': 'stream_flow',
-        '66191_00065': 'gage_height'
-    })
+    df = df.rename(
+        columns={"datetime": "time", "66190_00060": "stream_flow", "66191_00065": "gage_height"}
+    )
 
     # Filter columns
-    df = df[['time', 'stream_flow', 'gage_height']]
+    df = df[["time", "stream_flow", "gage_height"]]
 
     # Convert types
-    df['time'] = pd.to_datetime(df['time'])
+    df["time"] = pd.to_datetime(df["time"])
     # Note to self: ran this once in a test and it gave the following error:
     # >>> ValueError: could not convert string to float: ''
     # Reran and it went away
     # The error was here in this line casting `stream_flow` to a float:
-    df['stream_flow'] = df['stream_flow'].astype(float)
-    df['gage_height'] = df['gage_height'].astype(float)
+    df["stream_flow"] = df["stream_flow"].astype(float)
+    df["gage_height"] = df["gage_height"].astype(float)
 
     return df

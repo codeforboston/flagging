@@ -9,6 +9,7 @@ connected to the actual database in the `create_app` function: the app instance
 is passed in via `db.init_app(app)`, and the `db` object looks for the config
 variable `SQLALCHEMY_DATABASE_URI`.
 """
+
 import os
 from typing import Optional
 
@@ -38,10 +39,7 @@ def execute_sql(query: str) -> Optional[pd.DataFrame]:
     with db.session() as conn:
         res = conn.execute(text(query))
         try:
-            df = pd.DataFrame(
-                res.fetchall(),
-                columns=res.keys()
-            )
+            df = pd.DataFrame(res.fetchall(), columns=res.keys())
             return df
         except ResourceClosedError:
             conn.commit()
@@ -59,29 +57,27 @@ def execute_sql_from_file(file_name: str) -> Optional[pd.DataFrame]:
         Either a Pandas Dataframe the selected data for read queries, or None
         for write queries.
     """
-    path = os.path.join(current_app.config['QUERIES_DIR'], file_name)
+    path = os.path.join(current_app.config["QUERIES_DIR"], file_name)
     with current_app.open_resource(path) as f:
-        s = f.read().decode('utf8')
+        s = f.read().decode("utf8")
         return execute_sql(s)
 
 
 @init_db_callback
 def init_db():
     import alembic.config
-    alembic.config.main(['upgrade', 'head'])
 
-    execute_sql_from_file('define_reach.sql')
-    execute_sql_from_file('define_boathouse.sql')
-    execute_sql_from_file('define_default_options.sql')
+    alembic.config.main(["upgrade", "head"])
+
+    execute_sql_from_file("define_reach.sql")
+    execute_sql_from_file("define_boathouse.sql")
+    execute_sql_from_file("define_default_options.sql")
 
     # Now update the database
     from app.data.processing.core import update_db
+
     update_db()
 
 
 def get_current_time() -> pd.Timestamp:
-    return (
-        pd.Timestamp('now', tz='UTC')
-        .tz_convert('US/Eastern')
-        .tz_localize(None)
-    )
+    return pd.Timestamp("now", tz="UTC").tz_convert("US/Eastern").tz_localize(None)

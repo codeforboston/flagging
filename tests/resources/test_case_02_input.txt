@@ -1,4 +1,4 @@
-Data Format: 
+Data Format:
   dateTimeDelimiter: " "
   decimalSeparator: "."
   dataDelimiter: ","
@@ -7,7 +7,7 @@ Data Format:
   gmtOffset: -5
   daylightSavings: false
 
-Logger Info: 
+Logger Info:
  - &1
     launchDescription: "Charles River Weather Station"
     model: RX3000
@@ -17,7 +17,7 @@ Logger Info:
     firmwareVersion: 1.15
     firmwareVersionRaw: 0
     deploymentNumber: 1
-Series Info: 
+Series Info:
   - name: "Pressure"
     type: value
     unitName: "inHg"

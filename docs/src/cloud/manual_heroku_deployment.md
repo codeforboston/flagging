@@ -71,7 +71,7 @@ heroku addons:create heroku-postgresql -a crwa-flagging
 ```
 
 ???+ success
-    Pay attention to the last line of output: 
+    Pay attention to the last line of output:
 
     ```
     Creating heroku-postgresql on ⬢ crwa-flagging... free
@@ -80,7 +80,7 @@ heroku addons:create heroku-postgresql -a crwa-flagging
      ! data from another database with pg:copy
     Created postgresql-ukulele-12345 as DATABASE_URL
     ```
-    
+
     In the above case, `postgresql-ukulele-12345` is the "name" of the PostgreSQL add-on's dyno. We will be using this name in the next step.
 
 
@@ -147,7 +147,7 @@ git push heroku master
 
 ???+ tip
     If you are having any issues here related to merge conflicts, instead of deleting everything and starting over, try to pull the data from the `heroku` branch in and merge it into your local branch.
-    
+
     ```shell
     git fetch heroku
     git pull heroku master
@@ -181,7 +181,7 @@ git remote -v
 
 ???+ success
     The above command should output something like this:
-  
+
     ```
     heroku  https://git.heroku.com/crwa-flagging.git (fetch)
     heroku  https://git.heroku.com/crwa-flagging.git (push)

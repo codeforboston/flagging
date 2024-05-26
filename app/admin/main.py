@@ -16,7 +16,7 @@ from app.admin.views.website_options import WebsiteOptionsModelView
 from app.data.database import db
 
 
-admin = Admin(template_mode='bootstrap3', index_view=AdminIndexView())
+admin = Admin(template_mode="bootstrap3", index_view=AdminIndexView())
 
 
 def init_admin(app: Flask):
@@ -26,16 +26,16 @@ def init_admin(app: Flask):
     Args:
         app: A Flask application instance.
     """
+
     @app.before_request
     def auth_protect_admin_pages():
         """Authorize all paths that start with /admin/."""
-        if re.match('^/admin(?:$|/+)', request.path):
-
+        if re.match("^/admin(?:$|/+)", request.path):
             # Force HTTPS
-            if app.config['ENV'] == 'development':
+            if app.config["ENV"] == "development":
                 pass
             elif not request.is_secure:
-                url = request.url.replace('http://', 'https://', 1)
+                url = request.url.replace("http://", "https://", 1)
                 return redirect(url)
 
             # Now check if logged in. (Error is raised if not authorized.)
@@ -50,8 +50,6 @@ def init_admin(app: Flask):
         admin.add_view(WebsiteOptionsModelView(db.session))
         admin.add_view(ManualOverridesModelView(db.session))
         admin.add_view(BoathouseModelView(db.session))
-        admin.add_view(DatabaseView(name='Update Database', url='db/update',
-                                    category='Manage DB'))
-        admin.add_view(DownloadView(name='Download', url='db/download',
-                                    category='Manage DB'))
-        admin.add_view(LogoutView(name='Logout', url='logout'))
+        admin.add_view(DatabaseView(name="Update Database", url="db/update", category="Manage DB"))
+        admin.add_view(DownloadView(name="Download", url="db/download", category="Manage DB"))
+        admin.add_view(LogoutView(name="Logout", url="logout"))

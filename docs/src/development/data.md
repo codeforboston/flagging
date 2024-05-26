@@ -25,7 +25,7 @@ When you run `run_unix_dev.sh` (OSX) or `run_windows_dev.bat`, it will run these
 
 ???+ tip
     You can access your local PostgreSQL instance using the command `psql`. Here are some helpful commands inside the PSQL terminal:
-    
+
     * `\q`: Quit.
     * `\l`: Show what databases are available.
     * `\c [database_name]`: Connect to a database.
@@ -69,7 +69,7 @@ There are two sources of data for our website:
 1. An API hosted by the USGS National Water Information System API that's hooked up to a Waltham based stream gauge (herein **"USGS" data**);
 2. An API for a HOBOlink RX3000 Remote Monitoring Station device stationed on the Charles River (herein **"HOBOlink" data**).
 
-#### USGS 
+#### USGS
 
 The code for retrieving and processing the HOBOlink data is in `app/data/usgs.py`.
 
@@ -90,7 +90,7 @@ The HOBOlink device captures various information about the Charles River at the 
 - Rainfall
 
 The HOBOlink data is accessed through a REST API using the following environment variables for authorization:
- 
+
 - `HOBOLINK_PASSWORD`
 - `HOBOLINK_USERNAME`
 - `HOBOLINK_TOKEN`
@@ -105,20 +105,20 @@ As you can see from the above, the HOBOlink API is a bit finicky for whatever re
 
 ???+ note
     Our code is unit-tested against real HOBOlink outputs we've previously received that displayed weird data and caused problems for us:
-    
+
     - `test_case_01_input.txt`: Duplicative columns and `Time, GMT-04:00`.
     - `test_case_02_input.txt`: `Time, GMT-05:00`.
-    
+
     The file `tests/test_data.py` runs the raw inputs and makes sure it processes the same outputs.
-    
+
     If you in the future run into another HOBOlink output that causes errors, fix it then add the HOBOlink response to the test cases. You can generate such test cases by entering the `flask shell` and then running:
-    
+
     ```python
     res = request_to_hobolink()
     s = res.text
     open('test_case.txt', 'w+').write(s)
     ```
-    
+
     Then `exit()` after everything looks fine.
 
 ???+ tip
@@ -136,10 +136,10 @@ The database connection is managed by an object inside `database.py`, called `db
 
 ???+ note
     SQLAlchemy is a Python library used to connect Python code to a SQL database. It's a pretty advanced framework with lots of ways to use it.
-    
+
     We tried our best to only use the more advanced features of SQLAlchemy, e.g. the "ORM," for connecting the front-end to the database. We tried to avoid using these advanced features of SQLAlchemy when connecting the predictive model to the database.
 
-The `db` object does a lot for us. We use it in two main ways: 
+The `db` object does a lot for us. We use it in two main ways:
 
 1. to connect to the database, read from it, and write to it. As of writing we use the Pandas function `pd.read_sql()`, passing in the `db` object, to read the `model_outputs` data.
 2. to create database "models" (database models are models of the table schemas; these are not the same as the predictive models). These models are stored inside of `boathouses.py` and `live_website_options.py`, and are used extensively in the front-end.

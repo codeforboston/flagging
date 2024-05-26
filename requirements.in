@@ -38,15 +38,13 @@ pytest
 pytest-celery
 pytest-cov
 pytest-postgresql<4.0.0
-pytest-flask-sqlalchemy
 schemathesis
 
 # ==========================================================
 # Misc. dev stuff
 # ==========================================================
 
-flake8
-isort
+ruff
 uv
 pre-commit
 

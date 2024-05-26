@@ -9,16 +9,16 @@ from app.data.globals import cache
 class LogoutView(BaseView):
     """Returns a logout page that uses a jQuery trick to emulate a logout."""
 
-    @expose('/')
+    @expose("/")
     def index(self):
-        body = self.render('admin/logout.html')
+        body = self.render("admin/logout.html")
         status = 401
         cache.clear()
         return body, status
 
 
 class AdminIndexView(BaseView, _AdminIndexView):
-    @expose('/reset-cache')
+    @expose("/reset-cache")
     def reset_cache(self):
         cache.clear()
-        return redirect('/admin')
+        return redirect("/admin")

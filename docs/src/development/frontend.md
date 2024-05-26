@@ -60,13 +60,13 @@ It doesn't make sense to go through all the labor of processing a page 1,000 tim
 We use a simple cache-aside design for our frontend pages:
 
 - The first time a page is loaded, if it is not in the cache, then build the page.
-- If the page is loaded subsequently, 
+- If the page is loaded subsequently,
 - The _entire_ cache is cleared whenever a change to the database is made, either via the admin panel or via the `update_db()` command.
 - The cache entries have natural expiration (time to live, or "ttl") of 7 hours. As long as the scheduler works properly, cache entries should never expire on their own, though.
 
 ???+ note
     Yes, we clear the _entire_ cache after _every_ database update, even when the page we cached would hot have been affected by the database change.
-    
+
     It's not worth maintaining code for nuanced cache-clearing logic, where it only clears the cache for a page that would have been affected by a change. We get 99% of the performance boost and save ourselves a massive debugging headache.
 
 In production, we use [Redis](https://redis.io/topics/lru-cache) for server-side caching. Heroku automatically gives us a `REDIS_URL` environment variable that we can reference, and the Python packages `Flask-Caching` and `redis` handle the rest.
@@ -81,7 +81,7 @@ In development and testing, we use Werkzeug's [SimpleCache](https://werkzeug.pal
 Swagger is the organization behind the [OpenAPI Specification](https://swagger.io/specification/), or "OAS."
 
 OAS is very "meta" and easier to explain via example. If my endpoint always returns a positive integer labeled "foo," then these would all be valid responses:
- 
+
 - `#!json {"foo": 5}`
 - `#!json {"foo": 123}`
 - `#!json {"foo": 50000}`

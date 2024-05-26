@@ -11,26 +11,26 @@ from app.data.models.boathouse import Boathouse
 
 def auth_to_header(auth: str) -> dict:
     if auth is not None:
-        auth_encoded = b64encode(auth.encode()).decode('utf-8')
-        headers = {'Authorization': f'Basic {auth_encoded}'}
+        auth_encoded = b64encode(auth.encode()).decode("utf-8")
+        headers = {"Authorization": f"Basic {auth_encoded}"}
     else:
         headers = {}
     return headers
 
 
 @pytest.mark.parametrize(
-    ('page', 'expected_status_code'),
+    ("page", "expected_status_code"),
     [
-        ('/', 200),
-        ('/about', 200),
-        ('/model', 200),
-        ('/flags', 200),
-        ('/api', 200),
-        ('/api/docs', 200),
-        ('/api/v1/model', 200),
-        ('/api/v1/boathouses', 200),
-        ('/api/v1/model_input_data', 200),
-    ]
+        ("/", 200),
+        ("/about", 200),
+        ("/model", 200),
+        ("/flags", 200),
+        ("/api", 200),
+        ("/api/docs", 200),
+        ("/api/v1/model", 200),
+        ("/api/v1/boathouses", 200),
+        ("/api/v1/model_input_data", 200),
+    ],
 )
 def test_pages(client, page, expected_status_code):
     """Test that pages render without errors. This test is very broad; the
@@ -45,58 +45,53 @@ def test_pages(client, page, expected_status_code):
 
 
 @pytest.mark.parametrize(
-    ('page', 'auth', 'expected_status_code'),
+    ("page", "auth", "expected_status_code"),
     [
-        ('/admin/', None, 401),
-        ('/admin/', 'bad:credentials', 401),
-
-        ('/admin/boathouses/', None, 401),
-        ('/admin/boathouses/', 'bad:credentials', 401),
-
-        ('/admin/websiteoptions/', None, 401),
-        ('/admin/websiteoptions/', 'bad:credentials', 401),
-
-        ('/admin/', 'admin:password', 200),
-        ('/admin/websiteoptions/', 'admin:password', 302),
-        ('/admin/manual_overrides/', 'admin:password', 200),
-        ('/admin/boathouses/', 'admin:password', 200),
-        ('/admin/db/update/', 'admin:password', 200),
-        ('/admin/db/download/', 'admin:password', 200),
-    ]
+        ("/admin/", None, 401),
+        ("/admin/", "bad:credentials", 401),
+        ("/admin/boathouses/", None, 401),
+        ("/admin/boathouses/", "bad:credentials", 401),
+        ("/admin/websiteoptions/", None, 401),
+        ("/admin/websiteoptions/", "bad:credentials", 401),
+        ("/admin/", "admin:password", 200),
+        ("/admin/websiteoptions/", "admin:password", 302),
+        ("/admin/manual_overrides/", "admin:password", 200),
+        ("/admin/boathouses/", "admin:password", 200),
+        ("/admin/db/update/", "admin:password", 200),
+        ("/admin/db/download/", "admin:password", 200),
+    ],
 )
 def test_admin_pages(client, page, auth, expected_status_code):
     headers = auth_to_header(auth)
-    res = client.get(page, headers=headers, base_url='https://localhost')
-
+    res = client.get(page, headers=headers)
     assert res.status_code == expected_status_code
 
 
 @pytest.mark.parametrize(
-    ('page', 'auth', 'expected_status_code'),
+    ("page", "auth", "expected_status_code"),
     [
         # Valid
-        ('/admin/db/download/csv/src/hobolink', 'admin:password', 200),
-        ('/admin/db/download/csv/src/usgs', 'admin:password', 200),
-        ('/admin/db/download/csv/src/processed_data', 'admin:password', 200),
-        ('/admin/db/download/csv/src/prediction', 'admin:password', 200),
-        ('/admin/db/download/csv/src/boathouse', 'admin:password', 200),
-        ('/admin/db/download/csv/src/override_history', 'admin:password', 200),
-        ('/admin/db/download/csv/src_sync/processed_data_v1_source', 'admin:password', 200),  # noqa
-        ('/admin/db/download/csv/src_sync/processed_data_v2_source', 'admin:password', 200),  # noqa
-        ('/admin/db/download/csv/src_sync/hobolink_source', 'admin:password', 200),
-        ('/admin/db/download/csv/src_sync/usgs_source', 'admin:password', 200),
-        ('/admin/db/download/csv/src_sync/prediction_v1_source', 'admin:password', 200),
-        ('/admin/db/download/csv/src_sync/prediction_v2_source', 'admin:password', 200),
-
+        ("/admin/db/download/csv/src/hobolink", "admin:password", 200),
+        ("/admin/db/download/csv/src/usgs", "admin:password", 200),
+        ("/admin/db/download/csv/src/processed_data", "admin:password", 200),
+        ("/admin/db/download/csv/src/prediction", "admin:password", 200),
+        ("/admin/db/download/csv/src/boathouse", "admin:password", 200),
+        ("/admin/db/download/csv/src/override_history", "admin:password", 200),
+        ("/admin/db/download/csv/src_sync/processed_data_v1_source", "admin:password", 200),  # noqa
+        ("/admin/db/download/csv/src_sync/processed_data_v2_source", "admin:password", 200),  # noqa
+        ("/admin/db/download/csv/src_sync/hobolink_source", "admin:password", 200),
+        ("/admin/db/download/csv/src_sync/usgs_source", "admin:password", 200),
+        ("/admin/db/download/csv/src_sync/prediction_v1_source", "admin:password", 200),
+        ("/admin/db/download/csv/src_sync/prediction_v2_source", "admin:password", 200),
         # Errors
-        ('/admin/db/download/csv/arbitrary_table', 'admin:password', 404),
-        ('/admin/db/download/csv/boathouse', 'bad:credentials', 401),
-        ('/admin/db/download/csv/hobolink_source', None, 401),
-    ]
+        ("/admin/db/download/csv/arbitrary_table", "admin:password", 404),
+        ("/admin/db/download/csv/boathouse", "bad:credentials", 401),
+        ("/admin/db/download/csv/hobolink_source", None, 401),
+    ],
 )
 def test_admin_downloads(client, page, auth, expected_status_code):
     headers = auth_to_header(auth)
-    res = client.get(page, headers=headers, base_url='https://localhost')
+    res = client.get(page, headers=headers)
     assert res.status_code == expected_status_code
 
 
@@ -111,11 +106,8 @@ def test_override_on_home_page(client, db_session, cache):
     """
 
     def _get_flag_count():
-        res = client.get('/boathouses').data
-        return {
-            'blue': res.count(b'blue_flag.png'),
-            'red': res.count(b'red_flag.png')
-        }
+        res = client.get("/boathouses").data
+        return {"blue": res.count(b"blue_flag.png"), "red": res.count(b"red_flag.png")}
 
     # First let's get the home page.
     flags1 = _get_flag_count()
@@ -126,15 +118,14 @@ def test_override_on_home_page(client, db_session, cache):
     cache.clear()
     flags2 = _get_flag_count()
 
-    assert flags2['red'] == flags1['red']
-    assert flags2['blue'] == flags1['blue']
+    assert flags2["red"] == flags1["red"]
+    assert flags2["blue"] == flags1["blue"]
 
     # Now update the entry in the database.
 
-    db_session \
-        .query(Boathouse) \
-        .filter(Boathouse.name == 'Union Boat Club') \
-        .update({"overridden": True})
+    db_session.query(Boathouse).filter(Boathouse.name == "Union Boat Club").update(
+        {"overridden": True}
+    )
     db_session.commit()
 
     # Without clearing the cache, the page should be the exact same, even
@@ -142,8 +133,8 @@ def test_override_on_home_page(client, db_session, cache):
 
     flags3 = _get_flag_count()
 
-    assert flags3['red'] == flags1['red']
-    assert flags3['blue'] == flags1['blue']
+    assert flags3["red"] == flags1["red"]
+    assert flags3["blue"] == flags1["blue"]
 
     # Now let's clear the cache. At long last, now the page should change
     # because both the model updated and the cache cleared.
@@ -151,24 +142,23 @@ def test_override_on_home_page(client, db_session, cache):
     cache.clear()
     flags4 = _get_flag_count()
 
-    assert flags4['red'] == flags1['red'] + 1
-    assert flags4['blue'] == flags1['blue'] - 1
+    assert flags4["red"] == flags1["red"] + 1
+    assert flags4["blue"] == flags1["blue"] - 1
 
 
 @pytest.mark.parametrize(
-    ('template_name', 'script_name', 'expected_columns'),
+    ("template_name", "script_name", "expected_columns"),
     [
-        ('api/_boathouses.py.jinja',
-         'test_script_boathouses',
-         ['boathouse', 'latitude', 'reach']),
-        ('api/_model_outputs.py.jinja',
-         'test_script_model_outputs',
-         ['reach', 'prediction', 'safe'])
-    ]
+        ("api/_boathouses.py.jinja", "test_script_boathouses", ["boathouse", "latitude", "reach"]),
+        (
+            "api/_model_outputs.py.jinja",
+            "test_script_model_outputs",
+            ["reach", "prediction", "safe"],
+        ),
+    ],
 )
 def test_pandas_code_snippets(
-        app, client, tmpdir, monkeypatch,
-        template_name, script_name, expected_columns
+    app, client, tmpdir, monkeypatch, template_name, script_name, expected_columns
 ):
     """Bit of a complicated test, but TLDR: test that the API example Python
     scripts work.
@@ -179,34 +169,24 @@ def test_pandas_code_snippets(
     """
     # We need to mock a few things to test that the Pandas code works:
 
-    monkeypatch.setitem(
-        app.jinja_env.globals,
-        'url_for',
-        lambda loc, **kwargs: loc
-    )
+    monkeypatch.setitem(app.jinja_env.globals, "url_for", lambda loc, **kwargs: loc)
 
     class MockResponse:
         def __init__(self, data):
             self.json = lambda: json.loads(data)
 
     def _get(loc: str, **kwargs):
-        reversed_url_map = {
-            i.endpoint: i.rule
-            for i
-            in app.url_map.iter_rules()
-        }
+        reversed_url_map = {i.endpoint: i.rule for i in app.url_map.iter_rules()}
         res = client.get(reversed_url_map[loc])
         return MockResponse(data=res.data)
 
-    monkeypatch.setattr(requests, 'get', _get)
+    monkeypatch.setattr(requests, "get", _get)
 
     # Now let's render the code:
 
-    py_code = app.jinja_env \
-        .get_template(template_name) \
-        .render()
+    py_code = app.jinja_env.get_template(template_name).render()
 
-    f = tmpdir.mkdir('code').join(f'{script_name}.py')
+    f = tmpdir.mkdir("code").join(f"{script_name}.py")
     f.write(py_code)
 
     # Import the script as a module
@@ -214,29 +194,29 @@ def test_pandas_code_snippets(
     __import__(script_name)
     mod = sys.modules[script_name]
 
-    assert hasattr(mod, 'df')
+    assert hasattr(mod, "df")
     assert isinstance(mod.df, pd.DataFrame)  # noqa
     for c in expected_columns:
         assert c in mod.df.columns  # noqa
 
 
 @pytest.mark.parametrize(
-    ('page', 'cors_expected'),
+    ("page", "cors_expected"),
     [
-        ('/admin/', False),
-        ('/api/v1/boathouses', True),
-        ('/flags', True),
-    ]
+        ("/admin/", False),
+        ("/api/v1/boathouses", True),
+        ("/flags", True),
+    ],
 )
 def test_cors(client, page, cors_expected):
-    headers = auth_to_header('admin:password')
-    res = client.get(page, headers=headers, base_url='https://localhost')
+    headers = auth_to_header("admin:password")
+    res = client.get(page, headers=headers)
 
     assert res.status_code == 200
 
-    cors_actual = 'Access-Control-Allow-Origin' in res.headers
+    cors_actual = "Access-Control-Allow-Origin" in res.headers
 
     if cors_actual:
-        assert res.headers['Access-Control-Allow-Origin'] == '*'
+        assert res.headers["Access-Control-Allow-Origin"] == "*"
 
     assert cors_expected == cors_actual

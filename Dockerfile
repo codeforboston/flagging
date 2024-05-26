@@ -1,7 +1,5 @@
 FROM python:3.12
 
-MAINTAINER Daniel Reeves "xdanielreeves@gmail.com"
-
 ADD --chmod=755 https://astral.sh/uv/install.sh /install.sh
 RUN /install.sh && rm /install.sh
 
