@@ -2,7 +2,7 @@
 
 ???+ tip
     Unless you want to overhaul the website or do some bugfixing, you _probably_ don't need to learn any of the frameworks here.
-    
+
     The Flagging Website documentation is detailed, self-contained, and should cover the vast majority of use cases for the Flagging website from an administrative perspective, such as updating the predictive model and deploying the website to Heroku.
 
 The code base is mainly built with the following frameworks; all of these but the last one are Python frameworks:

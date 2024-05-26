@@ -29,4 +29,3 @@ The Charles River Watershed Association ("CRWA") was formed in 1965, the same ye
 > CRWA is one of the country’s oldest watershed organizations and has figured prominently in major cleanup and protection efforts. Since our earliest days of advocacy, we have worked with government officials and citizen groups from 35 Massachusetts watershed towns from Hopkinton to Boston.
 
 The EPA also relies on sample data collected by the CRWA to construct its report card.
-

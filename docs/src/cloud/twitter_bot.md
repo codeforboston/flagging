@@ -35,7 +35,7 @@ Follow these steps to set up the Twitter bot for the first time, such as on a ne
 
 ???+ success
     The `.env` file should look something like this when you're done:
-    
+
     ```
     TWITTER_API_KEY=T5jlO9KNtL2UyffM7s0UhYkks
     TWITTER_API_KEY_SECRET=O4Er0BNzyWWjyPcHxGjiDtFXh4zTYMJmWIGLUBKzaOePMKnhba

@@ -33,70 +33,70 @@ Install all of the following programs onto your computer:
 
 === "Windows (CMD)"
     1. Download [here](https://www.postgresql.org/download/windows/) and install via the executable.
-    
+
     2. (If you had any terminals open, close out and reopen after Postgres installation.)
-    
+
     3. Open command prompt and try the following (case-sensitive): `psql -V` If it returns the version number then you're set.
-    
+
     4. If you get an error about the command not being recognized, then it might mean you need to manually add Postgres's bin to your PATH ([see here](https://stackoverflow.com/a/11567231)).
 
 === "OSX (Bash)"
 
     1. If you do not have Homebrew installed, install it from [here](https://brew.sh/).
-    
+
     2. Via a bash terminal: `brew install postgres`
-    
+
     3. Test that it works by running (case-sensitive): `psql -V`. If it returns the version number then you're set.
 
 ???+ tip
     Chances are you are not going to need Postgres to run in the background constantly, so you should learn how to turn it off and back on.
-    
+
     === "Windows (CMD)"
-        
+
         **Turn Postgres on/off:**
-        
+
         1. Go to the Start menu and open up "Run..."
-        
+
         2. `services.msc` -> ++enter++. This opens the Services panel.
-        
+
         3. Look for the name _postgresql_ and start/stop Postgres.
-        
+
         **Keep Postgres from running at startup:**
-        
+
         (Via the Services panel) As long as the service is "manual" and not automatic, it will not load at startup.
-        
+
     === "OSX (Bash)"
-        
+
         **Turn Postgres on:**
-        
+
         ```shell
         pg_ctl -D /usr/local/var/postgres start
         ```
-        
+
         **Turn Postgres off:**
-        
+
         ```shell
         pg_ctl -D /usr/local/var/postgres stop
         ```
-        
+
         ---
-        
+
         There's a way I personally prefer, but it's sometimes a little hassle to set up. Install Lunchy via `brew install lunchy`. (There may be some additional configuration required.) Then your off and on commands are:
-        
+
         **Turn Postgres on (Lunchy):**
-        
+
         ```shell
         lunchy start postgres
         ```
-        
+
         **Turn Postgres off (Lunchy):**
-        
+
         ```shell
         lunchy stop postgres
         ```
-        
+
         **Keep Postgres from running at startup:**
-        
+
         Some solutions [here](https://superuser.com/questions/244589/prevent-postgresql-from-running-at-startup).
 
 ## Download and Setup the Code Base
@@ -128,7 +128,7 @@ echo "FLASK_ENV=development" >>.env
     If you do any commits to the repo, _please make sure `.env` is properly gitignored!_ (`.flaskenv` does not need to be gitignored, only `.env`.) `.env` contains sensitive information.
 
 5. The previous step created a file called `.env` (pronounced "dot env"). This file will eventually contain our HOBOlink credentials, Twitter credentials, and potentially Postgres credentials as well.
-    
+
     In this step, we will add HOBOlink credentials to the `.env` file. Run the following, replacing `replace_me` with the corresponding credentials. (`>>` means "append to the end of a file," so you can do one at a time and it won't overwrite anything).
 
 ```shell
@@ -155,7 +155,7 @@ After you get everything set up, you should run the website at least once. The p
 
 ???+ note
     The script being run is doing the following, in order:
-    
+
     1. Set up a "virtual environment" (basically an isolated folder inside your project directory that we install the Python packages into),
     2. install the packages inside of `requirements/dev.txt`; this can take a while during your first time.
     3. Set up some environment variables that Flask needs.
@@ -165,7 +165,7 @@ After you get everything set up, you should run the website at least once. The p
 
 ???+ tip
     If you are receiving any errors related to the Postgres database and you are certain that Postgres is running on your computer, you can modify the `POSTGRES_USER` and `POSTGRES_PASSWORD` environment variables to connect to your local Postgres instance properly.
-    
+
     You can also save these Postgres environment variables inside of your `.env` file, but **do not** save your system password (the password you use to login to your computer) in a plain text file. If you need to save a `POSTGRES_PASSWORD` in `.env`, make sure it's a unique password, e.g. an admin user `POSTGRES_USER=flagging` and a password you randomly generated for that user `POSTGRES_PASSWORD=my_random_password_here`.
 
 2. You will be prompted asking if you want to run the website with mock data. The `USE_MOCK_DATA` variable is a way to run the website with dummy data without accessing the credentials. It is useful for anyone who wants to run a demo of the website regardless of their affiliation with the CRWA or this project. It has also been useful for development purposes in the past for us.
@@ -174,7 +174,7 @@ After you get everything set up, you should run the website at least once. The p
 
 ???+ success
     You should be good if you eventually see something like the following in your terminal:
-    
+
     ```
      * Serving Flask app "app:create_app" (lazy loading)
      * Environment: development

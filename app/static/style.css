@@ -165,7 +165,7 @@ nav a:hover {
   border-top: thin solid #dce9f2;
   box-shadow: 0 4px 10px -2px #dce9f2;
   overflow: hidden;
-  
+
   max-height: 300px; /* exclusively for transition */
   transition: padding 0.3s, max-height 0.3s, border-top-width 0.3s;
 }
@@ -288,7 +288,7 @@ nav a:hover {
   border: 1px solid black;
   border-collapse: collapse;
   padding: 15px;
-  margin: 0 auto;            
+  margin: 0 auto;
 }
 
 .twitter-tweet {

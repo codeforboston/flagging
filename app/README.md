@@ -1,4 +1,4 @@
-# `/app` Content 
+# `/app` Content
 
   - `/blueprints`: custom endpoints for the flagging website (all the logic that helps to render the HTML pages or JSONs.)
   - `/data`: database, predictive models, and functions to retrieve live data.

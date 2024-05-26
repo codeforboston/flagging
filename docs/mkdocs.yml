@@ -46,7 +46,7 @@ markdown_extensions:
     custom_fences:
     - name: mermaid
       class: mermaid
-      format: !!python/name:pymdownx.superfences.fence_div_format
+      format: "!!python/name:pymdownx.superfences.fence_div_format"
 - sane_lists
 extra:
   flagging_website_url: https://crwa-flagging.herokuapp.com
