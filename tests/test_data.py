@@ -3,6 +3,7 @@ import os
 import pandas as pd
 import pytest
 from pandas.testing import assert_frame_equal
+from sqlalchemy import text
 
 from app.data.models.boathouse import Boathouse
 from app.data.processing import hobolink
@@ -84,7 +85,7 @@ def test_boathouse_trigger(db_session):
     def number_of_rows(r):
         return len([i for i in r])
 
-    before = db_session.execute('''SELECT * FROM override_history;''')
+    before = db_session.execute(text('''SELECT * FROM override_history;'''))
 
     db_session \
         .query(Boathouse) \
@@ -92,6 +93,6 @@ def test_boathouse_trigger(db_session):
         .update({"overridden": True})
     db_session.commit()
 
-    after = db_session.execute('''SELECT * FROM override_history;''')
+    after = db_session.execute(text('''SELECT * FROM override_history;'''))
 
     assert number_of_rows(after) == number_of_rows(before) + 1

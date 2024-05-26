@@ -16,7 +16,7 @@ else:
     app = create_app()
 
 db_uri = app.config["SQLALCHEMY_DATABASE_URI"]
-db = app.extensions["sqlalchemy"].db
+db = app.extensions["sqlalchemy"]
 
 # Provide access to the values within alembic.ini.
 config = context.config

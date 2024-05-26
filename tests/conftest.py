@@ -77,6 +77,28 @@ def _db(app):
 
 
 @pytest.fixture
+def db_session(app, _db):
+    with app.app_context():
+        engines = _db.engines
+
+    cleanup = []
+
+    for key, engine in engines.items():
+        c = engine.connect()
+        t = c.begin()
+        engines[key] = c
+        cleanup.append((key, engine, c, t))
+
+    with _db.session() as session:
+        yield session
+
+    for key, engine, c, t in cleanup:
+        t.rollback()
+        c.close()
+        engines[key] = engine
+
+
+@pytest.fixture
 def cli_runner(app):
     return app.test_cli_runner()
 
