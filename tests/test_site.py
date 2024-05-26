@@ -64,7 +64,6 @@ def test_pages(client, page, expected_status_code):
 def test_admin_pages(client, page, auth, expected_status_code):
     headers = auth_to_header(auth)
     res = client.get(page, headers=headers)
-
     assert res.status_code == expected_status_code
 
 

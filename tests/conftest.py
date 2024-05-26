@@ -2,6 +2,7 @@ from unittest.mock import patch
 
 import pytest
 from flask import g
+from flask.testing import FlaskClient
 from pytest_postgresql.janitor import DatabaseJanitor
 
 from app.data.database import init_db
@@ -46,7 +47,7 @@ def live_app(app):
 
 
 @pytest.fixture(scope="function")
-def client(app):
+def client(app) -> FlaskClient:
     """A test client for the app. You can think of the test like a web browser;
     it retrieves data from the website in a similar way that a browser would.
     """

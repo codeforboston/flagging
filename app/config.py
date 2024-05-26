@@ -261,6 +261,7 @@ class TestingConfig(Config):
     """
 
     ENV: str = "testing"
+    PREFERRED_URL_SCHEME: str = "https"
     SEND_TWEETS: bool = True  # Won't actually send tweets.
     TESTING: bool = True
     CACHE_TYPE: str = "flask_caching.backends.simple"
@@ -269,6 +270,8 @@ class TestingConfig(Config):
     POSTGRES_DB: str = os.getenv("POSTGRES_DB", "flagging") + "_test"
     MAIL_USERNAME = "admin@admin.com"
     MAIL_ERROR_ALERTS_TO = "some@email.com"
+    BASIC_AUTH_USERNAME: str = "admin"
+    BASIC_AUTH_PASSWORD: str = "password"
 
 
 class DemoConfig(ProductionConfig):
