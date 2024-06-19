@@ -21,6 +21,7 @@ blinker==1.8.2
     # via
     #   flask
     #   flask-mail
+    #   sentry-sdk
 cachelib==0.9.0
     # via flask-caching
 celery==5.4.0
@@ -33,6 +34,7 @@ certifi==2024.2.2
     #   httpcore
     #   httpx
     #   requests
+    #   sentry-sdk
 cfgv==3.4.0
     # via pre-commit
 charset-normalizer==3.3.2
@@ -84,6 +86,7 @@ flask==3.0.3
     #   flask-mail
     #   flask-postgres
     #   flask-sqlalchemy
+    #   sentry-sdk
 flask-admin==1.6.1
     # via -r requirements.in
 flask-basicauth==0.2.0
@@ -169,6 +172,7 @@ markupsafe==2.1.5
     # via
     #   jinja2
     #   mako
+    #   sentry-sdk
     #   werkzeug
     #   wtforms
 mdurl==0.1.2
@@ -288,6 +292,8 @@ ruff==0.4.5
     # via -r requirements.in
 schemathesis==3.28.1
     # via -r requirements.in
+sentry-sdk==2.6.0
+    # via -r requirements.in
 setuptools==70.0.0
     # via
     #   flask-db
@@ -343,6 +349,7 @@ urllib3==2.2.1
     # via
     #   docker
     #   requests
+    #   sentry-sdk
 uv==0.2.3
     # via -r requirements.in
 vine==5.1.0

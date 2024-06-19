@@ -125,20 +125,14 @@ def predict_v3_task(*args, **kwargs) -> RecordsType:
 
 
 @celery_app.task
-def update_db_task() -> None:
-    from app.data.processing.core import update_db
-
-    update_db()
-
-
-@celery_app.task
-def update_website_task() -> None:
+def update_db_task(tweet_status: bool = False) -> None:
     from app.data.globals import website_options
     from app.data.processing.core import update_db
-    from app.twitter import tweet_current_status
 
     update_db()
-    if website_options.boating_season:
+    if tweet_status and website_options.boating_season:
+        from app.twitter import tweet_current_status
+
         tweet_current_status()
 
 
@@ -161,5 +155,4 @@ predict_v1_task: WithAppContextTask
 predict_v2_task: WithAppContextTask
 predict_v3_task: WithAppContextTask
 update_db_task: WithAppContextTask
-update_website_task: WithAppContextTask
 send_database_exports_task: WithAppContextTask

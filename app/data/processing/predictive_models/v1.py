@@ -56,16 +56,16 @@ def process_data(df_hobolink: pd.DataFrame, df_usgs: pd.DataFrame) -> pd.DataFra
         df_hobolink.groupby("time")
         .agg(
             {
-                "pressure": np.mean,
-                "par": np.mean,
-                "rain": np.sum,
-                "rh": np.mean,
-                "dew_point": np.mean,
-                "wind_speed": np.mean,
-                "gust_speed": np.mean,
-                "wind_dir": np.mean,
+                "pressure": "mean",
+                "par": "mean",
+                "rain": "sum",
+                "rh": "mean",
+                "dew_point": "mean",
+                "wind_speed": "mean",
+                "gust_speed": "mean",
+                "wind_dir": "mean",
                 # 'water_temp': np.mean,
-                "air_temp": np.mean,
+                "air_temp": "mean",
             }
         )
         .reset_index()

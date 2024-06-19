@@ -202,6 +202,9 @@ class Config:
         "pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw",
     )  # noqa
 
+    SENTRY_DSN: str | None = os.getenv("SENTRY_DSN")
+    SENTRY_ENVIRONMENT: str | None = os.getenv("SENTRY_ENVIRONMENT")
+
 
 class ProductionConfig(Config):
     """The Production Config is used for deployment of the website to the

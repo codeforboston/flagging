@@ -87,6 +87,16 @@ def register_extensions(app: Flask):
     cors = CORS(resources={"/api/*": {"origins": "*"}, "/flags": {"origins": "*"}})
     cors.init_app(app)
 
+    if app.config.get("SENTRY_DSN"):
+        import sentry_sdk
+
+        sentry_sdk.init(
+            dsn=app.config["SENTRY_DSN"],
+            environment=app.config.get("SENTRY_ENVIRONMENT") or app.config.get["FLASK_ENV"],
+            traces_sample_rate=1.0,
+            profiles_sample_rate=1.0,
+        )
+
 
 def register_blueprints(app: Flask):
     """Register the "blueprints." Blueprints are basically like mini web apps
@@ -262,41 +272,25 @@ def register_commands(app: Flask):
         help="If set, then run this command in Celery."
         " This can help save a bit of money on Heroku compute.",
     )
+    @click.option(
+        "--tweet-status/--dont-tweet-status",
+        is_flag=True,
+        default=False,
+        help="If set, then send a tweet indicating the status of the flags.",
+    )
     @with_appcontext
     @mail_on_fail
-    def update_db_command(async_: bool = False):
+    def update_db_command(async_: bool = False, tweet_status: bool = False):
         """Update the database with the latest live data."""
         from app.data.celery import update_db_task
 
         if async_:
-            res = update_db_task.delay()
+            res = update_db_task.delay(tweet_status=tweet_status)
             click.echo(f"Started update database task ({res.id!r}).")
         else:
             click.echo("Updating the database...")
-            update_db_task.run()
+            update_db_task.run(tweet_status=tweet_status)
             click.echo("Updated the database successfully.")
-
-    @app.cli.command("update-website")
-    @click.option(
-        "--async",
-        "async_",
-        is_flag=True,
-        default=False,
-        help="If set, then run this command in Celery."
-        " This can help save a bit of money on Heroku compute.",
-    )
-    @mail_on_fail
-    def update_website_command(async_: bool = False):
-        """Updates the database, then Tweets a message."""
-        from app.data.celery import update_website_task
-
-        if async_:
-            res = update_website_task.delay()
-            click.echo(f"Started update website task ({res.id!r}).")
-        else:
-            click.echo("Updating the website...")
-            update_website_task.run()
-            click.echo("Updated the website successfully.")
 
     @app.cli.command("gen-mock-data")
     @dev_only

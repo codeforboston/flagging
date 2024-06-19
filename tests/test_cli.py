@@ -30,19 +30,8 @@ def mail_send():
         yield mocked_func
 
 
-@pytest.mark.parametrize("cmd", ["update-db", "update-website"])
-def test_update_runs(cmd, app, cli_runner, mock_update_db, mock_send_tweet):
-    res = cli_runner.invoke(app.cli, [cmd])
-
-    assert res.exit_code == 0
-    assert mock_update_db.call_count == 1
-
-    if cmd == "update-db":
-        assert mock_send_tweet.call_count == 0
-
-
 def test_mail_when_error_raised(mail_send, app, cli_runner, monkeypatch, db_session):
-    # This should not cause an email to be send:
+    # This should not cause an email to be sent:
     monkeypatch.setattr(core, "update_db", lambda: None)
     cli_runner.invoke(app.cli, ["update-db"])
     assert mail_send.call_count == 0
@@ -59,7 +48,7 @@ def test_mail_when_error_raised(mail_send, app, cli_runner, monkeypatch, db_sess
 def test_no_tweet_off_season(app, db_session, cli_runner, mock_update_db, mock_send_tweet):
     # Default database state (i.e. during testing) is boating_season is true.
     # So "update-website" should send a tweet.
-    res = cli_runner.invoke(app.cli, ["update-website"])
+    res = cli_runner.invoke(app.cli, ["update-db", "--tweet-status"])
     assert res.exit_code == 0
     assert mock_update_db.call_count == 1
     assert mock_send_tweet.call_count == 1
@@ -72,7 +61,7 @@ def test_no_tweet_off_season(app, db_session, cli_runner, mock_update_db, mock_s
 
     # No tweets should go out when it's not boating season.
     # The call count should not have gone up since the previous assert.
-    res = cli_runner.invoke(app.cli, ["update-website"])
+    res = cli_runner.invoke(app.cli, ["update-db", "--tweet-status"])
     assert res.exit_code == 0
     assert mock_update_db.call_count == 2
     assert mock_send_tweet.call_count == 1
