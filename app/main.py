@@ -89,9 +89,11 @@ def register_extensions(app: Flask):
 
     if app.config.get("SENTRY_DSN"):
         import sentry_sdk
+        from sentry_sdk.integrations.flask import FlaskIntegration
 
         sentry_sdk.init(
             dsn=app.config["SENTRY_DSN"],
+            integrations=[FlaskIntegration()],
             environment=app.config.get("SENTRY_ENVIRONMENT") or app.config.get["FLASK_ENV"],
             traces_sample_rate=1.0,
             profiles_sample_rate=1.0,
