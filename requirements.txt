@@ -58,7 +58,7 @@ click-repl==0.3.0
     # via celery
 colorama==0.4.6
     # via schemathesis
-coverage==7.5.1
+coverage[toml]==7.5.1
     # via pytest-cov
 debugpy==1.8.1
     # via pytest-celery
@@ -292,13 +292,8 @@ ruff==0.4.5
     # via -r requirements.in
 schemathesis==3.28.1
     # via -r requirements.in
-sentry-sdk==2.6.0
+sentry-sdk[flask]==2.6.0
     # via -r requirements.in
-setuptools==70.0.0
-    # via
-    #   flask-db
-    #   nodeenv
-    #   pytest-celery
 six==1.16.0
     # via
     #   flasgger
@@ -332,7 +327,7 @@ tomli==2.0.1
     # via schemathesis
 tomli-w==1.0.0
     # via schemathesis
-tornado==6.4
+tornado==6.4.1
     # via flower
 tweepy==4.14.0
     # via -r requirements.in
