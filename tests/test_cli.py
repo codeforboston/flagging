@@ -31,7 +31,7 @@ def mail_send():
 
 
 def test_mail_when_error_raised(mail_send, app, cli_runner, monkeypatch, db_session):
-    # This should not cause an email to be send:
+    # This should not cause an email to be sent:
     monkeypatch.setattr(core, "update_db", lambda: None)
     cli_runner.invoke(app.cli, ["update-db"])
     assert mail_send.call_count == 0
@@ -61,7 +61,7 @@ def test_no_tweet_off_season(app, db_session, cli_runner, mock_update_db, mock_s
 
     # No tweets should go out when it's not boating season.
     # The call count should not have gone up since the previous assert.
-    res = cli_runner.invoke(app.cli, ["update-website"])
+    res = cli_runner.invoke(app.cli, ["update-db", "--tweet-status"])
     assert res.exit_code == 0
     assert mock_update_db.call_count == 2
     assert mock_send_tweet.call_count == 1

@@ -62,14 +62,14 @@ def process_data(df_hobolink: pd.DataFrame, df_usgs: pd.DataFrame) -> pd.DataFra
         df_usgs.groupby("time")
         .agg(
             {
-                "log_stream_flow": np.mean,
+                "log_stream_flow": "mean",
             }
         )
         .reset_index()
     )
     df_hobolink = (
         df_hobolink.groupby("time")
-        .agg({"rain": np.sum, "log_air_temp": np.mean, "days_since_sig_rain": np.min})
+        .agg({"rain": "sum", "log_air_temp": "mean", "days_since_sig_rain": "min"})
         .reset_index()
     )
 

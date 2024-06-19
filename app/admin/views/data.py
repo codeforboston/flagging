@@ -117,50 +117,48 @@ class DownloadView(BaseView):
 
     @expose("/csv/src/hobolink_source")
     def source_hobolink(self):
-        async_result = live_hobolink_data_task.s(export_name="code_for_boston_export_90d").delay()
+        async_result = live_hobolink_data_task.delay(export_name="code_for_boston_export_90d")
         return redirect(
             url_for("admin_downloadview.csv_wait", task_id=async_result.id, data_source="hobolink")
         )
 
     @expose("/csv/src/usgs_source")
     def source_usgs(self):
-        async_result = live_usgs_data_task.s(days_ago=90).delay()
+        async_result = live_usgs_data_task.delay(days_ago=90)
         return redirect(
             url_for("admin_downloadview.csv_wait", task_id=async_result.id, data_source="usgs")
         )
 
     @expose("/csv/src/processed_data_v1_source")
     def source_combine_data_v1(self):
-        async_result = combine_data_v1_task.s(
+        async_result = combine_data_v1_task.delay(
             export_name="code_for_boston_export_90d", days_ago=90
-        ).delay()
+        )
         return redirect(
             url_for("admin_downloadview.csv_wait", task_id=async_result.id, data_source="combined")
         )
 
     @expose("/csv/src/processed_data_v2_source")
     def source_combine_data_v2(self):
-        async_result = combine_data_v2_task.s(
+        async_result = combine_data_v2_task.delay(
             export_name="code_for_boston_export_90d", days_ago=90
-        ).delay()
+        )
         return redirect(
             url_for("admin_downloadview.csv_wait", task_id=async_result.id, data_source="combined")
         )
 
     @expose("/csv/src/processed_data_v3_source")
     def source_combine_data_v3(self):
-        async_result = combine_data_v3_task.s(
+        async_result = combine_data_v3_task.delay(
             export_name="code_for_boston_export_90d", days_ago=90
-        ).delay()
+        )
         return redirect(
             url_for("admin_downloadview.csv_wait", task_id=async_result.id, data_source="combined")
         )
 
     @expose("/csv/src/prediction_v1_source")
     def source_prediction_v1(self):
-        async_result = predict_v1_task.s(
-            export_name="code_for_boston_export_90d", days_ago=90
-        ).delay()
+        async_result = predict_v1_task.delay(export_name="code_for_boston_export_90d", days_ago=90)
         return redirect(
             url_for(
                 "admin_downloadview.csv_wait", task_id=async_result.id, data_source="prediction"
@@ -169,9 +167,7 @@ class DownloadView(BaseView):
 
     @expose("/csv/src/prediction_v2_source")
     def source_prediction_v2(self):
-        async_result = predict_v2_task.s(
-            export_name="code_for_boston_export_90d", days_ago=90
-        ).delay()
+        async_result = predict_v2_task.delay(export_name="code_for_boston_export_90d", days_ago=90)
         return redirect(
             url_for(
                 "admin_downloadview.csv_wait", task_id=async_result.id, data_source="prediction"
@@ -180,9 +176,7 @@ class DownloadView(BaseView):
 
     @expose("/csv/src/prediction_v3_source")
     def source_prediction_v3(self):
-        async_result = predict_v3_task.s(
-            export_name="code_for_boston_export_90d", days_ago=90
-        ).delay()
+        async_result = predict_v3_task.delay(export_name="code_for_boston_export_90d", days_ago=90)
         return redirect(
             url_for(
                 "admin_downloadview.csv_wait", task_id=async_result.id, data_source="prediction"
