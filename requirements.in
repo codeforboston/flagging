@@ -27,6 +27,7 @@ redis
 requests
 rich-click
 SQLAlchemy
+sentry-sdk[flask]
 tenacity
 tweepy
 
