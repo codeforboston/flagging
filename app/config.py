@@ -203,6 +203,7 @@ class Config:
     )  # noqa
 
     SENTRY_DSN: str | None = os.getenv("SENTRY_DSN")
+    SENTRY_ENVIRONMENT: str | None = os.getenv("SENTRY_ENVIRONMENT")
 
 
 class ProductionConfig(Config):
