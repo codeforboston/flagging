@@ -58,7 +58,7 @@ click-repl==0.3.0
     # via celery
 colorama==0.4.6
     # via schemathesis
-coverage==7.5.1
+coverage[toml]==7.5.1
     # via pytest-cov
 debugpy==1.8.1
     # via pytest-celery
@@ -93,7 +93,7 @@ flask-basicauth==0.2.0
     # via -r requirements.in
 flask-caching==2.3.0
     # via -r requirements.in
-flask-cors==4.0.1
+flask-cors==5.0.0
     # via -r requirements.in
 flask-db==0.4.1
     # via -r requirements.in
@@ -292,13 +292,8 @@ ruff==0.4.5
     # via -r requirements.in
 schemathesis==3.28.1
     # via -r requirements.in
-sentry-sdk==2.6.0
+sentry-sdk[flask]==2.6.0
     # via -r requirements.in
-setuptools==70.0.0
-    # via
-    #   flask-db
-    #   nodeenv
-    #   pytest-celery
 six==1.16.0
     # via
     #   flasgger
