@@ -2,7 +2,11 @@
 
 This is a guide on how to do your first-time setup for running the website locally and getting ready to make changes to the code base. If you are a developer, you should follow this guide before doing anything else!
 
-This guide assumes you're a complete beginner at Python, Git, Postgres, etc. so don't be intimidated if you don't know what all of these things are. The main thing this guide assumes is that you know how to open up a terminal in your respective operating system (command prompt or "CMD" in Windows, and bash in OSX).
+This guide assumes you're a complete beginner at Python, Git, Postgres, etc. so don't be intimidated if you don't know what all of these things are. The main thing this guide assumes is that you know how to open up a terminal in your respective operating system (command prompt or Powershell in Windows, and bash/zsh in OSX).
+
+**We strongly recommend running this project via Docker Compose.** You can attempt to run the project without Docker Compose, but instructions are not included.
+
+**We also strongly recommend using `uv` for Python binary + dependency management.**
 
 ## Dependencies
 
@@ -10,94 +14,18 @@ Install all of the following programs onto your computer:
 
 **Required:**
 
-- [Python 3](https://www.python.org/downloads/) - specifically 3.8 or higher
+- [uv](https://docs.astral.sh/uv/#getting-started)
 - [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) (first time setup guide [here](https://git-scm.com/book/en/v2/Getting-Started-First-Time-Git-Setup))
-- [Postgres](https://www.postgresql.org/) _(see installation instructions below)_
-- [7zip](https://www.7-zip.org/) (If on OSX, install via Homebrew: `brew install p7zip`)
-- _(OSX only)_ [Homebrew](https://brew.sh/)
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 
 **Recommended:**
 
-- A good text editor or IDE, such as [Atom.io](https://atom.io/) (which is lightweight and beginner friendly) or [PyCharm](https://www.jetbrains.com/pycharm/) (which is powerful but bulky and geared toward advanced users).
+- A good text editor or IDE, such as [PyCharm](https://www.jetbrains.com/pycharm/) (which is powerful but bulky and geared toward advanced users).
 - [Heroku CLI](https://devcenter.heroku.com/articles/heroku-cli) _(required for remote deployment to Heroku.)_
-- _(OSX only)_ Lunchy: `brew install lunchy`. This makes it easier to run data services from the command line.
 
 **Other:**
 
 - It is strongly recommend that you create a [GitHub account](https://github.com/) if you haven't done so already. The GitHub account should have the same email as the one registered to your `git config --global user.email` that you set in the first time git setup.
-
-???+ warning
-    _(Windows users only)_ At least two Windows users have had problems getting Python working in Windows for the first time. Check out some people troubleshooting various Python installation related issues [on StackOverflow](https://stackoverflow.com/questions/13596505/python-not-working-in-command-prompt). Also note that the command to run Python in Windows may be `python`, `python3`, `py`, or `py3`. Figure out which one works for you.
-
-### Postgres installation
-
-=== "Windows (CMD)"
-    1. Download [here](https://www.postgresql.org/download/windows/) and install via the executable.
-
-    2. (If you had any terminals open, close out and reopen after Postgres installation.)
-
-    3. Open command prompt and try the following (case-sensitive): `psql -V` If it returns the version number then you're set.
-
-    4. If you get an error about the command not being recognized, then it might mean you need to manually add Postgres's bin to your PATH ([see here](https://stackoverflow.com/a/11567231)).
-
-=== "OSX (Bash)"
-
-    1. If you do not have Homebrew installed, install it from [here](https://brew.sh/).
-
-    2. Via a bash terminal: `brew install postgres`
-
-    3. Test that it works by running (case-sensitive): `psql -V`. If it returns the version number then you're set.
-
-???+ tip
-    Chances are you are not going to need Postgres to run in the background constantly, so you should learn how to turn it off and back on.
-
-    === "Windows (CMD)"
-
-        **Turn Postgres on/off:**
-
-        1. Go to the Start menu and open up "Run..."
-
-        2. `services.msc` -> ++enter++. This opens the Services panel.
-
-        3. Look for the name _postgresql_ and start/stop Postgres.
-
-        **Keep Postgres from running at startup:**
-
-        (Via the Services panel) As long as the service is "manual" and not automatic, it will not load at startup.
-
-    === "OSX (Bash)"
-
-        **Turn Postgres on:**
-
-        ```shell
-        pg_ctl -D /usr/local/var/postgres start
-        ```
-
-        **Turn Postgres off:**
-
-        ```shell
-        pg_ctl -D /usr/local/var/postgres stop
-        ```
-
-        ---
-
-        There's a way I personally prefer, but it's sometimes a little hassle to set up. Install Lunchy via `brew install lunchy`. (There may be some additional configuration required.) Then your off and on commands are:
-
-        **Turn Postgres on (Lunchy):**
-
-        ```shell
-        lunchy start postgres
-        ```
-
-        **Turn Postgres off (Lunchy):**
-
-        ```shell
-        lunchy stop postgres
-        ```
-
-        **Keep Postgres from running at startup:**
-
-        Some solutions [here](https://superuser.com/questions/244589/prevent-postgresql-from-running-at-startup).
 
 ## Download and Setup the Code Base
 
@@ -121,27 +49,30 @@ git fetch upstream
 4. In your newly created `flagging` folder, run the following:
 
 ```shell
-echo "FLASK_ENV=development" >>.env
+cp -n .env.example .env
 ```
 
 ???+ danger
-    If you do any commits to the repo, _please make sure `.env` is properly gitignored!_ (`.flaskenv` does not need to be gitignored, only `.env`.) `.env` contains sensitive information.
+    If you do any commits to the repo, _please make sure `.env` is properly gitignored!_ (`.env.example` does not need to be gitignored, only `.env`.) `.env` contains sensitive information.
 
-5. The previous step created a file called `.env` (pronounced "dot env"). This file will eventually contain our HOBOlink credentials, Twitter credentials, and potentially Postgres credentials as well.
+5. The previous step created a file called `.env` (pronounced "dot env"). This file will contain our HOBOlink credentials and Twitter/X credentials.
 
-    In this step, we will add HOBOlink credentials to the `.env` file. Run the following, replacing `replace_me` with the corresponding credentials. (`>>` means "append to the end of a file," so you can do one at a time and it won't overwrite anything).
+    Please update `.env` (**_NOT_** `.env.example`) to contain the correct credentials by replacing each `replace_me`. The Twitter/X credentials are optional.
 
-```shell
-echo "HOBOLINK_USERNAME=replace_me" >>.env
-echo "HOBOLINK_PASSWORD=replace_me" >>.env
-echo "HOBOLINK_TOKEN=replace_me" >>.env
-```
+    If you do not have HOBOlink credentials, please turn on demo mode by setting `FLASK_ENV=demo`.
 
 ## Run the Website Locally
 
-After you get everything set up, you should run the website at least once. The process of running the website installs the remaining dependencies, and sets up a virtual environment to work in.
+After you get everything set up, you should run the website at least once.
 
-1. Run the following:
+1. Although not strictly required for running the website (as we will be using Docker Compose), it is recommended you install all the project dependencies into a virtual environment.
+
+    To do this, run the following:
+
+    ```
+    uv pip sync requirements.txt
+    ```
+
 
 === "Windows (CMD)"
     ```shell

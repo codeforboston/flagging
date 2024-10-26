@@ -27,9 +27,6 @@ export FLASK_APP=app:create_app
 export FLASK_ENV=development
 # export DATABASE_URL=$(heroku config:get DATABASE_URL)
 
-read -p "Use mock data? [y/n]: " use_mock_data
-export USE_MOCK_DATA=${use_mock_data:-${USE_MOCK_DATA}}
-
 flask create-db
 flask init-db
 flask clear-cache

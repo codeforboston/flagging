@@ -8,8 +8,8 @@ this module, they won't refresh.
 
 import os
 import os.path as op
-from distutils.util import strtobool
 
+from distutils.util import strtobool
 from flask.cli import load_dotenv
 
 

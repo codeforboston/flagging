@@ -6,7 +6,7 @@ RUN /install.sh && rm /install.sh
 WORKDIR /app
 COPY requirements.txt ./requirements.txt
 
-RUN /root/.cargo/bin/uv pip install --system --no-cache -r requirements.txt
+RUN /root/.cargo/bin/uv sync --system --no-cache
 
 COPY ./ .
 

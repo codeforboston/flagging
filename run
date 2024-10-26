@@ -34,28 +34,23 @@ function cmd {
 
 function flask {
   # Run any Flask commands
-  cmd flask "${@}"
+  cmd uvx flask "${@}"
 }
 
 function lint:dockerfile {
   # Lint Dockerfile
-  docker container run --rm -i \
-    hadolint/hadolint hadolint --ignore DL3008 "${@}" - < Dockerfile
+  docker container run --rm -i -v ./Dockerfile:/Dockerfile \
+    hadolint/hadolint hadolint "${@}" /Dockerfile
 }
 
 function lint {
   # Lint Python code
-  cmd flake8 "${@}"
-}
-
-function format {
-  # Format Python code
-  cmd black . "${@}"
+  cmd uvx ruff check "${@}"
 }
 
 function test {
   # Run test suite
-  cmd python -m pytest "${@}"
+  cmd uvx python -m pytest "${@}"
 }
 
 function shell {
