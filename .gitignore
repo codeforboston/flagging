@@ -5,6 +5,8 @@ docs/site/
 pgadmin4/
 mkdocs_env/
 latest.dump
+server.crt
+server.key
 
 # Created by https://www.toptal.com/developers/gitignore/api/python,pycharm,windows,osx,visualstudiocode
 # Edit at https://www.toptal.com/developers/gitignore?templates=python,pycharm,windows,osx,visualstudiocode

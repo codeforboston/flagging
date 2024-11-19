@@ -182,7 +182,8 @@ def register_jinja_env(app: Flask):
     @app.template_filter("strftime")
     def strftime(value: datetime.datetime, fmt: str = "%Y-%m-%d %I:%M:%S %p") -> str:
         """Render datetimes with a default format for the frontend."""
-        return value.strftime(fmt)
+        if value:
+            return value.strftime(fmt)
 
     def _load_svg(file_name: str):
         """Load an svg file from `static/images/`."""
@@ -372,6 +373,7 @@ def register_commands(app: Flask):
     )
     @mail_on_fail
     def email_90_day_data_command(async_: bool = False):
+        """Send email containing database dump."""
         from app.data.celery import send_database_exports_task
 
         if async_:

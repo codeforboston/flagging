@@ -1,0 +1,57 @@
+# ==========================================================
+# Core
+# ==========================================================
+
+Celery
+click
+flasgger
+Flask-Admin
+Flask-BasicAuth
+Flask-Caching
+flask-cors
+Flask-DB
+Flask-Mail
+Flask-SQLAlchemy
+flask-postgres
+flask-talisman
+Flask
+flower
+Jinja2
+markdown
+pandas
+psycopg2-binary
+pyarrow
+python-dotenv
+PyYAML
+redis
+requests
+rich-click
+SQLAlchemy
+sentry-sdk[flask]
+tenacity
+tweepy
+
+# ==========================================================
+# Testing
+# ==========================================================
+
+pytest
+pytest-celery
+pytest-cov
+pytest-postgresql<4.0.0
+schemathesis
+
+# ==========================================================
+# Misc. dev stuff
+# ==========================================================
+
+ruff
+uv
+pre-commit
+
+# ==========================================================
+# Webserver
+# ==========================================================
+
+gunicorn>19
+inotify  # For --reload flag

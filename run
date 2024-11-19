@@ -27,6 +27,18 @@ function _build_run_down {
 
 # -----------------------------------------------------------------------------
 
+function ssl-cert {
+  # If you'd like to run in https
+  openssl genrsa -out server.key 2048
+  openssl req -new -x509 -nodes \
+    -config server.cnf \
+    -key server.key \
+    -out server.crt \
+    -days 365
+  chmod 600 server.key
+  chmod 644 server.crt
+}
+
 function cmd {
   # Run any command you want in the web container
   _dc web "${@}"
@@ -34,7 +46,7 @@ function cmd {
 
 function flask {
   # Run any Flask commands
-  cmd uvx flask "${@}"
+  cmd flask "${@}"
 }
 
 function lint:dockerfile {
@@ -45,12 +57,12 @@ function lint:dockerfile {
 
 function lint {
   # Lint Python code
-  cmd uvx ruff check "${@}"
+  cmd ruff check "${@}"
 }
 
 function test {
   # Run test suite
-  cmd uvx python -m pytest "${@}"
+  cmd python -m pytest "${@}"
 }
 
 function shell {

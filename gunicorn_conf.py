@@ -19,6 +19,10 @@ def gen_config():
     _host = os.getenv("HOST", "0.0.0.0")
     _port = os.getenv("PORT", "80")
     bind = os.getenv("BIND", f"{_host}:{_port}")
+    if os.getenv("CERTFILE"):
+        certfile = os.getenv("CERTFILE")
+    if os.getenv("KEYFILE"):
+        keyfile = os.getenv("KEYFILE")
 
     return {k: v for k, v in locals().items() if not k.startswith("_")}
 

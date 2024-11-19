@@ -12,8 +12,7 @@ class LogoutView(BaseView):
     @expose("/")
     def index(self):
         body = self.render("admin/logout.html")
-        status = 401
-        cache.clear()
+        status = 200
         return body, status
 
 
