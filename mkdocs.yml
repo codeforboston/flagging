@@ -6,20 +6,20 @@ repo_url: https://github.com/codeforboston/flagging
 repo_name: codeforboston/flagging
 docs_dir: docs/src
 nav:
-- Home: index.md
-- About: about.md
-- Setup: setup.md
-- Admin: admin.md
-- Cloud:
+  - Home: index.md
+  - About: about.md
+  - Setup: setup.md
+  - Admin: admin.md
+  - Cloud:
     - Overview: cloud/index.md
     # - Manual Deployment: cloud/manual_heroku_deployment.md
     - Twitter Bot: cloud/twitter_bot.md
-- Development:
+  - Development:
     - Overview: development/index.md
     - Data: development/data.md
     - Predictive Models: development/predictive_models.md
     - Front-End: development/frontend.md
-- Development Resources:
+  - Development Resources:
     - Overview: development_resources/index.md
     - Learning Resources: development_resources/learning_resources.md
     - Shell: development_resources/shell.md
@@ -37,18 +37,18 @@ theme:
 plugins:
   - macros
 markdown_extensions:
-- admonition
-- pymdownx.tabbed: # https://facelessuser.github.io/pymdown-extensions/
-    alternate_style: true
-- pymdownx.keys
-- pymdownx.details
-- pymdownx.inlinehilite
-- pymdownx.superfences:
-    custom_fences:
-      - name: mermaid
-        class: mermaid
-        format: "!!python/name:pymdownx.superfences.fence_code_format"
-- sane_lists
+  - admonition
+  - pymdownx.tabbed: # https://facelessuser.github.io/pymdown-extensions/
+      alternate_style: true
+  - pymdownx.keys
+  - pymdownx.details
+  - pymdownx.inlinehilite
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - sane_lists
 extra:
   flagging_website_url: https://crwa-flagging.herokuapp.com
   social:
