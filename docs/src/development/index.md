@@ -1,6 +1,6 @@
 # Development - Overview
 
-??? note
+???+ note
     **(Nov 2024 update)** We cannot guarantee that anything in the Development section is fully up-to-date. This should be considered a historic document. The best explanation for how the code works will ultimately be the code itself.
 
 The Development guide is aimed at users who wish to understand the code base and make changes to it if need be.

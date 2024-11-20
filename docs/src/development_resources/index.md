@@ -1,6 +1,6 @@
 # Stack
 
-??? info
+???+ info
     **(Nov 2024 update)** This document is more of a historic document to authoritatively resolve questions regarding the stack decisions. It is not an ongoing, active document. Consider this document archived.
 
     A small handful of the things in this document are no longer true or have not fully panned out, notably:
