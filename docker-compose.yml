@@ -29,7 +29,8 @@ services:
   web:
     <<: *app-config
     ports:
-      - 80:80
+      - "127.0.0.1:80:80"
+      - "127.0.0.1:443:443"
     depends_on:
       - postgres
     links:
@@ -72,7 +73,7 @@ services:
 
   celeryworker:
     <<: *app-config
-    entrypoint: ["flask", "celery", "worker", "--uid", "nobody", "--gid", "nogroup"]
+    entrypoint: ["flask", "celery", "worker"]
     ports:
       - 5555:5555
     depends_on:

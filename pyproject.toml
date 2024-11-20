@@ -1,3 +1,10 @@
+[project]
+name = "flagging"
+version = "0.1.0"
+description = "App for Charles River Watershed Assocaition's Flagging Program"
+readme = "README.md"
+requires-python = "~=3.12"
+
 [tool.ruff]
 line-length = 100
 

@@ -5,18 +5,19 @@
 {% block tail %}
     {{ super() }}
     <script>
-        $(document).ready(function(){
+        $(document).ready(setTimeout(function(){
             $.ajax({
                async: false,
                type: "GET",
                url: "{{ url_for('admin.index') }}",
-               username: "logout"
+               username: "x-logout",
+               password: "x-logout"
             })
             .done(function(){
             })
             .fail(function(){
                 window.location.href = "{{ url_for('flagging.index') }}";
             });
-        });
+        }, 500));
     </script>
 {% endblock %}

@@ -8,8 +8,8 @@ this module, they won't refresh.
 
 import os
 import os.path as op
-from distutils.util import strtobool
 
+from distutils.util import strtobool
 from flask.cli import load_dotenv
 
 
@@ -192,15 +192,7 @@ class Config:
 
     DEFAULT_WIDGET_VERSION: int = 2
 
-    MAPBOX_ACCESS_TOKEN: str = os.getenv(
-        "MAPBOX_ACCESS_TOKEN",
-        # This is a token that's floating around the web in a lot of quickstart
-        # examples for LeafletJS, and seems to work. ¯\_(ツ)_/¯
-        #
-        # You should not use it ideally, but as a default for very quick runs
-        # and demos, it should be OK.
-        "pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw",
-    )  # noqa
+    MAPBOX_ACCESS_TOKEN: str = os.getenv("MAPBOX_ACCESS_TOKEN")
 
     SENTRY_DSN: str | None = os.getenv("SENTRY_DSN")
     SENTRY_ENVIRONMENT: str | None = os.getenv("SENTRY_ENVIRONMENT")

@@ -1,15 +1,15 @@
-FROM python:3.12
-
-ADD --chmod=755 https://astral.sh/uv/install.sh /install.sh
-RUN /install.sh && rm /install.sh
+FROM python:3.12-slim
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
 WORKDIR /app
-COPY requirements.txt ./requirements.txt
+ENV UV_PROJECT_ENVIRONMENT=/usr/local
 
-RUN /root/.cargo/bin/uv pip install --system --no-cache -r requirements.txt
+RUN --mount=type=cache,target=/root/.cache/uv \
+    --mount=type=bind,source=requirements.txt,target=requirements.txt \
+    uv pip install -r requirements.txt --compile-bytecode --system
 
-COPY ./ .
+COPY . /app
 
-EXPOSE 80
+EXPOSE 80 443
 
 CMD ["bash", "-c", "flask db migrate && gunicorn -c gunicorn_conf.py app.main:create_app\\(\\)"]

@@ -19,7 +19,7 @@ flower
 Jinja2
 markdown
 pandas
-psycopg2
+psycopg2-binary
 pyarrow
 python-dotenv
 PyYAML

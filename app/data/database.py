@@ -69,10 +69,6 @@ def init_db():
 
     alembic.config.main(["upgrade", "head"])
 
-    execute_sql_from_file("define_reach.sql")
-    execute_sql_from_file("define_boathouse.sql")
-    execute_sql_from_file("define_default_options.sql")
-
     # Now update the database
     from app.data.processing.core import update_db
 
