@@ -50,7 +50,6 @@ click==8.1.7
     #   click-plugins
     #   click-repl
     #   flask
-    #   flask-postgres
     #   rich-click
     #   schemathesis
 click-didyoumean==0.3.1
@@ -85,7 +84,6 @@ flask==3.1.0
     #   flask-cors
     #   flask-db
     #   flask-mail
-    #   flask-postgres
     #   flask-sqlalchemy
     #   sentry-sdk
 flask-admin==1.6.1
@@ -100,13 +98,10 @@ flask-db==0.4.1
     # via -r requirements.in
 flask-mail==0.10.0
     # via -r requirements.in
-flask-postgres==0.2.5
-    # via -r requirements.in
 flask-sqlalchemy==3.1.1
     # via
     #   -r requirements.in
     #   flask-db
-    #   flask-postgres
 flask-talisman==1.1.0
     # via -r requirements.in
 flower==2.0.1
@@ -324,7 +319,6 @@ sqlalchemy==2.0.36
     #   -r requirements.in
     #   alembic
     #   flask-db
-    #   flask-postgres
     #   flask-sqlalchemy
     #   sqlalchemy-utils
 sqlalchemy-utils==0.41.2

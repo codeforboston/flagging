@@ -5,7 +5,6 @@ from flask import g
 from flask.testing import FlaskClient
 from pytest_postgresql.janitor import DatabaseJanitor
 
-from app.data.database import init_db
 from app.data.globals import cache as _cache
 from app.data.processing.core import update_db
 from app.main import create_app
@@ -73,7 +72,9 @@ def _db(app):
     from app.data.database import db
 
     with app.app_context():
-        init_db()
+        import alembic.config
+
+        alembic.config.main(["upgrade", "head"])
         update_db()
         yield db
 

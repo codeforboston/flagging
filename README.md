@@ -21,7 +21,7 @@ This code base is built in Python 3.10+ and utilizes the Flask library heavily. 
 ```shell
 docker compose build
 docker compose up -d
-docker compose exec web flask psql init
+docker compose exec flask update-db
 docker compose up
 ```
 

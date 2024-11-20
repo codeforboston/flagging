@@ -12,7 +12,6 @@ flask-cors
 Flask-DB
 Flask-Mail
 Flask-SQLAlchemy
-flask-postgres
 flask-talisman
 Flask
 flower

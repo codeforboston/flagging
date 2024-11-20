@@ -4,7 +4,7 @@
   "buildpacks": [
     { "url": "heroku/python" }
   ],
-  "scripts": { "postdeploy": "flask psql init" },
+  "scripts": { "postdeploy": "flask update-db" },
   "addons": [
     "scheduler",
     "mailgun:starter",
@@ -58,7 +58,7 @@
     "SECRET_KEY": { "generator": "secret" },
     "SEND_TWEETS": {
       "description": "If false, then 'flask update-website' doesn't send tweets.",
-      "value": "true"
+      "value": "false"
     },
     "USE_CELERY": {
       "value":  "true",
