@@ -225,6 +225,10 @@ class ProductionConfig(Config):
             )
             print(msg)
             raise
+        self.CACHE_REDIS_URL = self.CACHE_REDIS_URL + "?ssl_cert_reqs=none"
+        self.CELERY_BROKER_URL = self.CELERY_BROKER_URL + "?ssl_cert_reqs=none"
+        self.CELERY_RESULT_BACKEND = self.CELERY_RESULT_BACKEND + "?ssl_cert_reqs=none"
+        self.CACHE_OPTIONS = {"ssl_cert_reqs": "CERT_NONE"}
 
 
 class StagingConfig(ProductionConfig):
