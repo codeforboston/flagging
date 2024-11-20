@@ -4,7 +4,7 @@ site_description: Guide on developing and deploying the CRWA's flagging website.
 site_author: Code For Boston
 repo_url: https://github.com/codeforboston/flagging
 repo_name: codeforboston/flagging
-docs_dir: src
+docs_dir: docs/src
 nav:
 - Home: index.md
 - About: about.md
