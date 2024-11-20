@@ -48,7 +48,8 @@ def create_app(config: Optional[str] = None) -> Flask:
 
     # Fix an issue with some flask-admin stuff redirecting to "http". Because
     # we use HTTP BasicAuth, the http scheme is bad during authorized sessions.
-    # (This issue is specifically caused by Meinheld.)
+    # This issue was caused by Meinheld, which is no longer in the code,
+    # but it is here just to be safe since it does no harm.
     app.wsgi_app = ProxyFix(app.wsgi_app)
 
     return app

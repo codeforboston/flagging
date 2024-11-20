@@ -15,12 +15,10 @@ class Twitter Bot
 Twitter Bot : /twitter.py
 Heroku Task Scheduler ..> PostgreSQL
 Heroku <.. Gunicorn
-Gunicorn .. Meinheld
 Heroku .. Redis
 SQLAlchemy ..> blueprints
 Gunicorn <.. Flask : create_app()
 Gunicorn : /../Procfile
-Meinheld : /../Procfile
 Heroku .. PostgreSQL
 blueprints ..> FlaskCaching
 class Flask
