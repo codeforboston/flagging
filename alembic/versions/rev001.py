@@ -9,6 +9,8 @@ Create Date: 2022-01-22 15:49:40.837695
 
 """
 
+import os
+
 import sqlalchemy as sa
 from sqlalchemy import schema
 
@@ -52,7 +54,7 @@ def upgrade():
         sa.PrimaryKeyConstraint("boathouse"),
     )
 
-    with open(f"{QUERIES_DIR}/override_event_triggers_v1.sql", "r") as f:
+    with open(os.path.join(QUERIES_DIR, "override_event_triggers_v1.sql"), "r") as f:
         sql = sa.text(f.read())
         conn.execute(sql)
 
@@ -70,16 +72,6 @@ def upgrade():
         sa.Column("overridden", sa.BOOLEAN(), nullable=True),
         sa.Column("reason", sa.TEXT(), nullable=True),
     )
-
-    with open(f"{QUERIES_DIR}/define_reach.sql", "r") as f:
-        sql = sa.text(f.read())
-        conn.execute(sql)
-    with open(f"{QUERIES_DIR}/define_boathouse.sql", "r") as f:
-        sql = sa.text(f.read())
-        conn.execute(sql)
-    with open(f"{QUERIES_DIR}/define_default_options.sql", "r") as f:
-        sql = sa.text(f.read())
-        conn.execute(sql)
 
 
 def downgrade():

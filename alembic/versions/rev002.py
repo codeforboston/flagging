@@ -7,6 +7,8 @@ Create Date: 2022-01-22 17:03:23.094306
 
 """
 
+import os
+
 import sqlalchemy as sa
 from sqlalchemy.engine.reflection import Inspector
 
@@ -77,7 +79,16 @@ def upgrade():
     op.create_unique_constraint(None, "boathouses", ["name"])
     op.create_foreign_key(None, "boathouses", "reach", ["reach_id"], ["id"])
     op.rename_table("boathouses", "boathouse")
-    with open(QUERIES_DIR + "/override_event_triggers_v2.sql", "r") as f:
+    with open(os.path.join(QUERIES_DIR, "override_event_triggers_v2.sql"), "r") as f:
+        sql = sa.text(f.read())
+        conn.execute(sql)
+    with open(os.path.join(QUERIES_DIR, "define_reach.sql"), "r") as f:
+        sql = sa.text(f.read())
+        conn.execute(sql)
+    with open(os.path.join(QUERIES_DIR, "define_boathouse.sql"), "r") as f:
+        sql = sa.text(f.read())
+        conn.execute(sql)
+    with open(os.path.join(QUERIES_DIR, "define_default_options.sql"), "r") as f:
         sql = sa.text(f.read())
         conn.execute(sql)
 
