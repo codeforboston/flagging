@@ -79,7 +79,7 @@ After you get everything set up, you should run the website at least once.
     To do this, run the following:
 
 === "Windows (CMD)"
-    ```shell
+    ```cmd
     uv venv .venv
     .\.venv\Scripts\activate.bat
     uv pip sync requirements.txt

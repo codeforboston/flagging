@@ -31,14 +31,14 @@ Add this where you want the iFrame to be:
 
 ## For Developers
 
-To locally deploy the website and start coding, follow the [setup guide](../setup).
+To locally deploy the website and start coding, follow the [setup guide](./setup).
 
 Once you have the website setup locally, you now have access to the following:
 
-- Deploy the website to Heroku (guide [here](../deployment))
+- Deploy the website to Heroku (guide [here](./deployment))
 - Manually run commands and download data through the `flask shell`.
 - Make changes to the predictive model, including revising its coefficients. (Guide is currently WIP)
-- (Advanced) Make other changes to the website.
+- Make other changes to the website.
 
 ## To Deploy
 

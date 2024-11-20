@@ -45,9 +45,9 @@ markdown_extensions:
 - pymdownx.inlinehilite
 - pymdownx.superfences:
     custom_fences:
-    - name: mermaid
-      class: mermaid
-      format: "!!python/name:pymdownx.superfences.fence_div_format"
+      - name: mermaid
+        class: mermaid
+        format: "!!python/name:pymdownx.superfences.fence_code_format"
 - sane_lists
 extra:
   flagging_website_url: https://crwa-flagging.herokuapp.com
@@ -58,5 +58,3 @@ extra:
     link: https://www.meetup.com/Code-for-Boston/
   - icon: fontawesome/brands/twitter
     link: https://twitter.com/codeforboston
-extra_javascript:
-- https://unpkg.com/mermaid@8.4.6/dist/mermaid.min.js
