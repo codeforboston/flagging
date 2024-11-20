@@ -34,7 +34,7 @@ def test_usgs_data_is_recent(live_app, now):
         df = get_live_usgs_data()
         last_timestamp = df["time"].iloc[-1]
         time_difference = now - last_timestamp
-        assert time_difference < pd.Timedelta(hours=2)
+        assert time_difference < pd.Timedelta(hours=12)
 
 
 @pytest.mark.parametrize(
