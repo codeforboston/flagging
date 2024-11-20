@@ -381,3 +381,5 @@ wtforms==3.2.1
     # via flask-admin
 yarl==1.17.2
     # via schemathesis
+zipp==3.21.0
+    # via -r requirements.in

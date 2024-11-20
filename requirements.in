@@ -15,7 +15,7 @@ Flask-SQLAlchemy
 flask-talisman
 Flask
 flower
-Jinja2
+Jinja2>=3.1.4
 markdown
 pandas
 psycopg2-binary
@@ -47,6 +47,8 @@ schemathesis
 ruff
 uv
 pre-commit
+
+zipp>=3.19.1  # for security
 
 # ==========================================================
 # Webserver
