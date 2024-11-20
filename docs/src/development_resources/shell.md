@@ -1,37 +1,27 @@
 # Flask Shell Documentation
 
-The shell is used to access app functions and data, such as Hobolink and USGS
-data and access to the database.
+The shell is used to access app functions and data, such as Hobolink and USGS  data and access to the database.
 
-The reason why the shell is useful is because there may be cases where you want to play around with the app's functions. For example, maybe you see something that seems fishy in the data, so you want to have direct access to the function the website is running. You may also want to
+The reason why the shell is useful is because there may be cases where you want to play around with the app's functions. For example, maybe you see something that seems fishy in the data, so you want to have direct access to the function the website is running.
 
 The way Flask works makes it impossible to run the website's functions outside the Flask app context, which means importing the functions into a naked shell doesn't work as intended. The `flask shell` provides all the tools needed to let coders access the functions the exact same way the website does, except in a shell environment.
 
 ## Run the Shell
 
-1. Open up a terminal at the `flagging` folder.
+You can run the shell locally, but it is strongly recommended to do it in Docker Compose instead.
 
-2. Activate a Python virtual environment:
-
-```shell
-python3 -m venv venv
-source venv/bin/activate
-python3 -m pip install -r requirements.txt
-```
-
-3. Set up the `FLASK_ENV` environment variable:
+If the Docker Compose is not running, you can spin it up and run it like so:
 
 ```shell
-export FLASK_ENV=development
+docker compose run web flask shell
 ```
 
-4. Run the shell:
+If you'd like to leave the website running in the background, or you already have it running in another terminal, use `exec` instead of `run`:
 
 ```shell
-flask shell
+docker compose up -d
+docker compose exec web flask shell
 ```
-
-And you should be good to go! The functions listed below should be available for use, and the section below contains some example use cases for the shell.
 
 ???+ tip
     To exit from the shell, type `exit()` then ++enter++.

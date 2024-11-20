@@ -17,15 +17,12 @@ Install all of the following programs onto your computer:
 - [uv](https://docs.astral.sh/uv/#getting-started)
 - [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) (first time setup guide [here](https://git-scm.com/book/en/v2/Getting-Started-First-Time-Git-Setup))
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+- [A Github account](https://github.com/). The GitHub account should have the same email as the one registered to your `git config --global user.email` that you set in the first time git setup. You also need to set up SSH with Github ([instructions here](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account)).
 
 **Recommended:**
 
 - A good text editor or IDE, such as [PyCharm](https://www.jetbrains.com/pycharm/) (which is powerful but bulky and geared toward advanced users).
 - [Heroku CLI](https://devcenter.heroku.com/articles/heroku-cli) _(required for remote deployment to Heroku.)_
-
-**Other:**
-
-- It is strongly recommend that you create a [GitHub account](https://github.com/) if you haven't done so already. The GitHub account should have the same email as the one registered to your `git config --global user.email` that you set in the first time git setup.
 
 ## Download and Setup the Code Base
 
@@ -40,9 +37,9 @@ The flagging website is open source; the whole website's source code is availabl
 3. Run the following to download your fork and setup the connection to the upstream remote. Replace `YOUR_USERNAME_HERE` (in the first line) with your actual GitHub username.
 
 ```shell
-git clone https://github.com/YOUR_USERNAME_HERE/flagging/
+git clone git@github.com:YOUR_USERNAME_HERE/flagging.git
 cd flagging
-git remote add upstream https://github.com/codeforboston/flagging.git
+git remote add upstream git@github.com:codeforboston/flagging.git
 git fetch upstream
 ```
 
@@ -61,13 +58,17 @@ cp -n .env.example .env
 
     If you do not have HOBOlink credentials, please turn on demo mode by setting `USE_MOCK_DATA=true`.
 
-    **(Optional)** If you'd like, create a Mapbox access token and add it to your `.env`: https://www.mapbox.com/ If you don't do this, the map will not fully render.
+The steps below marked **Optional** are not required to get the website to run, but will improve the experience.
 
-    **(Very optional)** If you'd like, connect to Sentry via the `SENTRY_DSN` and `SENTRY_ENVIRONMENT` env vars: https://sentry.io/
+6. **(Optional)** If you'd like, create a Mapbox access token and add it to your `.env`: [https://www.mapbox.com/](https://www.mapbox.com/) If you don't do this, the map will not fully render.
 
-    **(Very optional)** You can also set up `https` and run that way. Create a certfile and key via the command `./run ssl-cert`, and add `CERTFILE=server.crt`, `KEYFILE=server.key`, and `PORT=443` to your `.env`. However this will require some additional finagling as your browser will not by default trust self-signed certs, so it's not recommended for most users.
+The steps below marked **Very optional** are generally _not_ recommended unless you have a good reason you want to do them.
 
-    **(Very optional)** You can also set up Twitter/X credentials and send tweets. However, right now we do not use Twitter/X; this functionality is effectively deprecated.
+7. **(Very optional)** If you'd like, connect to Sentry via the `SENTRY_DSN` and `SENTRY_ENVIRONMENT` env vars: [https://sentry.io/](https://sentry.io/)
+
+8. **(Very optional)** You can also set up `https` and run that way. Create a certfile and key via the command `./run ssl-cert`, and add `CERTFILE=server.crt`, `KEYFILE=server.key`, and `PORT=443` to your `.env`. However this will require some additional finagling as your browser will not by default trust self-signed certs, so it's not recommended for most users.
+
+9. **(Very optional)** You can also set up Twitter/X credentials and send tweets. However, right now we do not use Twitter/X; this functionality is effectively deprecated.
 
 ## Run the Website Locally
 

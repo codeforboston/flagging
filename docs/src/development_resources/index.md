@@ -1,5 +1,15 @@
 # Stack
 
+??? info
+    **(Nov 2024 update)** This document is more of a historic document to authoritatively resolve questions regarding the stack decisions. It is not an ongoing, active document. Consider this document archived.
+
+    A small handful of the things in this document are no longer true or have not fully panned out, notably:
+
+    - Heroku no longer has a free tier. We continue to use Heroku because it is affordable _enough_, and making changes at this stage would be onerous given the stability of the project.
+    - In practice, the project has been maintained not by academics or inexperienced volunteers, but by the original project lead for the website, Daniel Reeves (me), who has also developed significantly more expertise in web development and data engineering since working on this in 2020 (this project was one of the ways I gained experience!). The decision to use simple cron and CLI calls plus Pandas to process and stored in an ephemeral way is not exactly how I'd do things these days, especially given that (a) the code is not being used by others and therefore no concessions really needed to be made, (b) I have a lot more comfort spinning up infrastructure, including on cloud services that have generous free tiers for relevant services like BigQuery on GCP.
+
+    Despite that I would do a few things differently if I were to rebuild this today, I cannot say I have any regrets with our stack decisions. Even with the benefit of much gained experience over the years, I do believe our stack decisions made a lot of sense at the time, and also continue to work well enough today.
+
 ## Project History
 
 Traditionally, the CRWA Flagging Program was hosted on a PHP-built website that hosted a predictive model and ran it. However, that website was out of commission due to some bugs and the CRWA's lack of PHP development resources.

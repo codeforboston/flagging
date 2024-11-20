@@ -38,7 +38,8 @@ plugins:
   - macros
 markdown_extensions:
 - admonition
-- pymdownx.tabbed # https://facelessuser.github.io/pymdown-extensions/
+- pymdownx.tabbed: # https://facelessuser.github.io/pymdown-extensions/
+    alternate_style: true
 - pymdownx.keys
 - pymdownx.details
 - pymdownx.inlinehilite

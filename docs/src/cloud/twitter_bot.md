@@ -1,5 +1,8 @@
 # Twitter Bot
 
+???+ warning
+    The X/Twitter bot is no longer being used or maintained because of significant changes to the API causing the code to break.
+
 Every time the website updates, it sends out a tweet. In order for it to do that though, you need to set up a Twitter account.
 
 ## First Time Setup

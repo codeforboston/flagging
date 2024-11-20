@@ -7,9 +7,9 @@
 
 The admin panel is used to do the following:
 
-- Manually override the model outputs during events and advisories that would adversely effect the river quality.
+- Manually override the model outputs during events and advisories that would adversely affect the river quality.
 - Set a custom message that shows on the home page alongside the flags.
-- Manually update the database.
+- Manually update the database (e.g. add or remove Boathouses)
 - Download the data as a CSV, including downloading up to 90 days worth of data at a time.
 
 You can reach the admin panel by going to `/admin` after the URL for the flagging website homepage.
