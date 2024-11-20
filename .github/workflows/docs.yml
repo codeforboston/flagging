@@ -4,6 +4,11 @@ on:
     branches:
       - main
 
+# Cancel if a newer run is started
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     name: Deploy docs
@@ -12,16 +17,13 @@ jobs:
     - name: Checkout main
       uses: actions/checkout@v4
     - name: Python 3.10 Setup
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: "3.12"
-    - name: Install dependencies
+    - name: Install requirements for docs
       run: |
         sudo apt-get update
-    - name: Deploy docs
-      uses: mhausenblas/mkdocs-deploy-gh-pages@1.17
-      # Or use mhausenblas/mkdocs-deploy-gh-pages@nomaterial to build without the mkdocs-material theme
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        CONFIG_FILE: docs/mkdocs.yml
-        REQUIREMENTS: docs/requirements.txt
+        pip install -U uv
+        uv pip install --system -r docs/requirements.txt
+    - name: Build and deploy docs
+      run: mkdocs gh-deploy --force
