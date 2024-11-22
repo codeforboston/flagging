@@ -60,7 +60,7 @@ click-repl==0.3.0
     # via celery
 colorama==0.4.6
     # via schemathesis
-coverage==7.6.7
+coverage[toml]==7.6.7
     # via pytest-cov
 debugpy==1.8.8
     # via pytest-celery
@@ -110,6 +110,8 @@ fqdn==1.5.1
     # via jsonschema
 graphql-core==3.2.5
     # via hypothesis-graphql
+greenlet==3.1.1
+    # via sqlalchemy
 gunicorn==23.0.0
     # via -r requirements.in
 h11==0.14.0
@@ -154,7 +156,7 @@ jinja2==3.1.4
     #   flask
 jsonpointer==3.0.0
     # via jsonschema
-jsonschema==4.23.0
+jsonschema[format]==4.23.0
     # via
     #   flasgger
     #   hypothesis-jsonschema
@@ -296,12 +298,8 @@ ruff==0.7.4
     # via -r requirements.in
 schemathesis==3.38.7
     # via -r requirements.in
-sentry-sdk==2.18.0
+sentry-sdk[flask]==2.18.0
     # via -r requirements.in
-setuptools==75.5.0
-    # via
-    #   flask-db
-    #   pytest-celery
 six==1.16.0
     # via
     #   flasgger
@@ -337,7 +335,7 @@ tomli==2.1.0
     # via schemathesis
 tomli-w==1.1.0
     # via schemathesis
-tornado==6.4.1
+tornado==6.4.2
     # via flower
 tweepy==4.14.0
     # via -r requirements.in
