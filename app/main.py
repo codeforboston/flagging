@@ -320,13 +320,9 @@ def register_commands(app: Flask):
         from app.data.processing.hobolink import HOBOLINK_STATIC_FILE_NAME
         from app.data.processing.hobolink import get_live_hobolink_data
         from app.data.processing.usgs import USGS_STATIC_FILE_NAME
-
-        # from app.data.processing.usgs import USGS_W_STATIC_FILE_NAME
-        # from app.data.processing.usgs import USGS_MR_STATIC_FILE_NAME
         from app.data.processing.usgs import get_live_usgs_data
 
         df_hobolink = get_live_hobolink_data()
-        # df_usgs = get_live_usgs_data()
         df_usgs_w = get_live_usgs_data(site_no="01104500")
         df_usgs_mr = get_live_usgs_data(site_no="01104683")
 
@@ -335,13 +331,8 @@ def register_commands(app: Flask):
         click.echo(f"Wrote HOBOlink data to {fname_hobolink!r}")
 
         fname_usgs = _format_path(USGS_STATIC_FILE_NAME)
-        # fname_usgs_w = _format_path(USGS_W_STATIC_FILE_NAME)
-        # fname_usgs_mr = _format_path(USGS_MR_STATIC_FILE_NAME)
-        # df_usgs.to_pickle(fname_usgs)
         df_usgs_w.to_pickle(fname_usgs)
         df_usgs_mr.to_pickle(fname_usgs)
-        # df_usgs_w.to_pickle(fname_usgs_w)
-        # df_usgs_mr.to_pickle(fname_usgs_mr)
 
         click.echo(f"Wrote USGS data to {fname_hobolink!r}")
 

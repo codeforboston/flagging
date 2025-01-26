@@ -22,8 +22,6 @@ from app.mail import mail_on_fail
 
 USGS_URL = "https://waterdata.usgs.gov/nwis/uv"
 USGS_STATIC_FILE_NAME = "usgs.pickle"
-# USGS_W_STATIC_FILE_NAME = "usgs_w.pickle"
-# USGS_MR_STATIC_FILE_NAME = "usgs_mr.pickle"
 USGS_DEFAULT_DAYS_AGO = 14
 USGS_ROWS_PER_HOUR_WALTHAM = 4
 USGS_ROWS_PER_HOUR_MUDDY_RIVER = 6
@@ -113,7 +111,6 @@ def parse_usgs_data(res: Union[str, requests.models.Response], site_no: str) -> 
         raise ValueError(f"Unknown site number {site_no}. Cannot map columns.")
     df = df.rename(columns=column_map[site_no])
 
-    # Filter columns to retain only what is in column_map
     df = df[list(column_map[site_no].values())]
 
     # Convert types
@@ -126,5 +123,4 @@ def parse_usgs_data(res: Union[str, requests.models.Response], site_no: str) -> 
     numeric_columns = set(column_map[site_no].values()) - {"time"}  # All columns except "time"
     for col in numeric_columns:
         df[col] = df[col].astype(float)
-        # df[col] = pd.to_numeric(df[col], errors="coerce")
     return df
