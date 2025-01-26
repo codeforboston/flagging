@@ -1,9 +1,10 @@
 """
 This file handles connections to the USGS API to retrieve data from the Waltham
-gauge.
+and Muddy River gauge.
 
 Link to the web interface (not the api)
-https://waterdata.usgs.gov/nwis/uv?site_no=01104500
+Waltham: https://waterdata.usgs.gov/nwis/uv?site_no=01104500
+Muddy River: https://waterdata.usgs.gov/nwis/uv?site_no=01104683
 """
 
 from typing import Union
@@ -21,40 +22,52 @@ from app.mail import mail_on_fail
 
 USGS_URL = "https://waterdata.usgs.gov/nwis/uv"
 USGS_STATIC_FILE_NAME = "usgs.pickle"
+# USGS_W_STATIC_FILE_NAME = "usgs_w.pickle"
+# USGS_MR_STATIC_FILE_NAME = "usgs_mr.pickle"
 USGS_DEFAULT_DAYS_AGO = 14
-USGS_ROWS_PER_HOUR = 4
+USGS_ROWS_PER_HOUR_WALTHAM = 4
+USGS_ROWS_PER_HOUR_MUDDY_RIVER = 6
 
 
 @retry(reraise=True, wait=wait_fixed(1), stop=stop_after_attempt(3))
 @mock_source(filename=USGS_STATIC_FILE_NAME)
 @mail_on_fail
-def get_live_usgs_data(days_ago: int = USGS_DEFAULT_DAYS_AGO) -> pd.DataFrame:
+def get_live_usgs_data(
+    days_ago: int = USGS_DEFAULT_DAYS_AGO, site_no: str = "01104500"
+) -> pd.DataFrame:
     """This function runs through the whole process for retrieving data from
     usgs: first we perform the request, and then we parse the data.
 
     Returns:
         Pandas Dataframe containing the usgs data.
     """
-    res = request_to_usgs(days_ago=days_ago)
-    df = parse_usgs_data(res)
+    res = request_to_usgs(days_ago=days_ago, site_no=site_no)
+    df = parse_usgs_data(res, site_no=site_no)
     return df
 
 
-def request_to_usgs(days_ago: int = 14) -> requests.models.Response:
+def request_to_usgs(days_ago: int = 14, site_no: str = "01104500") -> requests.models.Response:
     """Get a request from the USGS.
 
     Args:
         days_ago: (int) Number of days of data to get.
+        site_no: (str) String of integer site number, either Waltham or Muddy River sites.
 
     Returns:
         Request Response containing the data from the request.
     """
+    # if site is waltham, takes both gage height and flow discharge,
+    # otherwise, only takes gage height
+    if site_no == "01104500":
+        additional_feature = "on"
+    else:
+        additional_feature = "off"
 
     payload = {
-        "cb_00060": "on",
-        "cb_00065": "on",
+        "cb_00060": additional_feature,
+        "cb_00065": "on",  # always accepts gage height
         "format": "rdb",
-        "site_no": "01104500",
+        "site_no": site_no,
         "period": days_ago,
     }
 
@@ -67,12 +80,13 @@ def request_to_usgs(days_ago: int = 14) -> requests.models.Response:
     return res
 
 
-def parse_usgs_data(res: Union[str, requests.models.Response]) -> pd.DataFrame:
+def parse_usgs_data(res: Union[str, requests.models.Response], site_no: str) -> pd.DataFrame:
     """
     Clean the response from the USGS API.
 
     Args:
         res: response object from USGS
+        site_no: site_no of usgs data currently being parsed
 
     Returns:
         Pandas DataFrame containing the usgs data.
@@ -87,12 +101,20 @@ def parse_usgs_data(res: Union[str, requests.models.Response]) -> pd.DataFrame:
     # Third row downward is the data
     df = pd.DataFrame(raw_data[2:], columns=raw_data[0])
 
-    df = df.rename(
-        columns={"datetime": "time", "66190_00060": "stream_flow", "66191_00065": "gage_height"}
-    )
+    column_map = {
+        "01104500": {
+            "datetime": "time",
+            "66190_00060": "stream_flow",
+            "66191_00065": "gage_height",
+        },
+        "01104683": {"datetime": "time", "66196_00065": "gage_height"},
+    }
+    if site_no not in column_map:
+        raise ValueError(f"Unknown site number {site_no}. Cannot map columns.")
+    df = df.rename(columns=column_map[site_no])
 
-    # Filter columns
-    df = df[["time", "stream_flow", "gage_height"]]
+    # Filter columns to retain only what is in column_map
+    df = df[list(column_map[site_no].values())]
 
     # Convert types
     df["time"] = pd.to_datetime(df["time"])
@@ -100,7 +122,9 @@ def parse_usgs_data(res: Union[str, requests.models.Response]) -> pd.DataFrame:
     # >>> ValueError: could not convert string to float: ''
     # Reran and it went away
     # The error was here in this line casting `stream_flow` to a float:
-    df["stream_flow"] = df["stream_flow"].astype(float)
-    df["gage_height"] = df["gage_height"].astype(float)
 
+    numeric_columns = set(column_map[site_no].values()) - {"time"}  # All columns except "time"
+    for col in numeric_columns:
+        df[col] = df[col].astype(float)
+        # df[col] = pd.to_numeric(df[col], errors="coerce")
     return df

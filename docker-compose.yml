@@ -23,7 +23,7 @@ x-app: &app-config
   volumes:
     - .:/app
 
-version: "3.3"
+# version: '3.3'
 services:
 
   web:

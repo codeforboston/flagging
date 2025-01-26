@@ -101,6 +101,14 @@ def combine_data_v3_task(*args, **kwargs) -> RecordsType:
 
 
 @celery_app.task
+def combine_data_v4_task(*args, **kwargs) -> RecordsType:
+    from app.data.processing.core import combine_v4_job
+
+    df = combine_v4_job(*args, **kwargs)
+    return df.to_dict(orient="records")
+
+
+@celery_app.task
 def predict_v1_task(*args, **kwargs) -> RecordsType:
     from app.data.processing.core import predict_v1_job
 
@@ -121,6 +129,14 @@ def predict_v3_task(*args, **kwargs) -> RecordsType:
     from app.data.processing.core import predict_v3_job
 
     df = predict_v3_job(*args, **kwargs)
+    return df.to_dict(orient="records")
+
+
+@celery_app.task
+def predict_v4_task(*args, **kwargs) -> RecordsType:
+    from app.data.processing.core import predict_v4_job
+
+    df = predict_v4_job(*args, **kwargs)
     return df.to_dict(orient="records")
 
 
@@ -150,9 +166,11 @@ live_usgs_data_task: WithAppContextTask
 combine_data_v1_task: WithAppContextTask
 combine_data_v2_task: WithAppContextTask
 combine_data_v3_task: WithAppContextTask
+combine_data_v4_task: WithAppContextTask
 clear_cache_task: WithAppContextTask
 predict_v1_task: WithAppContextTask
 predict_v2_task: WithAppContextTask
 predict_v3_task: WithAppContextTask
+predict_v4_task: WithAppContextTask
 update_db_task: WithAppContextTask
 send_database_exports_task: WithAppContextTask
