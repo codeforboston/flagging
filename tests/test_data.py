@@ -29,9 +29,17 @@ def test_hobolink_data_is_recent(live_app, now):
         assert time_difference < pd.Timedelta(hours=2)
 
 
-def test_usgs_data_is_recent(live_app, now):
+def test_usgs_w_data_is_recent(live_app, now):
     with live_app.app_context():
-        df = get_live_usgs_data()
+        df = get_live_usgs_data(site_no="01104500")
+        last_timestamp = df["time"].iloc[-1]
+        time_difference = now - last_timestamp
+        assert time_difference < pd.Timedelta(hours=12)
+
+
+def test_usgs_b_data_is_recent(live_app, now):
+    with live_app.app_context():
+        df = get_live_usgs_data(site_no="01104683")
         last_timestamp = df["time"].iloc[-1]
         time_difference = now - last_timestamp
         assert time_difference < pd.Timedelta(hours=12)

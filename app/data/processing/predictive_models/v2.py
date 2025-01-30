@@ -14,7 +14,9 @@ SIGNIFICANT_RAIN = 0.1
 MODEL_THRESHOLD = 235
 
 
-def process_data(df_hobolink: pd.DataFrame, df_usgs: pd.DataFrame) -> pd.DataFrame:
+def process_data(
+    df_hobolink: pd.DataFrame, df_usgs_w: pd.DataFrame, df_usgs_mr: pd.DataFrame
+) -> pd.DataFrame:
     """Combines the data from the Hobolink and the USGS into one table.
 
     Args:
@@ -25,20 +27,20 @@ def process_data(df_hobolink: pd.DataFrame, df_usgs: pd.DataFrame) -> pd.DataFra
         Cleaned dataframe.
     """
     df_hobolink = df_hobolink.copy()
-    df_usgs = df_usgs.copy()
+    df_usgs_w = df_usgs_w.copy()
 
     # Cast to datetime type.
     # When this comes from Celery, it might be a string.
     df_hobolink["time"] = pd.to_datetime(df_hobolink["time"])
-    df_usgs["time"] = pd.to_datetime(df_usgs["time"])
+    df_usgs_w["time"] = pd.to_datetime(df_usgs_w["time"])
 
     # Convert all timestamps to hourly in preparation for aggregation.
-    df_usgs["time"] = df_usgs["time"].dt.floor("h")
+    df_usgs_w["time"] = df_usgs_w["time"].dt.floor("h")
     df_hobolink["time"] = df_hobolink["time"].dt.floor("h")
 
     # The new model takes geomeans of some variables.
     # Put a floor on 0 for all of these variables, to be safe.
-    df_usgs["log_stream_flow"] = np.log(np.maximum(df_usgs["stream_flow"], 1))
+    df_usgs_w["log_stream_flow"] = np.log(np.maximum(df_usgs_w["stream_flow"], 1))
     df_hobolink["log_air_temp"] = np.log(np.maximum(df_hobolink["air_temp"], 1))
 
     # TODO: look into how to calculate this
@@ -58,8 +60,8 @@ def process_data(df_hobolink: pd.DataFrame, df_usgs: pd.DataFrame) -> pd.DataFra
     # Now collapse the data.
     # Take the mean measurements of everything except rain; rain is the sum
     # within an hour. (HOBOlink devices record all rain seen in 10 minutes).
-    df_usgs = (
-        df_usgs.groupby("time")
+    df_usgs_w = (
+        df_usgs_w.groupby("time")
         .agg(
             {
                 "log_stream_flow": "mean",
@@ -77,7 +79,7 @@ def process_data(df_hobolink: pd.DataFrame, df_usgs: pd.DataFrame) -> pd.DataFra
     # data than USGS data). With that said, for the most recent value, we need
     # to make sure one of the sources didn't update before the other one did.
     # Note that usually Hobolink updates first.
-    df = df_hobolink.merge(right=df_usgs, how="left", on="time")
+    df = df_hobolink.merge(right=df_usgs_w, how="left", on="time")
     df = df.sort_values("time")
     df = df.reset_index()
 

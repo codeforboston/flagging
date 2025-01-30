@@ -88,7 +88,15 @@ class DownloadView(BaseView):
     are handy because they get around limitations of the Heroku free tier.
     """
 
-    TABLES = ["hobolink", "usgs", "processed_data", "prediction", "boathouse", "override_history"]
+    TABLES = [
+        "hobolink",
+        "usgs_w",
+        "usgs_mr",
+        "processed_data",
+        "prediction",
+        "boathouse",
+        "override_history",
+    ]
 
     @expose("/")
     def index(self):
@@ -124,11 +132,18 @@ class DownloadView(BaseView):
             url_for("admin_downloadview.csv_wait", task_id=async_result.id, data_source="hobolink")
         )
 
-    @expose("/csv/src/usgs_source")
-    def source_usgs(self):
+    @expose("/csv/src/usgs_w_source")
+    def source_usgs_w(self):
         async_result = live_usgs_data_task.delay(days_ago=90)
         return redirect(
-            url_for("admin_downloadview.csv_wait", task_id=async_result.id, data_source="usgs")
+            url_for("admin_downloadview.csv_wait", task_id=async_result.id, data_source="usgs_w")
+        )
+
+    @expose("/csv/src/usgs_mr_source")
+    def source_usgs_mr(self):
+        async_result = live_usgs_data_task.delay(days_ago=90)
+        return redirect(
+            url_for("admin_downloadview.csv_wait", task_id=async_result.id, data_source="usgs_mr")
         )
 
     @expose("/csv/src/processed_data_v1_source")
@@ -242,10 +257,15 @@ class DownloadView(BaseView):
         df = live_hobolink_data_task.run("code_for_boston_export_90d")
         return send_csv_attachment_of_dataframe(df=pd.DataFrame(df), filename="hobolink_source.csv")
 
-    @expose("/csv/src_sync/usgs_source")
-    def sync_source_usgs(self):
+    @expose("/csv/src_sync/usgs_w_source")
+    def sync_source_usgs_w(self):
         df = live_usgs_data_task.run(days_ago=90)
-        return send_csv_attachment_of_dataframe(df=pd.DataFrame(df), filename="usgs_source.csv")
+        return send_csv_attachment_of_dataframe(df=pd.DataFrame(df), filename="usgs_w_source.csv")
+
+    @expose("/csv/src_sync/usgs_mr_source")
+    def sync_source_usgs_mr(self):
+        df = live_usgs_data_task.run(days_ago=90)
+        return send_csv_attachment_of_dataframe(df=pd.DataFrame(df), filename="usgs_mr_source.csv")
 
     @expose("/csv/src_sync/processed_data_v1_source")
     def sync_source_combine_data_v1(self):

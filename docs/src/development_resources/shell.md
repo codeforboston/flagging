@@ -36,7 +36,7 @@ docker compose exec web flask shell
   Gets the HOBOlink data table based on the given "export" name.
 - **`get_live_usgs_data`** (*() -> pd.DataFrame*):
   Gets the USGS data table.
-- **`process_data`** (*(pd.DataFrame, pd.DataFrame) -> pd.DataFrame*):
+- **`process_data`** (*(pd.DataFrame, pd.DataFrame, pd.DataFrame) -> pd.DataFrame*):
   Combines the Hobolink and USGS tables.
 - **`compose_tweet`** (*() -> str*):
   Generates a message for Twitter that represents the current status of the flagging program (note: this function does not actually send the Tweet to Twitter.com).
@@ -91,15 +91,18 @@ begin_date = "2023-01-02"
 end_date = "2023-11-09"
 
 # Usgs request
-res = requests.get("https://nwis.waterdata.usgs.gov/usa/nwis/uv/", params={"cb_00060": "on", "cb_00065": "on", "format": "rdb", "site_no": "01104500", "legacy": "1", "period": "", "begin_date": begin_date, "end_date": end_date})
+res_w = requests.get("https://nwis.waterdata.usgs.gov/usa/nwis/uv/", params={"cb_00060": "on", "cb_00065": "on", "format": "rdb", "site_no": "01104500", "legacy": "1", "period": "", "begin_date": begin_date, "end_date": end_date})
+res_b = requests.get("https://nwis.waterdata.usgs.gov/usa/nwis/uv/", params={"cb_00045": "off", "cb_00065": "on", "format": "rdb", "site_no": "01104683", "legacy": "1", "period": "", "begin_date": begin_date, "end_date": end_date})
 
 df_hobolink = get_live_hobolink_data("code_for_boston_export_180d")
-df_usgs = parse_usgs_data(res)
-df_combined = v1.process_data(df_hobolink=df_hobolink, df_usgs=df_usgs)
+df_usgs_w = parse_usgs_data(res_w)
+df_usgs_b = parse_usgs_data(res_b)
+df_combined = v1.process_data(df_hobolink=df_hobolink, df_usgs_w=df_usgs_w, df_usgs_mr=df_usgs_b)
 df_predictions = v1.all_models(df_combined)
 
 df_hobolink.to_csv(f"{end_date}-hobolink.csv")
-df_usgs.to_csv(f"{end_date}-usgs.csv")
+df_usgs_w.to_csv(f"{end_date}-usgs_w.csv")
+df_usgs_b.to_csv(f"{end_date}-usgs_b.csv")
 df_combined.to_csv(f"{end_date}-combined.csv")
 df_predictions.to_csv(f"{end_date}-predictions.csv")
 ```
