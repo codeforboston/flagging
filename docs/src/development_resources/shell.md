@@ -97,7 +97,7 @@ res_b = requests.get("https://nwis.waterdata.usgs.gov/usa/nwis/uv/", params={"cb
 df_hobolink = get_live_hobolink_data("code_for_boston_export_180d")
 df_usgs_w = parse_usgs_data(res_w)
 df_usgs_b = parse_usgs_data(res_b)
-df_combined = v1.process_data(df_hobolink=df_hobolink, df_usgs_w=df_usgs_w, df_usgs_mr=df_usgs_b)
+df_combined = v1.process_data(df_hobolink=df_hobolink, df_usgs_w=df_usgs_w, df_usgs_b=df_usgs_b)
 df_predictions = v1.all_models(df_combined)
 
 df_hobolink.to_csv(f"{end_date}-hobolink.csv")

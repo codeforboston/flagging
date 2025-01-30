@@ -27,7 +27,7 @@ def sigmoid(ser: np.ndarray) -> np.ndarray:
 
 
 def process_data(
-    df_hobolink: pd.DataFrame, df_usgs_w: pd.DataFrame, df_usgs_mr: pd.DataFrame
+    df_hobolink: pd.DataFrame, df_usgs_w: pd.DataFrame, df_usgs_b: pd.DataFrame
 ) -> pd.DataFrame:
     """Combines the data from the Hobolink and the USGS into one table.
 

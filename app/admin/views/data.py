@@ -91,7 +91,7 @@ class DownloadView(BaseView):
     TABLES = [
         "hobolink",
         "usgs_w",
-        "usgs_mr",
+        "usgs_b",
         "processed_data",
         "prediction",
         "boathouse",
@@ -139,11 +139,11 @@ class DownloadView(BaseView):
             url_for("admin_downloadview.csv_wait", task_id=async_result.id, data_source="usgs_w")
         )
 
-    @expose("/csv/src/usgs_mr_source")
-    def source_usgs_mr(self):
+    @expose("/csv/src/usgs_b_source")
+    def source_usgs_b(self):
         async_result = live_usgs_data_task.delay(days_ago=90)
         return redirect(
-            url_for("admin_downloadview.csv_wait", task_id=async_result.id, data_source="usgs_mr")
+            url_for("admin_downloadview.csv_wait", task_id=async_result.id, data_source="usgs_b")
         )
 
     @expose("/csv/src/processed_data_v1_source")
@@ -262,10 +262,10 @@ class DownloadView(BaseView):
         df = live_usgs_data_task.run(days_ago=90)
         return send_csv_attachment_of_dataframe(df=pd.DataFrame(df), filename="usgs_w_source.csv")
 
-    @expose("/csv/src_sync/usgs_mr_source")
-    def sync_source_usgs_mr(self):
+    @expose("/csv/src_sync/usgs_b_source")
+    def sync_source_usgs_b(self):
         df = live_usgs_data_task.run(days_ago=90)
-        return send_csv_attachment_of_dataframe(df=pd.DataFrame(df), filename="usgs_mr_source.csv")
+        return send_csv_attachment_of_dataframe(df=pd.DataFrame(df), filename="usgs_b_source.csv")
 
     @expose("/csv/src_sync/processed_data_v1_source")
     def sync_source_combine_data_v1(self):

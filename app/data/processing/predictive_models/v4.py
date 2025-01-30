@@ -13,31 +13,31 @@ MODEL_THRESHOLD = 410
 
 
 def process_data(
-    df_hobolink: pd.DataFrame, df_usgs_w: pd.DataFrame, df_usgs_mr: pd.DataFrame
+    df_hobolink: pd.DataFrame, df_usgs_w: pd.DataFrame, df_usgs_b: pd.DataFrame
 ) -> pd.DataFrame:
     """Combines the data from the Hobolink and the USGS into one table.
 
     Args:
         df_hobolink: Hobolink data
         df_usgs_w: USGS NWIS Waltham data
-        df_usgs_mr: USGS NWIS Muddy River data
+        df_usgs_b: USGS NWIS Brookline data
 
     Returns:
         Cleaned dataframe.
     """
     df_hobolink = df_hobolink.copy()
     df_usgs_w = df_usgs_w.copy()
-    df_usgs_mr = df_usgs_mr.copy()
+    df_usgs_b = df_usgs_b.copy()
 
     # Cast to datetime type.
     # When this comes from Celery, it might be a string.
     df_hobolink["time"] = pd.to_datetime(df_hobolink["time"])
     df_usgs_w["time"] = pd.to_datetime(df_usgs_w["time"])
-    df_usgs_mr["time"] = pd.to_datetime(df_usgs_mr["time"])
+    df_usgs_b["time"] = pd.to_datetime(df_usgs_b["time"])
 
     # Convert all timestamps to hourly in preparation for aggregation.
     df_usgs_w["time"] = df_usgs_w["time"].dt.floor("h")
-    df_usgs_mr["time"] = df_usgs_mr["time"].dt.floor("h")
+    df_usgs_b["time"] = df_usgs_b["time"].dt.floor("h")
     df_hobolink["time"] = df_hobolink["time"].dt.floor("h")
 
     # TODO: LOOK AT THE NORMAL MEANS INSTEAD OF GEOMETRIC MEANS OF THE DATA. LOG EVERYTHING NOT RECOMMENDED
@@ -45,7 +45,7 @@ def process_data(
     # Put a floor on 0 for all of these variables, to be safe.
     df_usgs_w["log_stream_flow"] = np.log(np.maximum(df_usgs_w["stream_flow"], 1))
     df_hobolink["log_air_temp"] = np.log(np.maximum(df_hobolink["air_temp"], 1))
-    df_usgs_mr["log_gage_height"] = np.log(np.maximum(df_usgs_mr["gage_height"], 1))
+    df_usgs_b["log_gage_height"] = np.log(np.maximum(df_usgs_b["gage_height"], 1))
 
     # Now collapse the data.
     # Take the mean measurements of everything except rain; rain is the sum
@@ -59,8 +59,8 @@ def process_data(
         )
         .reset_index()
     )
-    df_usgs_mr = (
-        df_usgs_mr.groupby("time")
+    df_usgs_b = (
+        df_usgs_b.groupby("time")
         .agg(
             {
                 "log_gage_height": "mean",
@@ -96,7 +96,7 @@ def process_data(
 
     # to merge, make sure that there are not any overlapping column names
     df = df_hobolink.merge(right=df_usgs_w, how="left", on="time")
-    df = df.merge(right=df_usgs_mr, how="left", on="time")
+    df = df.merge(right=df_usgs_b, how="left", on="time")
     df = df.sort_values("time")
     df = df.reset_index()
 
