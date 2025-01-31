@@ -60,17 +60,26 @@
         data from two USGS stream gauges located in Waltham and Brookline.</a>
     </p>
     <h2>Credits</h2>
-        <img class="auth-img" src="{{ url_for('static', filename='images/daniel_reeves_photo.jpg') }}" alt="Photo of Daniel Reeves near the Charles river." />
-            <p>
-                This website was built by volunteers at <a href="https://www.codeforboston.org/">Code for Boston</a> in
-                collaboration with the Charles River Watershed Association, and is currently maintained on a volunteer
-                basis by <a href="https://www.linkedin.com/in/daniel-reeves-27700545/" target="_blank">Daniel Reeves</a>
-                (pictured near Community Boating), a former project leader at Code For Boston.
-            </p>
-            <p>
-                This website is open source. You can view the source code and a list of contributors
-                <a href="https://github.com/codeforboston/flagging">here</a>. Documentation for developing and operating this
-                website is available <a href="https://codeforboston.github.io/flagging">here</a>.
-            </p>
+        <!-- <img class="auth-img" src="{{ url_for('static', filename='images/daniel_reeves_photo.jpg') }}" alt="Photo of Daniel Reeves near the Charles river." /> -->
+        <p>
+            This website was built by volunteers at <a href="https://www.codeforboston.org/">Code for Boston</a> in
+            collaboration with the Charles River Watershed Association, and is currently maintained on a volunteer
+            basis by <a href="https://www.linkedin.com/in/daniel-reeves-27700545/" target="_blank">Daniel Reeves</a>,
+            a former project leader at Code For Boston.
+        </p>
+        <p>
+            The predictive model currently being used for the flagging program website was developed and deployed by <a href="https://www.linkedin.com/in/laura_xia">Laura Xia</a>
+            (MIT, class of 2026).
+             <!-- She has updated the model with new data to reflect the changing conditions of the Charles River. -->
+
+            <!-- We can also write a quick sentence about the model and how it was developed if you'd like.
+            "In addition to updating the model with new data to reflect the changing conditions of the Charles River, Laura's model improves on previous modeling efforts by replacing the older model's logistic regression with a regression on log(E. coli cfu/100ml), using machine learning methods for feature selection, and using [hierarchical modeling? partial pooling? mixed effects?] to regularize inter-reach model parameters." Jumping the gun on the last one though. 😂 You should phrase the description of the model yourself, though, I'm only offering this as a starting point. Also, we'll obviously wait on a description until you think it's done. -->
+
+        </p>
+        <p>
+            This website is open source. You can view the source code and a list of contributors
+            <a href="https://github.com/codeforboston/flagging">here</a>. Documentation for developing and operating this
+            website is available <a href="https://codeforboston.github.io/flagging">here</a>.
+        </p>
     <br />
 {% endblock %}
