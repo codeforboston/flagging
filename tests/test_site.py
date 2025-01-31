@@ -72,17 +72,23 @@ def test_admin_pages(client, page, auth, expected_status_code):
     [
         # Valid
         ("/admin/db/download/csv/src/hobolink", "admin:password", 200),
-        ("/admin/db/download/csv/src/usgs", "admin:password", 200),
+        ("/admin/db/download/csv/src/usgs_w", "admin:password", 200),
+        ("/admin/db/download/csv/src/usgs_b", "admin:password", 200),
         ("/admin/db/download/csv/src/processed_data", "admin:password", 200),
         ("/admin/db/download/csv/src/prediction", "admin:password", 200),
         ("/admin/db/download/csv/src/boathouse", "admin:password", 200),
         ("/admin/db/download/csv/src/override_history", "admin:password", 200),
         ("/admin/db/download/csv/src_sync/processed_data_v1_source", "admin:password", 200),  # noqa
         ("/admin/db/download/csv/src_sync/processed_data_v2_source", "admin:password", 200),  # noqa
+        ("/admin/db/download/csv/src_sync/processed_data_v3_source", "admin:password", 200),  # noqa
+        ("/admin/db/download/csv/src_sync/processed_data_v4_source", "admin:password", 200),  # noqa
         ("/admin/db/download/csv/src_sync/hobolink_source", "admin:password", 200),
-        ("/admin/db/download/csv/src_sync/usgs_source", "admin:password", 200),
+        ("/admin/db/download/csv/src_sync/usgs_w_source", "admin:password", 200),
+        ("/admin/db/download/csv/src_sync/usgs_b_source", "admin:password", 200),
         ("/admin/db/download/csv/src_sync/prediction_v1_source", "admin:password", 200),
         ("/admin/db/download/csv/src_sync/prediction_v2_source", "admin:password", 200),
+        ("/admin/db/download/csv/src_sync/prediction_v3_source", "admin:password", 200),
+        ("/admin/db/download/csv/src_sync/prediction_v4_source", "admin:password", 200),
         # Errors
         ("/admin/db/download/csv/arbitrary_table", "admin:password", 404),
         ("/admin/db/download/csv/boathouse", "bad:credentials", 401),

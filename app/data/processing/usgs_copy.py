@@ -5,6 +5,10 @@ and Muddy River gauge.
 Link to the web interface (not the api)
 Waltham: https://waterdata.usgs.gov/nwis/uv?site_no=01104500
 Muddy River: https://waterdata.usgs.gov/nwis/uv?site_no=01104683
+
+imports additional features compared to the existing usgs.py
+    which are not used in the current model.
+must use this file in order to use v4_copy.py
 """
 
 from typing import Union
@@ -54,20 +58,17 @@ def request_to_usgs(days_ago: int = 14, site_no: str = "01104500") -> requests.m
     Returns:
         Request Response containing the data from the request.
     """
-    # if site is waltham, takes both gage height and flow discharge,
-    # otherwise, only takes gage height
-    if site_no == "01104500":
-        additional_feature = "on"
-    else:
-        additional_feature = "off"
-
     payload = {
-        "cb_00060": additional_feature,
         "cb_00065": "on",  # always accepts gage height
         "format": "rdb",
         "site_no": site_no,
         "period": days_ago,
     }
+
+    if site_no == "01104500":
+        payload["cb_00060"] = "on"  # flow discharge for Waltham
+    elif site_no == "01104683":
+        payload["cb_00045"] = "on"  # precipitation for Brookline
 
     res = requests.get(USGS_URL, params=payload)
     if res.status_code >= 400:
@@ -105,7 +106,7 @@ def parse_usgs_data(res: Union[str, requests.models.Response], site_no: str) -> 
             "66190_00060": "stream_flow",
             "66191_00065": "gage_height",
         },
-        "01104683": {"datetime": "time", "66196_00065": "gage_height"},
+        "01104683": {"datetime": "time", "66198_00045": "precip", "66196_00065": "gage_height"},
     }
     if site_no not in column_map:
         raise ValueError(f"Unknown site number {site_no}. Cannot map columns.")

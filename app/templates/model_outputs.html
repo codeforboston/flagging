@@ -11,7 +11,7 @@
         <thead>
             <tr style="text-align: right;">
                 <th title="Time">Time</th>
-                <th title="Probability">Probability</th>
+                <th title="Probability">Predicted E. coli Concentration (CFU) / 100 mL</th>
                 <th title="Safe">Safe</th>
             </tr>
         </thead>
@@ -19,7 +19,7 @@
             {% for p in reach.predictions_last_x_hours(24) %}
                 <tr>
                     <td>{{ p.time | strftime }}</td>
-                    <td>{{ p.probability_rounded_and_formatted }}</td>
+                    <td>{{ p.predicted_ecoli_cfu_100ml_rounded }}</td>
                     <td>{{ format_flag(p.safe) }}</td>
                     </tr>
             {% endfor %}
