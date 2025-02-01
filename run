@@ -2,28 +2,8 @@
 
 set -eo pipefail
 
-DC="${DC:-exec}"
-
-# If we're running in CI we need to disable TTY allocation for docker-compose
-# commands that enable it by default, such as exec and run.
-TTY=""
-if [[ ! -t 1 ]]; then
-  TTY="-T"
-fi
-
-# -----------------------------------------------------------------------------
-# Helper functions start with _ and aren't listed in this script's help menu.
-# -----------------------------------------------------------------------------
-
-function _dc {
-  docker compose --env-file .env "${DC}" ${TTY} "${@}"
-}
-
-function _build_run_down {
-  docker compose build
-  docker compose run ${TTY} "${@}"
-  docker compose down
-}
+# shellcheck disable=SC2046
+export $(grep -v '^#' .env | xargs)
 
 # -----------------------------------------------------------------------------
 
@@ -41,12 +21,12 @@ function ssl-cert {
 
 function cmd {
   # Run any command you want in the web container
-  _dc web "${@}"
+  docker compose exec web "${@}"
 }
 
 function flask {
   # Run any Flask commands
-  cmd flask "${@}"
+  docker compose exec web flask "${@}"
 }
 
 function lint:dockerfile {
@@ -57,68 +37,28 @@ function lint:dockerfile {
 
 function lint {
   # Lint Python code
-  cmd ruff check "${@}"
+  docker compose exec web ruff check "${@}"
 }
 
 function test {
   # Run test suite
-  cmd python -m pytest "${@}"
+  docker compose exec web python -m pytest "${@}"
 }
 
 function shell {
   # Start a shell session in the web container
-  cmd bash "${@}"
+  docker compose exec web bash "${@}"
 }
 
 function psql {
   # Connect to PostgreSQL
   # shellcheck disable=SC1091
-  . .env
- docker compose --env-file .env exec -i --tty postgres psql -U "${POSTGRES_USER}" "${@}"
-}
-
-function bash {
-  docker compose --env-file .env exec --tty -i web /bin/bash
+  docker compose exec postgres psql -U "${POSTGRES_USER}" -d "${POSTGRES_DB}" "${@}"
 }
 
 function redis-cli {
   # Connect to Redis
-  _dc redis redis-cli "${@}"
-}
-
-function ci:install-deps {
-  # Install Continuous Integration (CI) dependencies
-  sudo apt-get install -y curl shellcheck
-  sudo curl \
-    -L https://raw.githubusercontent.com/nickjj/wait-until/v0.2.0/wait-until \
-    -o /usr/local/bin/wait-until && sudo chmod +x /usr/local/bin/wait-until
-}
-
-function ci:test {
-  # Execute Continuous Integration (CI) pipeline
-  #
-  # It's expected that your CI environment has these tools available:
-  #   - https://github.com/koalaman/shellcheck
-  #   - https://github.com/nickjj/wait-until
-  shellcheck run bin/*
-  lint:dockerfile "${@}"
-
-  cp --no-clobber .env.example .env
-  cp --no-clobber docker-compose.override.yml.example docker-compose.override.yml
-
-  docker-compose build
-  docker-compose up -d
-
-  # shellcheck disable=SC1091
-  . .env
-  wait-until "docker-compose exec -T \
-    -e PGPASSWORD=${POSTGRES_PASSWORD} postgres \
-    psql -U ${POSTGRES_USER} ${POSTGRES_USER} -c 'SELECT 1'"
-
-  lint "${@}"
-  format --check
-  flask db reset --with-testdb
-  test "${@}"
+  docker compose exec redis redis-cli "${@}"
 }
 
 function help {
