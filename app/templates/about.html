@@ -3,9 +3,10 @@
 {% block content %}
     <h2>Flagging Program</h2>
     <p>
-        Of the many services that the CRWA provides to the greater Boston community, one of those is monitoring whether it is safe to swim and/or boat in the Charles River.The CRWA
-        Flagging Program uses a system of color-coded flags to indicate whether or not the river's water quality is safe for boating at eleven boating locations between Watertown and Boston.
-        Flag colors are based on E. coli and cyanobacteria (blue-green algae) levels; blue flags indicate suitable boating conditions and red flags indicate potential health risks.
+        Of the many services that the CRWA provides to the greater Boston community, one of those is monitoring whether it is safe to boat in the Charles River.The CRWA
+        Flagging Program uses a system of color-coded flags to indicate whether or not the river's water quality is safe for boating at 13 boating locations between Watertown and Boston.
+        Flag colors are based on <i>E. coli</i> and cyanobacteria (blue-green algae) levels, as well as if a CSO discharge has occurred in the last 48 hours.
+        Blue flags indicate suitable boating conditions and red flags indicate potential health risks.
         (<a href="https://www.crwa.org/flagging-program.html">CRWA Website</a>)
     </p>
     <div class="shrink-youtube">
@@ -18,25 +19,25 @@
     </div>
     <h2>Water Contamination</h2>
     <p>
-        CRWA conducts two water quality monitoring events per week during the peak recreational season in the Lower Basin from late June to late October.
+        CRWA conducts water quality sampling every week during the peak recreational season in the Lower Basin from May to late October.
         During monitoring events, CRWA measures water temperature and depth and collects water quality samples at four sampling locations in the Lower Basin.
-        G & L Laboratory in Quincy analyzes the samples for E. coli bacteria. Water temperature and depth are measured in situ with a digital field thermometer
+        G&L Laboratory in Quincy analyzes the samples for <i>E. coli</i> bacteria. Water temperature and depth are measured in situ with a digital field thermometer
         and a digital depth finder, respectively. Sampling locations are center channel sites, upstream of the following bridges: North Beacon Street,
         Larz Anderson Memorial Bridge, Boston University Bridge, and Longfellow Bridge. All samples are manual grab samples collected from a boat.
-        (<a href="https://www.crwa.org/s/2022-Flagging-Report.pdf">2022 Flagging Report</a>)
+        (<a href="https://www.crwa.org/s/2024-Flagging-Report_FINAL-1.pdf">2024 Flagging Report</a>)
     </p>
-    <h3>E. Coli</h3>
+    <h3><i>E. Coli</i></h3>
     <p>
-        "E. coli are bacteria found in the environment, foods, and intestines of people and animals. E. coli are a large and diverse group of bacteria. Although most strains of E. coli are harmless,
-        others can make you sick. Some kinds of E. coli can cause diarrhea, while others cause urinary tract infections, respiratory illness and pneumonia, and other illnesses."
+        <i>E. coli</i> are bacteria found in the environment, foods, and intestines of people and animals. <i>E. coli</i> are a large and diverse group of bacteria. Although most strains of <i>E. coli</i> are harmless,
+        others can make you sick. Some kinds of <i>E. coli</i> can cause diarrhea, while others cause urinary tract infections, respiratory illness and pneumonia, and other illnesses."
         (<a href="https://www.usgs.gov/special-topic/water-science-school/science/bacteria-and-e-coli-water?qt-science_center_objects=0#qt-science_center_objects">USGS</a>)
-        CRWA estimates E. coli bacteria levels using models that take into account a variety of environmental factors including rainfall and river flow.
+        CRWA estimates <i>E. coli</i> bacteria levels using models that take into account a variety of environmental factors including rainfall and river flow.
         CRWA collects water samples weekly to verify the model forecasts.
-        (<a href="https://www.crwa.org/flagging-program.html">CRWA Website</a>)
+        (<a href="https://www.crwa.org/cyano-monitoring">CRWA Website</a>)
     </p>
     <h3>Cyanobacteria</h3>
     <p>
-        "Cyanobacteria cause a multitude of water-quality concerns, including the potential to produce taste-and-odor causing compounds and toxins that are potent enough to poison animals and humans.
+        Cyanobacteria cause a multitude of water-quality concerns, including the potential to produce taste-and-odor causing compounds and toxins that are potent enough to poison animals and humans.
         Taste-and-odor compounds and toxins are of particular concern in lakes, reservoirs, and rivers that are used for either drinking water supplies or full body contact recreation."
         (<a href="https://www.usgs.gov/centers/kswsc/science/cyanobacterial-blue-green-algal-blooms-tastes-odors-and-toxins-0?qt-science_center_objects=0#qt-science_center_objects">USGS</a>)
         Cyanobacteria, also called blue-green algae, are microscopic cells that naturally grow in rivers and lakes. Cyanobacteria populations can explode in warm water with excess nutrients, and exposure
@@ -46,9 +47,9 @@
     </p>
     <h2>Predictive Models</h2>
     <p>
-        As part of our public notification program, CRWA uses statistical models to predict the likelihood that water quality will be in violation of the state standard threshold value for swimming at each of our four sampling reaches.
+        As part of our public notification program, CRWA uses statistical models to predict the likelihood that water quality will be in violation of the State's recreational water quality standard threshold value at each of our four sampling reaches.
         The models use antecedent rainfall, river flow, wind speed and air and water temperature to make predictions every hour throughout the recreational season. Models are necessary to produce real time water quality forecasts
-        because E. coli analysis requires at least 24 hours between sample collection and result reporting. These hourly forecasts allow boaters to make informed decisions about their desired contact with the river based on current
+        because <i>E. coli</i> analysis requires at least 24 hours between sample collection and result reporting. These hourly forecasts allow boaters to make informed decisions about their desired contact with the river based on current
         river water quality conditions.
         (<a href="https://www.crwa.org/s/2024-Flagging-Report_FINAL-1.pdf">2024 Flagging Report</a>)
     </p>
@@ -56,21 +57,29 @@
         CRWA's predictive models utilize live data from a HOBOlink RX3000 Remote Monitoring Station device, which is
         stationed at a boathouse on the Charles River. (You can download the latest raw data from this device
         <a href="https://www.hobolink.com/p/0cdac4a6910cef5a8883deb005d73ae1">here</a>.) Additionally, the model utilizes
-        data from a Waltham stream gauge via the <a href="https://waterdata.usgs.gov/nwis?">USGS National Water
-        Information System.</a>
+        data from two USGS stream gauges located in Waltham and Brookline.</a>
     </p>
     <h2>Credits</h2>
-        <img class="auth-img" src="{{ url_for('static', filename='images/daniel_reeves_photo.jpg') }}" alt="Photo of Daniel Reeves near the Charles river." />
-            <p>
-                This website was built by volunteers at <a href="https://www.codeforboston.org/">Code for Boston</a> in
-                collaboration with the Charles River Watershed Association, and is currently maintained on a volunteer
-                basis by <a href="https://www.linkedin.com/in/daniel-reeves-27700545/" target="_blank">Daniel Reeves</a>
-                (pictured near Community Boating), a former project leader at Code For Boston.
-            </p>
-            <p>
-                This website is open source. You can view the source code and a list of contributors
-                <a href="https://github.com/codeforboston/flagging">here</a>. Documentation for developing and operating this
-                website is available <a href="https://codeforboston.github.io/flagging">here</a>.
-            </p>
+        <!-- <img class="auth-img" src="{{ url_for('static', filename='images/daniel_reeves_photo.jpg') }}" alt="Photo of Daniel Reeves near the Charles river." /> -->
+        <p>
+            This website was built by volunteers at <a href="https://www.codeforboston.org/">Code for Boston</a> in
+            collaboration with the Charles River Watershed Association, and is currently maintained on a volunteer
+            basis by <a href="https://www.linkedin.com/in/daniel-reeves-27700545/" target="_blank">Daniel Reeves</a>,
+            a former project leader at Code For Boston.
+        </p>
+        <p>
+            The predictive model currently being used for the flagging program website was developed and deployed by <a href="https://www.linkedin.com/in/laura_xia">Laura Xia</a>
+            (MIT, class of 2026).
+             <!-- She has updated the model with new data to reflect the changing conditions of the Charles River. -->
+
+            <!-- We can also write a quick sentence about the model and how it was developed if you'd like.
+            "In addition to updating the model with new data to reflect the changing conditions of the Charles River, Laura's model improves on previous modeling efforts by replacing the older model's logistic regression with a regression on log(E. coli cfu/100ml), using machine learning methods for feature selection, and using [hierarchical modeling? partial pooling? mixed effects?] to regularize inter-reach model parameters." Jumping the gun on the last one though. 😂 You should phrase the description of the model yourself, though, I'm only offering this as a starting point. Also, we'll obviously wait on a description until you think it's done. -->
+
+        </p>
+        <p>
+            This website is open source. You can view the source code and a list of contributors
+            <a href="https://github.com/codeforboston/flagging">here</a>. Documentation for developing and operating this
+            website is available <a href="https://codeforboston.github.io/flagging">here</a>.
+        </p>
     <br />
 {% endblock %}
