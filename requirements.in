@@ -34,6 +34,9 @@ sentry-sdk[flask]
 tenacity
 tweepy
 
+# https://github.com/pallets-eco/flask-admin/issues/2548
+wtforms==3.1.2
+
 # ==========================================================
 # Testing
 # ==========================================================
