@@ -329,6 +329,15 @@ nav a:hover {
   z-index: 0;
 }
 
+.map_img {
+  display: block;
+  margin: 20px auto;
+  max-width: 645px;
+  width: 100%;
+  height: auto;
+}
+
+
 .auth-container {
   display: flex;
   flex-direction: row;
