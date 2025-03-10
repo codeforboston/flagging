@@ -122,5 +122,5 @@ def parse_usgs_data(res: Union[str, requests.models.Response], site_no: str) -> 
 
     numeric_columns = set(column_map[site_no].values()) - {"time"}  # All columns except "time"
     for col in numeric_columns:
-        df[col] = df[col].astype(float)
+        df[col] = df[col].replace("", None).astype(float)
     return df
