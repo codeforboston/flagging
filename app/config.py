@@ -125,6 +125,15 @@ class Config(BaseSettings):
         default_factory=lambda: os.getenv("REDIS_URL", "redis://localhost:6379/")
     )
 
+    @field_validator("CELERY_BROKER_URL", "CELERY_RESULT_BACKEND", "CACHE_REDIS_URL", mode="after")
+    @classmethod
+    def add_ssl_cert_reqs_to_heroku_redis_url(cls, v: str | None) -> str | None:
+        # This is required when running on Heroku.
+        if v is not None and v == os.getenv("REDIS_URL"):
+            v += "?ssl_cert_reqs=none"
+            return v
+        return v
+
     # Mail
     MAIL_SERVER: str = Field(
         default_factory=lambda: os.getenv("MAILGUN_SMTP_SERVER", "smtp.gmail.com")
