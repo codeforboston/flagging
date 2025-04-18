@@ -4,6 +4,9 @@ sending the message is handled by `tweet_current_status()`.
 """
 
 import warnings
+from datetime import datetime
+
+import pytz
 
 
 with warnings.catch_warnings():
@@ -13,7 +16,6 @@ with warnings.catch_warnings():
 from flask import Flask
 from flask import current_app
 
-from app.data.database import get_current_time
 from app.data.globals import boathouses
 
 
@@ -51,7 +53,7 @@ def compose_tweet() -> str:
 
     # Number of boathouses that are not safe. (`not b.safe`)
 
-    current_time = get_current_time().strftime("%I:%M %p, %m/%d/%Y")
+    current_time = datetime.now(pytz.timezone("US/Eastern")).strftime("%I:%M %p, %m/%d/%Y")
 
     unsafe_count = len(list(filter(lambda b: not b.safe, boathouses)))
 

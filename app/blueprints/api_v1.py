@@ -1,3 +1,6 @@
+from datetime import UTC
+from datetime import datetime
+
 from flasgger import LazyString
 from flasgger import Swagger
 from flasgger import swag_from
@@ -9,7 +12,6 @@ from flask import request
 from flask import url_for
 
 from app.data.database import execute_sql
-from app.data.database import get_current_time
 from app.data.globals import boathouses
 from app.data.globals import cache
 from app.data.globals import reaches
@@ -36,7 +38,7 @@ def predictive_model_api():
     return jsonify(
         {
             "model_version": DEFAULT_MODEL_VERSION,
-            "time_returned": get_current_time(),
+            "time_returned": datetime.now(UTC),
             "is_boating_season": website_options.boating_season,
             "model_outputs": [
                 {

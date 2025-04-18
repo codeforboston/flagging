@@ -44,7 +44,7 @@ def process_data(
     # The new model takes geomeans of some variables.
     # Put a floor on 0 for all of these variables, to be safe.
     df_usgs_w["log_stream_flow"] = np.log(np.maximum(df_usgs_w["stream_flow"], 1))
-    df_hobolink["log_air_temp"] = np.log(np.maximum(df_hobolink["air_temp"], 1))
+    df_hobolink["log_air_temp"] = np.log(np.maximum(df_hobolink["temperature"], 1))
     df_usgs_b["log_gage_height"] = np.log(np.maximum(df_usgs_b["gage_height"], 1))
 
     # Now collapse the data.
@@ -80,7 +80,7 @@ def process_data(
                 "dew_point": "mean",
                 "wind_speed": "mean",
                 "gust_speed": "mean",
-                "wind_dir": "mean",
+                "wind_direction": "mean",
                 # 'water_temp': np.mean,
                 # "air_temp": "mean",
                 "log_air_temp": "mean",

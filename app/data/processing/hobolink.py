@@ -1,10 +1,9 @@
-"""
-This file handles connections to the HOBOlink API, including cleaning and
-formatting of the data that we receive from it.
-"""
-
-import io
-from typing import Union
+import os
+from datetime import UTC
+from datetime import datetime
+from datetime import timedelta
+from typing import Any
+from urllib.parse import urljoin
 
 import pandas as pd
 import requests
@@ -14,81 +13,78 @@ from tenacity import retry
 from tenacity import stop_after_attempt
 from tenacity import wait_fixed
 
-from app.data.processing.utils import mock_source
 from app.mail import mail_on_fail
 
 
-# Constants
+BASE_URL = "https://api.hobolink.licor.cloud"
+HOBOLINK_ROWS_PER_HOUR = 12
+HOBOLINK_STATIC_FILE_NAME = ""
 
-HOBOLINK_URL = "http://webservice.hobolink.com/restv2/data/custom/file"
-HOBOLINK_DEFAULT_EXPORT_NAME = "code_for_boston_export_21d"
-HOBOLINK_ROWS_PER_HOUR = 6
-# Each key is the original column name; the value is the renamed column.
-HOBOLINK_COLUMNS = {
-    "Time, GMT-": "time",
-    "Pressure": "pressure",
-    "PAR": "par",
-    "Rain": "rain",
-    "RH": "rh",
-    "DewPt": "dew_point",
-    "Wind Speed": "wind_speed",
-    "Gust Speed": "gust_speed",
-    "Wind Dir": "wind_dir",
-    # 'Water Temp': 'water_temp',
-    "Temp": "air_temp",
-    # 'Batt, V, Charles River Weather Station': 'battery'
-}
-HOBOLINK_STATIC_FILE_NAME = "hobolink.pickle"
+
+"/v1/data"
 
 
 @retry(reraise=True, wait=wait_fixed(1), stop=stop_after_attempt(3))
-@mock_source(filename=HOBOLINK_STATIC_FILE_NAME)
 @mail_on_fail
-def get_live_hobolink_data(export_name: str = HOBOLINK_DEFAULT_EXPORT_NAME) -> pd.DataFrame:
+def get_live_hobolink_data(
+    start_date: datetime | None = None,
+    end_date: datetime | None = None,
+    days_ago: int = 30,
+    loggers: str | None = None,
+    exclude_sensors: list[str] | None = None,
+) -> pd.DataFrame:
     """This function runs through the whole process for retrieving data from
     HOBOlink: first we perform the request, and then we clean the data.
-
-    Args:
-        export_name: (str) Name of the "export." On the Hobolink web dashboard,
-                     go to Data > Exports and choose a name off the list.
 
     Returns:
         Pandas Dataframe containing the cleaned-up Hobolink data.
     """
-    res = request_to_hobolink(export_name=export_name)
-    df = parse_hobolink_data(res.text)
+    if current_app.config["USE_MOCK_DATA"]:
+        fpath = os.path.join(current_app.config["DATA_STORE"], "hobolink.pickle")
+        df = pd.read_pickle(fpath)
+        return df
+
+    if end_date is None:
+        end_date = datetime.now(tz=UTC)
+    if start_date is None:
+        start_date = end_date - timedelta(days=days_ago)
+    res = request_to_hobolink(start_date=start_date, end_date=end_date, loggers=loggers)
+    df = parse_hobolink_data(res.json(), exclude_sensors=exclude_sensors)
     return df
 
 
 def request_to_hobolink(
-    export_name: str = HOBOLINK_DEFAULT_EXPORT_NAME,
+    start_date: datetime, end_date: datetime, loggers: str = None, token: str | None = None
 ) -> requests.models.Response:
-    """
-    Get a request from the Hobolink server.
+    """ """
+    if loggers is None:
+        loggers = current_app.config["HOBOLINK_LOGGERS"]
+    if token is None:
+        token = current_app.config["HOBOLINK_BEARER_TOKEN"]
 
-    Args:
-        export_name: (str) Name of the "export." On the Hobolink web dashboard,
-                     go to Data > Exports and choose a name off the list.
+    res = requests.get(
+        urljoin(BASE_URL, "/v1/data"),
+        params={
+            "start_date_time": start_date.strftime("%Y-%m-%d %H:%M:%S"),
+            "end_date_time": end_date.strftime("%Y-%m-%d %H:%M:%S"),
+            "loggers": loggers,
+        },
+        headers={"Authorization": f"Bearer {token}", "accept": "application/json"},
+    )
 
-    Returns:
-        Request Response containing the data from the request.
-    """
-    data = {"query": export_name, "authentication": current_app.config["HOBOLINK_AUTH"]}
-
-    res = requests.post(HOBOLINK_URL, json=data)
-
-    # handle HOBOLINK errors by checking HTTP status code
-    # status codes in 400's are client errors, in 500's are server errors
     if res.status_code >= 400:
         error_msg = (
-            "API request to the HOBOlink endpoint failed with status " f"code {res.status_code}."
+            f"API request to the HOBOlink endpoint failed with status code {res.status_code}:"
+            + res.text
         )
         abort(500, error_msg)
 
     return res
 
 
-def parse_hobolink_data(res: Union[str, requests.models.Response]) -> pd.DataFrame:
+def parse_hobolink_data(
+    data: dict[str, Any], exclude_sensors: list[str] | None = None
+) -> pd.DataFrame:
     """
     Clean the response from the HOBOlink API.
 
@@ -98,42 +94,16 @@ def parse_hobolink_data(res: Union[str, requests.models.Response]) -> pd.DataFra
     Returns:
         Pandas DataFrame containing the HOBOlink data.
     """
-    if isinstance(res, requests.models.Response):
-        res = res.text
+    if not exclude_sensors:
+        # This sensor is for internal temp of device.
+        exclude_sensors = current_app.config["HOBOLINK_EXCLUDE_SENSORS"]
 
-    # The first half of the text from the response is a yaml. The part below
-    # the yaml is the actual data. The following lines split the text and grab
-    # the csv:
-    split_by = "------------"
-    str_table = res[res.find(split_by) + len(split_by) :]
+    df = pd.DataFrame(data["data"])
+    df = df.loc[~df["sensor_sn"].isin(exclude_sensors), :]
+    df["time"] = pd.to_datetime(df["timestamp"])
+    df["sensor_measurement_type"] = df["sensor_measurement_type"].str.lower().str.replace(" ", "_")
 
-    # Turn the text from the API response into a Pandas DataFrame.
-    df = pd.read_csv(io.StringIO(str_table), sep=",")
+    df = df.pivot(index="time", columns="sensor_measurement_type", values="value")
+    df = df.reset_index()
 
-    # There is a weird issue in the HOBOlink data where it sometimes returns
-    # multiple columns with the same name and spreads real data out across
-    # those two columns. It is VERY weird. I promise this code used to be much
-    # simpler before we ran into this issue and it broke the website. Please
-    # trust us that it does have to be this complicated.
-    for old_col_startswith, new_col in HOBOLINK_COLUMNS.items():
-        # Only look at rows that start with `old_col_startswith`
-        subset_df = df.loc[:, filter(lambda x: x.startswith(old_col_startswith), df.columns)]
-
-        # Remove rows with missing data (i.e. the 05, 15, 25, 35, 45, and 55 min
-        # timestamps, which only include the battery status.)
-        subset_df = subset_df.loc[~subset_df.isna().all(axis=1)]
-
-        # Take the first nonmissing column value within the subset of rows we've
-        # selected. This trick is similar to doing a COALESCE in sql.
-        df[new_col] = subset_df.apply(lambda x: x[x.first_valid_index()], axis=1)
-
-    # Only keep these columns
-    df = df[HOBOLINK_COLUMNS.values()]
-
-    # Remove the rows with all missing values again.
-    df = df.loc[df["air_temp"].notna()]
-
-    # Convert time column to Pandas datetime
-    df["time"] = pd.to_datetime(df["time"], format="%m/%d/%y %H:%M:%S")
-
-    return df.reset_index(drop=True)
+    return df

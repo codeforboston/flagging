@@ -8,9 +8,18 @@ this module, they won't refresh.
 
 import os
 import os.path as op
+from base64 import b64encode
+from typing import Annotated
+from typing import Any
 
-from distutils.util import strtobool
 from flask.cli import load_dotenv
+from pydantic import Field
+from pydantic import HttpUrl
+from pydantic import computed_field
+from pydantic import field_validator
+from pydantic_core import MultiHostUrl
+from pydantic_settings import BaseSettings
+from pydantic_settings import NoDecode
 
 
 # Constants
@@ -32,13 +41,10 @@ if os.getenv("ENV") != "production":
 # ~~~~~~~
 
 
-class Config:
+class Config(BaseSettings):
     """This class is a container for all config variables. Instances of this
     class are loaded into the Flask app in the `create_app` function.
     """
-
-    def __repr__(self):
-        return f"{self.__class__.__name__}()"
 
     # ==========================================================================
     # FLASK BUILTIN CONFIG OPTIONS
@@ -50,82 +56,87 @@ class Config:
     # ==========================================================================
 
     DEBUG: bool = False
-    TESTING: bool = False
-    SECRET_KEY: str = os.getenv("SECRET_KEY", os.urandom(32))
+    SECRET_KEY: str = Field(default_factory=lambda: b64encode(os.urandom(32)).decode())
+    PREFERRED_URL_SCHEME: str = "https"
 
     # ==========================================================================
-    # DATABASE CONFIG OPTIONS
+    # Database
     # ==========================================================================
 
-    POSTGRES_USER: str = os.getenv("POSTGRES_USER", os.getenv("USER", "postgres"))
-    POSTGRES_PASSWORD: str = os.getenv("POSTGRES_PASSWORD", "postgres")
-    POSTGRES_HOST: str = os.getenv("POSTGRES_HOST", "localhost")
-    POSTGRES_PORT: str = os.getenv("POSTGRES_PORT", "5432")
-    POSTGRES_DB: str = os.getenv("POSTGRES_DB", "flagging")
+    POSTGRES_USER: str = "postgres"
+    POSTGRES_PASSWORD: str = "postgres"
+    POSTGRES_HOST: str = "localhost"
+    POSTGRES_PORT: int = 5432
+    POSTGRES_DB: str = "postgres"
 
+    DATABASE_URL: str | None = None
+    """Heroku-specific env var. This overrides the POSTGRES_ fields."""
+
+    @computed_field
     @property
     def SQLALCHEMY_DATABASE_URI(self) -> str:
-        """
-        Returns the URI for the Postgres database.
-        Example:
-            >>> Config().SQLALCHEMY_DATABASE_URI
-            'postgres://postgres:password_here@localhost:5432/flagging'
-        """
-        if "DATABASE_URL" in os.environ:
-            return os.environ["DATABASE_URL"].replace("postgres://", "postgresql://")
+        if self.DATABASE_URL:
+            return self.DATABASE_URL.replace("postgres://", "postgresql://")
         else:
-            user = self.POSTGRES_USER
-            password = self.POSTGRES_PASSWORD
-            host = self.POSTGRES_HOST
-            port = self.POSTGRES_PORT
-            db = self.POSTGRES_DB
-            return f"postgresql://{user}:{password}@{host}:{port}/{db}"
-
-    QUERIES_DIR: str = QUERIES_DIR
-    """Directory that contains various queries that are accessible throughout
-    the rest of the code base.
-    """
+            return str(
+                MultiHostUrl.build(
+                    scheme="postgresql",
+                    username=self.POSTGRES_USER,
+                    password=self.POSTGRES_PASSWORD,
+                    host=self.POSTGRES_HOST,
+                    port=self.POSTGRES_PORT,
+                    path=self.POSTGRES_DB,
+                )
+            )
 
     # Flask-SQLAlchemy
     # https://flask-sqlalchemy.palletsprojects.com/en/2.x/config/
     SQLALCHEMY_TRACK_MODIFICATIONS: bool = False
 
-    # ==========================================================================
-    # CONFIG OPTIONS FROM OTHER EXTENSIONS
-    # ==========================================================================
-
     # Flask-DB
-    FLASK_DB_SEEDS_PATH = "alembic/seeds.py"
+    # https://github.com/nickjj/flask-db
+    FLASK_DB_SEEDS_PATH: str = "alembic/seeds.py"
 
     # Flask-Admin
     # https://flask-admin.readthedocs.io/en/latest/
-    FLASK_ADMIN_SWATCH = "lumen"
+    FLASK_ADMIN_SWATCH: str = "lumen"
 
     # Flask-BasicAuth
     # https://flask-basicauth.readthedocs.io/en/latest/
-    BASIC_AUTH_USERNAME: str = os.getenv("BASIC_AUTH_USERNAME", "admin")
-    BASIC_AUTH_PASSWORD: str = os.getenv("BASIC_AUTH_PASSWORD", "password")
+    BASIC_AUTH_USERNAME: str
+    BASIC_AUTH_PASSWORD: str
 
     # Flask-Caching
     # https://flask-caching.readthedocs.io/en/latest/
     # Set CACHE_TYPE=null in environment variables to turn off.
     CACHE_DEFAULT_TIMEOUT: int = 60 * 60 * 7
     CACHE_TYPE: str = "flask_caching.backends." + os.getenv("CACHE_TYPE", "redis")
-    CACHE_REDIS_URL: str = os.getenv("REDIS_URL", "redis://localhost:6379/")
+    # REDIS_URL is specific to Heroku
+    CACHE_REDIS_URL: str | None = Field(
+        default_factory=lambda: os.getenv("REDIS_URL", "redis://localhost:6379/")
+    )
     CACHE_KEY_PREFIX: str = "frontend_cache"
 
     # Celery
-    CELERY_BROKER_URL: str = os.getenv("REDIS_URL", "redis://localhost:6379/")
-    CELERY_RESULT_BACKEND: str = os.getenv("REDIS_URL", "redis://localhost:6379/")
+    CELERY_BROKER_URL: str | None = Field(
+        default_factory=lambda: os.getenv("REDIS_URL", "redis://localhost:6379/")
+    )
+    CELERY_RESULT_BACKEND: str | None = Field(
+        default_factory=lambda: os.getenv("REDIS_URL", "redis://localhost:6379/")
+    )
 
     # Mail
-    MAIL_SERVER = os.getenv("MAILGUN_SMTP_SERVER") or "smtp.gmail.com"
-    MAIL_PORT = int(os.getenv("MAILGUN_SMTP_PORT") or 587)
-    MAIL_USE_TLS = True
-    MAIL_USERNAME = os.getenv("MAILGUN_SMTP_LOGIN") or os.getenv("MAIL_USERNAME")
-    MAIL_PASSWORD = os.getenv("MAILGUN_SMTP_PASSWORD") or os.getenv("MAIL_PASSWORD")
-    MAIL_ERROR_ALERTS_TO = os.getenv("MAIL_ERROR_ALERTS_TO", "")
-    MAIL_DATABASE_EXPORTS_TO = os.getenv("MAIL_DATABASE_EXPORTS_TO", "")
+    MAIL_SERVER: str = Field(
+        default_factory=lambda: os.getenv("MAILGUN_SMTP_SERVER", "smtp.gmail.com")
+    )
+    MAIL_PORT: int = 587
+    MAIL_USE_TLS: bool = True
+    MAIL_USERNAME: str | None = Field(default_factory=lambda: os.getenv("MAILGUN_SMTP_LOGIN"))
+    MAIL_PASSWORD: str | None = Field(default_factory=lambda: os.getenv("MAILGUN_SMTP_PASSWORD"))
+    MAIL_ERROR_ALERTS_TO: Annotated[list[str], NoDecode] = Field(default_factory=lambda: [])
+    MAIL_DATABASE_EXPORTS_TO: Annotated[list[str], NoDecode] = Field(default_factory=lambda: [])
+    SEND_EMAILS: bool = False
+
     # ==========================================================================
     # MISC. CUSTOM CONFIG OPTIONS
     #
@@ -134,15 +145,11 @@ class Config:
     # website.
     # ==========================================================================
 
-    ENV: str = None
+    HOBOLINK_LOGGERS: str
+    HOBOLINK_BEARER_TOKEN: str
+    HOBOLINK_EXCLUDE_SENSORS: Annotated[list[str], NoDecode] = Field(default_factory=lambda: [])
 
-    HOBOLINK_AUTH: dict = {
-        "user": os.getenv("HOBOLINK_USERNAME"),
-        "password": os.getenv("HOBOLINK_PASSWORD"),
-        "token": os.getenv("HOBOLINK_TOKEN"),
-    }
-
-    TWITTER_AUTH: dict = {
+    TWITTER_AUTH: dict[str, Any] = {
         "api_key": os.getenv("TWITTER_API_KEY") or "",
         "api_key_secret": os.getenv("TWITTER_API_KEY_SECRET") or "",
         "access_token": os.getenv("TWITTER_ACCESS_TOKEN") or "",
@@ -177,14 +184,14 @@ class Config:
     to be well within that limit to the extent we can assure it.
     """
 
-    USE_CELERY: bool = strtobool(os.getenv("USE_CELERY", "true"))
+    USE_CELERY: bool = True
     """We need to get around Heroku free tier limitations by not using a worker
     dyno to process backend database stuff. This will end up blocking requests
     during heavy operations, but oh well. That's the price for not funding
     river science.
     """
 
-    SEND_TWEETS: bool = strtobool(os.getenv("SEND_TWEETS", "false"))
+    SEND_TWEETS: bool = False
     """If True, the website behaves normally. If False, any time the app would
     send a Tweet, it does not do so. It is useful to turn this off when
     developing to test Twitter messages.
@@ -192,122 +199,24 @@ class Config:
 
     DEFAULT_WIDGET_VERSION: int = 2
 
-    MAPBOX_ACCESS_TOKEN: str = os.getenv("MAPBOX_ACCESS_TOKEN")
+    MAPBOX_ACCESS_TOKEN: str | None = None
 
-    SENTRY_DSN: str | None = os.getenv("SENTRY_DSN")
-    SENTRY_ENVIRONMENT: str | None = os.getenv("SENTRY_ENVIRONMENT")
+    SENTRY_DSN: HttpUrl | None = None
+    SENTRY_ENVIRONMENT: str | None = None
 
-
-class ProductionConfig(Config):
-    """The Production Config is used for deployment of the website to the
-    internet. Currently the only part of the website that's pretty fleshed out
-    is the `flagging` part, so that's the only blueprint we import.
-    """
-
-    ENV: str = "production"
-    CACHE_TYPE: str = "flask_caching.backends.redis"
-    PREFERRED_URL_SCHEME: str = "https"
-    SEND_TWEETS: bool = strtobool(os.getenv("SEND_TWEETS", "true"))
-
-    def __init__(self):
-        """Initializing the production config allows us to ensure the existence
-        of these variables in the environment."""
-        try:
-            self.BASIC_AUTH_USERNAME: str = os.environ["BASIC_AUTH_USERNAME"]
-            self.BASIC_AUTH_PASSWORD: str = os.environ["BASIC_AUTH_PASSWORD"]
-        except KeyError:
-            msg = (
-                "You did not set all of the environment variables required to "
-                "initiate the app in production mode. If you are deploying "
-                "the website to Heroku, read the Deployment docs page to "
-                "learn how to set env variables in Heroku. If you are not on "
-                "Heroku, make sure your FLASK_ENV environment variable is set!"
-            )
-            print(msg)
-            raise
-        self.CACHE_REDIS_URL = self.CACHE_REDIS_URL + "?ssl_cert_reqs=none"
-        self.CELERY_BROKER_URL = self.CELERY_BROKER_URL + "?ssl_cert_reqs=none"
-        self.CELERY_RESULT_BACKEND = self.CELERY_RESULT_BACKEND + "?ssl_cert_reqs=none"
-        self.CACHE_OPTIONS = {"ssl_cert_reqs": "CERT_NONE"}
+    @field_validator(
+        "MAIL_ERROR_ALERTS_TO",
+        "MAIL_DATABASE_EXPORTS_TO",
+        "HOBOLINK_EXCLUDE_SENSORS",
+        mode="before",
+    )
+    @classmethod
+    def validate_semicolon_separated_lists(cls, v: list[str] | str | None) -> list[str]:
+        if isinstance(v, str):
+            return [i.strip() for i in v.split(";")]
+        elif v is None:
+            return []
+        return v
 
 
-class StagingConfig(ProductionConfig):
-    ENV: str = "staging"
-    pass
-
-
-class DevelopmentConfig(Config):
-    """The Development Config is used for running the website on your own
-    computer. This is the default config loaded up when you use `run_unix_dev`
-    or `run_windows_dev` to boot up the website.
-
-    This config turns on both Flask's debug mode (which shows detailed messages
-    for unhandled exceptions) and Flask's testing mode (which turns off the
-    app instance's builtin exception handling).
-    """
-
-    ENV: str = "development"
-    DEBUG: bool = True
-    TESTING: bool = True
-    CACHE_DEFAULT_TIMEOUT: int = 60
-    USE_MOCK_DATA: bool = strtobool(os.getenv("USE_MOCK_DATA", "false"))
-    SQLALCHEMY_ECHO: bool = strtobool(os.getenv("SQLALCHEMY_ECHO", "false"))
-
-
-class TestingConfig(Config):
-    """The Testing Config is used for unit-testing and integration-testing the
-    website.
-    """
-
-    ENV: str = "testing"
-    PREFERRED_URL_SCHEME: str = "https"
-    SEND_TWEETS: bool = True  # Won't actually send tweets.
-    TESTING: bool = True
-    CACHE_TYPE: str = "flask_caching.backends.simple"
-    USE_MOCK_DATA: bool = True
-    TWITTER_AUTH: dict = {k: "?" for k in Config.TWITTER_AUTH}
-    POSTGRES_DB: str = os.getenv("POSTGRES_DB", "flagging") + "_test"
-    MAIL_USERNAME = "admin@admin.com"
-    MAIL_ERROR_ALERTS_TO = "some@email.com"
-    BASIC_AUTH_USERNAME: str = "admin"
-    BASIC_AUTH_PASSWORD: str = "password"
-
-
-class DemoConfig(ProductionConfig):
-    """Config for the Heroku one-click deploy demo mode."""
-
-    ENV: str = "demo"
-    USE_MOCK_DATA: bool = True
-
-
-def get_config_from_env(env: str) -> Config:
-    """This function takes a string variable, looks at what that string variable
-    is, and returns an instance of a Config class corresponding to that string
-    variable.
-
-    Args:
-        env: (str) A string. Usually this is from `app.env` inside of the
-             `create_app` function, which in turn is set by the environment
-             variable `ENV`.
-    Returns:
-        A Config instance corresponding with the string passed.
-
-    Example:
-        >>> get_config_from_env('development')
-        DevelopmentConfig()
-    """
-    config_mapping = {
-        "production": ProductionConfig,
-        "staging": StagingConfig,
-        "development": DevelopmentConfig,
-        "testing": TestingConfig,
-        "demo": DemoConfig,
-    }
-    try:
-        config = config_mapping[env]
-    except KeyError:
-        valid_confs = config_mapping.values()
-        print(f"Bad config passed; the config must be in {valid_confs}")
-        raise
-    else:
-        return config()
+config = Config()

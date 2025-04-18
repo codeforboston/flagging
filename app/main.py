@@ -6,7 +6,6 @@ import datetime
 import hashlib
 import os
 from functools import wraps
-from typing import Optional
 
 import click
 from flask import Flask
@@ -21,7 +20,7 @@ from markupsafe import Markup
 from werkzeug.middleware.proxy_fix import ProxyFix
 
 
-def create_app(config: Optional[str] = None) -> Flask:
+def create_app() -> Flask:
     """Create and configure an instance of the Flask application.
 
     Args:
@@ -33,10 +32,9 @@ def create_app(config: Optional[str] = None) -> Flask:
     """
     app = Flask(__name__)
 
-    from .config import get_config_from_env
+    from .config import config
 
-    cfg = get_config_from_env(config or os.getenv("FLASK_ENV") or os.getenv("ENV"))
-    app.config.from_object(cfg)
+    app.config.from_object(config)
 
     with app.app_context():
         register_extensions(app)
@@ -257,7 +255,7 @@ def register_commands(app: Flask):
 
         @wraps(func)
         def _wrap(*args, **kwargs):
-            if current_app.config["ENV"] not in ["development", "testing"]:
+            if not current_app.config["DEBUG"]:
                 raise RuntimeError(
                     "You can only run this in the development environment."
                     " Make sure you set up the environment correctly if you"

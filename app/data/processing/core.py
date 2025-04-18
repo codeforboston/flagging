@@ -4,20 +4,20 @@ about adding a little repetition and not worrying about async processing-- both
 in service of simplifying the code for ease of maintenance.
 """
 
+from datetime import datetime
 from enum import Enum
 from functools import partial
 from typing import Optional
 from typing import Protocol
 
 import pandas as pd
+import pytz
 from flask import current_app
 
 from app.data.database import db
 from app.data.database import execute_sql
-from app.data.database import get_current_time
 from app.data.globals import cache
 from app.data.models.prediction import Prediction
-from app.data.processing.hobolink import HOBOLINK_DEFAULT_EXPORT_NAME
 from app.data.processing.hobolink import HOBOLINK_ROWS_PER_HOUR
 from app.data.processing.hobolink import get_live_hobolink_data
 from app.data.processing.usgs import USGS_DEFAULT_DAYS_AGO
@@ -79,13 +79,12 @@ DEFAULT_MODEL_VERSION = ModelVersion.v4
 @mail_on_fail
 def _combine_job(
     days_ago: int = USGS_DEFAULT_DAYS_AGO,
-    export_name: str = HOBOLINK_DEFAULT_EXPORT_NAME,
     model_version: ModelVersion = DEFAULT_MODEL_VERSION,
 ) -> pd.DataFrame:
     mod = model_version.get_module()
     df_usgs_w = get_live_usgs_data(days_ago=days_ago, site_no="01104500")
     df_usgs_b = get_live_usgs_data(days_ago=days_ago, site_no="01104683")
-    df_hobolink = get_live_hobolink_data(export_name=export_name)
+    df_hobolink = get_live_hobolink_data(days_ago=days_ago)
     df_combined = mod.process_data(
         df_hobolink=df_hobolink, df_usgs_w=df_usgs_w, df_usgs_b=df_usgs_b
     )
@@ -101,13 +100,12 @@ combine_v4_job = partial(_combine_job, model_version=ModelVersion.v4)
 @mail_on_fail
 def _predict_job(
     days_ago: int = USGS_DEFAULT_DAYS_AGO,
-    export_name: str = HOBOLINK_DEFAULT_EXPORT_NAME,
     model_version: ModelVersion = DEFAULT_MODEL_VERSION,
 ) -> pd.DataFrame:
     mod = model_version.get_module()
     df_usgs_w = get_live_usgs_data(days_ago=days_ago, site_no="01104500")
     df_usgs_b = get_live_usgs_data(days_ago=days_ago, site_no="01104683")
-    df_hobolink = get_live_hobolink_data(export_name=export_name)
+    df_hobolink = get_live_hobolink_data(days_ago=days_ago)
     df_combined = mod.process_data(
         df_hobolink=df_hobolink, df_usgs_w=df_usgs_w, df_usgs_b=df_usgs_b
     )
@@ -151,14 +149,14 @@ def send_database_exports() -> None:
     mod = DEFAULT_MODEL_VERSION.get_module()
     df_usgs_w = get_live_usgs_data(days_ago=90, site_no="01104500")
     df_usgs_b = get_live_usgs_data(days_ago=90, site_no="01104683")
-    df_hobolink = get_live_hobolink_data(export_name="code_for_boston_export_90d")
+    df_hobolink = get_live_hobolink_data(days_ago=90)
     df_combined = mod.process_data(
         df_hobolink=df_hobolink, df_usgs_w=df_usgs_w, df_usgs_b=df_usgs_b
     )
     df_predictions = mod.all_models(df_combined)
     df_override_history = execute_sql("select * from override_history;")
 
-    todays_date = get_current_time().strftime("%Y_%m_%d")
+    todays_date = datetime.now(pytz.timezone("US/Eastern")).strftime("%Y_%m_%d")
 
     msg = ExportEmail()
 

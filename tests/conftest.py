@@ -13,7 +13,8 @@ from app.twitter import tweepy_api
 
 @pytest.fixture(scope="session")
 def app():
-    app = create_app(config="testing")
+    app = create_app()
+    app.testing = True
 
     janitor = DatabaseJanitor(
         user=app.config["POSTGRES_USER"],
