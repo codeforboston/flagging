@@ -13,6 +13,9 @@ services:
     env_file:
       - .env
     environment:
+      CACHE_REDIS_URL: redis://redis:6379/
+      CELERY_BROKER_URL: redis://redis:6379/
+      CELERY_RESULT_BACKEND: redis://redis:6379/
       GUNICORN_CMD_ARGS: --reload
     networks:
       - db
@@ -68,6 +71,10 @@ services:
       - redis
     env_file:
       - .env
+    environment:
+      CACHE_REDIS_URL: redis://redis:6379/
+      CELERY_BROKER_URL: redis://redis:6379/
+      CELERY_RESULT_BACKEND: redis://redis:6379/
     ports:
       - 5555:5555
     depends_on:

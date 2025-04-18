@@ -63,5 +63,5 @@ pre-commit
 # Webserver
 # ==========================================================
 
-gunicorn>19
+gunicorn
 inotify  # For --reload flag

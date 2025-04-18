@@ -55,7 +55,7 @@ class Config(BaseSettings):
     # See here for more: https://flask.palletsprojects.com/en/1.1.x/config/
     # ==========================================================================
 
-    DEBUG: bool = False
+    FLASK_DEBUG: bool = False
     SECRET_KEY: str = Field(default_factory=lambda: b64encode(os.urandom(32)).decode())
     PREFERRED_URL_SCHEME: str = "https"
 
@@ -99,7 +99,7 @@ class Config(BaseSettings):
 
     # Flask-Admin
     # https://flask-admin.readthedocs.io/en/latest/
-    FLASK_ADMIN_SWATCH: str = "lumen"
+    FLASK_ADMIN_SWATCH: str = "flatly"
 
     # Flask-BasicAuth
     # https://flask-basicauth.readthedocs.io/en/latest/
@@ -131,6 +131,7 @@ class Config(BaseSettings):
         # This is required when running on Heroku.
         if v is not None and v == os.getenv("REDIS_URL"):
             v += "?ssl_cert_reqs=none"
+            v = v.replace("redis://", "rediss://")
             return v
         return v
 

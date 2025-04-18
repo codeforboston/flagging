@@ -1,6 +1,7 @@
 import re
 
 from flask import Flask
+from flask import current_app
 from flask import redirect
 from flask import request
 from flask_admin import Admin
@@ -16,7 +17,7 @@ from app.admin.views.website_options import WebsiteOptionsModelView
 from app.data.database import db
 
 
-admin = Admin(template_mode="bootstrap3", index_view=AdminIndexView())
+admin = Admin(template_mode="bootstrap4", index_view=AdminIndexView())
 
 
 def init_admin(app: Flask):
@@ -32,7 +33,7 @@ def init_admin(app: Flask):
         """Authorize all paths that start with /admin/."""
         if re.match("^/admin(?:$|/+)", request.path):
             # Force HTTPS
-            if not request.is_secure:
+            if not current_app.debug and not request.is_secure:
                 url = request.url.replace("http://", "https://", 1)
                 return redirect(url)
 

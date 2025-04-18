@@ -35,7 +35,7 @@ class Prediction(db.Model):
 
     @classmethod
     def _latest_ts_scalar_subquery(cls):
-        return select(func.max(Prediction.time)).as_scalar()
+        return select(func.max(Prediction.time)).scalar_subquery()
 
     @classmethod
     def get_latest(cls, reach: int) -> "Prediction":
