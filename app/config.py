@@ -145,8 +145,8 @@ class Config(BaseSettings):
     # website.
     # ==========================================================================
 
-    HOBOLINK_LOGGERS: str
-    HOBOLINK_BEARER_TOKEN: str
+    HOBOLINK_LOGGERS: str | None = None
+    HOBOLINK_BEARER_TOKEN: str | None = None
     HOBOLINK_EXCLUDE_SENSORS: Annotated[list[str], NoDecode] = Field(default_factory=lambda: [])
 
     TWITTER_AUTH: dict[str, Any] = {
