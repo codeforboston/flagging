@@ -1,42 +1,26 @@
-x-app: &app-config
-  build: .
-  depends_on:
-    - postgres
-    - redis
-  env_file:
-    - .env
-  environment:
-    POSTGRES_USER: postgres
-    POSTGRES_HOST: postgres
-    POSTGRES_PASSWORD: postgres
-    POSTGRES_DB: flagging
-    REDIS_URL: redis://redis:6379
-    FLASK_ENV: ${FLASK_ENV:-development}
-    BASIC_AUTH_USERNAME: ${BASIC_AUTH_USERNAME:-development}
-    GUNICORN_CMD_ARGS: --reload
-  networks:
-    - db
-    - redis
-  restart: unless-stopped
-  stop_grace_period: "5s"
-  tty: true
-  volumes:
-    - .:/app
-
-# version: '3.3'
 services:
 
   web:
-    <<: *app-config
+    build: .
+    tty: true
     ports:
       - "127.0.0.1:80:80"
       - "127.0.0.1:443:443"
     depends_on:
       - postgres
-    links:
-      - postgres
       - redis
       - celeryworker
+    env_file:
+      - .env
+    environment:
+      GUNICORN_CMD_ARGS: --reload
+    networks:
+      - db
+      - redis
+    restart: unless-stopped
+    stop_grace_period: "5s"
+    volumes:
+      - .:/app
 
   redis:
     image: redis:alpine
@@ -49,7 +33,12 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_HOST: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: flagging
+      POSTGRES_DB: postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     env_file:
       - .env
     tty: true
@@ -72,12 +61,22 @@ services:
       - pgadmin:/var/lib/pgadmin
 
   celeryworker:
-    <<: *app-config
+    build: .
+    tty: true
     entrypoint: ["flask", "celery", "worker"]
+    networks:
+      - redis
+    env_file:
+      - .env
     ports:
       - 5555:5555
     depends_on:
       - redis
+      - postgres
+    restart: unless-stopped
+    stop_grace_period: "5s"
+    volumes:
+      - .:/app
 
 
 networks:

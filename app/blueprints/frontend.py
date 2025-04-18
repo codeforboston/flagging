@@ -1,3 +1,5 @@
+from datetime import UTC
+from datetime import datetime
 from typing import Any
 from typing import Dict
 
@@ -7,7 +9,6 @@ from flask import current_app
 from flask import flash
 from flask import render_template
 
-from app.data.database import get_current_time
 from app.data.globals import boathouses
 from app.data.globals import cache
 from app.data.globals import reaches
@@ -22,7 +23,7 @@ bp = Blueprint("flagging", __name__)
 @cache.cached()  # <-- needs to be here. some issues occur if you exclude it.
 def before_request():
     last_pred_time = get_latest_prediction_time()
-    current_time = get_current_time()
+    current_time = datetime.now(UTC)
     # Calculate difference between now and latest prediction time
     # If model_outputs has zero rows, we raise the following error:
     # > TypeError: unsupported operand type(s) for -: 'Timestamp' and 'NoneType'
@@ -33,8 +34,8 @@ def before_request():
         diff = None
 
     # If more than 48 hours, flash message.
-    if current_app.config["ENV"] == "demo":
-        flash("This website is currently in demo mode. It is not using live data.")
+    if current_app.config["USE_MOCK_DATA"]:
+        flash("This website is currently in MOCK_DATA=true mode. It is not using live data.")
     elif diff is None:
         flash(
             "A unknown error occurred. It is likely that the database does not "

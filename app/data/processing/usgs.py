@@ -7,28 +7,28 @@ Waltham: https://waterdata.usgs.gov/nwis/uv?site_no=01104500
 Muddy River: https://waterdata.usgs.gov/nwis/uv?site_no=01104683
 """
 
+import os
 from typing import Union
 
 import pandas as pd
 import requests
 from flask import abort
+from flask import current_app
 from tenacity import retry
 from tenacity import stop_after_attempt
 from tenacity import wait_fixed
 
-from app.data.processing.utils import mock_source
 from app.mail import mail_on_fail
 
 
 USGS_URL = "https://waterdata.usgs.gov/nwis/uv"
 USGS_STATIC_FILE_NAME = "usgs.pickle"
-USGS_DEFAULT_DAYS_AGO = 14
+USGS_DEFAULT_DAYS_AGO = 30
 USGS_ROWS_PER_HOUR_WALTHAM = 4
 USGS_ROWS_PER_HOUR_MUDDY_RIVER = 6
 
 
 @retry(reraise=True, wait=wait_fixed(1), stop=stop_after_attempt(3))
-@mock_source(filename=USGS_STATIC_FILE_NAME)
 @mail_on_fail
 def get_live_usgs_data(
     days_ago: int = USGS_DEFAULT_DAYS_AGO, site_no: str = "01104500"
@@ -39,6 +39,14 @@ def get_live_usgs_data(
     Returns:
         Pandas Dataframe containing the usgs data.
     """
+    if current_app.config["USE_MOCK_DATA"]:
+        fname = {"01104500": "usgs_w.pickle", "01104683": "usgs_b.pickle"}.get(site_no)
+        if not fname:
+            raise ValueError(f"Site no {site_no} not mapped to a mock data file.")
+        fpath = os.path.join(current_app.config["DATA_STORE"], fname)
+        df = pd.read_pickle(fpath)
+        return df
+
     res = request_to_usgs(days_ago=days_ago, site_no=site_no)
     df = parse_usgs_data(res, site_no=site_no)
     return df
@@ -114,7 +122,7 @@ def parse_usgs_data(res: Union[str, requests.models.Response], site_no: str) -> 
     df = df[list(column_map[site_no].values())]
 
     # Convert types
-    df["time"] = pd.to_datetime(df["time"])
+    df["time"] = pd.to_datetime(df["time"]).dt.tz_localize("US/Eastern").dt.tz_convert("UTC")
     # Note to self: ran this once in a test and it gave the following error:
     # >>> ValueError: could not convert string to float: ''
     # Reran and it went away

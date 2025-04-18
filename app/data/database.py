@@ -60,7 +60,3 @@ def execute_sql_from_file(file_name: str) -> Optional[pd.DataFrame]:
     with current_app.open_resource(path) as f:
         s = f.read().decode("utf8")
         return execute_sql(s)
-
-
-def get_current_time() -> pd.Timestamp:
-    return pd.Timestamp("now", tz="UTC").tz_convert("US/Eastern").tz_localize(None)

@@ -14,10 +14,10 @@ T = TypeVar("T")
 
 
 class Mail(_Mail):
-    def send(self, message: str):
+    def send(self, message: Message) -> None:
         # Only use this in staging and production.
-        if current_app.config["ENV"] not in ["production", "staging"]:
-            print("(Not actually sending email.)")
+        if not current_app.config["SEND_EMAILS"]:
+            print("(Was about to send email, but did not because SEND_EMAILS=false.)")
             return
         super().send(message)
 
@@ -27,7 +27,7 @@ mail = Mail()
 
 class ErrorEmail(Message):
     def __init__(self, **kwargs):
-        recipients = [i.strip() for i in current_app.config["MAIL_ERROR_ALERTS_TO"].split(";")]
+        recipients = current_app.config["MAIL_ERROR_ALERTS_TO"]
         kwargs.setdefault("subject", "Flagging site error")
         kwargs.setdefault("recipients", recipients)
         kwargs.setdefault("sender", current_app.config["MAIL_USERNAME"])
@@ -36,7 +36,7 @@ class ErrorEmail(Message):
 
 class ExportEmail(Message):
     def __init__(self, **kwargs):
-        recipients = [i.strip() for i in current_app.config["MAIL_DATABASE_EXPORTS_TO"].split(";")]
+        recipients = current_app.config["MAIL_DATABASE_EXPORTS_TO"]
         html = render_template("mail/periodic_data_delivery.html")
         kwargs.setdefault("html", html)
         kwargs.setdefault("subject", "Flagging site data exports")

@@ -41,7 +41,7 @@ def process_data(
     # The new model takes geomeans of some variables.
     # Put a floor on 0 for all of these variables, to be safe.
     df_usgs_w["log_stream_flow"] = np.log(np.maximum(df_usgs_w["stream_flow"], 1))
-    df_hobolink["log_air_temp"] = np.log(np.maximum(df_hobolink["air_temp"], 1))
+    df_hobolink["log_air_temp"] = np.log(np.maximum(df_hobolink["temperature"], 1))
 
     # TODO: look into how to calculate this
     # the new model also takes max of whether there was > 0.1 rain per

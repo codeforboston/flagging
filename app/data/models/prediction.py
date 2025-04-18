@@ -3,6 +3,7 @@ from typing import Any
 from typing import Dict
 from typing import List
 
+import pytz
 from sqlalchemy import and_
 from sqlalchemy import func
 from sqlalchemy import select
@@ -19,6 +20,10 @@ class Prediction(db.Model):
     safe = db.Column(db.Boolean)
 
     reach = db.relationship("Reach", back_populates="predictions")
+
+    @property
+    def local_time(self) -> datetime:
+        return self.time.astimezone(pytz.timezone("US/Eastern"))
 
     @property
     def predicted_ecoli_cfu_100ml_rounded(self) -> float:

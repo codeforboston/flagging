@@ -18,7 +18,7 @@
         <tbody>
             {% for p in reach.predictions_last_x_hours(24) %}
                 <tr>
-                    <td>{{ p.time | strftime }}</td>
+                    <td>{{ p.local_time | strftime }}</td>
                     <td>{{ p.predicted_ecoli_cfu_100ml_rounded }}</td>
                     <td>{{ format_flag(p.safe) }}</td>
                     </tr>

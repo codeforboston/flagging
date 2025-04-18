@@ -52,9 +52,9 @@ def process_data(
                 "dew_point": "mean",
                 "wind_speed": "mean",
                 "gust_speed": "mean",
-                "wind_dir": "mean",
+                "wind_direction": "mean",
                 # 'water_temp': np.mean,
-                "air_temp": "mean",
+                "temperature": "mean",
             }
         )
         .reset_index()
