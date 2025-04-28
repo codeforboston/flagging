@@ -9,7 +9,7 @@ import pandas as pd
 
 MODEL_YEAR = "2025"
 
-MODEL_THRESHOLD = 410
+MODEL_THRESHOLD = 630
 
 
 def process_data(
