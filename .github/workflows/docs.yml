@@ -17,13 +17,12 @@ jobs:
     - name: Checkout main
       uses: actions/checkout@v4
     - name: Python 3.10 Setup
-      uses: actions/setup-python@v4
+      uses: astral-sh/setup-uv@v5
       with:
         python-version: "3.12"
     - name: Install requirements for docs
       run: |
         sudo apt-get update
-        pip install -U uv
-        uv pip install --system -r docs/requirements.txt
+        uv pip install -r docs/requirements.txt
     - name: Build and deploy docs
       run: mkdocs gh-deploy --force

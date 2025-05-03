@@ -28,17 +28,16 @@ jobs:
           - 6379:6379
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - name: Python Setup
-      uses: actions/setup-python@v2
+      uses: astral-sh/setup-uv@v5
       with:
         python-version: "3.12"
     - name: Install dependencies
       run: |
         sudo apt-get update
         sudo apt-get install libpq-dev
-        pip install --upgrade uv
-        uv pip install --system -r requirements.txt
+        uv pip install -r requirements.txt
     - name: Run pre-commit
       run: pre-commit run -a
     - name: Run Celery worker
