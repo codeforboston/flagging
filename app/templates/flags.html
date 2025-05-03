@@ -36,7 +36,7 @@
     {% include get_widget_filename(version=version) %}
 
     <div class="last-updated">
-        ( Last updated: {{ model_last_updated_time | strftime }} )
+        ( Last updated: {{ model_last_updated_time | strftime("%B %-d, %Y at %-I:%M %p") }} )
     </div>
     <div class="info">
         <a href="{{ url_for('flagging.index', _external=True) }}" target="_blank">Click here for more information.</a>

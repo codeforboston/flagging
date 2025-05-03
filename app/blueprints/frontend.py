@@ -4,6 +4,7 @@ from typing import Any
 from typing import Dict
 
 import pandas as pd
+import pytz
 from flask import Blueprint
 from flask import current_app
 from flask import flash
@@ -67,7 +68,9 @@ def flag_widget_params(force_display: bool = False) -> Dict[str, Any]:
     return dict(
         boathouses=boathouses,
         website_options=website_options,
-        model_last_updated_time=get_latest_prediction_time(),
+        model_last_updated_time=get_latest_prediction_time().astimezone(
+            pytz.timezone("US/Eastern")
+        ),
         boating_season=force_display or website_options.boating_season,
         flagging_message=website_options.rendered_flagging_message,
     )
