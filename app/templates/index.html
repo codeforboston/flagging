@@ -14,7 +14,7 @@
     {% include get_widget_filename() %}
 </div>
 <div class="last-updated">
-    ( Last updated: {{ model_last_updated_time | strftime }} )
+    ( Last updated: {{ model_last_updated_time | strftime("%B %-d, %Y at %-I:%M %p") }} )
 </div>
 <h2>What Do the Flags Mean?</h2>
 <ul class="flag-explanation">
