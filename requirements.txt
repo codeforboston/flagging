@@ -62,7 +62,7 @@ click-repl==0.3.0
     # via celery
 colorama==0.4.6
     # via schemathesis
-coverage==7.8.0
+coverage[toml]==7.8.0
     # via pytest-cov
 debugpy==1.8.14
     # via pytest-celery
@@ -76,7 +76,7 @@ filelock==3.18.0
     # via virtualenv
 flasgger==0.9.7.1
     # via -r requirements.in
-flask==3.1.0
+flask==3.1.1
     # via
     #   -r requirements.in
     #   flasgger
@@ -112,6 +112,8 @@ fqdn==1.5.1
     # via jsonschema
 graphql-core==3.2.6
     # via hypothesis-graphql
+greenlet==3.2.2
+    # via sqlalchemy
 gunicorn==23.0.0
     # via -r requirements.in
 h11==0.14.0
@@ -156,7 +158,7 @@ jinja2==3.1.6
     #   flask
 jsonpointer==3.0.0
     # via jsonschema
-jsonschema==4.23.0
+jsonschema[format]==4.23.0
     # via
     #   flasgger
     #   hypothesis-jsonschema
@@ -177,6 +179,7 @@ markdown-it-py==3.0.0
     # via rich
 markupsafe==3.0.2
     # via
+    #   flask
     #   jinja2
     #   mako
     #   sentry-sdk
@@ -314,12 +317,8 @@ ruff==0.11.6
     # via -r requirements.in
 schemathesis==3.39.15
     # via -r requirements.in
-sentry-sdk==2.26.1
+sentry-sdk[flask]==2.26.1
     # via -r requirements.in
-setuptools==78.1.0
-    # via
-    #   flask-db
-    #   pytest-celery
 six==1.17.0
     # via
     #   flasgger
