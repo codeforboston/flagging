@@ -10,7 +10,6 @@ Create Date: 2022-01-22 17:03:23.094306
 import os
 
 import sqlalchemy as sa
-from sqlalchemy.engine.reflection import Inspector
 
 from alembic import op
 from app.config import QUERIES_DIR
@@ -25,7 +24,7 @@ depends_on = None
 
 def upgrade():
     conn = op.get_bind()
-    inspector = Inspector.from_engine(conn)
+    inspector = sa.inspect(conn)
     tables = inspector.get_table_names()
 
     # Create reach association table

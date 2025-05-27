@@ -17,7 +17,7 @@ from app.admin.views.website_options import WebsiteOptionsModelView
 from app.data.database import db
 
 
-admin = Admin(template_mode="bootstrap4", index_view=AdminIndexView())
+admin = Admin(index_view=AdminIndexView())
 
 
 def init_admin(app: Flask):

@@ -76,11 +76,11 @@ class Config(BaseSettings):
     @property
     def SQLALCHEMY_DATABASE_URI(self) -> str:
         if self.DATABASE_URL:
-            return self.DATABASE_URL.replace("postgres://", "postgresql://")
+            return self.DATABASE_URL.replace("postgres://", "postgresql+psycopg://")
         else:
             return str(
                 MultiHostUrl.build(
-                    scheme="postgresql",
+                    scheme="postgresql+psycopg",
                     username=self.POSTGRES_USER,
                     password=self.POSTGRES_PASSWORD,
                     host=self.POSTGRES_HOST,

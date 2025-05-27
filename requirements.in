@@ -9,7 +9,7 @@
 Celery
 click
 flasgger
-Flask-Admin
+Flask-Admin==v2.0.0a4
 Flask-BasicAuth
 Flask-Caching
 flask-cors
@@ -22,7 +22,7 @@ flower
 Jinja2
 markdown
 pandas
-psycopg2-binary
+psycopg[binary]
 pyarrow
 python-dotenv
 PyYAML
@@ -48,7 +48,7 @@ pytest
 pytest-celery
 pytest-cov
 pytest-env
-pytest-postgresql<4.0.0
+pytest-postgresql
 schemathesis
 
 # ==========================================================
