@@ -47,6 +47,15 @@ def process_data(
     df_hobolink["log_air_temp"] = np.log(np.maximum(df_hobolink["temperature"], 1))
     df_usgs_b["log_gage_height"] = np.log(np.maximum(df_usgs_b["gage_height"], 1))
 
+    # Fill missing data for dew point using the Magnus formula.
+    # Hobolink device is having issues with this field.
+    c = 243.04
+    b = 17.625
+    temp_celsius = (df_hobolink["temperature"] - 32) * 5 / 9
+    gamma = np.log(df_hobolink["rh"] / 100) + (b * temp_celsius) / (c + temp_celsius)
+    dew_point_est = (c * gamma / (b - gamma)) * 9 / 5 + 32
+    df_hobolink["dew_point_est"] = df_hobolink["dew_point"].fillna(dew_point_est)
+
     # Now collapse the data.
     # Take the mean measurements of everything except rain; rain is the sum
     # within an hour. (HOBOlink devices record all rain seen in 10 minutes).
@@ -108,11 +117,6 @@ def process_data(
         df = df.drop(df.index[-1])
 
     # The code from here on consists of feature transformations.
-
-    # for var in x:
-    #     df[f"exp_log_mean_{var}"] = np.exp(
-    #         df[var].rolling(window=12, min_periods=1).apply(lambda x: np.log(x + 1).mean(), raw=True)
-    #     ) - 1
 
     df["geomean_rh_0_to_72h"] = np.exp(np.log(df["rh"]).rolling(72).mean())
     df["geomean_air_temp_0_to_72h"] = np.exp(df["log_air_temp"].rolling(72).mean())
