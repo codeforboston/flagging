@@ -1,0 +1,967 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Guide on developing and deploying the CRWA's flagging website.">
+      
+      
+        <meta name="author" content="Code For Boston">
+      
+      
+        <link rel="canonical" href="https://codeforboston.github.io/flagging/cloud/manual_heroku_deployment/">
+      
+      
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.45">
+    
+    
+      
+        <title>Remote Deployment - CRWA Flagging Website Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.0253249f.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Opens+Sans:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Opens Sans";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="black" data-md-color-accent="cyan">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#remote-deployment" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="CRWA Flagging Website Documentation" class="md-header__button md-logo" aria-label="CRWA Flagging Website Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M48 24C48 10.7 37.3 0 24 0S0 10.7 0 24v464c0 13.3 10.7 24 24 24s24-10.7 24-24V388l80.3-20.1c41.1-10.3 84.6-5.5 122.5 13.4 44.2 22.1 95.5 24.8 141.7 7.4l34.7-13c12.5-4.7 20.8-16.6 20.8-30V66c0-23-24.2-38-44.8-27.7l-9.6 4.8c-46.3 23.2-100.8 23.2-147.1 0-35.1-17.6-75.4-22-113.5-12.5L48 52zm0 77.5 96.6-24.2c27-6.7 55.5-3.6 80.4 8.8 54.9 27.4 118.7 29.7 175 6.8v241.8l-24.4 9.1c-33.7 12.6-71.2 10.7-103.4-5.4-48.2-24.1-103.3-30.1-155.6-17.1L48 338.5z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            CRWA Flagging Website Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Remote Deployment
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/codeforboston/flagging" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    codeforboston/flagging
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="CRWA Flagging Website Documentation" class="md-nav__button md-logo" aria-label="CRWA Flagging Website Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M48 24C48 10.7 37.3 0 24 0S0 10.7 0 24v464c0 13.3 10.7 24 24 24s24-10.7 24-24V388l80.3-20.1c41.1-10.3 84.6-5.5 122.5 13.4 44.2 22.1 95.5 24.8 141.7 7.4l34.7-13c12.5-4.7 20.8-16.6 20.8-30V66c0-23-24.2-38-44.8-27.7l-9.6 4.8c-46.3 23.2-100.8 23.2-147.1 0-35.1-17.6-75.4-22-113.5-12.5L48 52zm0 77.5 96.6-24.2c27-6.7 55.5-3.6 80.4 8.8 54.9 27.4 118.7 29.7 175 6.8v241.8l-24.4 9.1c-33.7 12.6-71.2 10.7-103.4-5.4-48.2-24.1-103.3-30.1-155.6-17.1L48 338.5z"/></svg>
+
+    </a>
+    CRWA Flagging Website Documentation
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/codeforboston/flagging" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    codeforboston/flagging
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Home
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../about/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    About
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../setup/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Setup
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../admin/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Admin
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Cloud
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            Cloud
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Overview
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../twitter_bot/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Twitter Bot
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Development
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            Development
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../development/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Overview
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../development/data/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Data
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../development/predictive_models/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Predictive Models
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../development/frontend/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Front-End
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Development Resources
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            Development Resources
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../development_resources/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Overview
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../development_resources/learning_resources/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Learning Resources
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../development_resources/shell/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Shell
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#first-time-deployment" class="md-nav__link">
+    <span class="md-ellipsis">
+      First Time Deployment
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#subsequent-deployments" class="md-nav__link">
+    <span class="md-ellipsis">
+      Subsequent Deployments
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#staging-and-production-split" class="md-nav__link">
+    <span class="md-ellipsis">
+      Staging and Production Split
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#updating-the-database-schema" class="md-nav__link">
+    <span class="md-ellipsis">
+      Updating the database schema
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+  
+
+
+<h1 id="remote-deployment">Remote Deployment</h1>
+<details class="warning" open="open">
+<summary>Warning</summary>
+<p><strong>This guide is outdated now that one-click deployment is available!</strong></p>
+</details>
+<details class="warning" open="open">
+<summary>Warning</summary>
+<p>This guide is missing the Redis caching setup, and may miss other things as we build out.</p>
+</details>
+<p>The following tools are required to deploy the website:</p>
+<ul>
+<li><a href="https://devcenter.heroku.com/articles/heroku-cli">Heroku CLI</a></li>
+<li><a href="https://git-scm.com/book/en/v2/Getting-Started-Installing-Git">Git</a></li>
+</ul>
+<p>Additionally, you will have to have set up the website locally to deploy to Heroku, notably including setting up the Postgres database.</p>
+<details class="tip" open="open">
+<summary>Tip</summary>
+<p>Read the <a href="../setup">setup guide</a> to learn how to run the website locally.</p>
+</details>
+<h2 id="first-time-deployment">First Time Deployment</h2>
+<details class="note" open="open">
+<summary>Note</summary>
+<p>In this section, the project name is assumed to be <code>crwa-flagging</code>. If you are deploying to another URL, such as <code>crwa-flagging-staging</code> or a personal domain, then replace each reference to <code>crwa-flagging</code> with that.</p>
+</details>
+<p>If you've never deployed the app from your computer, follow these instructions.</p>
+<ol>
+<li>If you have not already done so, follow the <a href="../setup">setup guide</a>. The following should now be true:</li>
+</ol>
+<ul>
+<li>Your terminal is pointed to the root directory of the project <code>/flagging</code>.</li>
+<li>You should have the HOBOlink credentials ready in a <code>.env</code> file.</li>
+<li>The Postgres database should be set up and up-to-date locally.</li>
+<li>Your Heroku account needs to be "verified," which means it needs to have a valid credit card registered to it. Registering a credit card does not incur any charges on its own. See <a href="https://devcenter.heroku.com/categories/billing">here</a> for Heroku's billing page for more information.</li>
+</ul>
+<details class="tip" open="open">
+<summary>Tip</summary>
+<p>If you are especially weary of cloud costs, you can plug a prepaid credit card in with a small nominal amount for the balance. See <a href="https://help.heroku.com/U32408KR/does-heroku-support-pre-paid-credit-cards-for-billing-and-account-verification">here</a> for more.</p>
+</details>
+<ol start="2">
+<li>Via the command line: login to Heroku, and add Heroku as a remote repo using Heroku's CLI:</li>
+</ol>
+<div class="highlight"><pre><span></span><code>heroku<span class="w"> </span>login
+heroku<span class="w"> </span>git:remote<span class="w"> </span>-a<span class="w"> </span>crwa-flagging
+</code></pre></div>
+<ol start="3">
+<li>Add the vault password as an environment variable to Heroku.</li>
+</ol>
+<div class="highlight"><pre><span></span><code>heroku<span class="w"> </span>config:set<span class="w"> </span><span class="nv">VAULT_PASSWORD</span><span class="o">=</span>vault_password_goes_here<span class="w"> </span>-a<span class="w"> </span>crwa-flagging
+</code></pre></div>
+<ol start="4">
+<li>You need to setup the <code>FLASK_ENV</code> and <code>FLASK_APP</code> environment variables. These are mainly used for the scheduler and other potential add-ons.</li>
+</ol>
+<div class="highlight"><pre><span></span><code>heroku<span class="w"> </span>config:set<span class="w"> </span><span class="nv">FLASK_ENV</span><span class="o">=</span>production<span class="w"> </span>-a<span class="w"> </span>crwa-flagging
+heroku<span class="w"> </span>config:set<span class="w"> </span><span class="nv">FLASK_APP</span><span class="o">=</span><span class="s2">&quot;app.main:create_app&quot;</span><span class="w"> </span>-a<span class="w"> </span>crwa-flagging
+</code></pre></div>
+<ol start="5">
+<li>Add a <code>BASIC_AUTH_USERNAME</code> and <code>BASIC_AUTH_PASSWORD</code> for the admin panel. The username can be whatever you want; e.g. <code>admin</code> does the trick. The password should be hard to guess.</li>
+</ol>
+<div class="highlight"><pre><span></span><code>heroku<span class="w"> </span>config:set<span class="w"> </span><span class="nv">BASIC_AUTH_USERNAME</span><span class="o">=</span>admin<span class="w"> </span>-a<span class="w"> </span>crwa-flagging
+heroku<span class="w"> </span>config:set<span class="w"> </span><span class="nv">BASIC_AUTH_PASSWORD</span><span class="o">=</span>admin_password_goes_here<span class="w"> </span>-a<span class="w"> </span>crwa-flagging
+</code></pre></div>
+<details class="danger" open="open">
+<summary>Danger</summary>
+<p>The password should be <em>unique</em> to this platform, not a universal password you use for everything. The password is <em>not</em> encrypted when stoerd, and it is visible to anyone who has access to the Heroku dashboard.</p>
+</details>
+<ol start="6">
+<li>Add some Heroku add-ons.</li>
+</ol>
+<div class="highlight"><pre><span></span><code>heroku<span class="w"> </span>addons:create<span class="w"> </span>scheduler<span class="w"> </span>-a<span class="w"> </span>crwa-flagging
+heroku<span class="w"> </span>addons:create<span class="w"> </span>heroku-postgresql<span class="w"> </span>-a<span class="w"> </span>crwa-flagging
+</code></pre></div>
+<details class="success" open="open">
+<summary>Success</summary>
+<p>Pay attention to the last line of output:</p>
+<div class="highlight"><pre><span></span><code>Creating heroku-postgresql on ⬢ crwa-flagging... free
+Database has been created and is available
+ ! This database is empty. If upgrading, you can transfer
+ ! data from another database with pg:copy
+Created postgresql-ukulele-12345 as DATABASE_URL
+</code></pre></div>
+<p>In the above case, <code>postgresql-ukulele-12345</code> is the "name" of the PostgreSQL add-on's dyno. We will be using this name in the next step.</p>
+</details>
+<ol start="7">
+<li>Push your local copy of the flagging database to the cloud. In the following command, replace <code>postgresql-ukulele-12345</code> with whatever the name of your PostgreSQL dyno is, which should have output from the previous step.</li>
+</ol>
+<div class="highlight"><pre><span></span><code>heroku<span class="w"> </span>pg:push<span class="w"> </span>flagging<span class="w"> </span>postgresql-ukulele-12345<span class="w"> </span>-a<span class="w"> </span>crwa-flagging
+</code></pre></div>
+<details class="note" open="open">
+<summary>Note</summary>
+<p>The above command assumes that your local Postgres database is up-to-date.</p>
+</details>
+<ol start="8">
+<li>Deploy the app.</li>
+</ol>
+<div class="highlight"><pre><span></span><code>git<span class="w"> </span>push<span class="w"> </span>heroku<span class="w"> </span>master
+</code></pre></div>
+<ol start="9">
+<li>Now try the following:</li>
+</ol>
+<div class="highlight"><pre><span></span><code>heroku<span class="w"> </span>logs<span class="w"> </span>--tail<span class="w"> </span>-a<span class="w"> </span>crwa-flagging
+</code></pre></div>
+<ol start="10">
+<li>If everything worked out, you should see the following at or near the bottom of the log:</li>
+</ol>
+<div class="highlight"><pre><span></span><code>2020-06-13T23:17:54.000000+00:00 app[api]: Build succeeded
+</code></pre></div>
+<details class="note" open="open">
+<summary>Note</summary>
+<p>If you see instead see something like <code>[...] State changed from starting to crashed</code>, then read the rest of the output to see what happened. The most common error when deploying to production will be a <code>RuntimeError: Unable to load the vault; bad password provided</code> which is self-explanatory. Update the password, and the website will automatically attempt to redeploy. If you don't see that error, then try to self-diagnose.</p>
+</details>
+<ol start="11">
+<li>
+<p>Go see the website for yourself!</p>
+</li>
+<li>
+<p>You are still not done; you need to do one more step, which is to set up the task scheduler. Run the following command:</p>
+</li>
+</ol>
+<div class="highlight"><pre><span></span><code>heroku<span class="w"> </span>addons:open<span class="w"> </span>scheduler<span class="w"> </span>-a<span class="w"> </span>crwa-flagging
+</code></pre></div>
+<ol start="13">
+<li>The above command should open up a new window in your browser that lets you add a command that runs on a schedule. That command you set should be <code>python3 -m flask update-website</code>, and you should run it once a day at 11:00 AM UTC:</li>
+</ol>
+<p><img alt="" src="../../img/scheduler_config.png" /></p>
+<details class="tip" open="open">
+<summary>Tip</summary>
+<p>If you want to have the website update more than once a day, it's probably better to run multiple scheduled jobs that run the same command on 24 hour intervals than it is to run a single scheduled job on hourly intervals.</p>
+</details>
+<details class="note" open="open">
+<summary>Note</summary>
+<p>The <code>update-website</code> command sends out a Tweet as well as re-running the predictive model. You can make the scheduled task only update the website without sending a tweet by replacing <code>update-website</code> with <code>update-db</code>.</p>
+</details>
+<h2 id="subsequent-deployments">Subsequent Deployments</h2>
+<ol>
+<li>Heroku doesn't allow you to redeploy the website unless you create a new commit. Add some updates if you need to with <code>git add .</code> then <code>git commit -m "describe your changes here"</code>.</li>
+</ol>
+<details class="note" open="open">
+<summary>Note</summary>
+<p>In the <em>very</em> rare case you simply need to redeploy without making any changes to the site, in lieu of the above, simply do <code>git commit --allow-empty -m "redeploy"</code>.</p>
+</details>
+<ol start="2">
+<li>Once you have done that, Heroku will redeploy the site when you merge your working branch:</li>
+</ol>
+<div class="highlight"><pre><span></span><code>git<span class="w"> </span>push<span class="w"> </span>heroku<span class="w"> </span>master
+</code></pre></div>
+<details class="tip" open="open">
+<summary>Tip</summary>
+<p>If you are having any issues here related to merge conflicts, instead of deleting everything and starting over, try to pull the data from the <code>heroku</code> branch in and merge it into your local branch.</p>
+<div class="highlight"><pre><span></span><code>git<span class="w"> </span>fetch<span class="w"> </span>heroku
+git<span class="w"> </span>pull<span class="w"> </span>heroku<span class="w"> </span>master
+</code></pre></div>
+</details>
+<ol start="3">
+<li>If you make any changes that affect the database, you should create the database locally, and then push it to the cloud, similar to the step above where we push the database for the first time. Note that updating the database this way requires that you reset it first.</li>
+</ol>
+<div class="highlight"><pre><span></span><code>heroku<span class="w"> </span>pg:reset<span class="w"> </span>-a<span class="w"> </span>crwa-flagging
+heroku<span class="w"> </span>pg:push<span class="w"> </span>flagging<span class="w"> </span>postgresql-ukulele-12345<span class="w"> </span>-a<span class="w"> </span>crwa-flagging
+</code></pre></div>
+<h2 id="staging-and-production-split">Staging and Production Split</h2>
+<p>It is recommended, though not required, that you have both "staging" and "production" environments for the website (see <a href="https://en.wikipedia.org/wiki/Deployment_environment#Staging">here</a> for an explanation), and furthermore it is recommended you deploy to staging and play around with the website to see if it looks right before you ever deploy to production.</p>
+<p>Managing effectively two separate Heroku apps from a single repository requires a bit of knowledge about how git works. Basically what you're doing is connecting to two separate remote git repositories. The default remote repo is called <code>heroku</code> and it was created by Heroku's CLI. But since you now have two Heroku remote repositories, the Heroku CLI doesn't know what it's supposed to name the 2nd one. So you have to manually name it using git.</p>
+<ol>
+<li>Run the following command to create a staging environment if it does not already exist.</li>
+</ol>
+<div class="highlight"><pre><span></span><code>heroku<span class="w"> </span>create<span class="w"> </span>crwa-flagging-staging
+</code></pre></div>
+<ol start="2">
+<li>Once it exists, add the staging environment as a remote; check to make sure all the remotes look right. The <code>heroku</code> remote should correspond with the production environment, and the <code>staging</code> remote should correspond with the staging environment you just created.</li>
+</ol>
+<div class="highlight"><pre><span></span><code>git<span class="w"> </span>remote<span class="w"> </span>add<span class="w"> </span>staging<span class="w"> </span>https://git.heroku.com/crwa-flagging-staging.git
+git<span class="w"> </span>remote<span class="w"> </span>-v
+</code></pre></div>
+<details class="success" open="open">
+<summary>Success</summary>
+<p>The above command should output something like this:</p>
+<div class="highlight"><pre><span></span><code>heroku  https://git.heroku.com/crwa-flagging.git (fetch)
+heroku  https://git.heroku.com/crwa-flagging.git (push)
+origin  https://github.com/YOUR_USERNAME_HERE/flagging.git (fetch)
+origin  https://github.com/YOUR_USERNAME_HERE/flagging.git (push)
+staging https://git.heroku.com/crwa-flagging-staging.git (fetch)
+staging https://git.heroku.com/crwa-flagging-staging.git (push)
+upstream        https://github.com/codeforboston/flagging.git (fetch)
+upstream        https://github.com/codeforboston/flagging.git (push)
+</code></pre></div>
+</details>
+<ol start="3">
+<li>
+<p>Now all of your <code>heroku</code> commands are going to require specifying this new app instance, but the steps to deploy in staging are otherwise similar to the production deployment, with the exception of <code>git push heroku master</code>.</p>
+</li>
+<li>
+<p>Deployment via git requires pushing to the new remote like so:</p>
+</li>
+</ol>
+<div class="highlight"><pre><span></span><code>git push staging master
+</code></pre></div>
+<h2 id="updating-the-database-schema">Updating the database schema</h2>
+<p>We do not use Alembic or any other tools to handle database migrations. Our database is relatively simple and does not store information that cannot be trivially rewritten, so we can migrate to a new database schema by simply creating the new database locally and completely overwriting the database in production.</p>
+<p>Here are the steps to do that:</p>
+<ol>
+<li>Make your changes to the database schema, then initialize the database again.</li>
+</ol>
+<div class="highlight"><pre><span></span><code>flask<span class="w"> </span>create-db<span class="w"> </span>--overwrite
+flask<span class="w"> </span>init-db
+</code></pre></div>
+<ol start="2">
+<li>Reset the database. You'll be asked if you're sure you want to reset, and go through that prompt.</li>
+</ol>
+<div class="highlight"><pre><span></span><code>heroku<span class="w"> </span>pg:reset<span class="w"> </span>-a<span class="w"> </span>crwa-flagging
+</code></pre></div>
+<ol start="3">
+<li>Now push the new database:</li>
+</ol>
+<div class="highlight"><pre><span></span><code>heroku<span class="w"> </span>pg:push<span class="w"> </span>flagging<span class="w"> </span>DATABASE<span class="w"> </span>-a<span class="w"> </span>crwa-flagging
+</code></pre></div>
+<details class="note" open="open">
+<summary>Note</summary>
+<p>Unless there's an emergency, it's recommended you do something like this either late at night, or even better when it's no longer boating season.</p>
+</details>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        <div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/codeforboston/flagging" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8M97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://www.meetup.com/Code-for-Boston/" target="_blank" rel="noopener" title="www.meetup.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M99 414.3c1.1 5.7-2.3 11.1-8 12.3-5.4 1.1-10.9-2.3-12-8-1.1-5.4 2.3-11.1 7.7-12.3s11.1 2.3 12.3 8m143.1 71.4c-6.3 4.6-8 13.4-3.7 20 4.6 6.6 13.4 8.3 20 3.7 6.3-4.6 8-13.4 3.4-20-4.2-6.5-13.1-8.3-19.7-3.7m-86-462.3c6.3-1.4 10.3-7.7 8.9-14-1.1-6.6-7.4-10.6-13.7-9.1-6.3 1.4-10.3 7.7-9.1 14 1.4 6.6 7.6 10.6 13.9 9.1M34.4 226.3c-10-6.9-23.7-4.3-30.6 6-6.9 10-4.3 24 5.7 30.9 10 7.1 23.7 4.6 30.6-5.7 6.9-10.4 4.3-24.1-5.7-31.2m272-170.9c10.6-6.3 13.7-20 7.7-30.3-6.3-10.6-19.7-14-30-7.7s-13.7 20-7.4 30.6c6 10.3 19.4 13.7 29.7 7.4m-191.1 58c7.7-5.4 9.4-16 4.3-23.7s-15.7-9.4-23.1-4.3c-7.7 5.4-9.4 16-4.3 23.7 5.1 7.8 15.6 9.5 23.1 4.3m372.3 156c-7.4 1.7-12.3 9.1-10.6 16.9 1.4 7.4 8.9 12.3 16.3 10.6 7.4-1.4 12.3-8.9 10.6-16.6-1.5-7.4-8.9-12.3-16.3-10.9m39.7-56.8c-1.1-5.7-6.6-9.1-12-8-5.7 1.1-9.1 6.9-8 12.6 1.1 5.4 6.6 9.1 12.3 8 5.4-1.5 9.1-6.9 7.7-12.6M447 138.9c-8.6 6-10.6 17.7-4.9 26.3s17.4 10.6 26 4.9c8.3-6 10.3-17.7 4.6-26.3-5.7-8.7-17.4-10.9-25.7-4.9m-6.3 139.4c26.3 43.1 15.1 100-26.3 129.1-17.4 12.3-37.1 17.7-56.9 17.1-12 47.1-69.4 64.6-105.1 32.6-1.1.9-2.6 1.7-3.7 2.9-39.1 27.1-92.3 17.4-119.4-22.3-9.7-14.3-14.6-30.6-15.1-46.9-65.4-10.9-90-94-41.1-139.7-28.3-46.9.6-107.4 53.4-114.9C151.6 70 234.1 38.6 290.1 82c67.4-22.3 136.3 29.4 130.9 101.1 41.1 12.6 52.8 66.9 19.7 95.2m-70 74.3c-3.1-20.6-40.9-4.6-43.1-27.1-3.1-32 43.7-101.1 40-128-3.4-24-19.4-29.1-33.4-29.4-13.4-.3-16.9 2-21.4 4.6-2.9 1.7-6.6 4.9-11.7-.3-6.3-6-11.1-11.7-19.4-12.9-12.3-2-17.7 2-26.6 9.7-3.4 2.9-12 12.9-20 9.1-3.4-1.7-15.4-7.7-24-11.4-16.3-7.1-40 4.6-48.6 20-12.9 22.9-38 113.1-41.7 125.1-8.6 26.6 10.9 48.6 36.9 47.1 11.1-.6 18.3-4.6 25.4-17.4 4-7.4 41.7-107.7 44.6-112.6 2-3.4 8.9-8 14.6-5.1 5.7 3.1 6.9 9.4 6 15.1-1.1 9.7-28 70.9-28.9 77.7-3.4 22.9 26.9 26.6 38.6 4 3.7-7.1 45.7-92.6 49.4-98.3 4.3-6.3 7.4-8.3 11.7-8 3.1 0 8.3.9 7.1 10.9-1.4 9.4-35.1 72.3-38.9 87.7-4.6 20.6 6.6 41.4 24.9 50.6 11.4 5.7 62.5 15.7 58.5-11.1m5.7 92.3c-10.3 7.4-12.9 22-5.7 32.6 7.1 10.6 21.4 13.1 32 6 10.6-7.4 13.1-22 6-32.6-7.4-10.6-21.7-13.5-32.3-6"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://twitter.com/codeforboston" target="_blank" rel="noopener" title="twitter.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M459.37 151.716c.325 4.548.325 9.097.325 13.645 0 138.72-105.583 298.558-298.558 298.558-59.452 0-114.68-17.219-161.137-47.106 8.447.974 16.568 1.299 25.34 1.299 49.055 0 94.213-16.568 130.274-44.832-46.132-.975-84.792-31.188-98.112-72.772 6.498.974 12.995 1.624 19.818 1.624 9.421 0 18.843-1.3 27.614-3.573-48.081-9.747-84.143-51.98-84.143-102.985v-1.299c13.969 7.797 30.214 12.67 47.431 13.319-28.264-18.843-46.781-51.005-46.781-87.391 0-19.492 5.197-37.36 14.294-52.954 51.655 63.675 129.3 105.258 216.365 109.807-1.624-7.797-2.599-15.918-2.599-24.04 0-57.828 46.782-104.934 104.934-104.934 30.213 0 57.502 12.67 76.67 33.137 23.715-4.548 46.456-13.32 66.599-25.34-7.798 24.366-24.366 44.833-46.132 57.827 21.117-2.273 41.584-8.122 60.426-16.243-14.292 20.791-32.161 39.308-52.628 54.253"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../..", "features": [], "search": "../../assets/javascripts/workers/search.6ce7567c.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.83f73b43.min.js"></script>
+      
+    
+  </body>
+</html>
