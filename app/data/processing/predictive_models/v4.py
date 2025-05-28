@@ -54,7 +54,7 @@ def process_data(
     temp_celsius = (df_hobolink["temperature"] - 32) * 5 / 9
     gamma = np.log(df_hobolink["rh"] / 100) + (b * temp_celsius) / (c + temp_celsius)
     dew_point_est = (c * gamma / (b - gamma)) * 9 / 5 + 32
-    df_hobolink["dew_point_est"] = df_hobolink["dew_point"].fillna(dew_point_est)
+    df_hobolink["dew_point"] = df_hobolink["dew_point"].fillna(dew_point_est)
 
     # Now collapse the data.
     # Take the mean measurements of everything except rain; rain is the sum
