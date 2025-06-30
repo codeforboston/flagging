@@ -16,7 +16,7 @@ from tenacity import wait_fixed
 from app.mail import mail_on_fail
 
 
-BASE_URL = "https://api.hobolink.licor.cloud"
+BASE_URL = "https://api.licor.cloud"
 HOBOLINK_ROWS_PER_HOUR = 12
 HOBOLINK_STATIC_FILE_NAME = ""
 
