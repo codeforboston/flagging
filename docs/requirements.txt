@@ -92,7 +92,7 @@ super-collections==0.5.3
     # via mkdocs-macros-plugin
 termcolor==2.5.0
     # via mkdocs-macros-plugin
-urllib3==2.2.3
+urllib3==2.6.0
     # via requests
 watchdog==6.0.0
     # via mkdocs
