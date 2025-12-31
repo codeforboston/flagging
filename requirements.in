@@ -49,7 +49,7 @@ pytest-celery
 pytest-cov
 pytest-env
 pytest-postgresql
-schemathesis
+schemathesis<4
 
 # ==========================================================
 # Misc. dev stuff
