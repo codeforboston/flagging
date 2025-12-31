@@ -19,7 +19,7 @@ jobs:
     - name: Python 3.10 Setup
       uses: astral-sh/setup-uv@v5
       with:
-        python-version: "3.12"
+        python-version: "3.13"
     - name: Install requirements for docs
       run: |
         sudo apt-get update
