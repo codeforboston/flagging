@@ -72,7 +72,7 @@ docker==7.1.0
     # via
     #   pytest-celery
     #   pytest-docker-tools
-filelock==3.18.0
+filelock==3.20.3
     # via virtualenv
 flasgger==0.9.7.1
     # via -r requirements.in
