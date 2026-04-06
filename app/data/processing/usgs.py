@@ -8,6 +8,8 @@ Muddy River: https://waterdata.usgs.gov/nwis/uv?site_no=01104683
 """
 
 import os
+from datetime import datetime
+from datetime import timedelta
 from typing import Union
 
 import pandas as pd
@@ -22,8 +24,9 @@ from app.mail import mail_on_fail
 
 
 USGS_URL = "https://waterdata.usgs.gov/nwis/uv"
+NEW_USGS_URL = "https://waterservices.usgs.gov/nwis/iv/"
 USGS_STATIC_FILE_NAME = "usgs.pickle"
-USGS_DEFAULT_DAYS_AGO = 30
+USGS_DEFAULT_DAYS_AGO = 100
 USGS_ROWS_PER_HOUR_WALTHAM = 4
 USGS_ROWS_PER_HOUR_MUDDY_RIVER = 6
 
@@ -48,6 +51,7 @@ def get_live_usgs_data(
         return df
 
     res = request_to_usgs(days_ago=days_ago, site_no=site_no)
+
     df = parse_usgs_data(res, site_no=site_no)
     return df
 
@@ -62,12 +66,16 @@ def request_to_usgs(days_ago: int = 14, site_no: str = "01104500") -> requests.m
     Returns:
         Request Response containing the data from the request.
     """
+
+    """Replaced this code with the new calling sequence for USGS data April 2026
     # if site is waltham, takes both gage height and flow discharge,
     # otherwise, only takes gage height
+
     if site_no == "01104500":
         additional_feature = "on"
     else:
         additional_feature = "off"
+
 
     payload = {
         "cb_00060": additional_feature,
@@ -78,6 +86,27 @@ def request_to_usgs(days_ago: int = 14, site_no: str = "01104500") -> requests.m
     }
 
     res = requests.get(USGS_URL, params=payload)
+    """
+
+    # New code April 2026
+
+    today = datetime.now().date()
+    delta_days_ago = today - timedelta(days=days_ago)
+
+    start_date_str = delta_days_ago.strftime("%Y-%m-%d")
+    end_date_str = today.strftime("%Y-%m-%d")
+
+    payload = {
+        "sites": site_no,
+        "parameterCd": "00060,00065",
+        "format": "rdb",
+        "startDT": start_date_str,
+        "endDT": end_date_str,
+    }
+
+    res = requests.get(NEW_USGS_URL, params=payload)
+    ###
+
     if res.status_code >= 400:
         error_msg = (
             "API request to the USGS endpoint failed with status " f"code {res.status_code}."
@@ -118,11 +147,14 @@ def parse_usgs_data(res: Union[str, requests.models.Response], site_no: str) -> 
     if site_no not in column_map:
         raise ValueError(f"Unknown site number {site_no}. Cannot map columns.")
     df = df.rename(columns=column_map[site_no])
-
     df = df[list(column_map[site_no].values())]
 
     # Convert types
-    df["time"] = pd.to_datetime(df["time"]).dt.tz_localize("US/Eastern").dt.tz_convert("UTC")
+    df["time"] = (
+        pd.to_datetime(df["time"])
+        .dt.tz_localize("US/Eastern", ambiguous="NaT")
+        .dt.tz_convert("UTC")
+    )
     # Note to self: ran this once in a test and it gave the following error:
     # >>> ValueError: could not convert string to float: ''
     # Reran and it went away
@@ -130,5 +162,6 @@ def parse_usgs_data(res: Union[str, requests.models.Response], site_no: str) -> 
 
     numeric_columns = set(column_map[site_no].values()) - {"time"}  # All columns except "time"
     for col in numeric_columns:
-        df[col] = df[col].replace("", None).astype(float)
+        df[col] = df[col].replace("", None).replace("Ice", None).astype(float)
+
     return df

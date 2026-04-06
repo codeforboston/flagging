@@ -116,6 +116,7 @@ class DownloadView(BaseView):
         # The reason it's OK in this case is because users don't touch it.
         # However it is dangerous to do this in some other contexts.
         query = f"""SELECT * FROM {sql_table_name}"""
+        # query = f"""SELECT * FROM prediction"""
         try:
             df = execute_sql(query)
         except ProgrammingError:

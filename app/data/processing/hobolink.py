@@ -29,6 +29,7 @@ HOBOLINK_STATIC_FILE_NAME = ""
 def get_live_hobolink_data(
     start_date: datetime | None = None,
     end_date: datetime | None = None,
+    # When this value was 50, Hobolink wasn't returning Temperature.  Change to 30 Apri 2026
     days_ago: int = 30,
     loggers: str | None = None,
     exclude_sensors: list[str] | None = None,
@@ -73,9 +74,9 @@ def request_to_hobolink(
     data: list[dict[str, Any]] = []
 
     start_date_for_req = start_date
-    end_date_for_req = min(start_date + pagination_delta, end_date)
+    # end_date_for_req = min(start_date + pagination_delta, end_date)
+    end_date_for_req = end_date
     half_interval = False
-
     while True:
         res = requests.get(
             urljoin(BASE_URL, "/v1/data"),

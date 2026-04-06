@@ -28,7 +28,6 @@ def process_data(
     df_hobolink = df_hobolink.copy()
     df_usgs_w = df_usgs_w.copy()
     df_usgs_b = df_usgs_b.copy()
-
     # Cast to datetime type.
     # When this comes from Celery, it might be a string.
     df_hobolink["time"] = pd.to_datetime(df_hobolink["time"])
@@ -55,7 +54,6 @@ def process_data(
     gamma = np.log(df_hobolink["rh"] / 100) + (b * temp_celsius) / (c + temp_celsius)
     dew_point_est = (c * gamma / (b - gamma)) * 9 / 5 + 32
     df_hobolink["dew_point"] = df_hobolink["dew_point"].fillna(dew_point_est)
-
     # Now collapse the data.
     # Take the mean measurements of everything except rain; rain is the sum
     # within an hour. (HOBOlink devices record all rain seen in 10 minutes).
@@ -97,7 +95,6 @@ def process_data(
         )
         .reset_index()
     )
-
     # This is an outer join to include all the data (we collect more Hobolink
     # data than USGS data). With that said, for the most recent value, we need
     # to make sure one of the sources didn't update before the other one did.
