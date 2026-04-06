@@ -1,0 +1,80 @@
+1. start docker
+2. anaconda
+3. fdb.bat
+4. flask.bat
+5. In Flask:
+from app.data.processing.fetch_calculate_and_output import fetch_and_output
+begin_date = "2025-07-02"
+end_date = "2025-08-01"
+fetch_and_output(begin_date, end_date)
+
+
+query = f"""SELECT * FROM predictions"""
+df.to_csv("prediction.csv")
+
+import importlib
+importlib.reload(parse_usgs_data)
+flask code to extract
+
+import requests
+from app.data.processing.hobolink import get_live_hobolink_data
+from app.data.processing.predictive_models import v4
+from app.data.processing.usgs import parse_usgs_data
+
+from datetime import datetime
+
+This section was attempting to build an extract that exactly matched the date/time of the model (legacy) extract.
+Turns out that the stream flow calculations are not sensitive to the date range -- all the aggregation in the code is to collect all samples for one day.  I have concluded that the flow data that the USGS API now provides is slightly different than the legacy extract.
+
+begin_date = "2025-07-02 13:00:00"
+end_date = "2025-08-01 12:00:00"
+u_begin_date = "2025-07-02T13:00-04:00"
+u_end_date = "2025-08-01T12:00-04:00"
+begin_date = "2025-07-02"
+end_date = "2025-08-01"
+
+d_begin_date = datetime.strptime(begin_date, "%Y-%m-%d")
+d_begin_date = datetime.strptime(begin_date, "%Y-%m-%d %H:%M:%S")
+d_end_date = datetime.strptime(end_date, "%Y-%m-%d %H:%M:%S")
+d_end_date = datetime.strptime(end_date, "%Y-%m-%d")
+
+df_hobolink = get_live_hobolink_data(start_date = d_begin_date, end_date = d_end_date)
+
+res_w = requests.get("https://nwis.waterdata.usgs.gov/usa/nwis/uv/", params={"cb_00060": "on", "cb_00065": "on", "format": "rdb", "site_no": "01104500", "legacy": "1", "period": "", "begin_date": u_begin_date, "end_date": u_end_date})
+
+
+res_b = requests.get("https://nwis.waterdata.usgs.gov/usa/nwis/uv/", params={"cb_00045": "off", "cb_00065": "on", "format": "rdb", "site_no": "01104683", "legacy": "1", "period": "", "begin_date": u_begin_date, "end_date": u_end_date})
+
+
+df_usgs_w = parse_usgs_data(res_w,site_no="01104500" )
+
+
+df_usgs_b = parse_usgs_data(res_b, site_no="01104683")
+
+df_combined = v4.process_data(df_hobolink=df_hobolink, df_usgs_w=df_usgs_w, df_usgs_b=df_usgs_b)
+df_predictions = v4.all_models(df_combined)
+
+df_combined.to_csv(f"{begin_date} - {end_date}-combined.csv", index=False)
+df_predictions.to_csv(f"{begin_date} - {end_date}-predictions.csv", index=False)
+
+df_usgs_w.to_csv(f"{begin_date} - {end_date}-usgs_w.csv", index=False)
+df_usgs_b.to_csv(f"{begin_date} - {end_date}-usgs_b.csv", index=False)
+df_hobolink.to_csv(f"{begin_date} - {end_date}-hobolink.csv", index=False)
+
+This is the recommendation from Claude to reduce the SSL errors.  "Solution 1: Use the newer waterservices endpoint (recommended)"
+
+res_w = requests.get("https://waterservices.usgs.gov/nwis/iv/", params={"sites": "01104500","parameterCd": "00060,00065", "startDT": u_begin_date, "endDT": u_end_date,"format": "rdb"})
+
+
+res_b = requests.get("https://waterservices.usgs.gov/nwis/iv/",params={"sites": "01104683","parameterCd": "00065", "startDT": u_begin_date, "endDT": u_end_date,"format": "rdb"})
+
+
+2. TO start flask shell:
+docker compose run web flask shell
+
+
+
+from app.data.processing.fetch_calculate_and_output import fetch_and_output
+begin_date = "2025-05-01"
+end_date = "2025-06-04"
+fetch_and_output(begin_date, end_date)
